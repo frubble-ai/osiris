@@ -1,0 +1,20 @@
+# Local dependencies: osiris's own Postgres, on 5433 so it runs beside the app's on 5432.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: osiris
+      POSTGRES_PASSWORD: osiris_dev
+      POSTGRES_DB: osiris
+    ports:
+      - "5433:5432"
+    volumes:
+      - osiris-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U osiris -d osiris"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  osiris-postgres:
