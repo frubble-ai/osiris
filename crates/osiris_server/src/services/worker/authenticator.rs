@@ -11,7 +11,7 @@ use osiris_tasks::{TaskAuthenticator, adapters::bearer::BearerAuthenticator};
 use std::{sync::Arc, time::Duration};
 
 pub fn authenticator(config: &Config) -> anyhow::Result<Arc<dyn TaskAuthenticator>> {
-    Ok(match &config.tasks {
+    Ok(match &config.integrations.tasks {
         TasksConfig::CloudTasks(cloud) => Arc::new(OidcAuthenticator::new(
             OidcConfig {
                 keys_url: GOOGLE_KEYS_URL.to_owned(),

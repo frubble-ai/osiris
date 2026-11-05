@@ -2,7 +2,9 @@
 //! the environment. The database values only satisfy the type: a test runs on the pool its
 //! `#[sqlx::test]` gives it.
 
-use crate::config::{Config, DatabaseConfig, Settings, TasksConfig};
+use crate::config::{
+    Config, DatabaseConfig, Settings, TasksConfig, integrations::IntegrationsConfig,
+};
 use osiris_common::secret::secret;
 use osiris_pubsub::PubSubConfig;
 
@@ -23,14 +25,16 @@ pub fn build_test_config() -> Config {
         },
         encryption_key: secret("a-test-secret-that-is-long-enough-for-osiris"),
         public_url: PUBLIC_URL.into(),
-        events: PubSubConfig {
-            project: "osiris-test".into(),
-            events_topic: "osiris-events".into(),
-            emulator_host: None,
-        },
-        tasks: TasksConfig::Local {
-            handler_url: "http://worker.test/tasks".into(),
-            token: secret(super::WORKER_TOKEN),
+        integrations: IntegrationsConfig {
+            events: PubSubConfig {
+                project: "osiris-test".into(),
+                events_topic: "osiris-events".into(),
+                emulator_host: None,
+            },
+            tasks: TasksConfig::Local {
+                handler_url: "http://worker.test/tasks".into(),
+                token: secret(super::WORKER_TOKEN),
+            },
         },
         settings,
     }

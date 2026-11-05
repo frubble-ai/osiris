@@ -1,8 +1,8 @@
 //! Which task scheduler runs osiris's scheduled tasks, set by `OSIRIS_TASKS`: `cloud_tasks` when
-//! deployed, `local` in development. Only this file and `services/build.rs` know which one is
-//! used; the core only sees the `TaskScheduler` trait.
+//! deployed, `local` in development, and each one's own configuration. `build_use_case_context`
+//! builds the chosen one; the use cases only see the `TaskScheduler` trait.
 
-use super::env_vars::{optional, required, secret};
+use crate::config::env_vars::{optional, required, secret};
 use anyhow::bail;
 use osiris_cloud_tasks::CloudTasksConfig;
 

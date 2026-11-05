@@ -3,11 +3,11 @@
 //! published, which scheduler runs tasks). It reaches the use cases as `ctx.config`.
 
 use super::{
-    DatabaseConfig, Settings, TasksConfig,
-    env_vars::{optional, required, secret},
+    DatabaseConfig, Settings,
+    env_vars::{required, secret},
+    integrations::IntegrationsConfig,
 };
 use osiris_common::secret::Secret;
-use osiris_pubsub::PubSubConfig;
 
 #[derive(Clone)]
 pub struct Config {
@@ -17,9 +17,8 @@ pub struct Config {
     pub encryption_key: Secret,
     /// Osiris's own public origin, where providers send the browser back (`/oauth/callback`).
     pub public_url: String,
-    /// Where events for clients are published.
-    pub events: PubSubConfig,
-    pub tasks: TasksConfig,
+    /// Where events are published, and what runs scheduled tasks.
+    pub integrations: IntegrationsConfig,
 }
 
 impl Config {
@@ -30,12 +29,7 @@ impl Config {
             public_url: required("OSIRIS_PUBLIC_URL")?
                 .trim_end_matches('/')
                 .to_owned(),
-            events: PubSubConfig {
-                project: required("PUBSUB_PROJECT")?,
-                events_topic: required("OSIRIS_EVENTS_TOPIC")?,
-                emulator_host: optional("PUBSUB_EMULATOR_HOST"),
-            },
-            tasks: TasksConfig::from_env()?,
+            integrations: IntegrationsConfig::from_env()?,
             settings,
         })
     }

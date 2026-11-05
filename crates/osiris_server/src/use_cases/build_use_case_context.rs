@@ -36,7 +36,7 @@ pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCa
         tokio::try_join!(
             db::connect(&config.database),
             async {
-                PubSubTransport::connect(&config.events)
+                PubSubTransport::connect(&config.integrations.events)
                     .await
                     .context("connecting to Pub/Sub")
             },
@@ -62,7 +62,7 @@ pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCa
 }
 
 async fn scheduler(config: &Config) -> anyhow::Result<Arc<dyn TaskScheduler>> {
-    Ok(match &config.tasks {
+    Ok(match &config.integrations.tasks {
         TasksConfig::CloudTasks(cloud) => Arc::new(
             CloudTasksScheduler::connect(cloud.clone())
                 .await
