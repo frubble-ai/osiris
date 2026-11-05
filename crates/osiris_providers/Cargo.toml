@@ -1,0 +1,23 @@
+[package]
+name = "osiris_providers"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+osiris_interfaces.workspace = true
+async-trait.workspace = true
+futures.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+url.workspace = true
+utoipa.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
+wiremock.workspace = true

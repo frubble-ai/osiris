@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM connected_account WHERE id = $1 RETURNING refresh_task",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "refresh_task",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "refresh_task"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "f5f78e024d7e932921a4881379b23d87bccb9a04112032c27ab51343b2b2c456"
+}

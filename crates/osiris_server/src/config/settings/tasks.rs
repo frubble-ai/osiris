@@ -1,0 +1,52 @@
+//! `[tasks]`: how long task outcomes are kept, and how the local scheduler retries.
+
+use super::seconds;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(default)]
+pub struct TasksSettings {
+    /// How long the outcome of a task run is kept.
+    pub outcome_retention_seconds: u64,
+    /// The most expired outcomes deleted each time a new one is recorded.
+    pub outcome_prune_batch: i64,
+    /// How long Google's OIDC signing keys are cached before they are fetched again.
+    pub oidc_keys_ttl_seconds: u64,
+    pub local: LocalTasksSettings,
+}
+
+/// `[tasks.local]`: the scheduler used in local development (`OSIRIS_TASKS=local`).
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(default)]
+pub struct LocalTasksSettings {
+    /// How long to wait before sending a task again after the worker refused it.
+    pub retry_delay_seconds: u64,
+    /// How many times a task is sent before the scheduler gives up on it.
+    pub max_attempts: u32,
+}
+
+impl TasksSettings {
+    pub fn outcome_retention(&self) -> time::Duration {
+        seconds(self.outcome_retention_seconds)
+    }
+}
+
+impl Default for TasksSettings {
+    fn default() -> Self {
+        Self {
+            outcome_retention_seconds: 2_592_000,
+            outcome_prune_batch: 100,
+            oidc_keys_ttl_seconds: 3600,
+            local: LocalTasksSettings::default(),
+        }
+    }
+}
+
+impl Default for LocalTasksSettings {
+    fn default() -> Self {
+        Self {
+            retry_delay_seconds: 5,
+            max_attempts: 5,
+        }
+    }
+}

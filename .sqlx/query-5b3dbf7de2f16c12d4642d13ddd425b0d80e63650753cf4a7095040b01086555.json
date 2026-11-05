@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE connected_account SET status = 'disabled', last_refresh_error = $2, updated_at = now()\n             WHERE id = $1 AND status = 'pending'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5b3dbf7de2f16c12d4642d13ddd425b0d80e63650753cf4a7095040b01086555"
+}

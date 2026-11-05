@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE connected_account SET\n             access_token = $2,\n             refresh_token = COALESCE($3, refresh_token),\n             refresh_token_issued_at = CASE WHEN $3::bytea IS NULL THEN refresh_token_issued_at ELSE now() END,\n             access_token_expires_at = $4,\n             scope = COALESCE($5, scope),\n             status = $6,\n             token_generation = $7::bigint,\n             refresh_task = $8,\n             refresh_task_at = $9,\n             last_refresh_error = NULL,\n             refresh_failures = 0,\n             updated_at = now()\n         WHERE id = $1 AND token_generation = $7::bigint - 1 AND ($10::text IS NULL OR status = $10)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Bytea",
+        "Bytea",
+        "Timestamptz",
+        "Text",
+        "Text",
+        "Int8",
+        "Text",
+        "Timestamptz",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6a1bab57333f6eebfc5c31c20b76a7daac11ee88b5b4e66fccc3835aff3c8dd7"
+}

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM idempotency_key WHERE key IN (\n                 SELECT key FROM idempotency_key WHERE created_at < now() - make_interval(secs => $1) AND key <> $2 LIMIT $3)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Float8",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "96a7ec60b92aa0b620c5d3c237e448b429872f2525bd05bfa21a4ea0218ae154"
+}

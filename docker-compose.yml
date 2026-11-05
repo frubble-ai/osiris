@@ -1,7 +1,25 @@
-# Local dependencies: osiris's own Postgres, on 5433 so it runs beside the app's on 5432.
+# Osiris's local stack: its own Postgres over TLS (5433, next to the app's 5432), the Pub/Sub emulator for
+# events (8086, next to the app's 8085), and a one-off container that creates the events topic and,
+# when asked, a subscription that pushes events to the app's worker. Scheduled tasks need nothing
+# here: locally they are timers inside osiris (OSIRIS_TASKS=local). When deployed, the topic, the
+# subscriptions and the Cloud Tasks queue are infrastructure owned by the platform.
+name: osiris
 services:
+  # Generates a local CA and a server certificate in .local/tls (git-ignored), once.
+  postgres-tls:
+    image: alpine:3.22
+    volumes:
+      - ./.local/tls:/tls
+      - ./scripts/local-tls.sh:/local-tls.sh:ro
+    entrypoint: ["sh", "/local-tls.sh"]
+
+  # Postgres over TLS only, as Cloud SQL is: plaintext connections are refused, and osiris
+  # connects with verify-ca against .local/tls/ca.pem (DB_CA_PEM).
   postgres:
     image: postgres:16-alpine
+    depends_on:
+      postgres-tls:
+        condition: service_completed_successfully
     environment:
       POSTGRES_USER: osiris
       POSTGRES_PASSWORD: osiris_dev
@@ -10,11 +28,59 @@ services:
       - "5433:5432"
     volumes:
       - osiris-postgres:/var/lib/postgresql/data
+      - ./.local/tls:/tls:ro
+    # Postgres needs its key owned by it and readable by it alone, so the files are copied in
+    # first; only TLS connections are allowed from outside the container.
+    entrypoint: ["sh", "-ec"]
+    command:
+      - |
+        install -o postgres -g postgres -m 0600 /tls/server.key /var/lib/postgresql/server.key
+        install -o postgres -g postgres -m 0644 /tls/server.crt /var/lib/postgresql/server.crt
+        printf 'local all all trust\nhostssl all all all scram-sha-256\nhostnossl all all all reject\n' > /var/lib/postgresql/pg_hba.conf
+        chown postgres:postgres /var/lib/postgresql/pg_hba.conf
+        exec docker-entrypoint.sh postgres -c ssl=on \
+          -c ssl_cert_file=/var/lib/postgresql/server.crt \
+          -c ssl_key_file=/var/lib/postgresql/server.key \
+          -c hba_file=/var/lib/postgresql/pg_hba.conf
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U osiris -d osiris"]
       interval: 2s
       timeout: 3s
       retries: 30
+
+  pubsub:
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
+    command: gcloud beta emulators pubsub start --host-port=0.0.0.0:8085 --project=osiris-local
+    ports:
+      - "8086:8085"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8085 >/dev/null"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # Creates the events topic and, if EVENTS_ENDPOINT is set, its push subscription. Runs once and
+  # exits.
+  pubsub-setup:
+    image: curlimages/curl:8.11.1
+    depends_on:
+      pubsub:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      EMULATOR: http://pubsub:8085/v1/projects/osiris-local
+      # The app's worker, when it runs locally. Left empty, nothing subscribes to events.
+      EVENTS_ENDPOINT: ${OSIRIS_EVENTS_PUSH_ENDPOINT:-}
+    entrypoint: ["sh", "-ec"]
+    command:
+      - |
+        curl -sf -X PUT "$$EMULATOR/topics/osiris-events" -o /dev/null || true
+        if [ -n "$$EVENTS_ENDPOINT" ]; then
+          curl -sf -X PUT "$$EMULATOR/subscriptions/osiris-events-app" -H 'content-type: application/json' \
+            -d "{\"topic\":\"projects/osiris-local/topics/osiris-events\",\"ackDeadlineSeconds\":60,\"pushConfig\":{\"pushEndpoint\":\"$$EVENTS_ENDPOINT\"}}" -o /dev/null || true
+        fi
+        echo "events topic ready"
 
 volumes:
   osiris-postgres:

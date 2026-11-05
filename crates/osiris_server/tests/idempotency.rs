@@ -1,0 +1,209 @@
+//! Idempotency keys only for an authenticated caller: nothing unauthenticated is stored or replayed.
+
+#[path = "support/app.rs"]
+mod support;
+
+use axum::http::StatusCode;
+use serde_json::json;
+use sqlx::PgPool;
+use support::{ADMIN_KEY, API_KEY, app};
+
+#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+async fn never_replays_a_stored_answer_to_a_caller_without_a_key(pool: PgPool) {
+    let app = app(pool).await;
+    let config = app.github_config().await;
+    let body = json!({ "auth_config_id": config, "user_id": "org_1", "callback_url": "http://app.test/cb" });
+    let first = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            Some(API_KEY),
+            Some(body.clone()),
+            &[("idempotency-key", "k1")],
+        )
+        .await;
+    assert_eq!(first.status, StatusCode::CREATED);
+
+    let stranger = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            None,
+            Some(body.clone()),
+            &[("idempotency-key", "k1")],
+        )
+        .await;
+    assert_eq!(stranger.status, StatusCode::UNAUTHORIZED);
+    assert!(
+        stranger.body.get("redirect_url").is_none(),
+        "no stored answer leaks"
+    );
+
+    let other_key = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            Some(ADMIN_KEY),
+            Some(body),
+            &[("idempotency-key", "k1")],
+        )
+        .await;
+    assert_eq!(
+        other_key.status,
+        StatusCode::UNAUTHORIZED,
+        "the admin key's scope holds no answer, and the route refuses it"
+    );
+}
+
+#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+async fn lets_an_unauthenticated_attempt_leave_the_key_free(pool: PgPool) {
+    let app = app(pool).await;
+    let config = app.github_config().await;
+    let body = json!({ "auth_config_id": config, "user_id": "org_1", "callback_url": "http://app.test/cb" });
+
+    let refused = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            None,
+            Some(body.clone()),
+            &[("idempotency-key", "k2")],
+        )
+        .await;
+    assert_eq!(refused.status, StatusCode::UNAUTHORIZED);
+    let real = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            Some(API_KEY),
+            Some(body),
+            &[("idempotency-key", "k2")],
+        )
+        .await;
+    assert_eq!(
+        real.status,
+        StatusCode::CREATED,
+        "the 401 was never stored for this key"
+    );
+    assert!(real.headers.get("idempotent-replayed").is_none());
+}
+
+#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+async fn refuses_a_key_reused_for_another_request(pool: PgPool) {
+    let app = app(pool).await;
+    let config = app.github_config().await;
+    let connect = |user: &str| json!({ "auth_config_id": config, "user_id": user, "callback_url": "http://app.test/cb" });
+    let first = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            Some(API_KEY),
+            Some(connect("org_1")),
+            &[("idempotency-key", "k1")],
+        )
+        .await;
+    assert_eq!(first.status, StatusCode::CREATED);
+    let other = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            Some(API_KEY),
+            Some(connect("org_2")),
+            &[("idempotency-key", "k1")],
+        )
+        .await;
+    assert_eq!(
+        other.status,
+        StatusCode::UNPROCESSABLE_ENTITY,
+        "{}",
+        other.body
+    );
+    assert_eq!(other.body["error"]["code"], "OS_08");
+}
+
+#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+async fn refuses_a_retry_while_the_first_request_is_still_running(pool: PgPool) {
+    let app = app(pool).await;
+    let config = app.github_config().await;
+    let body = json!({ "auth_config_id": config, "user_id": "org_1", "callback_url": "http://app.test/cb" });
+    // The first request with this key began and has not answered yet.
+    let hash = {
+        use sha2::{Digest, Sha256};
+        let mut hash = Sha256::new();
+        hash.update("POST");
+        hash.update("/v1/connected-accounts");
+        hash.update(body.to_string().as_bytes());
+        hex::encode(hash.finalize())
+    };
+    app.core
+        .begin_idempotent("Api POST /v1/connected-accounts k1", &hash)
+        .await
+        .unwrap();
+    let retry = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            Some(API_KEY),
+            Some(body),
+            &[("idempotency-key", "k1")],
+        )
+        .await;
+    assert_eq!(retry.status, StatusCode::CONFLICT, "{}", retry.body);
+    assert_eq!(retry.body["error"]["code"], "OS_09");
+}
+
+#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+async fn runs_a_retry_again_after_the_first_answer_was_a_server_error(pool: PgPool) {
+    let app = app(pool).await;
+    let config = app.github_config().await;
+    let body = json!({ "auth_config_id": config, "user_id": "org_1", "callback_url": "http://app.test/cb" });
+    app.tasks.fail(true);
+    let failed = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            Some(API_KEY),
+            Some(body.clone()),
+            &[("idempotency-key", "k1")],
+        )
+        .await;
+    assert_eq!(failed.status, StatusCode::INTERNAL_SERVER_ERROR);
+    app.tasks.fail(false);
+    let retry = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            Some(API_KEY),
+            Some(body),
+            &[("idempotency-key", "k1")],
+        )
+        .await;
+    assert_eq!(retry.status, StatusCode::CREATED, "{}", retry.body);
+    assert!(retry.headers.get("idempotent-replayed").is_none());
+}
+
+#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+async fn never_replays_an_answer_that_is_not_json(pool: PgPool) {
+    let app = app(pool).await;
+    let send = || async {
+        let request = axum::http::Request::builder()
+            .method("POST")
+            .uri("/v1/connected-accounts")
+            .header("content-type", "application/json")
+            .header("authorization", format!("Bearer {API_KEY}"))
+            .header("idempotency-key", "k1")
+            .body(axum::body::Body::from("not json"))
+            .unwrap();
+        tower::ServiceExt::oneshot(app.router.clone(), request)
+            .await
+            .unwrap()
+    };
+    let first = send().await;
+    assert!(first.status().is_client_error());
+    let retry = send().await;
+    assert!(retry.status().is_client_error());
+    assert!(
+        retry.headers().get("idempotent-replayed").is_none(),
+        "the plain-text answer was not stored"
+    );
+}

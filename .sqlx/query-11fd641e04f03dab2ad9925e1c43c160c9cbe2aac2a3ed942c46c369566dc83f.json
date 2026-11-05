@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE connected_account SET status = 'expired', refresh_task = NULL, refresh_task_at = NULL,\n                 last_refresh_error = $2, updated_at = now()\n             WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "11fd641e04f03dab2ad9925e1c43c160c9cbe2aac2a3ed942c46c369566dc83f"
+}

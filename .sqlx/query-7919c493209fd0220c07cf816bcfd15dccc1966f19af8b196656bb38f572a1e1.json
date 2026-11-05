@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE connected_account SET last_refresh_error = $2, refresh_failures = refresh_failures + 1 WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7919c493209fd0220c07cf816bcfd15dccc1966f19af8b196656bb38f572a1e1"
+}
