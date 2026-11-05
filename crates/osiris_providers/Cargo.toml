@@ -17,7 +17,14 @@ serde.workspace = true
 serde_json.workspace = true
 url.workspace = true
 utoipa.workspace = true
+fake = { workspace = true, optional = true }
+wiremock = { workspace = true, optional = true }
+
+[features]
+# Each provider's network faked for tests (its `mocks`), for other crates' tests to use.
+testing = ["dep:fake", "dep:wiremock"]
 
 [dev-dependencies]
+osiris_providers = { workspace = true, features = ["testing"] }
+rstest.workspace = true
 tokio.workspace = true
-wiremock.workspace = true

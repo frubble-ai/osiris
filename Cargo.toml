@@ -63,6 +63,8 @@ utoipa = { version = "6.0.0", features = ["axum_extras", "uuid", "time"] }
 utoipa-axum = "0.3.0"
 uuid = { version = "1.29.0", features = ["v4", "serde"] }
 wiremock = "0.6.5"
+fake = "5.1.0"
+rstest = "0.28.0"
 
 # Hyperswitch's workspace lints, as they are (juspay/hyperswitch, Apache-2.0).
 [workspace.lints.rust]
