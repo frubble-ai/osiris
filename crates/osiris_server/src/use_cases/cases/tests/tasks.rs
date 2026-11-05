@@ -124,10 +124,19 @@ async fn acknowledges_a_refresh_for_a_deleted_connection_as_stale(pool: PgPool) 
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
     let task = app.tasks.take(&names::refresh(&id, 1)).unwrap();
-    sqlx::query!("DELETE FROM connected_account WHERE id = $1", id)
-        .execute(&app.use_cases.context().db.pool)
-        .await
-        .unwrap();
+    MockGithubNetwork::on(&app.provider)
+        .answer_revoke(204, None)
+        .await;
+    let deleted = app
+        .send(
+            "DELETE",
+            &format!("/v1/connected-accounts/{id}"),
+            Some(API_KEY),
+            None,
+            &[],
+        )
+        .await;
+    assert_eq!(deleted.status, StatusCode::OK, "{}", deleted.body);
     assert!(app.run(&task).await.is_ok());
     assert_eq!(app.outcomes(&id).await, ["skipped_stale"]);
 }
