@@ -5,7 +5,7 @@
     reason = "tests: a failure here is the test failing"
 )]
 
-use super::{Profile, save::save_to};
+use super::{Profile, load_if_present::read_if_present, save::save_to};
 use fake::{Fake, faker::internet::en::Password};
 
 fn temporary_path() -> std::path::PathBuf {
@@ -13,7 +13,7 @@ fn temporary_path() -> std::path::PathBuf {
         .join(format!(
             "osiris-cli-{}",
             16.fake::<String>()
-                .replace(|c: char| !c.is_ascii_alphanumeric(), "x")
+                .replace(|character: char| !character.is_ascii_alphanumeric(), "x")
         ))
         .join("osiris")
         .join("config.toml")
@@ -63,5 +63,24 @@ fn tightens_an_older_profile_with_looser_permissions_before_writing_the_keys() {
         std::fs::metadata(&path).unwrap().permissions().mode() & 0o777,
         0o600
     );
+    std::fs::remove_dir_all(path.parent().unwrap().parent().unwrap()).unwrap();
+}
+
+#[test]
+fn finds_no_profile_where_none_was_saved() {
+    let path = temporary_path();
+
+    assert!(read_if_present(&path).unwrap().is_none());
+}
+
+#[test]
+fn refuses_a_profile_it_cannot_read_instead_of_treating_it_as_missing() {
+    let path = temporary_path();
+    std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+    std::fs::write(&path, "this is = not [valid toml").unwrap();
+
+    let error = read_if_present(&path).unwrap_err().to_string();
+
+    assert!(error.contains("reading"), "{error}");
     std::fs::remove_dir_all(path.parent().unwrap().parent().unwrap()).unwrap();
 }
