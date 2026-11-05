@@ -13,6 +13,7 @@ osiris_events.workspace = true
 async-trait.workspace = true
 google-cloud-auth.workspace = true
 google-cloud-pubsub.workspace = true
+tracing.workspace = true
 anyhow.workspace = true
 base64.workspace = true
 reqwest.workspace = true

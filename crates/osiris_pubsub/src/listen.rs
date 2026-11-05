@@ -47,6 +47,7 @@ pub async fn listen(
             .with_credentials(anonymous());
     }
     let admin = admin.build().await?;
+    let subscriber = subscriber.build().await?;
     admin
         .create_subscription()
         .set_name(&name)
@@ -57,7 +58,6 @@ pub async fn listen(
         .set_ack_deadline_seconds(listen.ack_deadline_seconds)
         .send()
         .await?;
-    let subscriber = subscriber.build().await?;
     let forwarded = async {
         let http = reqwest::Client::new();
         let mut stream = subscriber.subscribe(&name).build();
@@ -83,10 +83,13 @@ pub async fn listen(
         result = forwarded => result,
         () = stop => Ok(()),
     };
-    admin
+    if let Err(error) = admin
         .delete_subscription()
         .set_subscription(&name)
         .send()
-        .await?;
+        .await
+    {
+        tracing::warn!(%error, subscription = %name, "removing the subscription failed");
+    }
     result
 }
