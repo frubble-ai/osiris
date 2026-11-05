@@ -1,15 +1,15 @@
 //! Idempotency keys only for an authenticated caller: nothing unauthenticated is stored or replayed.
 
+use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
-use serde_json::json;
 use sqlx::PgPool;
 
 #[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
 async fn never_replays_a_stored_answer_to_a_caller_without_a_key(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
-    let body = json!({ "auth_config_id": config, "user_id": "org_1", "callback_url": "http://app.test/cb" });
+    let body = generate_connect_attempt(&config);
     let first = app
         .send(
             "POST",
@@ -56,7 +56,7 @@ async fn never_replays_a_stored_answer_to_a_caller_without_a_key(pool: PgPool) {
 async fn lets_an_unauthenticated_attempt_leave_the_key_free(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
-    let body = json!({ "auth_config_id": config, "user_id": "org_1", "callback_url": "http://app.test/cb" });
+    let body = generate_connect_attempt(&config);
 
     let refused = app
         .send(
@@ -89,13 +89,13 @@ async fn lets_an_unauthenticated_attempt_leave_the_key_free(pool: PgPool) {
 async fn refuses_a_key_reused_for_another_request(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
-    let connect = |user: &str| json!({ "auth_config_id": config, "user_id": user, "callback_url": "http://app.test/cb" });
+    let connect = |_: &str| generate_connect_attempt(&config);
     let first = app
         .send(
             "POST",
             "/v1/connected-accounts",
             Some(API_KEY),
-            Some(connect("org_1")),
+            Some(connect("")),
             &[("idempotency-key", "k1")],
         )
         .await;
@@ -105,7 +105,7 @@ async fn refuses_a_key_reused_for_another_request(pool: PgPool) {
             "POST",
             "/v1/connected-accounts",
             Some(API_KEY),
-            Some(connect("org_2")),
+            Some(connect("")),
             &[("idempotency-key", "k1")],
         )
         .await;
@@ -122,7 +122,7 @@ async fn refuses_a_key_reused_for_another_request(pool: PgPool) {
 async fn refuses_a_retry_while_the_first_request_is_still_running(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
-    let body = json!({ "auth_config_id": config, "user_id": "org_1", "callback_url": "http://app.test/cb" });
+    let body = generate_connect_attempt(&config);
     // The first request with this key began and has not answered yet.
     let hash = {
         use sha2::{Digest, Sha256};
@@ -158,7 +158,7 @@ async fn refuses_a_retry_while_the_first_request_is_still_running(pool: PgPool) 
 async fn runs_a_retry_again_after_the_first_answer_was_a_server_error(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
-    let body = json!({ "auth_config_id": config, "user_id": "org_1", "callback_url": "http://app.test/cb" });
+    let body = generate_connect_attempt(&config);
     app.tasks.fail(true);
     let failed = app
         .send(

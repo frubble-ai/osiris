@@ -6,6 +6,7 @@
     reason = "tests: a failure here is the test failing"
 )]
 
+use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
 use serde_json::json;
@@ -104,11 +105,11 @@ async fn answers_invalid_requests_with_os_02(pool: PgPool) {
             ADMIN_KEY,
             json!({ "provider": "github", "client_id": "c", "client_secret": "" }),
         ),
-        (
-            "/v1/connected-accounts",
-            API_KEY,
-            json!({ "auth_config_id": config, "user_id": "org_1", "callback_url": "ftp://app.test/cb" }),
-        ),
+        ("/v1/connected-accounts", API_KEY, {
+            let mut attempt = generate_connect_attempt(&config);
+            attempt["callback_url"] = "ftp://app.test/cb".into();
+            attempt
+        }),
         (
             "/v1/connected-accounts",
             API_KEY,

@@ -12,6 +12,7 @@
 )]
 
 pub mod arrange;
+pub mod generate_connect_attempt;
 pub mod observe;
 pub mod requests;
 pub mod run_tasks;

@@ -1,6 +1,7 @@
 //! Connecting: the consent and its expiry task, the callback (accepted once), the tokens saved
 //! with their first refresh task, the event, and the completeness rule.
 
+use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{API_KEY, setup_test_context};
 use axum::http::StatusCode;
 use osiris_domain::EventType;
@@ -9,7 +10,6 @@ use osiris_providers::{
     mocks::generate_token_answer::{generate_token_answer, generate_token_answer_without_refresh},
 };
 use osiris_tasks::{RefreshReason, TaskPayload, names};
-use serde_json::json;
 use sqlx::PgPool;
 use time::{Duration, OffsetDateTime};
 use url::Url;
@@ -21,7 +21,9 @@ async fn connects_through_the_consent_and_sends_the_browser_back_once(pool: PgPo
         .answer_code_exchange(generate_token_answer(Some(28800)))
         .await;
     let config = app.github_config().await;
-    let (id, state) = app.start_connect(&config).await;
+    let attempt = generate_connect_attempt(&config);
+    let (id, state) = app.start_connect_with(&attempt).await;
+    let callback_url = Url::parse(attempt["callback_url"].as_str().unwrap()).unwrap();
 
     let callback = app
         .send(
@@ -34,12 +36,16 @@ async fn connects_through_the_consent_and_sends_the_browser_back_once(pool: PgPo
         .await;
     assert_eq!(callback.status, StatusCode::SEE_OTHER);
     let back = Url::parse(callback.headers["location"].to_str().unwrap()).unwrap();
-    assert_eq!(back.host_str(), Some("app.test"));
+    assert_eq!(back.host_str(), callback_url.host_str());
     let query: Vec<(String, String)> = back
         .query_pairs()
         .map(|(k, v)| (k.into_owned(), v.into_owned()))
         .collect();
-    assert!(query.contains(&("connection".into(), "row-1".into())));
+    let (_, connection) = callback_url
+        .query_pairs()
+        .find(|(name, _)| name == "connection")
+        .unwrap();
+    assert!(query.contains(&("connection".into(), connection.into_owned())));
     assert!(query.contains(&("connected_account_id".into(), id.clone())));
     assert!(query.contains(&("status".into(), "active".into())));
 
@@ -61,7 +67,7 @@ async fn connects_through_the_consent_and_sends_the_browser_back_once(pool: PgPo
         panic!("a refresh task");
     };
     assert_eq!(refresh.generation, 1);
-    assert_eq!(refresh.tenant_id, "org_1");
+    assert_eq!(refresh.tenant_id, attempt["user_id"].as_str().unwrap());
     assert_eq!(refresh.reason, RefreshReason::Expiry);
     // Due a margin (five minutes) before the token's eight hours run out.
     let lead = OffsetDateTime::now_utc() + Duration::seconds(28800) - pending.run_at;
@@ -129,7 +135,7 @@ async fn fails_a_refused_consent_and_says_so_on_the_way_back(pool: PgPool) {
 async fn replays_a_connect_retried_with_the_same_idempotency_key(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
-    let body = json!({ "auth_config_id": config, "user_id": "org_1", "callback_url": "http://app.test/cb" });
+    let body = generate_connect_attempt(&config);
     let first = app
         .send(
             "POST",
@@ -183,7 +189,7 @@ async fn refuses_to_open_a_consent_whose_expiry_cannot_be_scheduled(pool: PgPool
             "POST",
             "/v1/connected-accounts",
             Some(API_KEY),
-            Some(json!({ "auth_config_id": config, "user_id": "org_1", "callback_url": "http://app.test/cb" })),
+            Some(generate_connect_attempt(&config)),
             &[],
         )
         .await;
@@ -260,15 +266,17 @@ async fn reports_an_active_row_missing_its_refresh_task_as_disabled(pool: PgPool
     let id = app.connected(28800).await;
     // The database's completeness check prevents this row. The check is dropped here to confirm
     // that the API would still report such a row as disabled, never as active.
-    sqlx::query("ALTER TABLE connected_account DROP CONSTRAINT connected_account_complete")
+    sqlx::query!("ALTER TABLE connected_account DROP CONSTRAINT connected_account_complete")
         .execute(&pool)
         .await
         .unwrap();
-    sqlx::query("UPDATE connected_account SET refresh_task = NULL WHERE id = $1")
-        .bind(&id)
-        .execute(&pool)
-        .await
-        .unwrap();
+    sqlx::query!(
+        "UPDATE connected_account SET refresh_task = NULL WHERE id = $1",
+        id
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
     let account = app.account(&id).await;
     assert_eq!(account["status"], "disabled");
     assert_eq!(account["setup_complete"], false);

@@ -1,7 +1,7 @@
 //! State a test starts from, arranged the way a client gets there: through the API and the
 //! providers' faked network.
 
-use super::{ADMIN_KEY, API_KEY, TestContext};
+use super::{ADMIN_KEY, API_KEY, TestContext, generate_connect_attempt::generate_connect_attempt};
 use axum::http::StatusCode;
 use osiris_providers::{
     github::mocks::MockGithubNetwork, linear::mocks::MockLinearNetwork,
@@ -31,14 +31,21 @@ impl TestContext {
         self.auth_config("github").await
     }
 
-    /// Opens a consent; answers the connection's id and the `state` of its consent URL.
+    /// Opens a consent for a generated attempt; answers the connection's id and the `state` of its
+    /// consent URL.
     pub async fn start_connect(&self, auth_config_id: &str) -> (String, String) {
+        self.start_connect_with(&generate_connect_attempt(auth_config_id))
+            .await
+    }
+
+    /// Opens a consent for `attempt` (see `generate_connect_attempt`).
+    pub async fn start_connect_with(&self, attempt: &Value) -> (String, String) {
         let answer = self
             .send(
                 "POST",
                 "/v1/connected-accounts",
                 Some(API_KEY),
-                Some(json!({ "auth_config_id": auth_config_id, "user_id": "org_1", "alias": "attempt-1", "callback_url": "http://app.test/integrations/callback?connection=row-1" })),
+                Some(attempt.clone()),
                 &[],
             )
             .await;

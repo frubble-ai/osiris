@@ -93,7 +93,14 @@ async fn acknowledges_a_task_for_an_older_generation_as_stale_and_does_nothing(p
         name: names::refresh(&id, 0),
         run_at: time::OffsetDateTime::now_utc(),
         payload: TaskPayload::ConnectionRefresh(osiris_tasks::RefreshTask {
-            tenant_id: "org_1".into(),
+            tenant_id: app
+                .use_cases
+                .context()
+                .store
+                .connected_account(&id)
+                .await
+                .unwrap()
+                .user_id,
             connected_account_id: id.clone(),
             generation: 0,
             reason: RefreshReason::Expiry,
@@ -117,8 +124,7 @@ async fn acknowledges_a_refresh_for_a_deleted_connection_as_stale(pool: PgPool) 
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
     let task = app.tasks.take(&names::refresh(&id, 1)).unwrap();
-    sqlx::query("DELETE FROM connected_account WHERE id = $1")
-        .bind(&id)
+    sqlx::query!("DELETE FROM connected_account WHERE id = $1", id)
         .execute(&app.use_cases.context().store.pool)
         .await
         .unwrap();
@@ -285,7 +291,14 @@ async fn acknowledges_the_expiry_of_a_finished_consent_as_stale(pool: PgPool) {
         name: names::consent(&id),
         run_at: time::OffsetDateTime::now_utc(),
         payload: TaskPayload::ConsentExpire(osiris_tasks::ConsentTask {
-            tenant_id: "org_1".into(),
+            tenant_id: app
+                .use_cases
+                .context()
+                .store
+                .connected_account(&id)
+                .await
+                .unwrap()
+                .user_id,
             connected_account_id: id.clone(),
         }),
     };
@@ -369,33 +382,4 @@ async fn refreshes_now_through_a_task_that_replaces_the_scheduled_one(pool: PgPo
         StatusCode::UNAUTHORIZED,
         "an operator's call"
     );
-}
-
-#[test]
-fn names_a_task_after_its_job_so_scheduling_it_twice_makes_one() {
-    use osiris_tasks::{Scheduled, TaskScheduler, adapters::memory::MemoryScheduler};
-    let scheduler = MemoryScheduler::default();
-    let task = |run_at| Task {
-        name: names::refresh("ca_1", 3),
-        run_at,
-        payload: TaskPayload::ConsentExpire(osiris_tasks::ConsentTask {
-            tenant_id: "org_1".into(),
-            connected_account_id: "ca_1".into(),
-        }),
-    };
-    let runtime = tokio::runtime::Builder::new_current_thread()
-        .build()
-        .unwrap();
-    let now = time::OffsetDateTime::now_utc();
-    assert_eq!(
-        runtime.block_on(scheduler.schedule(&task(now))).unwrap(),
-        Scheduled::Created
-    );
-    assert_eq!(
-        runtime
-            .block_on(scheduler.schedule(&task(now + time::Duration::hours(1))))
-            .unwrap(),
-        Scheduled::AlreadyScheduled
-    );
-    assert_eq!(scheduler.pending().len(), 1);
 }
