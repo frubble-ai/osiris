@@ -6,6 +6,9 @@ use crate::config::DatabaseConfig;
 use anyhow::Context;
 use sqlx::postgres::{PgPool, PgPoolOptions};
 
+/// The migrations in `migrations/`, compiled in.
+pub static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("../../migrations");
+
 pub async fn connect(config: &DatabaseConfig) -> anyhow::Result<PgPool> {
     PgPoolOptions::new()
         .max_connections(config.max_connections)
@@ -23,7 +26,7 @@ pub async fn connect(config: &DatabaseConfig) -> anyhow::Result<PgPool> {
 /// Apply every pending migration; already applied ones are skipped.
 pub async fn migrate(config: &DatabaseConfig) -> anyhow::Result<()> {
     let pool = connect(config).await?;
-    osiris_storage::MIGRATOR
+    MIGRATOR
         .run(&pool)
         .await
         .context("applying the migrations")?;

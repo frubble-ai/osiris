@@ -1,11 +1,11 @@
 //! Exchanges a consent's code at the provider for tokens.
 
 use super::{new_tokens::new_tokens, oauth_client::oauth_client};
+use crate::use_cases::lib::connected_accounts::NewTokens;
 use crate::use_cases::lib::shared::domain_errors::{UseCaseResult, provider as provider_error};
 use osiris_domain::{AuthConfig, DomainError};
 use osiris_interfaces::oauth;
 use osiris_providers::Providers;
-use osiris_storage::connected_accounts::NewTokens;
 
 pub struct Exchange<'a> {
     pub config: &'a AuthConfig,

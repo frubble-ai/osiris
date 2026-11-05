@@ -3,6 +3,7 @@
 //! connection is not in that state, so there is nothing to restore.
 
 use super::{next_refresh::next_refresh, scheduled::scheduled};
+use crate::use_cases::lib::database::Db;
 use crate::{
     config::settings::refresh::RefreshSettings,
     use_cases::lib::{
@@ -10,12 +11,10 @@ use crate::{
         tasks::{Scheduling, schedule::schedule},
     },
 };
-use osiris_common::errors::ReportSwitchExt;
 use osiris_domain::{ConnectedAccount, ConnectionStatus};
-use osiris_storage::Store;
 
 pub async fn restore(
-    store: &Store,
+    db: &Db,
     scheduling: Scheduling<'_>,
     refresh: &RefreshSettings,
     account: &ConnectedAccount,
@@ -36,10 +35,9 @@ pub async fn restore(
     // The task's name comes from the connection and generation, so a concurrent restore schedules
     // this same task: whichever restore saves first, the task is the connection's, and it is never
     // cancelled here.
-    let restored = store
+    let restored = db
         .restore(&account.id, account.token_generation, &scheduled(&task))
-        .await
-        .switch()?;
+        .await?;
     tracing::info!(connected_account_id = %account.id, restored, "refresh scheduled; the connection is active");
-    Ok(Some(store.connected_account(&account.id).await.switch()?))
+    Ok(Some(db.connected_account(&account.id).await?))
 }

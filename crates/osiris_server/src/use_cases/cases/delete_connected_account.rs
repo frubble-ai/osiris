@@ -12,7 +12,7 @@ use crate::use_cases::{
         tasks::cancel_quietly::cancel_quietly,
     },
 };
-use osiris_common::{errors::ReportSwitchExt, secret::ExposeSecret};
+use osiris_common::secret::ExposeSecret;
 use osiris_domain::DomainError;
 use osiris_interfaces::ProviderError;
 
@@ -28,11 +28,11 @@ impl UseCases {
         self.run("delete_connected_account", async {
             let ctx = self.context();
             let id = args.id;
-            let account = ctx.store.connected_account(id).await.switch()?;
+            let account = ctx.db.connected_account(id).await?;
             // Whatever its status, a connection that holds tokens has a grant to end at the
             // provider.
             if let Some(tokens) = &account.tokens {
-                let config = ctx.store.auth_config(&account.auth_config_id).await.switch()?;
+                let config = ctx.db.auth_config(&account.auth_config_id).await?;
                 let provider = ctx
                     .providers
                     .get(&config.provider)
@@ -57,7 +57,7 @@ impl UseCases {
                     Err(error) => return Err(provider_error(error)),
                 }
             }
-            if let Some(task) = ctx.store.delete_connected_account(id).await.switch()? {
+            if let Some(task) = ctx.db.delete_connected_account(id).await? {
                 cancel_quietly(ctx.scheduling(), &task).await;
             }
             Ok(())

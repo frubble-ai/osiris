@@ -12,6 +12,7 @@
 )]
 
 pub mod arrange;
+pub mod db_fixtures;
 pub mod generate_connect_attempt;
 pub mod observe;
 pub mod requests;

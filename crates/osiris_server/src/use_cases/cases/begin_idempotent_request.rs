@@ -1,7 +1,6 @@
 //! A request with an idempotency key arrives: run it, replay its first answer, or refuse it.
 
 use crate::use_cases::{UseCaseResult, UseCases};
-use osiris_common::errors::ReportSwitchExt;
 use osiris_domain::Begun;
 
 pub struct BeginIdempotentRequestArgs<'a> {
@@ -18,7 +17,7 @@ impl UseCases {
         self.run("begin_idempotent_request", async {
             let ctx = self.context();
             let idempotency = &ctx.config.settings.idempotency;
-            ctx.store
+            ctx.db
                 .begin_idempotent(
                     args.key,
                     args.request_hash,
@@ -26,7 +25,6 @@ impl UseCases {
                     idempotency.purge_batch,
                 )
                 .await
-                .switch()
         })
         .await
     }

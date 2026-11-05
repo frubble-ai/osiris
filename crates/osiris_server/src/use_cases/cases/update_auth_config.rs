@@ -1,9 +1,9 @@
 //! Changes an app's client, secret or scopes. Connections made before keep the scopes they got.
 
+use crate::use_cases::lib::auth_configs::AuthConfigChanges;
 use crate::use_cases::{UseCaseResult, UseCases};
-use osiris_common::{errors::ReportSwitchExt, secret::Secret};
+use osiris_common::secret::Secret;
 use osiris_domain::AuthConfig;
-use osiris_storage::auth_configs::AuthConfigChanges;
 
 pub struct UpdateAuthConfigArgs<'a> {
     pub id: &'a str,
@@ -19,7 +19,7 @@ impl UseCases {
     ) -> UseCaseResult<AuthConfig> {
         self.run("update_auth_config", async {
             self.context()
-                .store
+                .db
                 .update_auth_config(
                     args.id,
                     AuthConfigChanges {
@@ -29,7 +29,6 @@ impl UseCases {
                     },
                 )
                 .await
-                .switch()
         })
         .await
     }

@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT client_secret FROM auth_config WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "client_secret",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "auth_config",
+            "name": "client_secret"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "7c06000b3dcb57fbd6a13d8d467b61208c241cc92ce92d3dedee61a0915a01f8"
+}

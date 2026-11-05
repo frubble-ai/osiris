@@ -18,7 +18,6 @@ osiris_tasks.workspace = true
 osiris_cloud_tasks.workspace = true
 osiris_domain.workspace = true
 osiris_api_models.workspace = true
-osiris_storage.workspace = true
 error-stack.workspace = true
 hex.workspace = true
 sha2.workspace = true

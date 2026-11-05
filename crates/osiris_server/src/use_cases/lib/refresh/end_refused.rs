@@ -3,15 +3,14 @@
 //! cancelled unless it is the one running. Nothing is scheduled.
 
 use super::{Refresh, RunningTask, cancel_previous::cancel_previous};
+use crate::use_cases::lib::{connected_accounts::RefreshLock, database::Db};
 use crate::use_cases::lib::{
     events::publish::publish, shared::domain_errors::UseCaseResult, tasks::Scheduling,
 };
-use osiris_common::errors::ReportSwitchExt;
 use osiris_events::MessageBus;
-use osiris_storage::{Store, connected_accounts::RefreshLock};
 
 pub async fn end_refused(
-    store: &Store,
+    db: &Db,
     messages: &MessageBus,
     scheduling: Scheduling<'_>,
     lock: RefreshLock,
@@ -21,9 +20,8 @@ pub async fn end_refused(
     let id = lock.account.id.clone();
     let event = lock
         .expire("the provider refused the refresh; reconnect")
-        .await
-        .switch()?;
+        .await?;
     publish(messages, scheduling, &event).await;
     cancel_previous(scheduling, previous_task, running).await;
-    Ok(Refresh::Ended(store.connected_account(&id).await.switch()?))
+    Ok(Refresh::Ended(db.connected_account(&id).await?))
 }

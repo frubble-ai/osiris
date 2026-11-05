@@ -1,5 +1,5 @@
 //! The API's routes: one module per resource, one file per operation. A handler parses its request
-//! and names the core function `server_wrap` runs; nothing else.
+//! and names the use case `server_wrap` runs; nothing else.
 
 pub mod actions;
 pub mod auth_configs;

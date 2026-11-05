@@ -1,4 +1,4 @@
-//! What the core answers when it cannot do what was asked. The wire layer maps each to a status and
+//! What use cases answer with when they cannot do what was asked. The wire layer maps each to a status and
 //! an `OS_xx` code; the report underneath keeps the cause for the logs.
 
 #[derive(Debug, thiserror::Error)]

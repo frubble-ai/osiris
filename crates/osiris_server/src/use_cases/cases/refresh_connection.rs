@@ -29,10 +29,10 @@ use crate::use_cases::{
         shared::{domain_errors::provider as provider_error, redirect_uri::redirect_uri},
     },
 };
-use osiris_common::{errors::ReportSwitchExt, secret::ExposeSecret};
+use osiris_common::secret::ExposeSecret;
 use osiris_domain::{ConnectionStatus, DomainError};
 use osiris_interfaces::{ProviderError, oauth};
-use osiris_storage::StorageError;
+
 use time::OffsetDateTime;
 
 pub struct RefreshConnectionArgs<'a> {
@@ -53,20 +53,20 @@ impl UseCases {
             let settings = &ctx.config.settings;
             // Everything the refresh needs to read is read before the row is locked, so a refresh
             // holding a lock never waits for a second database connection.
-            let unlocked = match ctx.store.connected_account(id).await {
+            let unlocked = match ctx.db.connected_account(id).await {
                 Ok(account) => account,
                 Err(report)
                     if running.is_some()
-                        && matches!(report.current_context(), StorageError::NotFound(_)) =>
+                        && matches!(report.current_context(), DomainError::NotFound(_)) =>
                 {
                     return Ok(Refresh::Stale);
                 }
-                Err(report) => return Err(report).switch(),
+                Err(report) => return Err(report),
             };
-            let config = ctx.store.auth_config(&unlocked.auth_config_id).await.switch()?;
-            let lock = ctx.store.lock_for_refresh(id).await.switch()?;
+            let config = ctx.db.auth_config(&unlocked.auth_config_id).await?;
+            let lock = ctx.db.lock_for_refresh(id).await?;
             let lock = match check_task(
-                &ctx.store,
+                &ctx.db,
                 ctx.scheduling(),
                 &settings.refresh,
                 lock,
@@ -89,7 +89,7 @@ impl UseCases {
             let (true, ConnectionStatus::Active, Some(refresh_token)) =
                 (due, account.status, refresh_token)
             else {
-                lock.release().await.switch()?;
+                lock.release().await?;
                 return Ok(Refresh::Unchanged(account));
             };
             let provider = ctx
@@ -126,7 +126,7 @@ impl UseCases {
                 ) => {
                     tracing::warn!(connected_account_id = id, %message, "the provider permanently refused the refresh; the user must reconnect");
                     end_refused(
-                        &ctx.store,
+                        &ctx.db,
                         &ctx.messages,
                         ctx.scheduling(),
                         lock,
@@ -138,8 +138,7 @@ impl UseCases {
                 Err(error @ ProviderError::Unavailable { .. }) => {
                     tracing::warn!(connected_account_id = id, %error, "the provider failed the refresh for now; it will be tried again");
                     lock.failed("the provider could not be reached; retrying")
-                        .await
-                        .switch()?;
+                        .await?;
                     Err(provider_error(error))
                 }
             }

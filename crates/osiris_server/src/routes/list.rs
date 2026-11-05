@@ -1,4 +1,4 @@
-//! A batch from storage as the API's list.
+//! A batch from the database as the API's list.
 
 use osiris_api_models::list::List;
 use osiris_domain::Page;

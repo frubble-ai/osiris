@@ -19,7 +19,7 @@ use crate::use_cases::{
         tasks::cancel_quietly::cancel_quietly,
     },
 };
-use osiris_common::{errors::ReportSwitchExt, secret::ExposeSecret};
+use osiris_common::secret::ExposeSecret;
 use osiris_domain::DomainError;
 use osiris_tasks::names;
 
@@ -35,7 +35,7 @@ impl UseCases {
             let Some(state) = callback.state.filter(|state| !state.is_empty()) else {
                 return Ok(Outcome::Unknown);
             };
-            let claimed = match ctx.store.claim_consent(&state).await {
+            let claimed = match ctx.db.claim_consent(&state).await {
                 Ok(Some(claimed)) => claimed,
                 Ok(None) => return Ok(Outcome::Unknown),
                 Err(error) => {
@@ -49,27 +49,22 @@ impl UseCases {
             let code = match (&callback.error, callback.code, claimed.expired) {
                 (_, _, true) => {
                     return Ok(
-                        consent_failed(&ctx.store, &account, "the consent took too long").await,
+                        consent_failed(&ctx.db, &account, "the consent took too long").await,
                     );
                 }
                 (Some(error), _, _) => {
                     return Ok(
-                        consent_failed(&ctx.store, &account, &consent_error_reason(error)).await,
+                        consent_failed(&ctx.db, &account, &consent_error_reason(error)).await,
                     );
                 }
                 (None, None, _) => {
                     return Ok(
-                        consent_failed(&ctx.store, &account, "the provider sent no code").await,
+                        consent_failed(&ctx.db, &account, "the provider sent no code").await,
                     );
                 }
                 (None, Some(code), false) => code,
             };
-            let exchanged = match ctx
-                .store
-                .auth_config(&account.auth_config_id)
-                .await
-                .switch()
-            {
+            let exchanged = match ctx.db.auth_config(&account.auth_config_id).await {
                 Ok(config) => {
                     let redirect_uri = redirect_uri(&ctx.config.public_url);
                     exchange_code(
@@ -101,7 +96,7 @@ impl UseCases {
                         DomainError::ProviderUnavailable(_) => "the provider could not be reached",
                         _ => "osiris could not finish the consent",
                     };
-                    return Ok(consent_failed(&ctx.store, &account, reason).await);
+                    return Ok(consent_failed(&ctx.db, &account, reason).await);
                 }
             };
             let issues_refresh_tokens = ctx
@@ -110,7 +105,7 @@ impl UseCases {
                 .is_some_and(|provider| provider.oauth().issues_refresh_tokens);
             Ok(activate_consent(
                 Activation {
-                    store: &ctx.store,
+                    db: &ctx.db,
                     messages: &ctx.messages,
                     scheduling: ctx.scheduling(),
                     refresh: &ctx.config.settings.refresh,

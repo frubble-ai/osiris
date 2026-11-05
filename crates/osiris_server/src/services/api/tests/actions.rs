@@ -14,7 +14,7 @@ use osiris_providers::{
 };
 use sqlx::PgPool;
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn reads_installations_with_the_connection_s_token(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let tokens = generate_token_answer(Some(28800));
@@ -44,7 +44,7 @@ async fn reads_installations_with_the_connection_s_token(pool: PgPool) {
     assert_eq!(answer.body["data"][0]["account_type"], "user");
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_an_action_of_another_provider(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -60,7 +60,7 @@ async fn refuses_an_action_of_another_provider(pool: PgPool) {
     assert_eq!(answer.status, StatusCode::BAD_REQUEST);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn revokes_a_connection_whose_token_stays_rejected_after_a_refresh(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -107,7 +107,7 @@ async fn revokes_a_connection_whose_token_stays_rejected_after_a_refresh(pool: P
     );
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn lists_github_repositories_through_the_router(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -132,7 +132,7 @@ async fn lists_github_repositories_through_the_router(pool: PgPool) {
     assert_eq!(answer.body["data"][0]["full_name"], repository["full_name"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn lists_linear_teams_through_the_router(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let (id, token) = app.connected_to("linear").await;
@@ -153,7 +153,7 @@ async fn lists_linear_teams_through_the_router(pool: PgPool) {
     assert_eq!(answer.body["data"][0]["name"], team["name"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn lists_slack_channels_through_the_router(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let (id, _) = app.connected_to("slack").await;
@@ -174,7 +174,7 @@ async fn lists_slack_channels_through_the_router(pool: PgPool) {
     assert_eq!(answer.body["data"][0]["name"], channel["name"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn never_returns_the_provider_s_refusal_text_to_the_client(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;

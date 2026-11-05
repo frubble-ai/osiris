@@ -13,7 +13,7 @@ use osiris_providers::{
 };
 use sqlx::PgPool;
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn deletes_a_connection_whose_grant_the_provider_no_longer_has(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -42,7 +42,7 @@ async fn deletes_a_connection_whose_grant_the_provider_no_longer_has(pool: PgPoo
     assert_eq!(gone.status, StatusCode::NOT_FOUND);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn keeps_a_connection_when_the_provider_cannot_end_its_grant(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -75,7 +75,7 @@ async fn keeps_a_connection_when_the_provider_cannot_end_its_grant(pool: PgPool)
     );
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn ends_the_grant_at_the_provider_when_deleting_a_disabled_connection(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;

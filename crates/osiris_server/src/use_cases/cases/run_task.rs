@@ -41,14 +41,14 @@ impl UseCases {
             let settings = &ctx.config.settings.tasks;
             match ran {
                 Ok((outcome, detail)) => {
-                    record_outcome(&ctx.store, settings, task, outcome, detail).await;
+                    record_outcome(&ctx.db, settings, task, outcome, detail).await;
                     Ok(outcome)
                 }
                 Err(report) => {
                     tracing::warn!(error = ?report, task = %task.name, "task failed; the scheduler will run it again");
                     // The recorded detail is a fixed message; the full error stays in the logs.
                     record_outcome(
-                        &ctx.store,
+                        &ctx.db,
                         settings,
                         task,
                         TaskOutcome::Failed,

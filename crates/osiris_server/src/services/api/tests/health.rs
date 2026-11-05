@@ -10,7 +10,7 @@ use crate::testing::setup_test_context;
 use axum::http::StatusCode;
 use sqlx::PgPool;
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn answers_health_with_the_commit_and_503_once_the_database_is_down(pool: PgPool) {
     let app = setup_test_context(pool.clone()).await;
     let up = app.send("GET", "/health", None, None, &[]).await;

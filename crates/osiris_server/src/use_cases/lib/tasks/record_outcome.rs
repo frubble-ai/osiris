@@ -2,12 +2,12 @@
 //! again, because its work has already been done (or not) either way.
 
 use crate::config::settings::tasks::TasksSettings;
+use crate::use_cases::lib::{database::Db, task_outcomes::Recorded};
 use osiris_domain::TaskOutcome;
-use osiris_storage::{Store, task_outcomes::Recorded};
 use osiris_tasks::Task;
 
 pub async fn record_outcome(
-    store: &Store,
+    db: &Db,
     settings: &TasksSettings,
     task: &Task,
     outcome: TaskOutcome,
@@ -21,7 +21,7 @@ pub async fn record_outcome(
         outcome,
         detail,
     };
-    if let Err(error) = store
+    if let Err(error) = db
         .record_task_outcome(
             recorded,
             settings.outcome_retention(),

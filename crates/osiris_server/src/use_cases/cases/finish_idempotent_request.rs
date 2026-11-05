@@ -1,7 +1,6 @@
 //! Keeps a keyed request's first answer, to replay.
 
 use crate::use_cases::{UseCaseResult, UseCases};
-use osiris_common::errors::ReportSwitchExt;
 use serde_json::Value;
 
 pub struct FinishIdempotentRequestArgs<'a> {
@@ -17,10 +16,9 @@ impl UseCases {
     ) -> UseCaseResult<()> {
         self.run("finish_idempotent_request", async {
             self.context()
-                .store
+                .db
                 .finish_idempotent(args.key, args.status, args.body)
                 .await
-                .switch()
         })
         .await
     }

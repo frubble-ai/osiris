@@ -1,12 +1,9 @@
 //! Registers a provider's app: its OAuth client and the scopes it asks for.
 
+use crate::use_cases::lib::auth_configs::NewAuthConfig;
 use crate::use_cases::{UseCaseResult, UseCases};
-use osiris_common::{
-    errors::ReportSwitchExt,
-    secret::{ExposeSecret, Secret},
-};
+use osiris_common::secret::{ExposeSecret, Secret};
 use osiris_domain::{AuthConfig, DomainError};
-use osiris_storage::auth_configs::NewAuthConfig;
 
 pub struct CreateAuthConfigArgs {
     pub provider: String,
@@ -37,7 +34,7 @@ impl UseCases {
                 )
                 .into());
             }
-            ctx.store
+            ctx.db
                 .create_auth_config(NewAuthConfig {
                     provider: args.provider,
                     client_id: args.client_id,
@@ -45,7 +42,6 @@ impl UseCases {
                     scopes: args.scopes,
                 })
                 .await
-                .switch()
         })
         .await
     }

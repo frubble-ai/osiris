@@ -10,6 +10,7 @@ use super::{
     disable_consent::disable_consent,
     first_refresh::{FirstRefresh, first_refresh},
 };
+use crate::use_cases::lib::{connected_accounts::NewTokens, database::Db};
 use crate::{
     config::settings::refresh::RefreshSettings,
     use_cases::lib::{
@@ -20,11 +21,10 @@ use crate::{
 };
 use osiris_domain::{ConnectedAccount, ConnectionStatus, Event, EventType};
 use osiris_events::MessageBus;
-use osiris_storage::{Store, connected_accounts::NewTokens};
 
 /// What activating a consent needs.
 pub struct Activation<'a> {
-    pub store: &'a Store,
+    pub db: &'a Db,
     pub messages: &'a MessageBus,
     pub scheduling: Scheduling<'a>,
     pub refresh: &'a RefreshSettings,
@@ -38,7 +38,7 @@ pub async fn activate_consent(
     tokens: NewTokens,
 ) -> Outcome {
     let Activation {
-        store,
+        db,
         messages,
         scheduling,
         refresh,
@@ -54,7 +54,7 @@ pub async fn activate_consent(
         FirstRefresh::NotNeeded => None,
         FirstRefresh::MissingRefreshToken => {
             return disable_consent(
-                store,
+                db,
                 account,
                 "the provider sent no refresh token; check that the app issues them (expiring tokens or token rotation), then connect again",
             )
@@ -66,13 +66,13 @@ pub async fn activate_consent(
     {
         tracing::warn!(error = ?report, connected_account_id = %account.id, "the first refresh could not be scheduled; the connection is disabled");
         return disable_consent(
-            store,
+            db,
             account,
             "osiris could not schedule the token refresh; connect again",
         )
         .await;
     }
-    let saved = store
+    let saved = db
         .activate(account, &tokens, next.as_ref().map(scheduled).as_ref())
         .await;
     match saved {
@@ -95,7 +95,7 @@ pub async fn activate_consent(
             if let Some(task) = &next {
                 cancel_quietly(scheduling, &task.name).await;
             }
-            consent_failed(store, account, "osiris could not save the tokens").await
+            consent_failed(db, account, "osiris could not save the tokens").await
         }
     }
 }

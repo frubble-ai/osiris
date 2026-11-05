@@ -5,7 +5,7 @@ use crate::use_cases::{UseCaseResult, UseCases};
 impl UseCases {
     pub async fn check_database(&self) -> UseCaseResult<bool> {
         self.run("check_database", async {
-            Ok(self.context().store.ping().await)
+            Ok(self.context().db.ping().await)
         })
         .await
     }

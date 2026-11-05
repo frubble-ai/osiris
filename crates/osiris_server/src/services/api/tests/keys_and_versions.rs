@@ -4,7 +4,7 @@ use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
 use sqlx::PgPool;
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn keeps_each_resource_behind_its_own_key(pool: PgPool) {
     let app = setup_test_context(pool).await;
     assert_eq!(
@@ -37,7 +37,7 @@ async fn keeps_each_resource_behind_its_own_key(pool: PgPool) {
     assert_eq!(refused.body["error"]["code"], "OS_00");
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn serves_the_pinned_version_and_refuses_an_unknown_one(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let pinned = app
@@ -57,7 +57,7 @@ async fn serves_the_pinned_version_and_refuses_an_unknown_one(pool: PgPool) {
     assert_eq!(unknown.body["error"]["code"], "OS_07");
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn keeps_every_auth_config_change_behind_the_admin_key(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;

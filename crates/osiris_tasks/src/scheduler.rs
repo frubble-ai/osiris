@@ -1,4 +1,4 @@
-//! The trait every task scheduler implements. The core depends only on this trait.
+//! The trait every task scheduler implements. Use cases depend only on this trait.
 
 use crate::{Scheduled, Task, TaskError};
 use async_trait::async_trait;

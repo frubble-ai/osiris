@@ -24,7 +24,7 @@ impl TestContext {
             "SELECT outcome FROM task_outcome WHERE connected_account_id = $1 ORDER BY id",
             connected_account_id
         )
-        .fetch_all(&self.use_cases.context().store.pool)
+        .fetch_all(&self.use_cases.context().db.pool)
         .await
         .expect("the outcomes")
     }

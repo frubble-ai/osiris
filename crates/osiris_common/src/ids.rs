@@ -1,4 +1,4 @@
-//! Public ids: a type prefix and 24 random base62 characters (`ac_…`, `ca_…`), like Composio's.
+//! Public ids: a type prefix and 24 random base62 characters (`ac_…`, `ca_…`).
 
 use rand::{RngExt, distr::Alphanumeric};
 

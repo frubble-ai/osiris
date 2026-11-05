@@ -1,5 +1,5 @@
 //! Osiris's own model: auth configs, connected accounts and their tokens, events, task outcomes, and the
-//! errors its core answers with. Plain values: storage decrypts before handing them over.
+//! errors use cases answer with. Plain values: the database decrypts before handing them over.
 
 pub mod account_filter;
 pub mod auth_config;

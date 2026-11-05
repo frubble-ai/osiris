@@ -10,7 +10,6 @@ use crate::use_cases::{
         tasks::{cancel_quietly::cancel_quietly, schedule::schedule},
     },
 };
-use osiris_common::errors::ReportSwitchExt;
 use osiris_domain::{ConnectedAccount, DomainError};
 use osiris_tasks::{RefreshReason, RefreshTask, Task, TaskPayload, names};
 use time::OffsetDateTime;
@@ -51,10 +50,9 @@ impl UseCases {
             };
             schedule(ctx.scheduling(), &task).await?;
             let set = ctx
-                .store
+                .db
                 .set_refresh_task(&account.id, account.token_generation, &scheduled(&task))
-                .await
-                .switch()?;
+                .await?;
             if !set {
                 // The connection changed meanwhile; the new task would do nothing anyway.
                 cancel_quietly(ctx.scheduling(), &task.name).await;

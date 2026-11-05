@@ -12,7 +12,7 @@ use axum::http::StatusCode;
 use serde_json::json;
 use sqlx::PgPool;
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn manages_auth_configs_without_ever_returning_the_secret(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.github_config().await;
@@ -72,7 +72,7 @@ async fn manages_auth_configs_without_ever_returning_the_secret(pool: PgPool) {
     assert_eq!(gone.body["error"]["code"], "OS_01");
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_to_delete_an_auth_config_a_connection_uses(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
@@ -90,7 +90,7 @@ async fn refuses_to_delete_an_auth_config_a_connection_uses(pool: PgPool) {
     assert_eq!(answer.body["error"]["code"], "OS_03");
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn answers_invalid_requests_with_os_02(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;

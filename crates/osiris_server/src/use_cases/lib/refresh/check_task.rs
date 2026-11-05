@@ -4,13 +4,12 @@
 //! out of date. Otherwise the refresh goes on.
 
 use super::{Refresh, RunningTask, restore::restore};
+use crate::use_cases::lib::{connected_accounts::RefreshLock, database::Db};
 use crate::{
     config::settings::refresh::RefreshSettings,
     use_cases::lib::{shared::domain_errors::UseCaseResult, tasks::Scheduling},
 };
-use osiris_common::errors::ReportSwitchExt;
 use osiris_domain::ConnectionStatus;
-use osiris_storage::{Store, connected_accounts::RefreshLock};
 
 pub enum Checked {
     /// Go on with the refresh, still holding the lock.
@@ -20,7 +19,7 @@ pub enum Checked {
 }
 
 pub async fn check_task(
-    store: &Store,
+    db: &Db,
     scheduling: Scheduling<'_>,
     refresh: &RefreshSettings,
     lock: RefreshLock,
@@ -34,16 +33,16 @@ pub async fn check_task(
         && account.tokens.is_some()
         && account.refresh_task.is_none()
     {
-        lock.release().await.switch()?;
+        lock.release().await?;
         return Ok(Checked::Done(Box::new(
-            match restore(store, scheduling, refresh, &account).await? {
+            match restore(db, scheduling, refresh, &account).await? {
                 Some(restored) => Refresh::Restored(restored),
                 None => Refresh::Stale,
             },
         )));
     }
     if account.status != ConnectionStatus::Active || account.token_generation != task.generation {
-        lock.release().await.switch()?;
+        lock.release().await?;
         return Ok(Checked::Done(Box::new(Refresh::Stale)));
     }
     Ok(Checked::Go(Box::new(lock)))

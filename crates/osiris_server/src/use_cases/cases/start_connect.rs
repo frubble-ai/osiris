@@ -2,6 +2,7 @@
 //! nobody finishes it in time, and returns the provider's consent URL for the browser. If that task
 //! cannot be scheduled, the consent is marked as failed and an error is returned.
 
+use crate::use_cases::lib::connected_accounts::NewPending;
 use crate::use_cases::{
     UseCaseResult, UseCases,
     lib::{
@@ -11,13 +12,11 @@ use crate::use_cases::{
 };
 use error_stack::ResultExt;
 use osiris_common::{
-    errors::ReportSwitchExt,
     ids,
     secret::{ExposeSecret, secret},
 };
 use osiris_domain::{ConnectedAccount, DomainError};
 use osiris_interfaces::oauth;
-use osiris_storage::connected_accounts::NewPending;
 use osiris_tasks::{ConsentTask, Task, TaskPayload, names};
 use time::OffsetDateTime;
 use url::Url;
@@ -48,7 +47,7 @@ impl UseCases {
             if args.user_id.trim().is_empty() {
                 return Err(DomainError::Invalid("user_id is required".into()).into());
             }
-            let config = ctx.store.auth_config(&args.auth_config_id).await.switch()?;
+            let config = ctx.db.auth_config(&args.auth_config_id).await?;
             let provider = ctx
                 .providers
                 .get(&config.provider)
@@ -62,7 +61,7 @@ impl UseCases {
                 .pkce
                 .then(|| secret(oauth::pkce_verifier()));
             let account = ctx
-                .store
+                .db
                 .create_pending(NewPending {
                     auth_config_id: config.id.clone(),
                     user_id: args.user_id,
@@ -72,8 +71,7 @@ impl UseCases {
                     oauth_state_expires_at: expires_at,
                     pkce_verifier: verifier.clone(),
                 })
-                .await
-                .switch()?;
+                .await?;
             let expiry = Task {
                 name: names::consent(&account.id),
                 run_at: expires_at,
@@ -84,7 +82,7 @@ impl UseCases {
             };
             if let Err(report) = schedule(ctx.scheduling(), &expiry).await {
                 if let Err(error) = ctx
-                    .store
+                    .db
                     .fail(
                         &account.id,
                         "osiris could not schedule the consent's expiry",

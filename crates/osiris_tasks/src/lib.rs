@@ -6,7 +6,7 @@
 //! check that the job is still wanted, and its name is built from what it is for, so scheduling
 //! the same job twice creates only one task.
 //!
-//! The core schedules tasks through the [`TaskScheduler`] trait and does not know which service
+//! Use cases schedule tasks through the [`TaskScheduler`] trait and does not know which service
 //! runs them. Each implementation lives in its own crate or module and is chosen when a process
 //! starts: Cloud Tasks when deployed (`osiris_cloud_tasks`), local timers in development, and
 //! memory in tests. When a task is due, the scheduler sends it as JSON to the worker's

@@ -2,7 +2,6 @@
 //! was already finished, the task is out of date and does nothing.
 
 use crate::use_cases::{UseCaseResult, UseCases};
-use osiris_common::errors::ReportSwitchExt;
 use osiris_domain::TaskOutcome;
 use osiris_tasks::ConsentTask;
 
@@ -19,10 +18,9 @@ impl UseCases {
             Ok(
                 if self
                     .context()
-                    .store
+                    .db
                     .fail_open_consent(&args.task.connected_account_id)
-                    .await
-                    .switch()?
+                    .await?
                 {
                     (TaskOutcome::ConsentExpired, None)
                 } else {

@@ -3,6 +3,7 @@
 //! tasks.
 
 use super::UseCaseContext;
+use crate::use_cases::lib::database::Db;
 use crate::{
     config::{Config, TasksConfig, settings::http::HttpSettings},
     db,
@@ -13,7 +14,6 @@ use osiris_common::{crypto::MasterKey, secret::ExposeSecret};
 use osiris_events::MessageBus;
 use osiris_providers::Providers;
 use osiris_pubsub::PubSubTransport;
-use osiris_storage::Store;
 use osiris_tasks::{
     TaskScheduler,
     adapters::local::{LocalConfig, LocalScheduler},
@@ -46,7 +46,7 @@ pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCa
     .await?;
     settings.refresh.check_against(tasks.max_lead_time())?;
     Ok(UseCaseContext {
-        store: Store::new(pool, master, settings.database.lock_timeout()),
+        db: Db::new(pool, master, settings.database.lock_timeout()),
         messages: MessageBus::new(Arc::new(transport)),
         tasks,
         providers: Arc::new(providers),

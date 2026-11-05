@@ -11,7 +11,7 @@ use axum::http::StatusCode;
 use osiris_tasks::names;
 use sqlx::PgPool;
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn checks_the_worker_token_and_acknowledges_a_body_that_is_not_a_task(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -34,7 +34,7 @@ async fn checks_the_worker_token_and_acknowledges_a_body_that_is_not_a_task(pool
     );
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn answers_the_worker_s_health_with_503_once_it_is_draining(pool: PgPool) {
     let app = setup_test_context(pool).await;
     assert_eq!(app.send_to_worker_get("/health").await, StatusCode::OK);

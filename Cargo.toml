@@ -19,7 +19,6 @@ osiris_api_models = { path = "crates/osiris_api_models" }
 osiris_tasks = { path = "crates/osiris_tasks" }
 osiris_cloud_tasks = { path = "crates/osiris_cloud_tasks" }
 osiris_pubsub = { path = "crates/osiris_pubsub" }
-osiris_storage = { path = "crates/osiris_storage" }
 osiris_server = { path = "crates/osiris_server" }
 osiris_cli = { path = "crates/osiris_cli" }
 

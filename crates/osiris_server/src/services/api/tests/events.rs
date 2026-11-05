@@ -12,7 +12,7 @@ use osiris_domain::EventType;
 use serde_json::json;
 use sqlx::PgPool;
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn triggers_each_event_type_and_leaves_the_connection_as_it_is(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -38,7 +38,7 @@ async fn triggers_each_event_type_and_leaves_the_connection_as_it_is(pool: PgPoo
     assert_eq!(app.account(&id).await["status"], "active");
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_an_unknown_event_type_or_connection(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;

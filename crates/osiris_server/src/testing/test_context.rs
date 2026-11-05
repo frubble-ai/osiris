@@ -2,6 +2,7 @@
 //! adapters, and the API and worker routers over those use cases.
 
 use super::test_config::build_test_config;
+use crate::use_cases::lib::database::Db;
 use crate::{
     config::Config,
     http::state::ApiState,
@@ -15,7 +16,6 @@ use osiris_common::{
 };
 use osiris_events::{MessageBus, adapters::memory::MemoryTransport};
 use osiris_providers::{ProviderUrls, Providers};
-use osiris_storage::Store;
 use osiris_tasks::adapters::{bearer::BearerAuthenticator, memory::MemoryScheduler};
 use sqlx::PgPool;
 use std::sync::{Arc, atomic::AtomicBool};
@@ -68,7 +68,7 @@ pub async fn setup_test_context_with(
     let bus = Arc::new(MemoryTransport::default());
     let tasks = Arc::new(MemoryScheduler::default());
     let use_cases = UseCases::new(UseCaseContext {
-        store: Store::new(
+        db: Db::new(
             pool,
             MasterKey::from_secret(config.encryption_key.expose_secret()).expect("the test key"),
             settings.database.lock_timeout(),

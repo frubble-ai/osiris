@@ -2185,7 +2185,6 @@ dependencies = [
  "osiris_interfaces",
  "osiris_providers",
  "osiris_pubsub",
- "osiris_storage",
  "osiris_tasks",
  "reqwest",
  "rstest",
@@ -2203,21 +2202,6 @@ dependencies = [
  "utoipa",
  "utoipa-axum",
  "wiremock",
-]
-
-[[package]]
-name = "osiris_storage"
-version = "0.1.0"
-dependencies = [
- "error-stack",
- "futures",
- "osiris_common",
- "osiris_domain",
- "serde_json",
- "sqlx",
- "thiserror",
- "time",
- "tokio",
 ]
 
 [[package]]

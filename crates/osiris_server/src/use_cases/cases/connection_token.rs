@@ -53,7 +53,7 @@ impl UseCases {
                 account
             };
             let account = match restore(
-                &ctx.store,
+                &ctx.db,
                 ctx.scheduling(),
                 &ctx.config.settings.refresh,
                 &account,

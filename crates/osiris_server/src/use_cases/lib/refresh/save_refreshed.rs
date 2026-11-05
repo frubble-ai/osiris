@@ -11,6 +11,7 @@ use super::{
     Refresh, RunningTask, cancel_previous::cancel_previous, next_refresh::next_refresh,
     scheduled::scheduled,
 };
+use crate::use_cases::lib::connected_accounts::{NewTokens, RefreshLock};
 use crate::{
     config::settings::refresh::RefreshSettings,
     use_cases::lib::{
@@ -18,8 +19,6 @@ use crate::{
         tasks::{Scheduling, schedule::schedule},
     },
 };
-use osiris_common::errors::ReportSwitchExt;
-use osiris_storage::connected_accounts::{NewTokens, RefreshLock};
 use osiris_tasks::TaskScheduler;
 use std::{sync::Arc, time::Duration};
 
@@ -70,14 +69,10 @@ async fn save_now(
             &tokens,
             "osiris could not schedule the next refresh; retrying",
         )
-        .await
-        .switch()?;
+        .await?;
         return Err(report);
     }
-    let refreshed = lock
-        .refreshed(&tokens, Some(&scheduled(&next)))
-        .await
-        .switch()?;
+    let refreshed = lock.refreshed(&tokens, Some(&scheduled(&next))).await?;
     tracing::info!(connected_account_id = %account.id, next_refresh = %next.run_at, "tokens refreshed");
     cancel_previous(scheduling, account.refresh_task.as_deref(), running).await;
     Ok(Refresh::Refreshed(refreshed))

@@ -4,15 +4,15 @@
 
 use super::lib::tasks::Scheduling;
 use crate::config::Config;
+use crate::use_cases::lib::database::Db;
 use osiris_events::MessageBus;
 use osiris_providers::Providers;
-use osiris_storage::Store;
 use osiris_tasks::TaskScheduler;
 use std::sync::Arc;
 
 pub struct UseCaseContext {
     pub config: Arc<Config>,
-    pub store: Store,
+    pub db: Db,
     /// Where events for clients are published.
     pub messages: MessageBus,
     /// What runs scheduled tasks (token refreshes, consent expiries and event retries).

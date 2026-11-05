@@ -1,5 +1,5 @@
 //! Errors as error-stack reports: each layer has its own error type, and turns the one below into
-//! its own with [`ErrorSwitch`] (storage → domain → wire), keeping the chain for the logs.
+//! its own with [`ErrorSwitch`] (database → domain → wire), keeping the chain for the logs.
 
 pub use error_stack::{Report, ResultExt};
 

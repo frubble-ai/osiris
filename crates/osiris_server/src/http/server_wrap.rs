@@ -1,4 +1,4 @@
-//! The one wrapper every `/v1` route goes through (Hyperswitch's `server_wrap`): the key, the
+//! The one wrapper every `/v1` route goes through: the key, the
 //! flow's span with the request's id, the outcome logged with its time, and the error mapped to the
 //! wire. A route only parses its request and names the use case to run. Secrets are typed
 //! `Secret`, so nothing logged here can carry one.

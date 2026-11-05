@@ -1,7 +1,7 @@
-//! A provider's token answer as tokens to store, with the expiry made absolute.
+//! A provider's token answer as tokens to db, with the expiry made absolute.
 
+use crate::use_cases::lib::connected_accounts::NewTokens;
 use osiris_interfaces::Tokens;
-use osiris_storage::connected_accounts::NewTokens;
 use time::{Duration, OffsetDateTime};
 
 pub fn new_tokens(tokens: Tokens) -> NewTokens {

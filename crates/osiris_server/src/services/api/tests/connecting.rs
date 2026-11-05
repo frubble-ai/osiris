@@ -14,7 +14,7 @@ use sqlx::PgPool;
 use time::{Duration, OffsetDateTime};
 use url::Url;
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn connects_through_the_consent_and_sends_the_browser_back_once(pool: PgPool) {
     let app = setup_test_context(pool).await;
     MockGithubNetwork::on(&app.provider)
@@ -98,7 +98,7 @@ async fn connects_through_the_consent_and_sends_the_browser_back_once(pool: PgPo
     );
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn fails_a_refused_consent_and_says_so_on_the_way_back(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
@@ -131,7 +131,7 @@ async fn fails_a_refused_consent_and_says_so_on_the_way_back(pool: PgPool) {
     assert_eq!(account.body["status"], "failed");
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn replays_a_connect_retried_with_the_same_idempotency_key(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
@@ -163,7 +163,7 @@ async fn replays_a_connect_retried_with_the_same_idempotency_key(pool: PgPool) {
     assert_eq!(listed.body["data"].as_array().unwrap().len(), 1);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn schedules_the_consent_s_expiry_when_it_opens(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
@@ -179,7 +179,7 @@ async fn schedules_the_consent_s_expiry_when_it_opens(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_to_open_a_consent_whose_expiry_cannot_be_scheduled(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
@@ -200,7 +200,7 @@ async fn refuses_to_open_a_consent_whose_expiry_cannot_be_scheduled(pool: PgPool
     assert_eq!(listed.body["data"][0]["status"], "failed");
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn keeps_no_tokens_and_disables_the_connection_when_the_first_refresh_cannot_be_scheduled(
     pool: PgPool,
 ) {
@@ -234,7 +234,7 @@ async fn keeps_no_tokens_and_disables_the_connection_when_the_first_refresh_cann
     let stored = app
         .use_cases
         .context()
-        .store
+        .db
         .connected_account(&id)
         .await
         .unwrap();
@@ -260,7 +260,7 @@ async fn keeps_no_tokens_and_disables_the_connection_when_the_first_refresh_cann
     assert_eq!(action.status, StatusCode::CONFLICT);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn reports_an_active_row_missing_its_refresh_task_as_disabled(pool: PgPool) {
     let app = setup_test_context(pool.clone()).await;
     let id = app.connected(28800).await;
@@ -282,7 +282,7 @@ async fn reports_an_active_row_missing_its_refresh_task_as_disabled(pool: PgPool
     assert_eq!(account["setup_complete"], false);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn disables_a_connection_whose_provider_should_have_sent_a_refresh_token(pool: PgPool) {
     let app = setup_test_context(pool).await;
     // GitHub issues refresh tokens; an app with expiring tokens turned off sends none.
@@ -319,7 +319,7 @@ async fn disables_a_connection_whose_provider_should_have_sent_a_refresh_token(p
     assert!(
         app.use_cases
             .context()
-            .store
+            .db
             .connected_account(&id)
             .await
             .unwrap()
@@ -329,7 +329,7 @@ async fn disables_a_connection_whose_provider_should_have_sent_a_refresh_token(p
     assert!(app.tasks.get(&names::refresh(&id, 1)).is_none());
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn stores_a_fixed_reason_when_the_consent_comes_back_with_an_unknown_error(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;

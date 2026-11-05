@@ -23,7 +23,7 @@ async fn refresh_answers(app: &crate::testing::TestContext, status: u16, body: s
         .await;
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refreshes_saves_the_next_task_with_the_new_tokens_then_acknowledges(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -47,7 +47,7 @@ async fn refreshes_saves_the_next_task_with_the_new_tokens_then_acknowledges(poo
     let stored = app
         .use_cases
         .context()
-        .store
+        .db
         .connected_account(&id)
         .await
         .unwrap();
@@ -57,7 +57,7 @@ async fn refreshes_saves_the_next_task_with_the_new_tokens_then_acknowledges(poo
     assert_eq!(app.outcomes(&id).await, ["refreshed"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn schedules_a_keepalive_for_a_token_that_does_not_expire(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -81,7 +81,7 @@ async fn schedules_a_keepalive_for_a_token_that_does_not_expire(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn acknowledges_a_task_for_an_older_generation_as_stale_and_does_nothing(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -96,7 +96,7 @@ async fn acknowledges_a_task_for_an_older_generation_as_stale_and_does_nothing(p
             tenant_id: app
                 .use_cases
                 .context()
-                .store
+                .db
                 .connected_account(&id)
                 .await
                 .unwrap()
@@ -111,7 +111,7 @@ async fn acknowledges_a_task_for_an_older_generation_as_stale_and_does_nothing(p
     let stored = app
         .use_cases
         .context()
-        .store
+        .db
         .connected_account(&id)
         .await
         .unwrap();
@@ -119,20 +119,20 @@ async fn acknowledges_a_task_for_an_older_generation_as_stale_and_does_nothing(p
     assert_eq!(app.outcomes(&id).await, ["skipped_stale"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn acknowledges_a_refresh_for_a_deleted_connection_as_stale(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
     let task = app.tasks.take(&names::refresh(&id, 1)).unwrap();
     sqlx::query!("DELETE FROM connected_account WHERE id = $1", id)
-        .execute(&app.use_cases.context().store.pool)
+        .execute(&app.use_cases.context().db.pool)
         .await
         .unwrap();
     assert!(app.run(&task).await.is_ok());
     assert_eq!(app.outcomes(&id).await, ["skipped_stale"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn answers_an_error_on_a_temporary_failure_so_the_same_task_runs_again(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -145,7 +145,7 @@ async fn answers_an_error_on_a_temporary_failure_so_the_same_task_runs_again(poo
     let stored = app
         .use_cases
         .context()
-        .store
+        .db
         .connected_account(&id)
         .await
         .unwrap();
@@ -156,7 +156,7 @@ async fn answers_an_error_on_a_temporary_failure_so_the_same_task_runs_again(poo
     assert_eq!(app.outcomes(&id).await, ["failed"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn keeps_new_tokens_disabled_when_the_next_task_cannot_be_scheduled_then_restores_on_retry(
     pool: PgPool,
 ) {
@@ -177,7 +177,7 @@ async fn keeps_new_tokens_disabled_when_the_next_task_cannot_be_scheduled_then_r
     let stored = app
         .use_cases
         .context()
-        .store
+        .db
         .connected_account(&id)
         .await
         .unwrap();
@@ -198,7 +198,7 @@ async fn keeps_new_tokens_disabled_when_the_next_task_cannot_be_scheduled_then_r
     assert_eq!(app.outcomes(&id).await, ["failed", "rescheduled"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn restores_a_disabled_connection_when_an_action_uses_it(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -230,7 +230,7 @@ async fn restores_a_disabled_connection_when_an_action_uses_it(pool: PgPool) {
     assert!(app.tasks.get(&names::refresh(&id, 2)).is_some());
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn ends_the_connection_on_a_permanent_refusal_with_its_event_and_no_new_task(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -250,7 +250,7 @@ async fn ends_the_connection_on_a_permanent_refusal_with_its_event_and_no_new_ta
     assert_eq!(app.outcomes(&id).await, ["failed"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn deletes_the_pending_refresh_task_on_disconnect(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -272,7 +272,7 @@ async fn deletes_the_pending_refresh_task_on_disconnect(pool: PgPool) {
     assert!(app.tasks.get(&names::refresh(&id, 1)).is_none());
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn fails_a_consent_still_open_when_its_expiry_task_runs(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
@@ -283,7 +283,7 @@ async fn fails_a_consent_still_open_when_its_expiry_task_runs(pool: PgPool) {
     assert_eq!(app.outcomes(&id).await, ["consent_expired"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn acknowledges_the_expiry_of_a_finished_consent_as_stale(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
@@ -294,7 +294,7 @@ async fn acknowledges_the_expiry_of_a_finished_consent_as_stale(pool: PgPool) {
             tenant_id: app
                 .use_cases
                 .context()
-                .store
+                .db
                 .connected_account(&id)
                 .await
                 .unwrap()
@@ -307,7 +307,7 @@ async fn acknowledges_the_expiry_of_a_finished_consent_as_stale(pool: PgPool) {
     assert_eq!(app.outcomes(&id).await, ["skipped_stale"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn publishes_an_event_again_through_a_task_named_after_it(pool: PgPool) {
     let app = setup_test_context(pool).await;
     app.bus.fail(true);
@@ -335,7 +335,7 @@ async fn publishes_an_event_again_through_a_task_named_after_it(pool: PgPool) {
     assert_eq!(app.outcomes(&id).await, ["failed", "published"]);
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refreshes_now_through_a_task_that_replaces_the_scheduled_one(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;

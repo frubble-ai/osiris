@@ -5,7 +5,7 @@ use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
 use sqlx::PgPool;
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn never_replays_a_stored_answer_to_a_caller_without_a_key(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
@@ -52,7 +52,7 @@ async fn never_replays_a_stored_answer_to_a_caller_without_a_key(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn lets_an_unauthenticated_attempt_leave_the_key_free(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
@@ -85,7 +85,7 @@ async fn lets_an_unauthenticated_attempt_leave_the_key_free(pool: PgPool) {
     assert!(real.headers.get("idempotent-replayed").is_none());
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_a_key_reused_for_another_request(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
@@ -118,7 +118,7 @@ async fn refuses_a_key_reused_for_another_request(pool: PgPool) {
     assert_eq!(other.body["error"]["code"], "OS_08");
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_a_retry_while_the_first_request_is_still_running(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
@@ -154,7 +154,7 @@ async fn refuses_a_retry_while_the_first_request_is_still_running(pool: PgPool) 
     assert_eq!(retry.body["error"]["code"], "OS_09");
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn runs_a_retry_again_after_the_first_answer_was_a_server_error(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
@@ -184,7 +184,7 @@ async fn runs_a_retry_again_after_the_first_answer_was_a_server_error(pool: PgPo
     assert!(retry.headers.get("idempotent-replayed").is_none());
 }
 
-#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn never_replays_an_answer_that_is_not_json(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let send = || async {
