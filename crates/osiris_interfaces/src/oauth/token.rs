@@ -87,8 +87,17 @@ async fn token_request(
     parse_token_answer(provider, status, &body)
 }
 
-/// OAuth error codes that mean "try again" (RFC 6749, section 4.1.2.1), not "this grant is dead".
-const TRANSIENT_ERRORS: &[&str] = &["temporarily_unavailable", "server_error"];
+/// Error codes that mean "try again", not "this grant is dead": the standard ones (RFC 6749,
+/// section 4.1.2.1) and the ones Slack answers with `ok: false`.
+const TRANSIENT_ERRORS: &[&str] = &[
+    "temporarily_unavailable",
+    "server_error",
+    "ratelimited",
+    "service_unavailable",
+    "internal_error",
+    "fatal_error",
+    "request_timeout",
+];
 
 /// A token answer. Some providers refuse with a 200 and an `error` (GitHub), or `ok: false`
 /// (Slack); a token endpoint may echo credentials, so an unreadable body is never repeated.
