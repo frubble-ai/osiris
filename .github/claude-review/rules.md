@@ -57,17 +57,21 @@ responsible for the whole diff.
 
 ## Step 3 — the completion gate
 
-A lens's answer is **usable** exactly when the workflow's own check accepts it, which is when it holds one
-of these and not the other:
+A lens's answer is **usable** when it is either of these — the same test the workflow's own check applies
+to the run log:
 
-- the line `Area clean (<lens>) — no findings.`, with its own lens name; a short note before or after it
-  is fine and still counts as clean; or
-- a `Findings` heading (`### Findings`, or any heading level) with entries that carry `file:line`, each
-  with a severity label, a problem and a fix.
+- **findings** — a `Findings` heading (`### Findings`, or any heading level) followed by at least one
+  entry carrying `file:line`, a severity label, a problem and a fix; or
+- **clean** — the line `Area clean (<lens>) — no findings.`, with its own lens name, anywhere in the
+  answer on a line of its own. A note, a `not examined:` line or a short explanation before or after it
+  does not change that: the answer is still clean and usable, so never retry a lens for it.
 
-Anything else is a **lost** answer: an empty reply, an error, prose with neither the clean line nor a
-findings block, a findings heading with no `file:line` entry, or both a findings block and the clean line.
-Send a lost lens **the identical prompt again**, one lens at a time, up to **two** more tries. A lens
+When an answer has both — real findings entries and a clean line — it counts as **findings**: never throw
+a finding away because a lens also wrote the clean line. Read the findings, ignore the line.
+
+Only an answer with neither is **lost**: an empty reply, an error, or prose with no findings entries and
+no clean line. Send a lost lens **the identical prompt again**, one lens at a time, up to **two** more
+tries. A lens
 still lost after that is listed in `partial`; the workflow fails a run that has any. Never stand in for a
 lens, and never review its area yourself. Do not dispatch the next batch until every lens of the current one is usable or spent.
 
