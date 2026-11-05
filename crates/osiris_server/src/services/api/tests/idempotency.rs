@@ -3,7 +3,9 @@
 use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
+use osiris_providers::github::mocks::MockGithubNetwork;
 use sqlx::PgPool;
+use std::time::Duration;
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn never_replays_a_stored_answer_to_a_caller_without_a_key(pool: PgPool) {
@@ -172,4 +174,38 @@ async fn never_replays_an_answer_that_is_not_json(pool: PgPool) {
         retry.headers().get("idempotent-replayed").is_none(),
         "the plain-text answer was not stored"
     );
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn finishes_a_keyed_request_its_caller_gave_up_on(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    let id = app.connected(28800).await;
+    MockGithubNetwork::on(&app.provider)
+        .answer_revoke_after(Duration::from_millis(400), 204)
+        .await;
+    let path = format!("/v1/connected-accounts/{id}");
+    let key = [("idempotency-key", "k1")];
+
+    // The caller gives up while the provider is still answering.
+    let gave_up = tokio::time::timeout(
+        Duration::from_millis(50),
+        app.send("DELETE", &path, Some(API_KEY), None, &key),
+    )
+    .await;
+    assert!(gave_up.is_err(), "the caller was cut off");
+
+    // The request still finishes, so the retry is replayed, never left answering "in flight".
+    let retry = tokio::time::timeout(Duration::from_secs(10), async {
+        loop {
+            let answer = app.send("DELETE", &path, Some(API_KEY), None, &key).await;
+            if answer.status != StatusCode::CONFLICT {
+                return answer;
+            }
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .unwrap();
+    assert_eq!(retry.status, StatusCode::OK, "{}", retry.body);
+    assert_eq!(retry.headers["idempotent-replayed"], "true");
 }

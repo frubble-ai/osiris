@@ -1,5 +1,6 @@
 //! `Idempotency-Key` on a POST or DELETE: the request runs once; a retry with the same key gets the
-//! first answer again. Errors that may pass (5xx) free the key, so a retry runs again.
+//! first answer again. Errors that may pass (5xx) free the key, so a retry runs again. The request
+//! runs on a task of its own, so a timeout or a disconnect does not leave the key in flight.
 //!
 //! Only a request carrying a valid key takes part: one without is passed to its route, which
 //! refuses it, so nothing unauthenticated is ever stored or replayed. Keys are scoped by which key
@@ -82,29 +83,46 @@ pub async fn idempotency(
         Begun::InFlight => return Err(ApiError::InFlight),
     }
 
-    let response = next
-        .run(Request::from_parts(parts, Body::from(bytes)))
-        .await;
+    // Run on a task of its own: a timeout or a client that disconnects drops this future, and the
+    // key must still be finished or freed, so a retry gets the answer or runs again.
+    let request = Request::from_parts(parts, Body::from(bytes));
+    let task = tokio::spawn(run_keyed(use_cases.clone(), scoped.clone(), request, next));
+    match task.await {
+        Ok(response) => Ok(response),
+        Err(error) => {
+            tracing::error!(?error, "a keyed request's task failed");
+            abandon(use_cases, &scoped).await;
+            Ok(StatusCode::INTERNAL_SERVER_ERROR.into_response())
+        }
+    }
+}
+
+/// Runs the route, then keeps its answer under the key, or frees the key when the answer can't be
+/// replayed.
+async fn run_keyed(use_cases: UseCases, scoped: String, request: Request, next: Next) -> Response {
+    let use_cases = &use_cases;
+    let scoped = scoped.as_str();
+    let response = next.run(request).await;
     let status = response.status();
     if status.is_server_error() {
-        abandon(use_cases, &scoped).await;
-        return Ok(response);
+        abandon(use_cases, scoped).await;
+        return response;
     }
     let (parts, body) = response.into_parts();
     // The route's own answer, whole: the request's limit is not the response's.
     let Ok(bytes) = to_bytes(body, usize::MAX).await else {
-        abandon(use_cases, &scoped).await;
+        abandon(use_cases, scoped).await;
         tracing::error!("reading a keyed request's answer failed");
-        return Ok(StatusCode::INTERNAL_SERVER_ERROR.into_response());
+        return StatusCode::INTERNAL_SERVER_ERROR.into_response();
     };
     // Only a JSON answer can be replayed as it was; any other frees the key for a retry.
     let Ok(json) = serde_json::from_slice::<serde_json::Value>(&bytes) else {
-        abandon(use_cases, &scoped).await;
-        return Ok(Response::from_parts(parts, Body::from(bytes)));
+        abandon(use_cases, scoped).await;
+        return Response::from_parts(parts, Body::from(bytes));
     };
     if let Err(error) = use_cases
         .finish_idempotent_request(FinishIdempotentRequestArgs {
-            key: &scoped,
+            key: scoped,
             status: status.as_u16(),
             body: &json,
         })
@@ -112,7 +130,7 @@ pub async fn idempotency(
     {
         tracing::error!(?error, "keeping the idempotent answer failed");
     }
-    Ok(Response::from_parts(parts, Body::from(bytes)))
+    Response::from_parts(parts, Body::from(bytes))
 }
 
 /// Free the key; a failure is logged, and the key stays in flight until its retention ends.

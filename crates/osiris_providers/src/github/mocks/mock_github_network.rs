@@ -126,4 +126,13 @@ impl<'a> MockGithubNetwork<'a> {
         }
         mock.mount(self.server).await;
     }
+
+    /// Ending a grant answers `status`, but only after `delay`.
+    pub async fn answer_revoke_after(&self, delay: std::time::Duration, status: u16) {
+        Mock::given(method("DELETE"))
+            .and(path_regex("^/applications/.*/grant$"))
+            .respond_with(ResponseTemplate::new(status).set_delay(delay))
+            .mount(self.server)
+            .await;
+    }
 }
