@@ -1,10 +1,13 @@
+# Two code owners, so neither one's own pull request can pass on the automated
+# review's approval alone: GitHub waives the code-owner rule when the author is
+# the only owner, and the review's approval would then count.
 # Review is required specifically on the paths that decide what the automated
 # review lets through: its workflow, its rules and helpers, and this file.
 #
 # Once the dev ruleset requires code-owner approval, an approval from the
 # automated review never counts toward a merge: only these people's does.
 
-*                                         @drn1996
-/.github/workflows/claude-code-review.yml  @drn1996
-/.github/claude-review/**                 @drn1996
-/.github/CODEOWNERS                       @drn1996
+*                                         @drn1996 @frubble-platform
+/.github/workflows/claude-code-review.yml  @drn1996 @frubble-platform
+/.github/claude-review/**                 @drn1996 @frubble-platform
+/.github/CODEOWNERS                       @drn1996 @frubble-platform
