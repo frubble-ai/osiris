@@ -1,7 +1,7 @@
 //! A list request's cursor, its length bounded by `[pagination]`.
 
 use crate::http::state::ApiState;
-use osiris_storage::Cursor;
+use osiris_domain::Cursor;
 
 pub fn cursor(
     state: &ApiState,

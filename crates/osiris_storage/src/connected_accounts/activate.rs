@@ -1,5 +1,6 @@
 //! The user finished the consent: saves the tokens and their first refresh task, and makes the
-//! connection active, in one statement.
+//! connection active, in one statement. Nothing is read back afterwards: once the write succeeds
+//! there is nothing left that could fail.
 
 use super::{
     NewTokens, ScheduledRefresh,
@@ -17,7 +18,7 @@ impl Store {
         account: &ConnectedAccount,
         tokens: &NewTokens,
         refresh: Option<&ScheduledRefresh>,
-    ) -> StorageResult<ConnectedAccount> {
+    ) -> StorageResult<()> {
         let cipher = self.cipher_for(&Tenant::user(&account.user_id)).await?;
         let mut connection = self.pool.acquire().await.map_err(db)?;
         store_tokens(
@@ -33,7 +34,6 @@ impl Store {
             },
         )
         .await?;
-        drop(connection);
-        self.connected_account(&account.id).await
+        Ok(())
     }
 }

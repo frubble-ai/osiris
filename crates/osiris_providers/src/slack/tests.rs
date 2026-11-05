@@ -55,10 +55,12 @@ async fn lists_channels_across_cursor_pages_naming_an_unnamed_one_by_its_id() {
 }
 
 #[rstest]
-#[case::revoked_token("token_revoked", true)]
-#[case::missing_scope("missing_scope", false)]
+#[case::revoked_token("token_revoked", "unauthorized")]
+#[case::missing_scope("missing_scope", "refused")]
+#[case::rate_limited("ratelimited", "unavailable")]
+#[case::slack_is_down("service_unavailable", "unavailable")]
 #[tokio::test]
-async fn reads_ok_false_by_its_error(#[case] error: &str, #[case] rejected: bool) {
+async fn reads_ok_false_by_its_error(#[case] error: &str, #[case] reading: &str) {
     let server = MockServer::start().await;
     MockSlackNetwork::on(&server)
         .answer_channels_error(error)
@@ -69,17 +71,12 @@ async fn reads_ok_false_by_its_error(#[case] error: &str, #[case] rejected: bool
         .await
         .unwrap_err();
 
-    if rejected {
-        assert!(
-            matches!(failure, ProviderError::Unauthorized { .. }),
-            "{failure}"
-        );
-    } else {
-        assert!(
-            matches!(failure, ProviderError::Refused { .. }),
-            "{failure}"
-        );
-    }
+    let as_expected = match reading {
+        "unauthorized" => matches!(failure, ProviderError::Unauthorized { .. }),
+        "refused" => matches!(failure, ProviderError::Refused { .. }),
+        _ => matches!(failure, ProviderError::Unavailable { .. }),
+    };
+    assert!(as_expected, "{failure}");
 }
 
 #[tokio::test]

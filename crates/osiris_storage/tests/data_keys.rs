@@ -50,3 +50,28 @@ async fn reads_nothing_with_another_master_key(pool: PgPool) {
     );
     assert!(stranger.connected_account(&id).await.is_err());
 }
+
+#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+async fn gives_racing_first_uses_of_a_tenant_the_same_key(pool: PgPool) {
+    // Several stores with nothing cached, as several instances are after a deploy, all meeting a
+    // tenant for the first time at once: none fails, and they all end up with the one key stored.
+    let stores: Vec<Store> = (0..8).map(|_| store(pool.clone())).collect();
+    let tenant = osiris_storage::Tenant::user("org_race");
+
+    let ciphers = futures::future::join_all(stores.iter().map(|store| store.cipher_for(&tenant)))
+        .await
+        .into_iter()
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
+
+    let sealed = ciphers[0].encrypt("the same key").unwrap();
+    for cipher in &ciphers {
+        assert_eq!(cipher.decrypt(&sealed).unwrap(), "the same key");
+    }
+    let stored: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM data_key WHERE tenant = 'user:org_race'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(stored, 1);
+}

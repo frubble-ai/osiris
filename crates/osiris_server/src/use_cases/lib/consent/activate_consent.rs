@@ -76,17 +76,17 @@ pub async fn activate_consent(
         .activate(account, &tokens, next.as_ref().map(scheduled).as_ref())
         .await;
     match saved {
-        Ok(active) => {
+        Ok(()) => {
             publish(
                 messages,
                 scheduling,
-                &Event::new(EventType::ConnectionActive, &active.id),
+                &Event::new(EventType::ConnectionActive, &account.id),
             )
             .await;
-            tracing::info!(connected_account_id = %active.id, "connection active");
+            tracing::info!(connected_account_id = %account.id, "connection active");
             Outcome::Redirect(back_to(
-                &active.callback_url,
-                &active.id,
+                &account.callback_url,
+                &account.id,
                 ConnectionStatus::Active,
             ))
         }

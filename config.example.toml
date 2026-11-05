@@ -60,6 +60,9 @@ max_concurrent = 4
 schedule_timeout_seconds = 10
 # How long Google's keys for checking a task's OIDC token are cached before they are fetched again.
 oidc_keys_ttl_seconds = 3600
+# The shortest time between two fetches of those keys for a key id not yet in the cache, so a caller
+# sending made-up key ids can't make osiris call Google on every request.
+oidc_keys_refetch_seconds = 30
 
 [tasks.local]
 # The local development scheduler (OSIRIS_TASKS=local): how long to wait before sending a task

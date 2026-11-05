@@ -77,6 +77,10 @@ impl Settings {
                 "tasks.oidc_keys_ttl_seconds",
                 self.tasks.oidc_keys_ttl_seconds,
             ),
+            (
+                "tasks.oidc_keys_refetch_seconds",
+                self.tasks.oidc_keys_refetch_seconds,
+            ),
         ]
     }
 }

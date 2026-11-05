@@ -34,7 +34,7 @@ exit.
 | `OSIRIS_ENCRYPTION_KEY` | serve, worker | the master key's secret, 32+ characters; never rotated without re-wrapping the data keys |
 | `OSIRIS_PUBLIC_URL` | serve, worker | osiris's public origin, used in the OAuth redirect URI |
 | `OSIRIS_API_KEY` | serve | the key clients send (32+ characters) |
-| `OSIRIS_ADMIN_KEY` | serve | the key operators send; never given to a client (32+ characters) |
+| `OSIRIS_ADMIN_KEY` | serve | the key operators send; never given to a client (32+ characters). It must differ from `OSIRIS_API_KEY`: startup fails if they match |
 | `PUBSUB_PROJECT`, `OSIRIS_EVENTS_TOPIC` | serve, worker | where events for clients are published |
 | `PUBSUB_EMULATOR_HOST` | locally | the Pub/Sub emulator; unset when deployed |
 | `OSIRIS_TASKS` | serve, worker | which task scheduler runs scheduled tasks: `cloud_tasks` when deployed, `local` in development |

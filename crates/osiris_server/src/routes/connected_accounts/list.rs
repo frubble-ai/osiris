@@ -19,9 +19,9 @@ use osiris_api_models::{
     connected_accounts::{ConnectedAccount, ConnectedAccountFilter},
     list::List,
 };
+use osiris_domain::AccountFilter;
 use osiris_domain::ConnectionStatus;
 use osiris_env::Flow;
-use osiris_storage::connected_accounts::AccountFilter;
 
 /// Connections, filtered, in batches; `alias` finds what an attempt made.
 #[utoipa::path(get, path = "/v1/connected-accounts", tag = "connected-accounts", params(ConnectedAccountFilter),

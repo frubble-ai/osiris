@@ -3,7 +3,7 @@
 use crate::use_cases::{UseCaseResult, UseCases};
 use osiris_common::errors::ReportSwitchExt;
 use osiris_domain::AuthConfig;
-use osiris_storage::{Cursor, Page};
+use osiris_domain::{Cursor, Page};
 
 pub struct ListAuthConfigsArgs<'a> {
     pub cursor: &'a Cursor,

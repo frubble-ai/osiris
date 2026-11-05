@@ -31,10 +31,12 @@ impl Store {
                 .master
                 .new_data_key()
                 .change_context(StorageError::Encrypt)?;
-            // A concurrent first use may have made one: keep whichever was stored first.
+            // A concurrent first use may have made one: the update changes nothing, and returns the
+            // row that was stored first, whichever transaction stored it.
             sqlx::query_scalar!(
-                "WITH made AS (INSERT INTO data_key (tenant, wrapped_key) VALUES ($1, $2) ON CONFLICT (tenant) DO NOTHING RETURNING wrapped_key)
-                 SELECT wrapped_key AS \"wrapped_key!\" FROM made UNION ALL SELECT wrapped_key FROM data_key WHERE tenant = $1 LIMIT 1",
+                "INSERT INTO data_key (tenant, wrapped_key) VALUES ($1, $2)
+                 ON CONFLICT (tenant) DO UPDATE SET tenant = EXCLUDED.tenant
+                 RETURNING wrapped_key",
                 key,
                 wrapped
             )

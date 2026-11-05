@@ -7,4 +7,4 @@ pub mod abandon;
 pub mod begin;
 pub mod finish;
 
-pub use begin::Begun;
+pub use osiris_domain::Begun;

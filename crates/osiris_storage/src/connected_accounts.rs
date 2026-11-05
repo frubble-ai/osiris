@@ -17,5 +17,6 @@ pub mod set_refresh_task;
 pub mod store_tokens;
 pub mod types;
 
+pub use osiris_domain::AccountFilter;
 pub use refresh_lock::RefreshLock;
-pub use types::{AccountFilter, Claimed, NewPending, NewTokens, ScheduledRefresh};
+pub use types::{Claimed, NewPending, NewTokens, ScheduledRefresh};

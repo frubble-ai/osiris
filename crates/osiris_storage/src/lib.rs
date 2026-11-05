@@ -7,14 +7,13 @@ pub mod connected_accounts;
 pub mod data_keys;
 pub mod errors;
 pub mod idempotency;
-pub mod page;
 pub mod ping;
 pub mod rows;
 pub mod task_outcomes;
 pub mod tenant;
 
 pub use errors::StorageError;
-pub use page::{Cursor, Page};
+pub use osiris_domain::{Cursor, Page};
 pub use tenant::Tenant;
 
 use osiris_common::crypto::{Cipher, MasterKey};

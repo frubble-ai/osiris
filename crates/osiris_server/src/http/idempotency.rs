@@ -21,7 +21,7 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
-use osiris_storage::idempotency::Begun;
+use osiris_domain::Begun;
 use sha2::{Digest, Sha256};
 
 const HEADER: &str = "idempotency-key";

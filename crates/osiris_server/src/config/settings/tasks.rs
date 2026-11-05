@@ -17,6 +17,8 @@ pub struct TasksSettings {
     pub schedule_timeout_seconds: u64,
     /// How long Google's OIDC signing keys are cached before they are fetched again.
     pub oidc_keys_ttl_seconds: u64,
+    /// The shortest time between two fetches of those keys for a key id not yet in the cache.
+    pub oidc_keys_refetch_seconds: u64,
     pub local: LocalTasksSettings,
 }
 
@@ -48,6 +50,7 @@ impl Default for TasksSettings {
             max_concurrent: 4,
             schedule_timeout_seconds: 10,
             oidc_keys_ttl_seconds: 3600,
+            oidc_keys_refetch_seconds: 30,
             local: LocalTasksSettings::default(),
         }
     }

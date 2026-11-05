@@ -3,7 +3,7 @@
 use crate::use_cases::{UseCaseResult, UseCases};
 use osiris_common::errors::ReportSwitchExt;
 use osiris_domain::ConnectedAccount;
-use osiris_storage::{Cursor, Page, connected_accounts::AccountFilter};
+use osiris_domain::{AccountFilter, Cursor, Page};
 
 pub struct ListConnectedAccountsArgs<'a> {
     pub filter: &'a AccountFilter,

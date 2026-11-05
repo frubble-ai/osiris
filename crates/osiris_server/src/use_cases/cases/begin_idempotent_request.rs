@@ -2,7 +2,7 @@
 
 use crate::use_cases::{UseCaseResult, UseCases};
 use osiris_common::errors::ReportSwitchExt;
-use osiris_storage::idempotency::Begun;
+use osiris_domain::Begun;
 
 pub struct BeginIdempotentRequestArgs<'a> {
     /// The key, scoped to the caller, the method and the path.

@@ -1,7 +1,7 @@
 //! A batch from storage as the API's list.
 
 use osiris_api_models::list::List;
-use osiris_storage::Page;
+use osiris_domain::Page;
 
 pub fn list<T, U: From<T>>(page: Page<T>) -> List<U> {
     List {

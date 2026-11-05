@@ -14,6 +14,15 @@ const TOKEN_GONE: &[&str] = &[
     "not_authed",
 ];
 
+/// The errors that mean Slack failed for now: try again, the grant is not at fault.
+const TRY_AGAIN: &[&str] = &[
+    "ratelimited",
+    "service_unavailable",
+    "internal_error",
+    "fatal_error",
+    "request_timeout",
+];
+
 /// `ok`, and the `error` when not.
 #[derive(Deserialize)]
 pub struct Status {
@@ -31,6 +40,8 @@ impl Status {
         let message = format!("{method}: {error}");
         Some(if TOKEN_GONE.contains(&error) {
             ProviderError::unauthorized("slack", message)
+        } else if TRY_AGAIN.contains(&error) {
+            ProviderError::unavailable("slack", message)
         } else {
             ProviderError::refused("slack", message)
         })
