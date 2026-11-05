@@ -1,9 +1,11 @@
 # The everyday commands. `just` alone lists them.
 set dotenv-load
 
-# Osiris reads the database's CA certificate from DB_CA_PEM, in every environment. Locally it is
-# the CA docker-compose generates in .local/tls (`just up`).
-export DB_CA_PEM := `cat .local/tls/ca.pem 2>/dev/null || true`
+# Osiris reads the database's CA certificate from DB_CA_PEM, in every environment. A value already
+# set (in the shell or in .env) is used as it is. Otherwise it is the CA docker-compose generates in
+# .local/tls (`just up`). A missing file is not an error here, so that `just --list` works before
+# `just up`; osiris itself refuses an empty DB_CA_PEM at startup.
+export DB_CA_PEM := env("DB_CA_PEM", `cat .local/tls/ca.pem 2>/dev/null || true`)
 
 # sqlx's tools (sqlx-cli, `cargo sqlx prepare`) and its test harness (`#[sqlx::test]`) only take a
 # URL, so one is built here from the same DB_* values, with the same TLS. Osiris itself never reads

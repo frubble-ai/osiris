@@ -1,7 +1,7 @@
 name: Live providers
 
 # The provider actions against the real GitHub, Linear and Slack, with test accounts' tokens.
-# Nightly, and on demand. A provider whose secret is unset is skipped.
+# Nightly, and on demand. A test whose token is unset is skipped locally and fails in CI.
 on:
   schedule:
     - cron: "17 4 * * *"
