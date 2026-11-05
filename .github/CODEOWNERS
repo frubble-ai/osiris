@@ -4,6 +4,7 @@
 # Once the dev ruleset requires code-owner approval, an approval from the
 # automated review never counts toward a merge: only these people's does.
 
+*                                         @drn1996
 /.github/workflows/claude-code-review.yml  @drn1996
 /.github/claude-review/**                 @drn1996
 /.github/CODEOWNERS                       @drn1996
