@@ -1,6 +1,5 @@
-//! `osiris`: the developer CLI. Manage the providers' apps and the schedule, connect a provider in
-//! your browser, inspect connections, run actions, and receive or trigger events locally, the way
-//! the Stripe CLI works with Stripe.
+//! `osiris`: the developer CLI. Manage the providers' apps, connect a provider in your browser,
+//! inspect and refresh connections, run actions, and receive or trigger events locally.
 
 #![allow(clippy::print_stdout, reason = "a CLI answers on stdout")]
 

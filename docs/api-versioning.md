@@ -1,6 +1,6 @@
 # API versioning
 
-As Stripe does it. The path is `/v1`, a generation of the API's ground rules; the version is a
+The path is `/v1`, a generation of the API's ground rules; the version is a
 date and a named release, sent as `Osiris-Version`, e.g. `2026-11-04.anubis`.
 
 - A request naming no version is served at the API key's pinned version (`[api] pinned_version`).

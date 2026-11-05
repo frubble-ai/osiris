@@ -6,8 +6,8 @@ connections. Osiris holds the tokens (encrypted, per tenant), keeps them fresh w
 refresh tasks, and tells the client when a connection needs reconnecting. The client never holds a
 provider token.
 
-It runs as two request-driven Cloud Run services, `serve` (public) and `worker` (internal), plus a
-`migrate` job. Nothing is always on: work at a set time is a Cloud Task.
+It runs as two request-driven Cloud Run services, `serve` (public) and `worker` (internal), and a
+`migrate` job. Work at a set time is a Cloud Task.
 
 Providers: GitHub (through a GitHub App), Linear, Slack.
 
@@ -24,8 +24,8 @@ just dev       # OSIRIS_PROCESS=serve on PORT=8090 and OSIRIS_PROCESS=worker on 
 curl localhost:8090/health
 ```
 
-Locally osiris runs exactly as deployed: the same `DB_*` variables, TLS verified against
-`DB_CA_PEM`, and the process chosen by `OSIRIS_PROCESS` ([docs/configuration.md](docs/configuration.md)).
+Locally, osiris reads the same `DB_*` variables with TLS verified against `DB_CA_PEM`, and the
+process is chosen by `OSIRIS_PROCESS` ([docs/configuration.md](docs/configuration.md)).
 
 Then, with the CLI (`cargo install --path crates/osiris_cli`, or `cargo run -p osiris_cli --`):
 

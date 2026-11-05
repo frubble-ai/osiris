@@ -1,5 +1,5 @@
 //! What every provider is, whatever it does: its id, where its API is, how a request carries the
-//! token, and how its errors read. Hyperswitch's `ConnectorCommon`, for providers.
+//! token, and how its errors read.
 
 use crate::ProviderError;
 use reqwest::{

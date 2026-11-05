@@ -1,4 +1,4 @@
-//! API versions, as Stripe's: a date and a named release. A client sends `Osiris-Version`; every
+//! API versions: a date and a named release. A client sends `Osiris-Version`; every
 //! answer says the version it was served at. Breaking changes only come with a new release, named
 //! after the Egyptian pantheon in alphabetical order: anubis, bastet, …
 
