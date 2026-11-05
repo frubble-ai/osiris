@@ -57,15 +57,17 @@ responsible for the whole diff.
 
 ## Step 3 — the completion gate
 
-A lens's answer is **usable** only if it is one of these, and nothing else:
+A lens's answer is **usable** exactly when the workflow's own check accepts it, which is when it holds one
+of these and not the other:
 
-- a `### Findings` heading followed by entries that each carry `file:line`, a severity label, a problem
-  and a fix; or
-- exactly the line `Area clean (<lens>) — no findings.`
+- the line `Area clean (<lens>) — no findings.`, with its own lens name; a short note before or after it
+  is fine and still counts as clean; or
+- a `Findings` heading (`### Findings`, or any heading level) with entries that carry `file:line`, each
+  with a severity label, a problem and a fix.
 
-Anything else is a **lost** answer: an empty reply, an error, prose with no findings block, a findings
-heading with no entries, or both a findings heading and the clean line. Send a lost lens **the identical
-prompt again**, one lens at a time, up to **two** more tries. A lens still lost after that is listed in
+Anything else is a **lost** answer: an empty reply, an error, prose with neither the clean line nor a
+findings block, a findings heading with no `file:line` entry, or both a findings block and the clean line.
+Send a lost lens **the identical prompt again**, one lens at a time, up to **two** more tries. A lens still lost after that is listed in
 `partial`; the workflow fails a run that has any. Never stand in for a lens, and never review its area
 yourself. Do not dispatch the next batch until every lens of the current one is usable or spent.
 

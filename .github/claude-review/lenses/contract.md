@@ -70,9 +70,9 @@ the outcomes it chooses between and what each one means for every lens.
   so the reader sees that another bot or person caught it as well. When the nearby comment is about a
   _different_ defect, report yours with no note. Never drop a finding without saying so.
 - Answer with a short findings list under a `### Findings` heading. When your lens is clean, answer
-  exactly `Area clean (<lens>) — no findings.` with your own lens name — the review's completion check
-  looks for that exact line, and text that does not match it counts as a missing answer and is sent
-  again.
+  with the line `Area clean (<lens>) — no findings.` with your own lens name, word for word; a short note
+  may follow it. The review's completion check looks for that exact line: an answer with neither that
+  line nor a findings block, or with both, counts as a missing answer and is sent again.
 
 ## Evidence and tone
 
