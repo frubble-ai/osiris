@@ -73,9 +73,11 @@ jobs:
         run: typos
       - name: Every commit is a Conventional Commit
         if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          git fetch -q origin "${{ github.base_ref }}"
-          cog check "origin/${{ github.base_ref }}..HEAD"
+          git fetch -q origin "$BASE_REF"
+          cog check "origin/$BASE_REF..HEAD"
 
   test:
     needs: secret-scan
