@@ -6,7 +6,8 @@
 use crate::use_cases::{
     UseCaseResult, UseCases,
     cases::{
-        get_connected_account::GetConnectedAccountArgs, refresh_connection::RefreshConnectionArgs,
+        get_connected_account::GetConnectedAccountArgs,
+        refresh_connected_account::RefreshConnectedAccountArgs,
     },
     lib::refresh::{When, restore::restore},
 };
@@ -14,17 +15,20 @@ use osiris_common::secret::Secret;
 use osiris_domain::{ConnectionStatus, DomainError};
 use time::OffsetDateTime;
 
-pub struct ConnectionTokenArgs<'a> {
+pub struct ConnectedAccountTokenArgs<'a> {
     pub id: &'a str,
     pub provider: &'a str,
     pub action: &'a str,
 }
 
 impl UseCases {
-    pub async fn connection_token(&self, args: ConnectionTokenArgs<'_>) -> UseCaseResult<Secret> {
-        self.run("connection_token", async {
+    pub async fn connected_account_token(
+        &self,
+        args: ConnectedAccountTokenArgs<'_>,
+    ) -> UseCaseResult<Secret> {
+        self.run("connected_account_token", async {
             let ctx = self.context();
-            let ConnectionTokenArgs { id, provider, action } = args;
+            let ConnectedAccountTokenArgs { id, provider, action } = args;
             let account = self.get_connected_account(GetConnectedAccountArgs { id }).await?;
             if account.provider != provider {
                 return Err(DomainError::Invalid(format!(
@@ -41,7 +45,7 @@ impl UseCases {
                 )
             });
             let account = if due {
-                self.refresh_connection(RefreshConnectionArgs {
+                self.refresh_connected_account(RefreshConnectedAccountArgs {
                     id,
                     when: When::IfDue,
                     running: None,

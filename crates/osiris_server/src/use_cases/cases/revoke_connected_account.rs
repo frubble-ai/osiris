@@ -7,17 +7,20 @@ use crate::use_cases::{
     lib::{events::publish::publish, tasks::cancel_quietly::cancel_quietly},
 };
 
-pub struct RevokeConnectionArgs<'a> {
+pub struct RevokeConnectedAccountArgs<'a> {
     pub id: &'a str,
     /// The provider's own text, for the log only.
     pub reason: &'a str,
 }
 
 impl UseCases {
-    pub async fn revoke_connection(&self, args: RevokeConnectionArgs<'_>) -> UseCaseResult<()> {
-        self.run("revoke_connection", async {
+    pub async fn revoke_connected_account(
+        &self,
+        args: RevokeConnectedAccountArgs<'_>,
+    ) -> UseCaseResult<()> {
+        self.run("revoke_connected_account", async {
             let ctx = self.context();
-            let RevokeConnectionArgs { id, reason } = args;
+            let RevokeConnectedAccountArgs { id, reason } = args;
             // The provider's own text stays in the log; the connection stores a fixed reason.
             tracing::warn!(connected_account_id = id, %reason, "the provider rejects the token; the grant is gone");
             let lock = ctx.db.lock_for_refresh(id).await?;

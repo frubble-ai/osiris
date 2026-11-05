@@ -5,8 +5,9 @@
 use crate::use_cases::{
     UseCaseResult, UseCases,
     cases::{
-        connection_token::ConnectionTokenArgs, refresh_connection::RefreshConnectionArgs,
-        revoke_connection::RevokeConnectionArgs,
+        connected_account_token::ConnectedAccountTokenArgs,
+        refresh_connected_account::RefreshConnectedAccountArgs,
+        revoke_connected_account::RevokeConnectedAccountArgs,
     },
     lib::{refresh::When, shared::domain_errors::provider},
 };
@@ -14,7 +15,7 @@ use osiris_common::secret::Secret;
 use osiris_domain::{ConnectionStatus, DomainError};
 use osiris_interfaces::ProviderError;
 
-pub struct RunConnectionActionArgs<'a, F> {
+pub struct RunConnectedAccountActionArgs<'a, F> {
     pub id: &'a str,
     pub provider: &'a str,
     pub action: &'a str,
@@ -23,23 +24,23 @@ pub struct RunConnectionActionArgs<'a, F> {
 }
 
 impl UseCases {
-    pub async fn run_connection_action<T, F, Fut>(
+    pub async fn run_connected_account_action<T, F, Fut>(
         &self,
-        args: RunConnectionActionArgs<'_, F>,
+        args: RunConnectedAccountActionArgs<'_, F>,
     ) -> UseCaseResult<T>
     where
         F: Fn(Secret) -> Fut,
         Fut: Future<Output = Result<T, ProviderError>>,
     {
-        self.run("run_connection_action", async {
-            let RunConnectionActionArgs {
+        self.run("run_connected_account_action", async {
+            let RunConnectedAccountActionArgs {
                 id,
                 provider: provider_id,
                 action,
                 call,
             } = args;
             let token = self
-                .connection_token(ConnectionTokenArgs {
+                .connected_account_token(ConnectedAccountTokenArgs {
                     id,
                     provider: provider_id,
                     action,
@@ -51,7 +52,7 @@ impl UseCases {
                 Err(error) => return Err(provider(error)),
             };
             let account = self
-                .refresh_connection(RefreshConnectionArgs {
+                .refresh_connected_account(RefreshConnectedAccountArgs {
                     id,
                     when: When::Now,
                     running: None,
@@ -66,14 +67,14 @@ impl UseCases {
                 .tokens
                 .filter(|tokens| tokens.refresh_token.is_some())
             else {
-                self.revoke_connection(RevokeConnectionArgs { id, reason: &first })
+                self.revoke_connected_account(RevokeConnectedAccountArgs { id, reason: &first })
                     .await?;
                 return Err(DomainError::NotActive("expired").into());
             };
             match call(tokens.access_token).await {
                 Ok(answer) => Ok(answer),
                 Err(ProviderError::Unauthorized { message, .. }) => {
-                    self.revoke_connection(RevokeConnectionArgs {
+                    self.revoke_connected_account(RevokeConnectedAccountArgs {
                         id,
                         reason: &message,
                     })

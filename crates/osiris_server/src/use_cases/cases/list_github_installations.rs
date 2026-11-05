@@ -1,7 +1,7 @@
 //! `github.list_installations`: where the GitHub App is installed, of what the connected user can see.
 
 use crate::use_cases::{
-    UseCaseResult, UseCases, cases::run_connection_action::RunConnectionActionArgs,
+    UseCaseResult, UseCases, cases::run_connected_account_action::RunConnectedAccountActionArgs,
 };
 use osiris_common::secret::{ExposeSecret, Secret};
 use osiris_providers::github::types::GithubInstallation;
@@ -19,7 +19,7 @@ impl UseCases {
         self.run("list_github_installations", async {
             let ctx = self.context();
             let (provider, http) = (&ctx.providers.github, &ctx.http);
-            self.run_connection_action(RunConnectionActionArgs {
+            self.run_connected_account_action(RunConnectedAccountActionArgs {
                 id: args.id,
                 provider: "github",
                 action: "github.list_installations",

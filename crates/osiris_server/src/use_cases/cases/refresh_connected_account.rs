@@ -35,7 +35,7 @@ use osiris_interfaces::{ProviderError, oauth};
 
 use time::OffsetDateTime;
 
-pub struct RefreshConnectionArgs<'a> {
+pub struct RefreshConnectedAccountArgs<'a> {
     pub id: &'a str,
     pub when: When,
     /// The refresh task asking, when a task asks.
@@ -43,13 +43,13 @@ pub struct RefreshConnectionArgs<'a> {
 }
 
 impl UseCases {
-    pub async fn refresh_connection(
+    pub async fn refresh_connected_account(
         &self,
-        args: RefreshConnectionArgs<'_>,
+        args: RefreshConnectedAccountArgs<'_>,
     ) -> UseCaseResult<Refresh> {
-        self.run("refresh_connection", async {
+        self.run("refresh_connected_account", async {
             let ctx = self.context();
-            let RefreshConnectionArgs { id, when, running } = args;
+            let RefreshConnectedAccountArgs { id, when, running } = args;
             let settings = &ctx.config.settings;
             // Everything the refresh needs to read is read before the row is locked, so a refresh
             // holding a lock never waits for a second database connection.

@@ -33,7 +33,7 @@ Nothing else in osiris names one.
 1. `<provider>/<action>.rs` with the call, `types.rs` with our answer type, `transformers.rs` with
    the provider's answer and its `From`.
 2. The use case: `use_cases/cases/list_<provider>_<thing>.rs`, a method on `UseCases` that runs
-   the provider call through `run_connection_action` (so a rejected token is refreshed once, then
+   the provider call through `run_connected_account_action` (so a rejected token is refreshed once, then
    the connection revoked), declared in `use_cases/cases.rs`
    ([use cases](style-guide/use-cases.md)).
 3. The route: `routes/actions/<provider>/<action>.rs` (declared in `routes/actions/<provider>.rs`),

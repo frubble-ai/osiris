@@ -1,7 +1,7 @@
 //! `linear.list_teams`: the Linear teams the connected user can see.
 
 use crate::use_cases::{
-    UseCaseResult, UseCases, cases::run_connection_action::RunConnectionActionArgs,
+    UseCaseResult, UseCases, cases::run_connected_account_action::RunConnectedAccountActionArgs,
 };
 use osiris_common::secret::{ExposeSecret, Secret};
 use osiris_providers::linear::types::LinearTeam;
@@ -19,7 +19,7 @@ impl UseCases {
         self.run("list_linear_teams", async {
             let ctx = self.context();
             let (provider, http) = (&ctx.providers.linear, &ctx.http);
-            self.run_connection_action(RunConnectionActionArgs {
+            self.run_connected_account_action(RunConnectedAccountActionArgs {
                 id: args.id,
                 provider: "linear",
                 action: "linear.list_teams",

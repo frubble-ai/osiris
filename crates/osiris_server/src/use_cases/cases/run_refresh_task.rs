@@ -4,7 +4,7 @@
 
 use crate::use_cases::{
     UseCaseResult, UseCases,
-    cases::refresh_connection::RefreshConnectionArgs,
+    cases::refresh_connected_account::RefreshConnectedAccountArgs,
     lib::refresh::{Refresh, RunningTask, When},
 };
 use osiris_domain::TaskOutcome;
@@ -27,7 +27,7 @@ impl UseCases {
             };
             Ok(
                 match self
-                    .refresh_connection(RefreshConnectionArgs {
+                    .refresh_connected_account(RefreshConnectedAccountArgs {
                         id: &args.task.connected_account_id,
                         when: When::Now,
                         running: Some(running),
