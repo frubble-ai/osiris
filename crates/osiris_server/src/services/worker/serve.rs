@@ -4,7 +4,7 @@
 use super::{router::router, state::WorkerState};
 use crate::{
     config::{Config, listen::listen_address},
-    http::serve_until_stopped::serve_until_stopped,
+    http::{serve_until_stopped::serve_until_stopped, shutdown},
     use_cases::{UseCases, build_use_case_context::build_use_case_context},
 };
 use std::sync::{
@@ -27,9 +27,15 @@ pub async fn serve(config: Config) -> anyhow::Result<()> {
     let address = listen_address()?;
     let listener = tokio::net::TcpListener::bind(&address).await?;
     tracing::info!(%address, "osiris worker listening");
-    serve_until_stopped(listener, router(state), grace, move || {
-        draining.store(true, Ordering::SeqCst);
-        tracing::info!("draining");
-    })
+    serve_until_stopped(
+        listener,
+        router(state),
+        grace,
+        shutdown::signal(),
+        move || {
+            draining.store(true, Ordering::SeqCst);
+            tracing::info!("draining");
+        },
+    )
     .await
 }
