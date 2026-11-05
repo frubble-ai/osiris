@@ -42,7 +42,7 @@ CREATE INDEX auth_config_created_idx ON auth_config (created_at, id);
 -- client's: who it is for, and the client's own mark for the attempt that made it.
 CREATE TABLE connected_account (
     id text PRIMARY KEY,
-    auth_config_id text NOT NULL REFERENCES auth_config (id) ON DELETE CASCADE,
+    auth_config_id text NOT NULL REFERENCES auth_config (id) ON DELETE RESTRICT,
     -- The auth config's provider, kept on the connection so reading one needs no join.
     provider text NOT NULL REFERENCES provider (key),
     user_id text NOT NULL,
