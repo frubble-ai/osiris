@@ -2,6 +2,7 @@
 
 use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
+use serde_json::{Value, json};
 use sqlx::PgPool;
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
@@ -57,32 +58,20 @@ async fn serves_the_pinned_version_and_refuses_an_unknown_one(pool: PgPool) {
     assert_eq!(unknown.body["error"]["code"], "OS_07");
 }
 
-#[sqlx::test(migrator = "crate::db::MIGRATOR")]
-async fn keeps_every_auth_config_change_behind_the_admin_key(pool: PgPool) {
+async fn keeps_an_auth_config_change_behind_the_admin_key(
+    pool: PgPool,
+    method: &str,
+    path: &str,
+    body: Option<Value>,
+) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
-    let changes = [
-        (
-            "POST",
-            "/v1/auth-configs".to_owned(),
-            Some(
-                serde_json::json!({ "provider": "github", "client_id": "c", "client_secret": "s" }),
-            ),
-        ),
-        (
-            "PATCH",
-            format!("/v1/auth-configs/{config}"),
-            Some(serde_json::json!({ "client_id": "other" })),
-        ),
-        ("DELETE", format!("/v1/auth-configs/{config}"), None),
-    ];
-    for (method, path, body) in changes {
-        let refused = app
-            .send(method, &path, Some(API_KEY), body.clone(), &[])
-            .await;
-        assert_eq!(refused.status, StatusCode::UNAUTHORIZED, "{method} {path}");
-        assert_eq!(refused.body["error"]["code"], "OS_00", "{method} {path}");
-    }
+    let path = path.replace("{config}", &config);
+
+    let refused = app.send(method, &path, Some(API_KEY), body, &[]).await;
+
+    assert_eq!(refused.status, StatusCode::UNAUTHORIZED);
+    assert_eq!(refused.body["error"]["code"], "OS_00");
     // Nothing changed: the app is still there, unchanged.
     let read = app
         .send(
@@ -95,4 +84,37 @@ async fn keeps_every_auth_config_change_behind_the_admin_key(pool: PgPool) {
         .await;
     assert_eq!(read.status, StatusCode::OK);
     assert_eq!(read.body["client_id"], "client");
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn keeps_creating_an_auth_config_behind_the_admin_key(pool: PgPool) {
+    keeps_an_auth_config_change_behind_the_admin_key(
+        pool,
+        "POST",
+        "/v1/auth-configs",
+        Some(json!({ "provider": "github", "client_id": "c", "client_secret": "s" })),
+    )
+    .await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn keeps_updating_an_auth_config_behind_the_admin_key(pool: PgPool) {
+    keeps_an_auth_config_change_behind_the_admin_key(
+        pool,
+        "PATCH",
+        "/v1/auth-configs/{config}",
+        Some(json!({ "client_id": "other" })),
+    )
+    .await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn keeps_deleting_an_auth_config_behind_the_admin_key(pool: PgPool) {
+    keeps_an_auth_config_change_behind_the_admin_key(
+        pool,
+        "DELETE",
+        "/v1/auth-configs/{config}",
+        None,
+    )
+    .await;
 }

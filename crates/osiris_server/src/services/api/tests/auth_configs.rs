@@ -9,7 +9,7 @@
 use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
-use serde_json::json;
+use serde_json::{Value, json};
 use sqlx::PgPool;
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
@@ -90,43 +90,60 @@ async fn refuses_to_delete_an_auth_config_a_connection_uses(pool: PgPool) {
     assert_eq!(answer.body["error"]["code"], "OS_03");
 }
 
-#[sqlx::test(migrator = "crate::db::MIGRATOR")]
-async fn answers_invalid_requests_with_os_02(pool: PgPool) {
+async fn answers_an_invalid_request_with_os_02(
+    pool: PgPool,
+    route: &str,
+    key: &str,
+    body: impl FnOnce(&str) -> Value,
+) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
-    let invalid = [
-        (
-            "/v1/auth-configs",
-            ADMIN_KEY,
-            json!({ "provider": "nope", "client_id": "c", "client_secret": "s" }),
-        ),
-        (
-            "/v1/auth-configs",
-            ADMIN_KEY,
-            json!({ "provider": "github", "client_id": "c", "client_secret": "" }),
-        ),
-        ("/v1/connected-accounts", API_KEY, {
-            let mut attempt = generate_connect_attempt(&config);
-            attempt["callback_url"] = "ftp://app.test/cb".into();
-            attempt
-        }),
-        (
-            "/v1/connected-accounts",
-            API_KEY,
-            json!({ "auth_config_id": config, "user_id": " ", "callback_url": "http://app.test/cb" }),
-        ),
-    ];
-    for (route, key, body) in invalid {
-        let answer = app
-            .send("POST", route, Some(key), Some(body.clone()), &[])
-            .await;
-        assert_eq!(
-            answer.status,
-            StatusCode::BAD_REQUEST,
-            "{body}: {}",
-            answer.body
-        );
-        assert_eq!(answer.body["error"]["code"], "OS_02", "{body}");
-        assert!(answer.body["error"]["message"].is_string());
-    }
+
+    let answer = app
+        .send("POST", route, Some(key), Some(body(&config)), &[])
+        .await;
+
+    assert_eq!(answer.status, StatusCode::BAD_REQUEST, "{}", answer.body);
+    assert_eq!(answer.body["error"]["code"], "OS_02");
+    assert!(answer.body["error"]["message"].is_string());
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_an_unknown_provider(pool: PgPool) {
+    answers_an_invalid_request_with_os_02(
+        pool,
+        "/v1/auth-configs",
+        ADMIN_KEY,
+        |_| json!({ "provider": "nope", "client_id": "c", "client_secret": "s" }),
+    )
+    .await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_an_empty_client_secret(pool: PgPool) {
+    answers_an_invalid_request_with_os_02(
+        pool,
+        "/v1/auth-configs",
+        ADMIN_KEY,
+        |_| json!({ "provider": "github", "client_id": "c", "client_secret": "" }),
+    )
+    .await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_a_callback_that_is_not_http(pool: PgPool) {
+    answers_an_invalid_request_with_os_02(pool, "/v1/connected-accounts", API_KEY, |config| {
+        let mut attempt = generate_connect_attempt(config);
+        attempt["callback_url"] = "ftp://app.test/cb".into();
+        attempt
+    })
+    .await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_a_blank_user(pool: PgPool) {
+    answers_an_invalid_request_with_os_02(pool, "/v1/connected-accounts", API_KEY, |config| {
+        json!({ "auth_config_id": config, "user_id": " ", "callback_url": "http://app.test/cb" })
+    })
+    .await;
 }
