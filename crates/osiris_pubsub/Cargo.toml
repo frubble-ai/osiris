@@ -22,4 +22,6 @@ tokio.workspace = true
 
 [dev-dependencies]
 osiris_events = { workspace = true, features = ["testing"] }
+fake.workspace = true
+wiremock.workspace = true
 tokio.workspace = true

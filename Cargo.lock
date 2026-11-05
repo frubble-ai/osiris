@@ -2158,6 +2158,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "base64 0.23.1",
+ "fake",
  "google-cloud-auth",
  "google-cloud-pubsub",
  "osiris_events",
@@ -2165,6 +2166,7 @@ dependencies = [
  "serde_json",
  "tokio",
  "tracing",
+ "wiremock",
 ]
 
 [[package]]
