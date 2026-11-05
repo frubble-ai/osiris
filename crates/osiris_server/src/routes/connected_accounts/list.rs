@@ -1,5 +1,6 @@
 //! `GET /v1/connected-accounts`: connections, filtered, in batches.
 
+use crate::use_cases::cases::list_connected_accounts::ListConnectedAccountsArgs;
 use crate::{
     http::{
         auth::Auth,
@@ -51,8 +52,12 @@ pub async fn list_connected_accounts(
         &headers,
         Auth::Api,
         StatusCode::OK,
-        |core| async move {
-            core.list_connected_accounts(&filter, &cursor)
+        |use_cases| async move {
+            use_cases
+                .list_connected_accounts(ListConnectedAccountsArgs {
+                    filter: &filter,
+                    cursor: &cursor,
+                })
                 .await
                 .map(list)
         },

@@ -2,8 +2,11 @@
 //! is the only thing trusted, and it works once.
 
 use crate::{
-    core::oauth_callback::{Callback, Outcome},
     http::state::ApiState,
+    use_cases::{
+        cases::finish_consent::FinishConsentArgs,
+        lib::consent::{Callback, Outcome},
+    },
 };
 use axum::{
     extract::{Query, State},
@@ -25,9 +28,19 @@ pub async fn oauth_callback(
     State(state): State<ApiState>,
     Query(query): Query<CallbackQuery>,
 ) -> Response {
-    match state.core.finish_consent(Callback { state: query.state, code: query.code, error: query.error }).await {
-        Outcome::Redirect(url) => Redirect::to(&url).into_response(),
-        Outcome::Unknown => (
+    let finished = state
+        .use_cases
+        .finish_consent(FinishConsentArgs {
+            callback: Callback {
+                state: query.state,
+                code: query.code,
+                error: query.error,
+            },
+        })
+        .await;
+    match finished {
+        Ok(Outcome::Redirect(url)) => Redirect::to(&url).into_response(),
+        Ok(Outcome::Unknown) | Err(_) => (
             StatusCode::BAD_REQUEST,
             Html("<!doctype html><title>Osiris</title><p>This connection link is no longer valid. Start connecting again from the app.</p>"),
         )

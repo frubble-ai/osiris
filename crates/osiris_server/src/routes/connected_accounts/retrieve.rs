@@ -1,6 +1,7 @@
 //! `GET /v1/connected-accounts/{id}`.
 
 use crate::http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState};
+use crate::use_cases::cases::get_connected_account::GetConnectedAccountArgs;
 use axum::{
     Json,
     extract::{Path, State},
@@ -23,8 +24,9 @@ pub async fn retrieve_connected_account(
         &headers,
         Auth::Api,
         StatusCode::OK,
-        |core| async move {
-            core.connected_account(&id)
+        |use_cases| async move {
+            use_cases
+                .get_connected_account(GetConnectedAccountArgs { id: &id })
                 .await
                 .map(ConnectedAccount::from)
         },

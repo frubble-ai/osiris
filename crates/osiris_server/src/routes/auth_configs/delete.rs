@@ -1,6 +1,7 @@
 //! `DELETE /v1/auth-configs/{id}`.
 
 use crate::http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState};
+use crate::use_cases::cases::delete_auth_config::DeleteAuthConfigArgs;
 use axum::{
     Json,
     extract::{Path, State},
@@ -24,8 +25,9 @@ pub async fn delete_auth_config(
         &headers,
         Auth::Admin,
         StatusCode::OK,
-        |core| async move {
-            core.delete_auth_config(&id)
+        |use_cases| async move {
+            use_cases
+                .delete_auth_config(DeleteAuthConfigArgs { id: &id })
                 .await
                 .map(|()| Deleted { id, deleted: true })
         },

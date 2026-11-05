@@ -7,5 +7,5 @@ use serde_json::Value;
 
 #[tracing::instrument(skip_all, fields(flow = %Flow::Health))]
 pub async fn health(State(state): State<ApiState>) -> (StatusCode, Json<Value>) {
-    health_answer(state.core.database_up().await)
+    health_answer(state.use_cases.check_database().await.unwrap_or(false))
 }

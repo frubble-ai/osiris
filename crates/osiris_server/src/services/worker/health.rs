@@ -16,5 +16,5 @@ pub async fn health(State(state): State<WorkerState>) -> (StatusCode, Json<Value
             Json(json!({ "status": "draining", "commit": osiris_env::build::commit() })),
         );
     }
-    health_answer(state.core.database_up().await)
+    health_answer(state.use_cases.check_database().await.unwrap_or(false))
 }

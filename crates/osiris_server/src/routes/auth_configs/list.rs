@@ -1,5 +1,6 @@
 //! `GET /v1/auth-configs`: the providers' apps, in batches.
 
+use crate::use_cases::cases::list_auth_configs::ListAuthConfigsArgs;
 use crate::{
     http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
     routes::{cursor::cursor, list::list},
@@ -30,7 +31,12 @@ pub async fn list_auth_configs(
         &headers,
         Auth::Admin,
         StatusCode::OK,
-        |core| async move { core.list_auth_configs(&cursor).await.map(list) },
+        |use_cases| async move {
+            use_cases
+                .list_auth_configs(ListAuthConfigsArgs { cursor: &cursor })
+                .await
+                .map(list)
+        },
     )
     .await
 }

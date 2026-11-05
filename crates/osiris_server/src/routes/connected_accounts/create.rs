@@ -1,8 +1,8 @@
 //! `POST /v1/connected-accounts`: start connecting a user.
 
 use crate::{
-    core::connected_accounts::StartConnect,
     http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
+    use_cases::cases::start_connect::StartConnectArgs,
 };
 use axum::{
     Json,
@@ -26,7 +26,7 @@ pub async fn create_connected_account(
     headers: HeaderMap,
     Json(body): Json<CreateConnectedAccount>,
 ) -> ApiResult<(StatusCode, Json<ConnectedAccountCreated>)> {
-    let start = StartConnect {
+    let start = StartConnectArgs {
         auth_config_id: body.auth_config_id,
         user_id: body.user_id,
         alias: body.alias,
@@ -38,8 +38,8 @@ pub async fn create_connected_account(
         &headers,
         Auth::Api,
         StatusCode::CREATED,
-        |core| async move {
-            let (account, redirect_url) = core.start_connect(start).await?;
+        |use_cases| async move {
+            let (account, redirect_url) = use_cases.start_connect(start).await?;
             Ok(ConnectedAccountCreated {
                 id: account.id,
                 status: account.status,

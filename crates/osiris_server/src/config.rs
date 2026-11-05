@@ -3,7 +3,7 @@
 //! read once at startup, and a missing or malformed value stops the process naming it.
 
 pub mod api_config;
-pub mod core_config;
+pub mod app_config;
 pub mod database_config;
 pub mod env_vars;
 pub mod listen;
@@ -13,7 +13,7 @@ pub mod settings;
 pub mod tasks_config;
 
 pub use api_config::ApiConfig;
-pub use core_config::CoreConfig;
+pub use app_config::Config;
 pub use database_config::DatabaseConfig;
 pub use settings::Settings;
 pub use tasks_config::TasksConfig;

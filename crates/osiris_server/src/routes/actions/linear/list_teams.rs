@@ -1,6 +1,9 @@
 //! `POST /v1/connected-accounts/{id}/actions/linear.list_teams`.
 
-use crate::http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState};
+use crate::{
+    http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
+    use_cases::cases::list_linear_teams::ListLinearTeamsArgs,
+};
 use axum::{
     Json,
     extract::{Path, State},
@@ -28,8 +31,9 @@ pub async fn linear_list_teams(
         &headers,
         Auth::Api,
         StatusCode::OK,
-        |core| async move {
-            core.linear_list_teams(&id)
+        |use_cases| async move {
+            use_cases
+                .list_linear_teams(ListLinearTeamsArgs { id: &id })
                 .await
                 .map(|data| ActionResult { data })
         },

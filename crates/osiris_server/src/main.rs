@@ -20,7 +20,7 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!(?process, commit = osiris_env::build::commit(), "starting");
     match process {
         Process::Serve => services::api::serve(config::ApiConfig::from_env(settings)?).await,
-        Process::Worker => services::worker::serve(config::CoreConfig::from_env(settings)?).await,
+        Process::Worker => services::worker::serve(config::Config::from_env(settings)?).await,
         Process::Migrate => db::migrate(&config::DatabaseConfig::from_env(&settings)?).await,
     }
 }

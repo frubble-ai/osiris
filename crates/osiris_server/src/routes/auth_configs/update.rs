@@ -1,8 +1,8 @@
 //! `PATCH /v1/auth-configs/{id}`.
 
 use crate::{
-    core::auth_configs::UpdateAuthConfig as Changes,
     http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
+    use_cases::cases::update_auth_config::UpdateAuthConfigArgs,
 };
 use axum::{
     Json,
@@ -25,19 +25,20 @@ pub async fn update_auth_config(
     Path(id): Path<String>,
     Json(body): Json<UpdateAuthConfig>,
 ) -> ApiResult<(StatusCode, Json<AuthConfig>)> {
-    let changes = Changes {
-        client_id: body.client_id,
-        client_secret: body.client_secret.map(secret),
-        scopes: body.scopes,
-    };
     server_wrap(
         Flow::AuthConfigsUpdate,
         &state,
         &headers,
         Auth::Admin,
         StatusCode::OK,
-        |core| async move {
-            core.update_auth_config(&id, changes)
+        |use_cases| async move {
+            use_cases
+                .update_auth_config(UpdateAuthConfigArgs {
+                    id: &id,
+                    client_id: body.client_id,
+                    client_secret: body.client_secret.map(secret),
+                    scopes: body.scopes,
+                })
                 .await
                 .map(AuthConfig::from)
         },

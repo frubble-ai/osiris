@@ -10,7 +10,7 @@ use tower_http::trace::TraceLayer;
 
 pub fn router(state: WorkerState) -> Router {
     // Each task may hold a database connection, so at most `[tasks] max_concurrent` run at once.
-    let max_concurrent = state.core.settings.tasks.max_concurrent;
+    let max_concurrent = state.config.settings.tasks.max_concurrent;
     Router::new()
         .route("/health", get(health))
         .route(

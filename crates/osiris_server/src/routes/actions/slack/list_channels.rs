@@ -1,6 +1,9 @@
 //! `POST /v1/connected-accounts/{id}/actions/slack.list_channels`.
 
-use crate::http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState};
+use crate::{
+    http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
+    use_cases::cases::list_slack_channels::ListSlackChannelsArgs,
+};
 use axum::{
     Json,
     extract::{Path, State},
@@ -28,8 +31,9 @@ pub async fn slack_list_channels(
         &headers,
         Auth::Api,
         StatusCode::OK,
-        |core| async move {
-            core.slack_list_channels(&id)
+        |use_cases| async move {
+            use_cases
+                .list_slack_channels(ListSlackChannelsArgs { id: &id })
                 .await
                 .map(|data| ActionResult { data })
         },

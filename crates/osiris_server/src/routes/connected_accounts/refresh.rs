@@ -1,6 +1,7 @@
 //! `POST /v1/connected-accounts/{id}/refresh`.
 
 use crate::http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState};
+use crate::use_cases::cases::refresh_connected_account_now::RefreshConnectedAccountNowArgs;
 use axum::{
     Json,
     extract::{Path, State},
@@ -25,7 +26,12 @@ pub async fn refresh_connected_account(
         &headers,
         Auth::Admin,
         StatusCode::ACCEPTED,
-        |core| async move { core.refresh_now(&id).await.map(ConnectedAccount::from) },
+        |use_cases| async move {
+            use_cases
+                .refresh_connected_account_now(RefreshConnectedAccountNowArgs { id: &id })
+                .await
+                .map(ConnectedAccount::from)
+        },
     )
     .await
 }

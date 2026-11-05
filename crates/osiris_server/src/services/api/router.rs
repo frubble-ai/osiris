@@ -10,8 +10,8 @@ use axum::{Router, extract::DefaultBodyLimit, middleware, routing::get};
 use tower_http::{timeout::TimeoutLayer, trace::TraceLayer};
 
 pub fn router(state: ApiState) -> Router {
-    let timeout = state.core.settings.server.request_timeout();
-    let max_body = state.core.settings.server.max_body();
+    let timeout = state.config.settings.server.request_timeout();
+    let max_body = state.config.settings.server.max_body();
     let (v1, _) = v1()
         .layer(middleware::from_fn_with_state(state.clone(), idempotency))
         .layer(middleware::from_fn_with_state(state.clone(), version))

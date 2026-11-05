@@ -1,0 +1,47 @@
+//! The worker's HTTP concerns: who may send a task, a body that is not a task, and `/health`
+//! while draining.
+
+#![allow(
+    clippy::unwrap_used,
+    reason = "tests: a failure here is the test failing"
+)]
+
+use crate::testing::{WORKER_TOKEN, setup_test_context};
+use axum::http::StatusCode;
+use osiris_tasks::names;
+use sqlx::PgPool;
+
+#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+async fn checks_the_worker_token_and_acknowledges_a_body_that_is_not_a_task(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    let id = app.connected(28800).await;
+    let task = app.tasks.get(&names::refresh(&id, 1)).unwrap();
+    let body = serde_json::to_vec(&task).unwrap();
+
+    assert_eq!(
+        app.send_to_worker(body.clone(), None).await,
+        StatusCode::UNAUTHORIZED
+    );
+    assert_eq!(
+        app.send_to_worker(body, Some("wrong")).await,
+        StatusCode::UNAUTHORIZED
+    );
+    assert_eq!(
+        app.send_to_worker(b"not a task".to_vec(), Some(WORKER_TOKEN))
+            .await,
+        StatusCode::NO_CONTENT,
+        "sending it again would never help"
+    );
+}
+
+#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+async fn answers_the_worker_s_health_with_503_once_it_is_draining(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    assert_eq!(app.send_to_worker_get("/health").await, StatusCode::OK);
+    app.draining
+        .store(true, std::sync::atomic::Ordering::SeqCst);
+    assert_eq!(
+        app.send_to_worker_get("/health").await,
+        StatusCode::SERVICE_UNAVAILABLE
+    );
+}

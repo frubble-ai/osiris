@@ -1,6 +1,6 @@
 //! The one wrapper every `/v1` route goes through (Hyperswitch's `server_wrap`): the key, the
 //! flow's span with the request's id, the outcome logged with its time, and the error mapped to the
-//! wire. A route only parses its request and names the core function to run. Secrets are typed
+//! wire. A route only parses its request and names the use case to run. Secrets are typed
 //! `Secret`, so nothing logged here can carry one.
 
 use super::{
@@ -8,7 +8,7 @@ use super::{
     error::ApiError,
     state::ApiState,
 };
-use crate::core::{Core, CoreResult};
+use crate::use_cases::{UseCaseResult, UseCases};
 use axum::{
     Json,
     http::{HeaderMap, StatusCode},
@@ -28,8 +28,8 @@ pub async fn server_wrap<T, F, Fut>(
 ) -> Result<(StatusCode, Json<T>), ApiError>
 where
     T: Serialize,
-    F: FnOnce(Core) -> Fut,
-    Fut: Future<Output = CoreResult<T>>,
+    F: FnOnce(UseCases) -> Fut,
+    Fut: Future<Output = UseCaseResult<T>>,
 {
     let request_id = headers
         .get(osiris_env::request_id::HEADER)
@@ -40,7 +40,7 @@ where
     async move {
         let started = Instant::now();
         check(state, headers, auth)?;
-        let outcome = run(state.core.clone()).await;
+        let outcome = run(state.use_cases.clone()).await;
         let elapsed_ms = started.elapsed().as_millis();
         match outcome {
             Ok(answer) => {

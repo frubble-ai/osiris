@@ -1,8 +1,8 @@
 //! `POST /v1/auth-configs`: register a provider's app.
 
 use crate::{
-    core::auth_configs::CreateAuthConfig as New,
     http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
+    use_cases::cases::create_auth_config::CreateAuthConfigArgs as New,
 };
 use axum::{
     Json,
@@ -37,7 +37,12 @@ pub async fn create_auth_config(
         &headers,
         Auth::Admin,
         StatusCode::CREATED,
-        |core| async move { core.create_auth_config(new).await.map(AuthConfig::from) },
+        |use_cases| async move {
+            use_cases
+                .create_auth_config(new)
+                .await
+                .map(AuthConfig::from)
+        },
     )
     .await
 }

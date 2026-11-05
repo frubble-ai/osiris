@@ -1,5 +1,6 @@
-//! What every process needs: the settings, the database, the master key, where events are
-//! published, and which scheduler runs tasks.
+//! The configuration the use cases run on, read from the environment once at boot: the settings,
+//! the database, the master key, osiris's public URL, and the integrations (where events are
+//! published, which scheduler runs tasks). It reaches the use cases as `ctx.config`.
 
 use super::{
     DatabaseConfig, Settings, TasksConfig,
@@ -9,7 +10,7 @@ use osiris_common::secret::Secret;
 use osiris_pubsub::PubSubConfig;
 
 #[derive(Clone)]
-pub struct CoreConfig {
+pub struct Config {
     pub settings: Settings,
     pub database: DatabaseConfig,
     /// The master key every tenant's data key is wrapped with.
@@ -21,7 +22,7 @@ pub struct CoreConfig {
     pub tasks: TasksConfig,
 }
 
-impl CoreConfig {
+impl Config {
     pub fn from_env(settings: Settings) -> anyhow::Result<Self> {
         Ok(Self {
             database: DatabaseConfig::from_env(&settings)?,

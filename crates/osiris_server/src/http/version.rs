@@ -21,7 +21,7 @@ pub async fn version(
             .to_str()
             .map_err(|_| ApiError::UnknownVersion("(not text)".into()))?
             .to_owned(),
-        None => state.core.settings.api.pinned_version.clone(),
+        None => state.config.settings.api.pinned_version.clone(),
     };
     let served = VERSIONS
         .iter()

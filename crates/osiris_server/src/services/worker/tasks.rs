@@ -8,6 +8,7 @@
 //! (a body that is not a task). A 500 makes the scheduler run the same task again later.
 
 use super::state::WorkerState;
+use crate::use_cases::cases::run_task::RunTaskArgs;
 use axum::{
     body::Bytes,
     extract::State,
@@ -37,7 +38,7 @@ pub async fn run_task(
             return StatusCode::NO_CONTENT;
         }
     };
-    match state.core.run_task(&task).await {
+    match state.use_cases.run_task(RunTaskArgs { task: &task }).await {
         Ok(_) => StatusCode::NO_CONTENT,
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
     }

@@ -12,6 +12,6 @@ pub fn cursor(
     Cursor {
         after,
         before,
-        limit: state.core.settings.pagination.limit(limit),
+        limit: state.config.settings.pagination.limit(limit),
     }
 }

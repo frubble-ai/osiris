@@ -1,6 +1,7 @@
 //! `GET /v1/auth-configs/{id}`.
 
 use crate::http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState};
+use crate::use_cases::cases::get_auth_config::GetAuthConfigArgs;
 use axum::{
     Json,
     extract::{Path, State},
@@ -23,7 +24,12 @@ pub async fn retrieve_auth_config(
         &headers,
         Auth::Admin,
         StatusCode::OK,
-        |core| async move { core.auth_config(&id).await.map(AuthConfig::from) },
+        |use_cases| async move {
+            use_cases
+                .get_auth_config(GetAuthConfigArgs { id: &id })
+                .await
+                .map(AuthConfig::from)
+        },
     )
     .await
 }

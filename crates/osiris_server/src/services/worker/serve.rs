@@ -3,21 +3,25 @@
 
 use super::{router::router, state::WorkerState};
 use crate::{
-    config::{CoreConfig, listen::listen_address},
+    config::{Config, listen::listen_address},
     http::serve_until_stopped::serve_until_stopped,
+    use_cases::{UseCases, build_use_case_context::build_use_case_context},
 };
 use std::sync::{
     Arc,
     atomic::{AtomicBool, Ordering},
 };
 
-pub async fn serve(config: CoreConfig) -> anyhow::Result<()> {
-    let core = crate::services::build::core(&config).await?;
-    let grace = core.settings.server.shutdown_grace();
+pub async fn serve(config: Config) -> anyhow::Result<()> {
+    let config = Arc::new(config);
+    let grace = config.settings.server.shutdown_grace();
+    // Built once, before taking traffic, so a broken configuration stops the process here.
+    let use_cases = UseCases::new(build_use_case_context(config.clone()).await?);
     let draining = Arc::new(AtomicBool::new(false));
     let state = WorkerState {
-        core,
-        authenticator: crate::services::build::authenticator(&config)?,
+        use_cases,
+        authenticator: super::authenticator::authenticator(&config)?,
+        config,
         draining: draining.clone(),
     };
     let address = listen_address()?;

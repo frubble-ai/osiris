@@ -43,7 +43,10 @@ utoipa.workspace = true
 utoipa-axum.workspace = true
 
 [dev-dependencies]
+fake.workspace = true
 http-body-util = "0.1"
+osiris_providers = { workspace = true, features = ["testing"] }
+rstest.workspace = true
 tower.workspace = true
 wiremock.workspace = true
 

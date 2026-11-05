@@ -12,3 +12,6 @@ pub use router::router;
 pub use serve::serve;
 pub use spec::spec;
 pub use state::state;
+
+#[cfg(test)]
+mod tests;

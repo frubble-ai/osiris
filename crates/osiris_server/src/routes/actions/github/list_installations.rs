@@ -1,6 +1,9 @@
 //! `POST /v1/connected-accounts/{id}/actions/github.list_installations`.
 
-use crate::http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState};
+use crate::{
+    http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
+    use_cases::cases::list_github_installations::ListGithubInstallationsArgs,
+};
 use axum::{
     Json,
     extract::{Path, State},
@@ -28,8 +31,9 @@ pub async fn github_list_installations(
         &headers,
         Auth::Api,
         StatusCode::OK,
-        |core| async move {
-            core.github_list_installations(&id)
+        |use_cases| async move {
+            use_cases
+                .list_github_installations(ListGithubInstallationsArgs { id: &id })
                 .await
                 .map(|data| ActionResult { data })
         },

@@ -1,6 +1,7 @@
 //! `DELETE /v1/connected-accounts/{id}`.
 
 use crate::http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState};
+use crate::use_cases::cases::delete_connected_account::DeleteConnectedAccountArgs;
 use axum::{
     Json,
     extract::{Path, State},
@@ -24,8 +25,9 @@ pub async fn delete_connected_account(
         &headers,
         Auth::Api,
         StatusCode::OK,
-        |core| async move {
-            core.delete_connected_account(&id)
+        |use_cases| async move {
+            use_cases
+                .delete_connected_account(DeleteConnectedAccountArgs { id: &id })
                 .await
                 .map(|()| Deleted { id, deleted: true })
         },

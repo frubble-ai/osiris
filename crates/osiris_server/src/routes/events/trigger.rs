@@ -6,6 +6,7 @@ use crate::http::{
     server_wrap,
     state::ApiState,
 };
+use crate::use_cases::cases::trigger_event::TriggerEventArgs;
 use axum::{
     Json,
     extract::State,
@@ -35,9 +36,12 @@ pub async fn trigger_event(
         &headers,
         Auth::Admin,
         StatusCode::CREATED,
-        |core| async move {
-            let event = core
-                .trigger_event(event_type, &body.connected_account_id)
+        |use_cases| async move {
+            let event = use_cases
+                .trigger_event(TriggerEventArgs {
+                    event_type,
+                    connected_account_id: &body.connected_account_id,
+                })
                 .await?;
             Ok(TriggeredEvent {
                 event_id: event.id,
