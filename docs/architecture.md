@@ -8,7 +8,7 @@ migration job. All state is in Postgres.
 
 | Crate | Holds |
 | --- | --- |
-| `osiris_common` | errors (error-stack, `ErrorSwitch`), encryption (master key, data keys, AES-256-GCM), `Secret`, ids |
+| `osiris_common` | errors (error-stack), encryption (master key, data keys, AES-256-GCM), `Secret`, ids |
 | `osiris_env` | logging, request ids, the build's commit, and the `Flow` every operation is logged under |
 | `osiris_domain` | auth configs, connections, tokens, events, task outcomes, pagination, `DomainError` |
 | `osiris_interfaces` | `ProviderCommon` and `Provider`, the OAuth2 flow a provider's definition drives, `call` |

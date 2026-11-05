@@ -10,7 +10,7 @@ How code in osiris is written.
 | [Test organization](./test-organization.md) | tests, mocks and factories beside the code; `testing/` |
 | [Testing patterns](./testing-patterns.md) | what is tested where, and what a test asserts |
 | [Settings](./settings.md) | configuration from the environment; tuning values in settings |
-| [Errors](./errors.md) | an error type per layer, `ErrorSwitch`, error-stack reports, `OS_xx` on the wire |
+| [Errors](./errors.md) | an error type per layer, error-stack reports, `OS_xx` on the wire |
 | [Migrations](./migrations.md) | reversible SQL, run by the migrate process, checked queries |
 
 Hyperswitch's workspace lints are on as warnings and CI fails on any; `clippy.toml` lets tests
