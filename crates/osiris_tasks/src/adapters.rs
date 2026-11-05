@@ -5,3 +5,6 @@
 pub mod bearer;
 pub mod local;
 pub mod memory;
+
+#[cfg(test)]
+mod tests;

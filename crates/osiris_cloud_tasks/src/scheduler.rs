@@ -26,6 +26,11 @@ impl CloudTasksScheduler {
         Ok(Self { client, config })
     }
 
+    /// A scheduler over an already built client (a test points one at a fake).
+    pub fn with_client(client: CloudTasks, config: CloudTasksConfig) -> Self {
+        Self { client, config }
+    }
+
     fn task_path(&self, name: &str) -> String {
         format!("{}/tasks/{name}", self.config.queue_path())
     }

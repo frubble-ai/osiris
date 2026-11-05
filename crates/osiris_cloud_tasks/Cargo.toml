@@ -22,6 +22,8 @@ tokio.workspace = true
 tracing.workspace = true
 
 [dev-dependencies]
+osiris_tasks = { workspace = true, features = ["testing"] }
+google-cloud-auth.workspace = true
 aws-lc-rs = "1"
 base64.workspace = true
 time.workspace = true

@@ -26,6 +26,8 @@ pub mod refresh_task;
 pub mod scheduled;
 pub mod scheduler;
 pub mod task;
+#[cfg(any(test, feature = "testing"))]
+pub mod testing;
 
 pub use auth_error::AuthError;
 pub use authenticator::TaskAuthenticator;

@@ -13,3 +13,7 @@ osiris_events.workspace = true
 async-trait.workspace = true
 google-cloud-auth.workspace = true
 google-cloud-pubsub.workspace = true
+
+[dev-dependencies]
+osiris_events = { workspace = true, features = ["testing"] }
+tokio.workspace = true

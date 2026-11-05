@@ -2035,6 +2035,7 @@ dependencies = [
  "async-trait",
  "aws-lc-rs",
  "base64 0.23.1",
+ "google-cloud-auth",
  "google-cloud-gax",
  "google-cloud-tasks-v2",
  "google-cloud-wkt",
@@ -2092,8 +2093,10 @@ name = "osiris_events"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "fake",
  "osiris_common",
  "osiris_domain",
+ "osiris_events",
  "serde",
  "serde_json",
  "thiserror",
@@ -2151,6 +2154,7 @@ dependencies = [
  "google-cloud-auth",
  "google-cloud-pubsub",
  "osiris_events",
+ "tokio",
 ]
 
 [[package]]
@@ -2214,7 +2218,9 @@ name = "osiris_tasks"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "fake",
  "osiris_domain",
+ "osiris_tasks",
  "reqwest",
  "serde",
  "serde_json",

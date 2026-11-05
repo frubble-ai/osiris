@@ -19,6 +19,12 @@ thiserror.workspace = true
 time.workspace = true
 tokio.workspace = true
 tracing.workspace = true
+fake = { workspace = true, optional = true }
+
+[features]
+# The contract every scheduler is held to, and test data, for other crates' tests.
+testing = ["dep:fake"]
 
 [dev-dependencies]
+osiris_tasks = { workspace = true, features = ["testing"] }
 tokio.workspace = true

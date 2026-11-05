@@ -89,11 +89,13 @@ jobs:
       DB_NAME: osiris
       DB_USER: osiris
       DB_PASSWORD: osiris_dev
+      PUBSUB_EMULATOR_HOST: localhost:8086
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Start Postgres over TLS
+      - name: Start Postgres over TLS, and the Pub/Sub emulator with the events topic
         run: |
-          docker compose up -d --wait postgres
+          docker compose up -d --wait postgres pubsub
+          docker compose run --rm pubsub-setup
           {
             echo "DB_CA_PEM<<PEM"
             cat .local/tls/ca.pem
