@@ -5,10 +5,15 @@ pub async fn signal() {
         let _ = tokio::signal::ctrl_c().await;
     };
     let terminate = async {
-        if let Ok(mut signal) =
-            tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
-        {
-            signal.recv().await;
+        match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()) {
+            Ok(mut signal) => {
+                signal.recv().await;
+            }
+            Err(error) => {
+                // Without the handler only Ctrl-C can stop the server; it must not stop at once.
+                tracing::error!(%error, "listening for SIGTERM failed");
+                std::future::pending::<()>().await;
+            }
         }
     };
     tokio::select! {

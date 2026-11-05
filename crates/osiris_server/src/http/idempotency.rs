@@ -62,7 +62,36 @@ pub async fn idempotency(
     let request_hash = hex::encode(hash.finalize());
     let scoped = format!("{caller:?} {} {} {key}", parts.method, parts.uri.path());
 
-    let use_cases = &state.use_cases;
+    // Everything from here runs on a task of its own: a timeout or a client that disconnects drops
+    // this future, and a key that was begun must still be finished or freed, so a retry gets the
+    // answer or runs again.
+    let request = Request::from_parts(parts, Body::from(bytes));
+    let use_cases = state.use_cases.clone();
+    let task = tokio::spawn(keyed(
+        use_cases.clone(),
+        scoped.clone(),
+        request_hash,
+        request,
+        next,
+    ));
+    match task.await {
+        Ok(answer) => answer,
+        Err(error) => {
+            tracing::error!(?error, "a keyed request's task failed");
+            abandon(&use_cases, &scoped).await;
+            Ok(StatusCode::INTERNAL_SERVER_ERROR.into_response())
+        }
+    }
+}
+
+/// Begins the key, and, for a new request, runs the route and keeps its answer.
+async fn keyed(
+    use_cases: UseCases,
+    scoped: String,
+    request_hash: String,
+    request: Request,
+    next: Next,
+) -> Result<Response, ApiError> {
     match use_cases
         .begin_idempotent_request(BeginIdempotentRequestArgs {
             key: &scoped,
@@ -82,19 +111,7 @@ pub async fn idempotency(
         Begun::Mismatch => return Err(ApiError::IdempotencyMismatch),
         Begun::InFlight => return Err(ApiError::InFlight),
     }
-
-    // Run on a task of its own: a timeout or a client that disconnects drops this future, and the
-    // key must still be finished or freed, so a retry gets the answer or runs again.
-    let request = Request::from_parts(parts, Body::from(bytes));
-    let task = tokio::spawn(run_keyed(use_cases.clone(), scoped.clone(), request, next));
-    match task.await {
-        Ok(response) => Ok(response),
-        Err(error) => {
-            tracing::error!(?error, "a keyed request's task failed");
-            abandon(use_cases, &scoped).await;
-            Ok(StatusCode::INTERNAL_SERVER_ERROR.into_response())
-        }
-    }
+    Ok(run_keyed(use_cases, scoped, request, next).await)
 }
 
 /// Runs the route, then keeps its answer under the key, or frees the key when the answer can't be
