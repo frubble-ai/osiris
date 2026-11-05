@@ -28,3 +28,28 @@ async fn answers_health_with_the_commit_and_503_once_the_database_is_down(pool: 
         StatusCode::SERVICE_UNAVAILABLE
     );
 }
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn echoes_the_callers_request_id_or_makes_one(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+
+    let given = app
+        .send(
+            "GET",
+            "/health",
+            None,
+            None,
+            &[("x-request-id", "caller-1")],
+        )
+        .await;
+    let first = app.send("GET", "/health", None, None, &[]).await;
+    let second = app.send("GET", "/health", None, None, &[]).await;
+
+    assert_eq!(given.headers["x-request-id"], "caller-1");
+    let made = first.headers["x-request-id"].to_str().unwrap();
+    assert!(!made.is_empty());
+    assert_ne!(
+        first.headers["x-request-id"],
+        second.headers["x-request-id"]
+    );
+}

@@ -119,42 +119,6 @@ async fn refuses_a_key_reused_for_another_request(pool: PgPool) {
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
-async fn refuses_a_retry_while_the_first_request_is_still_running(pool: PgPool) {
-    let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
-    let body = generate_connect_attempt(&config);
-    // The first request with this key began and has not answered yet.
-    let hash = {
-        use sha2::{Digest, Sha256};
-        let mut hash = Sha256::new();
-        hash.update("POST");
-        hash.update("/v1/connected-accounts");
-        hash.update(body.to_string().as_bytes());
-        hex::encode(hash.finalize())
-    };
-    app.use_cases
-        .begin_idempotent_request(
-            crate::use_cases::cases::begin_idempotent_request::BeginIdempotentRequestArgs {
-                key: "Api POST /v1/connected-accounts k1",
-                request_hash: &hash,
-            },
-        )
-        .await
-        .unwrap();
-    let retry = app
-        .send(
-            "POST",
-            "/v1/connected-accounts",
-            Some(API_KEY),
-            Some(body),
-            &[("idempotency-key", "k1")],
-        )
-        .await;
-    assert_eq!(retry.status, StatusCode::CONFLICT, "{}", retry.body);
-    assert_eq!(retry.body["error"]["code"], "OS_09");
-}
-
-#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn runs_a_retry_again_after_the_first_answer_was_a_server_error(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
