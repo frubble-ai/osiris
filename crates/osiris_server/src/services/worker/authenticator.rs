@@ -1,10 +1,7 @@
 //! How the worker checks who sent each task, for the chosen scheduler: Google's OIDC token for
 //! Cloud Tasks, the worker token for the local scheduler.
 
-use crate::{
-    config::{Config, TasksConfig},
-    use_cases::build_use_case_context::http_client,
-};
+use crate::config::{Config, TasksConfig};
 use osiris_cloud_tasks::{OidcAuthenticator, OidcConfig, oidc::GOOGLE_KEYS_URL};
 use osiris_tasks::{TaskAuthenticator, adapters::bearer::BearerAuthenticator};
 use std::{sync::Arc, time::Duration};
@@ -21,7 +18,7 @@ pub fn authenticator(config: &Config) -> anyhow::Result<Arc<dyn TaskAuthenticato
                     config.settings.tasks.oidc_keys_refetch_seconds,
                 ),
             },
-            http_client(&config.settings.http)?,
+            config.settings.http.client()?,
         )),
         TasksConfig::Local { token, .. } => Arc::new(BearerAuthenticator::new(token.clone())?),
     })

@@ -18,6 +18,16 @@ impl HttpSettings {
     pub fn timeout(&self) -> Duration {
         Duration::from_secs(self.timeout_seconds)
     }
+
+    /// The HTTP client for providers and Google's keys: bounded, so a slow peer can't hold a
+    /// request.
+    pub fn client(&self) -> reqwest::Result<reqwest::Client> {
+        reqwest::Client::builder()
+            .user_agent("osiris")
+            .connect_timeout(self.connect_timeout())
+            .timeout(self.timeout())
+            .build()
+    }
 }
 
 impl Default for HttpSettings {

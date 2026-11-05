@@ -5,7 +5,7 @@
 use super::UseCaseContext;
 use crate::use_cases::lib::database::Db;
 use crate::{
-    config::{Config, TasksConfig, settings::http::HttpSettings},
+    config::{Config, TasksConfig},
     db,
 };
 use anyhow::Context;
@@ -50,7 +50,7 @@ pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCa
         messages: MessageBus::new(Arc::new(transport)),
         tasks,
         providers: Arc::new(providers),
-        http: http_client(&settings.http)?,
+        http: settings.http.client()?,
         config,
     })
 }
@@ -72,13 +72,4 @@ async fn scheduler(config: &Config) -> anyhow::Result<Arc<dyn TaskScheduler>> {
             }))
         }
     })
-}
-
-/// The HTTP client for providers: bounded, so a slow provider can't hold a request.
-pub fn http_client(settings: &HttpSettings) -> reqwest::Result<reqwest::Client> {
-    reqwest::Client::builder()
-        .user_agent("osiris")
-        .connect_timeout(settings.connect_timeout())
-        .timeout(settings.timeout())
-        .build()
 }
