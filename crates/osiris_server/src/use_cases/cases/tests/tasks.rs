@@ -12,6 +12,7 @@ use crate::testing::{API_KEY, setup_test_context};
 use axum::http::StatusCode;
 use osiris_domain::EventType;
 use osiris_providers::github::mocks::MockGithubNetwork;
+use osiris_providers::mocks::generate_token_answer::generate_token_answer;
 use osiris_tasks::{RefreshReason, Task, TaskPayload, names};
 use serde_json::json;
 use sqlx::PgPool;
@@ -27,12 +28,7 @@ async fn refresh_answers(app: &crate::testing::TestContext, status: u16, body: s
 async fn refreshes_saves_the_next_task_with_the_new_tokens_then_acknowledges(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
-    refresh_answers(
-        &app,
-        200,
-        json!({ "access_token": "ghu_2", "refresh_token": "ghr_2", "expires_in": 28800 }),
-    )
-    .await;
+    refresh_answers(&app, 200, generate_token_answer(Some(28800))).await;
 
     assert!(app.run_pending(&names::refresh(&id, 1)).await.is_ok());
 
@@ -61,12 +57,7 @@ async fn refreshes_saves_the_next_task_with_the_new_tokens_then_acknowledges(poo
 async fn schedules_a_keepalive_for_a_token_that_does_not_expire(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
-    refresh_answers(
-        &app,
-        200,
-        json!({ "access_token": "ghu_2", "refresh_token": "ghr_2" }),
-    )
-    .await;
+    refresh_answers(&app, 200, generate_token_answer(None)).await;
 
     assert!(app.run_pending(&names::refresh(&id, 1)).await.is_ok());
     let task = app.tasks.get(&names::refresh(&id, 2)).unwrap();
@@ -171,12 +162,7 @@ async fn keeps_new_tokens_disabled_when_the_next_task_cannot_be_scheduled_then_r
 ) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
-    refresh_answers(
-        &app,
-        200,
-        json!({ "access_token": "ghu_2", "refresh_token": "ghr_2", "expires_in": 28800 }),
-    )
-    .await;
+    refresh_answers(&app, 200, generate_token_answer(Some(28800))).await;
     let task = app.tasks.take(&names::refresh(&id, 1)).unwrap();
     app.tasks.fail(true);
 
@@ -211,12 +197,7 @@ async fn keeps_new_tokens_disabled_when_the_next_task_cannot_be_scheduled_then_r
 async fn restores_a_disabled_connection_when_an_action_uses_it(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
-    refresh_answers(
-        &app,
-        200,
-        json!({ "access_token": "ghu_2", "refresh_token": "ghr_2", "expires_in": 28800 }),
-    )
-    .await;
+    refresh_answers(&app, 200, generate_token_answer(Some(28800))).await;
     let task = app.tasks.take(&names::refresh(&id, 1)).unwrap();
     app.tasks.fail(true);
     let _ = app.run(&task).await;
@@ -348,12 +329,7 @@ async fn publishes_an_event_again_through_a_task_named_after_it(pool: PgPool) {
 async fn refreshes_now_through_a_task_that_replaces_the_scheduled_one(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
-    refresh_answers(
-        &app,
-        200,
-        json!({ "access_token": "ghu_2", "refresh_token": "ghr_2", "expires_in": 28800 }),
-    )
-    .await;
+    refresh_answers(&app, 200, generate_token_answer(Some(28800))).await;
 
     let answer = app
         .send(

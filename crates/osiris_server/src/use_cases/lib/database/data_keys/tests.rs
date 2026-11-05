@@ -1,6 +1,6 @@
 //! Each tenant's data key, wrapped by the master key.
 
-use crate::testing::db_fixtures::{active, db};
+use crate::testing::db_fixtures::{active_with, db, generate_tokens};
 use crate::use_cases::lib::database::Db;
 use osiris_common::{crypto::MasterKey, secret::ExposeSecret};
 use sqlx::PgPool;
@@ -8,8 +8,8 @@ use sqlx::PgPool;
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn gives_each_user_a_data_key_of_its_own(pool: PgPool) {
     let db = db(pool.clone());
-    active(&db, "org_1", "s1", Some(3600)).await;
-    active(&db, "org_2", "s2", Some(3600)).await;
+    active_with(&db, "org_1", "s1", &generate_tokens(Some(3600))).await;
+    active_with(&db, "org_2", "s2", &generate_tokens(Some(3600))).await;
 
     let tenants = sqlx::query_scalar!("SELECT tenant FROM data_key ORDER BY tenant")
         .fetch_all(&pool)
@@ -26,7 +26,8 @@ async fn gives_each_user_a_data_key_of_its_own(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn reads_nothing_with_another_master_key(pool: PgPool) {
     let db = db(pool.clone());
-    let id = active(&db, "org_1", "s1", Some(3600)).await;
+    let tokens = generate_tokens(Some(3600));
+    let id = active_with(&db, "org_1", "s1", &tokens).await;
     let reopened = crate::testing::db_fixtures::db(pool.clone());
     assert_eq!(
         reopened
@@ -37,7 +38,7 @@ async fn reads_nothing_with_another_master_key(pool: PgPool) {
             .unwrap()
             .access_token
             .expose_secret(),
-        "access-1"
+        tokens.access_token.expose_secret()
     );
 
     let stranger = Db::new(

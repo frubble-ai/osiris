@@ -9,6 +9,7 @@
 use crate::testing::{WORKER_TOKEN, setup_test_context};
 use axum::http::StatusCode;
 use osiris_providers::github::mocks::MockGithubNetwork;
+use osiris_providers::mocks::generate_token_answer::generate_token_answer;
 use osiris_tasks::names;
 use sqlx::PgPool;
 
@@ -52,10 +53,7 @@ async fn answers_204_for_a_task_that_ran(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
     MockGithubNetwork::on(&app.provider)
-        .answer_refresh(
-            200,
-            serde_json::json!({ "access_token": "ghu_2", "refresh_token": "ghr_2", "expires_in": 28800 }),
-        )
+        .answer_refresh(200, generate_token_answer(Some(28800)))
         .await;
 
     assert_eq!(

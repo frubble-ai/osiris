@@ -2,7 +2,8 @@
 //! refresh locking, and the completeness rule.
 
 use crate::testing::db_fixtures::{
-    active, db, github_config, no_expiry, pending, refresh_task, tokens,
+    active, active_with, db, generate_secret, generate_tokens, github_config, no_expiry, pending,
+    pending_with, refresh_task,
 };
 use osiris_common::secret::ExposeSecret;
 use osiris_domain::{AccountFilter, Cursor};
@@ -13,7 +14,8 @@ use sqlx::PgPool;
 async fn lets_a_consent_be_claimed_once(pool: PgPool) {
     let db = db(pool);
     let config = github_config(&db).await;
-    let id = pending(&db, &config, "org_1", "state-1").await;
+    let verifier = generate_secret("verifier");
+    let id = pending_with(&db, &config, "org_1", "state-1", &verifier).await;
 
     let claimed = db.claim_consent("state-1").await.unwrap().unwrap();
     assert_eq!(claimed.account.id, id);
@@ -22,7 +24,7 @@ async fn lets_a_consent_be_claimed_once(pool: PgPool) {
             .pkce_verifier
             .as_ref()
             .map(ExposeSecret::expose_secret),
-        Some("verifier")
+        Some(verifier.as_str())
     );
     assert!(!claimed.expired);
     assert!(db.claim_consent("state-1").await.unwrap().is_none());
@@ -31,7 +33,8 @@ async fn lets_a_consent_be_claimed_once(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn saves_the_tokens_with_their_refresh_task_as_generation_one(pool: PgPool) {
     let db = db(pool);
-    let id = active(&db, "org_1", "state-1", Some(3600)).await;
+    let tokens = generate_tokens(Some(3600));
+    let id = active_with(&db, "org_1", "state-1", &tokens).await;
 
     let account = db.connected_account(&id).await.unwrap();
     assert_eq!(account.status, ConnectionStatus::Active);
@@ -41,7 +44,7 @@ async fn saves_the_tokens_with_their_refresh_task_as_generation_one(pool: PgPool
     assert!(account.is_complete());
     assert_eq!(
         account.tokens.unwrap().access_token.expose_secret(),
-        "access-1"
+        tokens.access_token.expose_secret()
     );
 }
 
@@ -55,7 +58,7 @@ async fn refuses_to_save_a_refreshable_token_without_its_refresh_task(pool: PgPo
     // The database's completeness check refuses an active connection whose refresh token has no
     // refresh task.
     assert!(
-        db.activate(&account, &tokens(Some(3600)), None)
+        db.activate(&account, &generate_tokens(Some(3600)), None)
             .await
             .is_err()
     );
@@ -71,7 +74,7 @@ async fn counts_a_token_without_a_refresh_token_as_complete_without_a_task(pool:
     let id = pending(&db, &config, "org_1", "state-1").await;
     let account = db.connected_account(&id).await.unwrap();
 
-    db.activate(&account, &no_expiry("access-1"), None)
+    db.activate(&account, &no_expiry(&generate_secret("access")), None)
         .await
         .unwrap();
     let active = db.connected_account(&id).await.unwrap();
@@ -95,20 +98,25 @@ async fn disables_a_consent_without_keeping_tokens(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn moves_to_the_next_generation_with_the_next_task_and_keeps_the_refresh_token(pool: PgPool) {
     let db = db(pool);
-    let id = active(&db, "org_1", "state-1", Some(60)).await;
+    let original = generate_tokens(Some(60));
+    let id = active_with(&db, "org_1", "state-1", &original).await;
+    let next_access = generate_secret("access");
 
     let refreshed = db
         .lock_for_refresh(&id)
         .await
         .unwrap()
-        .refreshed(&no_expiry("access-2"), Some(&refresh_task("refresh-2")))
+        .refreshed(&no_expiry(&next_access), Some(&refresh_task("refresh-2")))
         .await
         .unwrap();
     assert_eq!(refreshed.token_generation, 2);
     assert_eq!(refreshed.refresh_task.as_deref(), Some("refresh-2"));
     let held = refreshed.tokens.unwrap();
-    assert_eq!(held.access_token.expose_secret(), "access-2");
-    assert_eq!(held.refresh_token.unwrap().expose_secret(), "refresh-1");
+    assert_eq!(held.access_token.expose_secret(), next_access);
+    assert_eq!(
+        held.refresh_token.unwrap().expose_secret(),
+        original.refresh_token.unwrap().expose_secret()
+    );
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
@@ -130,7 +138,10 @@ async fn counts_failed_refreshes_and_starts_over_after_one_works(pool: PgPool) {
     db.lock_for_refresh(&id)
         .await
         .unwrap()
-        .refreshed(&tokens(Some(3600)), Some(&refresh_task("refresh-2")))
+        .refreshed(
+            &generate_tokens(Some(3600)),
+            Some(&refresh_task("refresh-2")),
+        )
         .await
         .unwrap();
     assert_eq!(db.connected_account(&id).await.unwrap().refresh_failures, 0);
@@ -307,7 +318,7 @@ async fn keeps_unscheduled_new_tokens_disabled_until_restored(pool: PgPool) {
         .lock_for_refresh(&id)
         .await
         .unwrap()
-        .refreshed_unscheduled(&tokens(Some(3600)), "no scheduler")
+        .refreshed_unscheduled(&generate_tokens(Some(3600)), "no scheduler")
         .await
         .unwrap();
     assert_eq!(disabled.status, ConnectionStatus::Disabled);
@@ -337,8 +348,9 @@ async fn keeps_unscheduled_new_tokens_disabled_until_restored(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn lists_connections_of_several_tenants_each_decrypted_with_its_own_key(pool: PgPool) {
     let writer = db(pool.clone());
+    let tokens = generate_tokens(Some(3600));
     for (user, state) in [("org_1", "s1"), ("org_2", "s2"), ("org_3", "s3")] {
-        active(&writer, user, state, Some(3600)).await;
+        active_with(&writer, user, state, &tokens).await;
     }
     // A fresh db has no key in memory: the page reads them in one go.
     let reader = db(pool);
@@ -356,7 +368,7 @@ async fn lists_connections_of_several_tenants_each_decrypted_with_its_own_key(po
     for account in page.items {
         assert_eq!(
             account.tokens.unwrap().access_token.expose_secret(),
-            "access-1"
+            tokens.access_token.expose_secret()
         );
     }
 }

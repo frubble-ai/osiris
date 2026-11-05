@@ -12,6 +12,7 @@ use crate::use_cases::lib::{
     connected_accounts::{NewPending, NewTokens, ScheduledRefresh},
     database::Db,
 };
+use fake::Fake;
 use osiris_common::{crypto::MasterKey, secret::secret};
 use sqlx::PgPool;
 use time::{Duration, OffsetDateTime};
@@ -34,11 +35,20 @@ pub fn refresh_task(name: &str) -> ScheduledRefresh {
     }
 }
 
+/// A random value for a secret, so a test reads what it expects from what it stored.
+pub fn generate_secret(prefix: &str) -> String {
+    format!("{prefix}-{}", 24.fake::<String>())
+}
+
 pub async fn github_config(db: &Db) -> String {
+    github_config_with(db, &generate_secret("client-secret")).await
+}
+
+pub async fn github_config_with(db: &Db, client_secret: &str) -> String {
     db.create_auth_config(NewAuthConfig {
         provider: "github".into(),
         client_id: "Iv1.client".into(),
-        client_secret: secret("client-secret"),
+        client_secret: secret(client_secret),
         scopes: vec![],
     })
     .await
@@ -47,6 +57,23 @@ pub async fn github_config(db: &Db) -> String {
 }
 
 pub async fn pending(db: &Db, auth_config_id: &str, user_id: &str, state: &str) -> String {
+    pending_with(
+        db,
+        auth_config_id,
+        user_id,
+        state,
+        &generate_secret("verifier"),
+    )
+    .await
+}
+
+pub async fn pending_with(
+    db: &Db,
+    auth_config_id: &str,
+    user_id: &str,
+    state: &str,
+    pkce_verifier: &str,
+) -> String {
     db.create_pending(NewPending {
         auth_config_id: auth_config_id.into(),
         user_id: user_id.into(),
@@ -54,17 +81,17 @@ pub async fn pending(db: &Db, auth_config_id: &str, user_id: &str, state: &str) 
         callback_url: "http://localhost:8080/integrations/callback".into(),
         oauth_state: state.into(),
         oauth_state_expires_at: OffsetDateTime::now_utc() + Duration::minutes(15),
-        pkce_verifier: Some(secret("verifier")),
+        pkce_verifier: Some(secret(pkce_verifier)),
     })
     .await
     .unwrap()
     .id
 }
 
-pub fn tokens(expires_in: Option<i64>) -> NewTokens {
+pub fn generate_tokens(expires_in: Option<i64>) -> NewTokens {
     NewTokens {
-        access_token: secret("access-1"),
-        refresh_token: Some(secret("refresh-1")),
+        access_token: secret(generate_secret("access")),
+        refresh_token: Some(secret(generate_secret("refresh"))),
         access_token_expires_at: expires_in
             .map(|seconds| OffsetDateTime::now_utc() + Duration::seconds(seconds)),
         scope: Some("read".into()),
@@ -82,15 +109,16 @@ pub fn no_expiry(access: &str) -> NewTokens {
 
 /// An active connection with tokens expiring in `expires_in` seconds, and its refresh task.
 pub async fn active(db: &Db, user_id: &str, state: &str, expires_in: Option<i64>) -> String {
+    active_with(db, user_id, state, &generate_tokens(expires_in)).await
+}
+
+/// An active connection holding `tokens`, and its refresh task.
+pub async fn active_with(db: &Db, user_id: &str, state: &str, tokens: &NewTokens) -> String {
     let config = github_config(db).await;
     let id = pending(db, &config, user_id, state).await;
     let account = db.connected_account(&id).await.unwrap();
-    db.activate(
-        &account,
-        &tokens(expires_in),
-        Some(&refresh_task("refresh-1")),
-    )
-    .await
-    .unwrap();
+    db.activate(&account, tokens, Some(&refresh_task("refresh-1")))
+        .await
+        .unwrap();
     id
 }
