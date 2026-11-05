@@ -67,9 +67,9 @@ of these and not the other:
 
 Anything else is a **lost** answer: an empty reply, an error, prose with neither the clean line nor a
 findings block, a findings heading with no `file:line` entry, or both a findings block and the clean line.
-Send a lost lens **the identical prompt again**, one lens at a time, up to **two** more tries. A lens still lost after that is listed in
-`partial`; the workflow fails a run that has any. Never stand in for a lens, and never review its area
-yourself. Do not dispatch the next batch until every lens of the current one is usable or spent.
+Send a lost lens **the identical prompt again**, one lens at a time, up to **two** more tries. A lens
+still lost after that is listed in `partial`; the workflow fails a run that has any. Never stand in for a
+lens, and never review its area yourself. Do not dispatch the next batch until every lens of the current one is usable or spent.
 
 Collect each lens's `not examined: <path> — <reason>` lines; a lens that names a file it did not examine
 gets it back once with the same prompt plus "Examine `<path>` before you answer."
