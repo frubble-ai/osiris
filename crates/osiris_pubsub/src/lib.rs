@@ -3,6 +3,7 @@
 //! credentials. When deployed, it uses the service account's Application Default Credentials.
 
 pub mod config;
+pub mod listen;
 pub mod transport;
 
 pub use config::PubSubConfig;

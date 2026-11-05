@@ -5,7 +5,10 @@ use crate::{
     client::{Client, Key},
     profile,
 };
-use anyhow::{Context, bail};
+pub mod choose_auth_config;
+
+use anyhow::Context;
+use choose_auth_config::choose_auth_config;
 use clap::Args;
 use reqwest::Method;
 use serde_json::json;
@@ -42,34 +45,7 @@ impl Connect {
                     &[("limit", "100".to_owned())],
                 )
                 .await?;
-            let matching: Vec<String> = configs
-                .get("data")
-                .and_then(serde_json::Value::as_array)
-                .into_iter()
-                .flatten()
-                .filter(|config| {
-                    config.get("provider").and_then(serde_json::Value::as_str)
-                        == Some(self.provider.as_str())
-                })
-                .filter_map(|config| {
-                    config
-                        .get("id")
-                        .and_then(serde_json::Value::as_str)
-                        .map(str::to_owned)
-                })
-                .collect();
-            match matching.as_slice() {
-                [one] => one.clone(),
-                [] => bail!(
-                    "no auth config for {0}: `osiris auth-configs create --provider {0} …`",
-                    self.provider
-                ),
-                _ => bail!(
-                    "several auth configs for {}: name one with --auth-config ({})",
-                    self.provider,
-                    matching.join(", ")
-                ),
-            }
+            choose_auth_config(&self.provider, &configs)?
         };
         let body = json!({ "auth_config_id": auth_config, "user_id": self.user, "callback_url": self.callback_url });
         let created = client

@@ -1,12 +1,15 @@
 //! Calling osiris with the profile's keys: the version header always sent, error answers turned
 //! into their code and message.
 
+pub mod error_from_answer;
+pub mod print;
+
+pub use print::print;
+
 use crate::profile::Profile;
-use anyhow::{Context, bail};
-use osiris_api_models::{
-    errors::ErrorBody,
-    version::{CURRENT, HEADER},
-};
+use anyhow::Context;
+use error_from_answer::error_from_answer;
+use osiris_api_models::version::{CURRENT, HEADER};
 use reqwest::Method;
 use serde_json::Value;
 
@@ -67,15 +70,7 @@ impl Client {
         let status = response.status();
         let text = response.text().await?;
         if !status.is_success() {
-            match serde_json::from_str::<ErrorBody>(&text) {
-                Ok(error) => bail!(
-                    "{} {}: {}",
-                    error.error.code,
-                    error.error.error_type,
-                    error.error.message
-                ),
-                Err(_) => bail!("{status}: {text}"),
-            }
+            return Err(error_from_answer(status, &text));
         }
         Ok(if text.is_empty() {
             Value::Null
@@ -83,10 +78,4 @@ impl Client {
             serde_json::from_str(&text)?
         })
     }
-}
-
-/// Print an answer as indented JSON.
-pub fn print(value: &Value) -> anyhow::Result<()> {
-    println!("{}", serde_json::to_string_pretty(value)?);
-    Ok(())
 }
