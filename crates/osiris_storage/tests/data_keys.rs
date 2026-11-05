@@ -46,6 +46,7 @@ async fn reads_nothing_with_another_master_key(pool: PgPool) {
     let stranger = Store::new(
         pool,
         MasterKey::from_secret("a-different-master-secret-long-enough").unwrap(),
+        std::time::Duration::from_secs(5),
     );
     assert!(stranger.connected_account(&id).await.is_err());
 }

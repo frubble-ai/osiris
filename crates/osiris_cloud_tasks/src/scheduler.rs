@@ -9,6 +9,9 @@ use google_cloud_tasks_v2::{
 };
 use osiris_tasks::{Scheduled, Task, TaskError, TaskScheduler};
 
+/// Cloud Tasks schedules a task at most 30 days ahead.
+pub const MAX_LEAD_TIME: std::time::Duration = std::time::Duration::from_hours(30 * 24);
+
 pub struct CloudTasksScheduler {
     client: CloudTasks,
     config: CloudTasksConfig,
@@ -67,6 +70,10 @@ impl TaskScheduler for CloudTasksScheduler {
             }
             Err(error) => Err(TaskError::new(error.to_string())),
         }
+    }
+
+    fn max_lead_time(&self) -> Option<std::time::Duration> {
+        Some(MAX_LEAD_TIME)
     }
 
     async fn cancel(&self, name: &str) -> Result<(), TaskError> {

@@ -4,9 +4,6 @@
 use super::seconds;
 use serde::{Deserialize, Serialize};
 
-/// How far ahead a task can be scheduled at most. Cloud Tasks allows 30 days.
-pub const MAX_SCHEDULE_AHEAD_SECONDS: u64 = 30 * 86_400;
-
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(default)]
 pub struct RefreshSettings {
@@ -17,7 +14,7 @@ pub struct RefreshSettings {
     pub min_lead_seconds: u64,
     /// The longest delay before a refresh task runs. A token that does not expire within this
     /// time is refreshed anyway after it, which keeps its refresh token valid. Must be under the
-    /// 30-day limit.
+    /// chosen task scheduler's own limit (30 days for Cloud Tasks), checked at startup.
     pub keepalive_seconds: u64,
 }
 

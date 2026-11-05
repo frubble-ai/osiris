@@ -74,6 +74,7 @@ pub async fn app(pool: PgPool) -> App {
         store: Store::new(
             pool,
             MasterKey::from_secret("a-test-secret-that-is-long-enough-for-osiris").unwrap(),
+            settings.database.lock_timeout(),
         ),
         bus: MessageBus::new(bus.clone()),
         tasks: tasks.clone(),

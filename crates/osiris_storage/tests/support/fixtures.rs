@@ -19,7 +19,11 @@ use time::{Duration, OffsetDateTime};
 pub const MASTER_SECRET: &str = "a-test-secret-that-is-long-enough-for-osiris";
 
 pub fn store(pool: PgPool) -> Store {
-    Store::new(pool, MasterKey::from_secret(MASTER_SECRET).unwrap())
+    Store::new(
+        pool,
+        MasterKey::from_secret(MASTER_SECRET).unwrap(),
+        std::time::Duration::from_secs(5),
+    )
 }
 
 /// A refresh task as the core would name it, due in an hour.

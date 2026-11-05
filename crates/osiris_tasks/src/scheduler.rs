@@ -9,6 +9,11 @@ pub trait TaskScheduler: Send + Sync {
     /// name already exists or ran recently, nothing new is created.
     async fn schedule(&self, task: &Task) -> Result<Scheduled, TaskError>;
 
+    /// How far ahead this scheduler accepts a task's `run_at`, if it has a limit.
+    fn max_lead_time(&self) -> Option<std::time::Duration> {
+        None
+    }
+
     /// Deletes the pending task called `name`. Deleting a task that no longer exists is not an
     /// error.
     async fn cancel(&self, name: &str) -> Result<(), TaskError>;

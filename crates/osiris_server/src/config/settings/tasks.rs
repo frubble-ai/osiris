@@ -10,6 +10,11 @@ pub struct TasksSettings {
     pub outcome_retention_seconds: u64,
     /// The most expired outcomes deleted each time a new one is recorded.
     pub outcome_prune_batch: i64,
+    /// The most tasks the worker runs at once; more wait. Keep it under
+    /// `database.max_connections`, since each task may hold a connection.
+    pub max_concurrent: usize,
+    /// How long scheduling one task may take before it counts as failed.
+    pub schedule_timeout_seconds: u64,
     /// How long Google's OIDC signing keys are cached before they are fetched again.
     pub oidc_keys_ttl_seconds: u64,
     pub local: LocalTasksSettings,
@@ -26,6 +31,10 @@ pub struct LocalTasksSettings {
 }
 
 impl TasksSettings {
+    pub fn schedule_timeout(&self) -> std::time::Duration {
+        std::time::Duration::from_secs(self.schedule_timeout_seconds)
+    }
+
     pub fn outcome_retention(&self) -> time::Duration {
         seconds(self.outcome_retention_seconds)
     }
@@ -36,6 +45,8 @@ impl Default for TasksSettings {
         Self {
             outcome_retention_seconds: 2_592_000,
             outcome_prune_batch: 100,
+            max_concurrent: 4,
+            schedule_timeout_seconds: 10,
             oidc_keys_ttl_seconds: 3600,
             local: LocalTasksSettings::default(),
         }

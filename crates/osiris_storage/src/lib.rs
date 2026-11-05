@@ -31,17 +31,20 @@ pub struct Store {
     master: MasterKey,
     /// Data keys already read, by tenant.
     keys: Arc<Mutex<HashMap<String, Cipher>>>,
+    /// How long a refresh waits for another refresh's row lock before giving up.
+    lock_timeout: std::time::Duration,
 }
 
 /// The migrations in `migrations/`, compiled in.
 pub static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("../../migrations");
 
 impl Store {
-    pub fn new(pool: PgPool, master: MasterKey) -> Self {
+    pub fn new(pool: PgPool, master: MasterKey, lock_timeout: std::time::Duration) -> Self {
         Self {
             pool,
             master,
             keys: Arc::default(),
+            lock_timeout,
         }
     }
 }

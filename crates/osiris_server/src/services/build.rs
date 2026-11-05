@@ -26,7 +26,6 @@ use std::{sync::Arc, time::Duration};
 
 pub async fn core(config: &CoreConfig) -> anyhow::Result<Core> {
     let settings = &config.settings;
-    let pool = db::connect(&config.database).await?;
     let master = MasterKey::from_secret(config.encryption_key.expose_secret())?;
     let providers = &settings.providers;
     let providers = Providers::new(
@@ -35,13 +34,31 @@ pub async fn core(config: &CoreConfig) -> anyhow::Result<Core> {
         &providers.slack.urls()?,
         providers.listing.limits(),
     )?;
-    let transport = PubSubTransport::connect(&config.events)
-        .await
-        .context("connecting to Pub/Sub")?;
+    // The three connections are independent, so a cold start opens them at once.
+    // Boxed: the three connections' futures together are large.
+    let (pool, transport, tasks) = Box::pin(async {
+        tokio::try_join!(
+            db::connect(&config.database),
+            async {
+                PubSubTransport::connect(&config.events)
+                    .await
+                    .context("connecting to Pub/Sub")
+            },
+            scheduler(config),
+        )
+    })
+    .await?;
+    if let Some(limit) = tasks.max_lead_time() {
+        anyhow::ensure!(
+            settings.refresh.keepalive() < time::Duration::try_from(limit)?,
+            "refresh.keepalive_seconds must be under the task scheduler's limit of {} seconds",
+            limit.as_secs()
+        );
+    }
     Ok(Core {
-        store: Store::new(pool, master),
+        store: Store::new(pool, master, settings.database.lock_timeout()),
         bus: MessageBus::new(Arc::new(transport)),
-        tasks: scheduler(config).await?,
+        tasks,
         providers: Arc::new(providers),
         http: http_client(&settings.http)?,
         public_url: config.public_url.clone(),
