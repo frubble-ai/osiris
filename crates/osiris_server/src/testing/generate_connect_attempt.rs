@@ -8,7 +8,7 @@ use serde_json::{Value, json};
 pub fn generate_connect_attempt(auth_config_id: &str) -> Value {
     json!({
         "auth_config_id": auth_config_id,
-        "user_id": format!("org_{}", 16.fake::<String>().replace(|c: char| !c.is_ascii_alphanumeric(), "x")),
+        "user_id": format!("org_{}", 16.fake::<String>().replace(|character: char| !character.is_ascii_alphanumeric(), "x")),
         "alias": format!("attempt-{}", Word().fake::<String>()),
         "callback_url": format!(
             "https://{}.{}/integrations/callback?connection={}",

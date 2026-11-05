@@ -8,7 +8,7 @@ pub fn generate_task() -> Task {
     let id = format!(
         "ca_{}",
         16.fake::<String>()
-            .replace(|c: char| !c.is_ascii_alphanumeric(), "x")
+            .replace(|character: char| !character.is_ascii_alphanumeric(), "x")
     );
     Task {
         name: names::consent(&id),
