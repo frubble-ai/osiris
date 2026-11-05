@@ -12,7 +12,7 @@ use std::sync::{
     atomic::{AtomicBool, Ordering},
 };
 use std::time::Instant;
-use tokio::sync::oneshot;
+use tokio::sync::{Notify, oneshot};
 
 const GRACE: Duration = Duration::from_millis(300);
 const LONG_ENOUGH: Duration = Duration::from_secs(10);
@@ -60,13 +60,18 @@ async fn stops_at_once_when_nothing_is_running() {
 
 #[tokio::test]
 async fn stops_after_the_grace_though_a_request_never_finishes() {
+    let started = Arc::new(Notify::new());
+    let reached = started.clone();
     let router = Router::new().route(
         "/hang",
-        get(|| async { std::future::pending::<&'static str>().await }),
+        get(move || async move {
+            reached.notify_one();
+            std::future::pending::<&'static str>().await
+        }),
     );
     let (address, stop, signalled, server) = serving(router).await;
     let request = tokio::spawn(reqwest::get(format!("http://{address}/hang")));
-    tokio::time::sleep(Duration::from_millis(100)).await;
+    started.notified().await;
 
     stop.send(()).unwrap();
     let started = Instant::now();
