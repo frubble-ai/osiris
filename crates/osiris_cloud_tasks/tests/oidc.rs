@@ -85,6 +85,7 @@ async fn authenticator(keys: &[&Signer]) -> (OidcAuthenticator, MockServer) {
             audience: AUDIENCE.into(),
             service_account_email: ACCOUNT.into(),
             keys_ttl: Duration::from_secs(3600),
+            refetch_interval: Duration::from_secs(30),
         },
         reqwest::Client::new(),
     );
@@ -138,4 +139,22 @@ async fn refuses_a_token_signed_by_a_key_google_did_not_publish_and_a_missing_to
     );
     assert!(auth.authenticate(None).await.is_err());
     assert!(auth.authenticate(Some("Bearer not.a.token")).await.is_err());
+}
+
+#[tokio::test]
+async fn fetches_google_s_keys_once_however_many_unknown_key_ids_it_is_sent() {
+    let google = Signer::new("k1");
+    let (auth, server) = authenticator(&[&google]).await;
+    for kid in ["k2", "k3", "k4", "k5"] {
+        assert!(
+            auth.authenticate(Some(&Signer::new(kid).token(&claims(&[]))))
+                .await
+                .is_err()
+        );
+    }
+    auth.authenticate(Some(&google.token(&claims(&[]))))
+        .await
+        .unwrap();
+
+    assert_eq!(server.received_requests().await.unwrap().len(), 1);
 }

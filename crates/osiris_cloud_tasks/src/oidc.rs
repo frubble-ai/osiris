@@ -1,14 +1,16 @@
 //! Authenticates the tasks Cloud Tasks sends: each carries a Google-signed OIDC token, minted for
 //! the configured service account with the worker's URL as its audience. The token's signature is
 //! checked against Google's published keys, then its issuer, audience, expiry and service account.
-//! The keys are cached for `keys_ttl`, and fetched again when a token names a key not yet seen.
+//! The keys are cached for `keys_ttl`. A token naming a key not in the cache fetches them again, but
+//! at most once per `refetch_interval`, and one fetch at a time, so a caller sending made-up key ids
+//! can't make osiris call Google on every request.
 
 use async_trait::async_trait;
 use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode, decode_header, jwk::JwkSet};
 use osiris_tasks::{AuthError, TaskAuthenticator};
 use serde::Deserialize;
 use std::time::{Duration, Instant};
-use tokio::sync::RwLock;
+use tokio::sync::{Mutex, RwLock};
 
 /// Where Google publishes the keys that sign its OIDC tokens.
 pub const GOOGLE_KEYS_URL: &str = "https://www.googleapis.com/oauth2/v3/certs";
@@ -24,12 +26,16 @@ pub struct OidcConfig {
     /// The service account tasks are minted for.
     pub service_account_email: String,
     pub keys_ttl: Duration,
+    /// The shortest time between two fetches of the keys for a key id not in the cache.
+    pub refetch_interval: Duration,
 }
 
 pub struct OidcAuthenticator {
     config: OidcConfig,
     http: reqwest::Client,
     keys: RwLock<Option<(JwkSet, Instant)>>,
+    /// Held while the keys are fetched, so concurrent callers wait for one fetch.
+    fetching: Mutex<()>,
 }
 
 #[derive(Deserialize)]
@@ -44,6 +50,7 @@ impl OidcAuthenticator {
             config,
             http,
             keys: RwLock::new(None),
+            fetching: Mutex::new(()),
         }
     }
 
@@ -62,21 +69,40 @@ impl OidcAuthenticator {
         Ok(keys)
     }
 
-    /// The key `kid`, from the cache when it is fresh and holds it, otherwise fetched again.
+    /// The key `kid`, from the cache when it is fresh and holds it, otherwise from a fetch.
     async fn key(&self, kid: &str) -> Result<DecodingKey, AuthError> {
-        let cached = self.keys.read().await.clone();
-        let keys = match cached {
-            Some((keys, fetched))
-                if fetched.elapsed() < self.config.keys_ttl && keys.find(kid).is_some() =>
-            {
-                keys
-            }
-            _ => self.fetch_keys().await?,
-        };
+        if let Some(key) = self.cached(kid).await? {
+            return Ok(key);
+        }
+        let _fetching = self.fetching.lock().await;
+        // Another caller may have fetched while this one waited.
+        if let Some(key) = self.cached(kid).await? {
+            return Ok(key);
+        }
+        let keys = self.fetch_keys().await?;
         let jwk = keys
             .find(kid)
             .ok_or_else(|| AuthError::new("the token is signed with an unknown key"))?;
         DecodingKey::from_jwk(jwk).map_err(|error| AuthError::new(error.to_string()))
+    }
+
+    /// The key `kid` from the cache, if it is fresh and holds it. An error when the keys were
+    /// fetched less than `refetch_interval` ago and still lack `kid`: fetching again would not
+    /// help, and must not be something a caller can force.
+    async fn cached(&self, kid: &str) -> Result<Option<DecodingKey>, AuthError> {
+        let Some((keys, fetched)) = self.keys.read().await.clone() else {
+            return Ok(None);
+        };
+        let age = fetched.elapsed();
+        match keys.find(kid) {
+            Some(jwk) if age < self.config.keys_ttl => DecodingKey::from_jwk(jwk)
+                .map(Some)
+                .map_err(|error| AuthError::new(error.to_string())),
+            None if age < self.config.refetch_interval => {
+                Err(AuthError::new("the token is signed with an unknown key"))
+            }
+            _ => Ok(None),
+        }
     }
 }
 

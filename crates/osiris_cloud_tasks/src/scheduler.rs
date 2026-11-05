@@ -1,8 +1,7 @@
 //! The `TaskScheduler` implementation for Cloud Tasks.
 
-use crate::CloudTasksConfig;
+use crate::{CloudTasksConfig, outcome};
 use async_trait::async_trait;
-use google_cloud_gax::error::rpc::Code;
 use google_cloud_tasks_v2::{
     client::CloudTasks,
     model::{HttpMethod, HttpRequest, OidcToken, Task as CloudTask},
@@ -64,17 +63,7 @@ impl TaskScheduler for CloudTasksScheduler {
             )
             .send()
             .await;
-        match created {
-            Ok(_) => Ok(Scheduled::Created),
-            Err(error)
-                if error
-                    .status()
-                    .is_some_and(|status| status.code == Code::AlreadyExists) =>
-            {
-                Ok(Scheduled::AlreadyScheduled)
-            }
-            Err(error) => Err(TaskError::new(error.to_string())),
-        }
+        outcome::created(created.map(|_| ()))
     }
 
     fn max_lead_time(&self) -> Option<std::time::Duration> {
@@ -82,22 +71,12 @@ impl TaskScheduler for CloudTasksScheduler {
     }
 
     async fn cancel(&self, name: &str) -> Result<(), TaskError> {
-        match self
-            .client
-            .delete_task()
-            .set_name(self.task_path(name))
-            .send()
-            .await
-        {
-            Ok(()) => Ok(()),
-            Err(error)
-                if error
-                    .status()
-                    .is_some_and(|status| status.code == Code::NotFound) =>
-            {
-                Ok(())
-            }
-            Err(error) => Err(TaskError::new(error.to_string())),
-        }
+        outcome::cancelled(
+            self.client
+                .delete_task()
+                .set_name(self.task_path(name))
+                .send()
+                .await,
+        )
     }
 }

@@ -9,6 +9,7 @@
 
 pub mod config;
 pub mod oidc;
+pub mod outcome;
 pub mod scheduler;
 
 pub use config::CloudTasksConfig;
