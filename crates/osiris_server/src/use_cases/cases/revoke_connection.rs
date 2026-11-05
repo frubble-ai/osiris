@@ -22,7 +22,7 @@ impl UseCases {
             tracing::warn!(connected_account_id = id, %reason, "the provider rejects the token; the grant is gone");
             let lock = ctx.db.lock_for_refresh(id).await?;
             let task = lock.account.refresh_task.clone();
-            let event = lock
+            let (event, _) = lock
                 .revoke("the provider no longer accepts the connection's token; reconnect")
                 .await?;
             publish(&ctx.messages, ctx.scheduling(), &event).await;

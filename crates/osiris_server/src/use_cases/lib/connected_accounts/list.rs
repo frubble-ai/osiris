@@ -7,16 +7,35 @@ use crate::use_cases::lib::database::Db;
 use crate::use_cases::lib::database::Tenant;
 use crate::use_cases::lib::database::errors::db;
 use crate::use_cases::lib::database::rows::AccountRow;
+use error_stack::Report;
 use osiris_domain::Cursor;
+use osiris_domain::DomainError;
 use osiris_domain::Page;
 use osiris_domain::{ConnectedAccount, ConnectionStatus};
 
 impl Db {
+    async fn require_connected_account_cursor(&self, cursor: &Cursor) -> UseCaseResult<()> {
+        let Some(id) = cursor.after.as_deref().or(cursor.before.as_deref()) else {
+            return Ok(());
+        };
+        let found = sqlx::query_scalar!("SELECT id FROM connected_account WHERE id = $1", id)
+            .fetch_optional(&self.pool)
+            .await
+            .map_err(db)?;
+        if found.is_none() {
+            return Err(Report::new(DomainError::Invalid(
+                "the cursor names a record that no longer exists".to_owned(),
+            )));
+        }
+        Ok(())
+    }
+
     pub async fn list_connected_accounts(
         &self,
         filter: &AccountFilter,
         cursor: &Cursor,
     ) -> UseCaseResult<Page<ConnectedAccount>> {
+        self.require_connected_account_cursor(cursor).await?;
         // One static query per direction, so `(created_at, id)` serves the order.
         let found = match cursor.before.as_deref() {
             None => sqlx::query_as!(

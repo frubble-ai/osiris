@@ -14,6 +14,7 @@ use osiris_common::{crypto::Cipher, secret::ExposeSecret};
 use osiris_domain::ConnectionStatus;
 use osiris_domain::DomainError;
 use sqlx::PgConnection;
+use time::OffsetDateTime;
 
 pub struct TokenWrite<'a> {
     pub id: &'a str,
@@ -27,11 +28,17 @@ pub struct TokenWrite<'a> {
     pub from: Option<ConnectionStatus>,
 }
 
+/// What the database stamped on the row while writing.
+pub struct Stamped {
+    pub updated_at: OffsetDateTime,
+    pub refresh_token_issued_at: Option<OffsetDateTime>,
+}
+
 pub async fn store_tokens(
     connection: &mut PgConnection,
     cipher: &Cipher,
     write: TokenWrite<'_>,
-) -> UseCaseResult<()> {
+) -> UseCaseResult<Stamped> {
     let access = encrypt(cipher, write.tokens.access_token.expose_secret())?;
     let refresh_token = write
         .tokens
@@ -53,7 +60,8 @@ pub async fn store_tokens(
              last_refresh_error = NULL,
              refresh_failures = 0,
              updated_at = now()
-         WHERE id = $1 AND token_generation = $7::bigint - 1 AND ($10::text IS NULL OR status = $10)",
+         WHERE id = $1 AND token_generation = $7::bigint - 1 AND ($10::text IS NULL OR status = $10)
+         RETURNING updated_at, refresh_token_issued_at",
         write.id,
         access,
         refresh_token,
@@ -65,12 +73,14 @@ pub async fn store_tokens(
         write.refresh.map(|refresh| refresh.at),
         write.from.map(ConnectionStatus::as_str),
     )
-    .execute(connection)
+    .fetch_optional(connection)
     .await
-    .map_err(db)?
-    .rows_affected();
-    if written == 0 {
+    .map_err(db)?;
+    let Some(written) = written else {
         return Err(DomainError::Conflict("the connection moved on meanwhile".into()).into());
-    }
-    Ok(())
+    };
+    Ok(Stamped {
+        updated_at: written.updated_at,
+        refresh_token_issued_at: written.refresh_token_issued_at,
+    })
 }

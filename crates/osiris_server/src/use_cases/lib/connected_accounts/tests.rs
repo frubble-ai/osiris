@@ -141,7 +141,7 @@ async fn revokes_with_its_event_and_clears_the_refresh_task(pool: PgPool) {
     let db = db(pool);
     let id = active(&db, "org_1", "state-1", Some(3600)).await;
 
-    let event = db
+    let (event, _) = db
         .lock_for_refresh(&id)
         .await
         .unwrap()
@@ -157,7 +157,7 @@ async fn revokes_with_its_event_and_clears_the_refresh_task(pool: PgPool) {
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn makes_a_second_refresh_wait_for_the_first(pool: PgPool) {
-    let db = db(pool);
+    let db = db(pool.clone());
     let id = active(&db, "org_1", "state-1", Some(60)).await;
 
     let first = db.lock_for_refresh(&id).await.unwrap();
@@ -166,7 +166,24 @@ async fn makes_a_second_refresh_wait_for_the_first(pool: PgPool) {
         let id = id.clone();
         tokio::spawn(async move { db.lock_for_refresh(&id).await.unwrap() })
     };
-    tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+    // The second refresh is waiting on the first one's row lock, as Postgres reports it.
+    tokio::time::timeout(std::time::Duration::from_secs(10), async {
+        loop {
+            let waiting = sqlx::query_scalar!(
+                r#"SELECT count(*) AS "waiting!" FROM pg_stat_activity
+                   WHERE wait_event_type = 'Lock' AND datname = current_database()"#
+            )
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+            if waiting > 0 {
+                break;
+            }
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .expect("the second refresh waits for the lock");
     assert!(!second.is_finished());
     first
         .refreshed(&no_expiry("access-2"), Some(&refresh_task("refresh-2")))
@@ -342,4 +359,26 @@ async fn lists_connections_of_several_tenants_each_decrypted_with_its_own_key(po
             "access-1"
         );
     }
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_a_cursor_naming_a_deleted_connection(pool: PgPool) {
+    let db = db(pool);
+
+    let failure = db
+        .list_connected_accounts(
+            &AccountFilter::default(),
+            &Cursor {
+                after: Some("ca_gone".into()),
+                limit: 2,
+                ..Default::default()
+            },
+        )
+        .await
+        .unwrap_err();
+
+    assert!(matches!(
+        failure.current_context(),
+        osiris_domain::DomainError::Invalid(_)
+    ));
 }

@@ -29,6 +29,6 @@ impl Db {
             .ok_or(DomainError::NotFound("connected account"))?;
         let cipher = self.cipher_for(&Tenant::user(&row.user_id)).await?;
         let account = row.decrypt(&cipher)?;
-        Ok(RefreshLock::new(tx, self.clone(), cipher, account))
+        Ok(RefreshLock::new(tx, cipher, account))
     }
 }

@@ -126,7 +126,6 @@ impl UseCases {
                 ) => {
                     tracing::warn!(connected_account_id = id, %message, "the provider permanently refused the refresh; the user must reconnect");
                     end_refused(
-                        &ctx.db,
                         &ctx.messages,
                         ctx.scheduling(),
                         lock,
