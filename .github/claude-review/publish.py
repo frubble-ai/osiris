@@ -18,7 +18,8 @@ This script writes, and holds both to hard rules whatever they said:
   resolved by accepting a dispute is kept or reopened as the reconcile step judged (with no
   judgement, nothing is published), and every accepted dispute gets a marked reply;
 - a finding the reconcile step matched is never posted; every other one is, all in one review,
-  except one on the exact line of a thread that stays open, sharing a lens with it;
+  except one on the exact line of an open thread no finding matched, sharing a lens with it: that
+  thread is its twin and is kept open, whatever the reconcile step chose for it;
 - a finding on a line the diff does not carry moves to the nearest one it does; one with no line
   to sit on at all is listed in the verdict, and still counts as open;
 - the verdict follows the threads: changes are requested while any thread of this workflow is
@@ -48,7 +49,8 @@ BOT_GRAPHQL = "github-actions"
 # GitHub names the bot both ways: `github-actions` as a comment's author, `github-actions[bot]`
 # as the one who resolved a thread.
 BOT_LOGINS = {BOT, BOT_GRAPHQL}
-REQUIRED = "<sub>Required before merge: fix it, or reply with why it does not apply.</sub>"
+REQUIRED = ("<sub>Required before merge: fix it, or reply with why it does not apply and run the Claude Code "
+            "Review workflow again (a push, or by hand with this PR's number).</sub>")
 
 REPO = os.environ["GITHUB_REPOSITORY"]
 PR = os.environ["PR"]
@@ -159,12 +161,22 @@ WRITERS = {}
 
 
 def can_write(login):
-    """Whether `login` has write access to the repository, the same check the gate makes."""
+    """Whether `login` has write access to the repository, the same check the gate makes.
+
+    A failed lookup counts as no access, so the dispute stays open, and says so: someone who is not
+    a collaborator answers 404, anything else is a warning on the run.
+    """
     if not login:
         return False
     if login not in WRITERS:
-        answer = gh(f"repos/{REPO}/collaborators/{login}/permission", check=False) or {}
-        WRITERS[login] = answer.get("permission") in ("admin", "maintain", "write")
+        done = subprocess.run(
+            ["gh", "api", f"repos/{REPO}/collaborators/{login}/permission", "--jq", ".permission"],
+            capture_output=True, text=True,
+        )
+        if done.returncode != 0 and "HTTP 404" not in done.stderr:
+            print(f"::warning::could not read {login}'s permission, so their reply is not taken as a "
+                  f"dispute: {done.stderr.strip()}")
+        WRITERS[login] = done.returncode == 0 and done.stdout.strip() in ("admin", "maintain", "write")
     return WRITERS[login]
 
 
@@ -249,6 +261,24 @@ def main():
         matched_finding[index] = thread_id
         matched_thread[thread_id] = index
 
+    # A safety net for a match the reconcile step missed, decided before any thread changes: an
+    # unmatched finding on the very spot of an open thread no finding matched, sharing a lens with
+    # it, is that thread's twin. It counts as matched, so the thread stays open and the finding is
+    # not posted again; a finding at the same spot under other lenses is a different defect.
+    twins = set()
+    for index, finding in enumerate(findings):
+        if index in matched_finding:
+            continue
+        twin = next((thread for thread in threads
+                     if not thread["isResolved"] and thread["id"] not in matched_thread
+                     and (finding["path"], finding["line"]) in thread["places"]
+                     and thread["lenses"] & finding["lenses"]), None)
+        if twin:
+            matched_finding[index] = twin["id"]
+            matched_thread[twin["id"]] = index
+            twins.add(twin["id"])
+            print(f"matched {finding['path']}:{finding['line']} to open thread {twin['id']}: the same spot")
+
     # Each thread's action, held to what that thread allows.
     actions = {item.get("thread"): item for item in decisions.get("threads", [])}
     # A matched thread resolved by accepting a dispute needs the reconcile step's judgement, never
@@ -270,7 +300,10 @@ def main():
         # open thread (a dispute), and a matched thread resolved by accepting a dispute (does
         # the reply it accepted still hold at the head?).
         matched = thread["id"] in matched_thread
-        if matched and thread["isResolved"] and not by_person:
+        if thread["id"] in twins:
+            # The reconcile step judged it unmatched, so its choice for it does not hold.
+            action, decision = "keep", {}
+        elif matched and thread["isResolved"] and not by_person:
             if not thread["accepted"]:
                 action = "reopen"
         elif not matched and not thread["isResolved"]:
@@ -309,15 +342,6 @@ def main():
     comments, unplaced = [], []
     for index, finding in enumerate(findings):
         if index in matched_finding:
-            continue
-        # A safety net for a match the reconcile step missed: only a thread no other finding
-        # matched can be this finding's twin.
-        twin = next((thread for thread in open_threads
-                     if thread["id"] not in matched_thread
-                     and (finding["path"], finding["line"]) in thread["places"]
-                     and thread["lenses"] & finding["lenses"]), None)
-        if twin:
-            print(f"skipped {finding['path']}:{finding['line']}: the same spot as open thread {twin['id']}")
             continue
         path, line, note = anchor(finding["path"], finding["line"], valid)
         if path is None:

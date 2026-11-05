@@ -5,7 +5,10 @@ on:
     branches: [dev]
     types: [opened, synchronize, ready_for_review, reopened]
   # Reviews one pull request on demand, with this workflow and the rules as
-  # they are on the branch it is run from.
+  # they are on the branch it is run from. A reply that disputes a finding
+  # triggers nothing by itself: run this by hand with the PR number (or push)
+  # to have the dispute judged. Replies are not a trigger, because each run
+  # reviews the whole change again and spends the subscription's usage.
   workflow_dispatch:
     inputs:
       pr:
@@ -504,7 +507,7 @@ jobs:
           OPEN: ${{ steps.publish.outputs.open }}
         run: |
           if [ "$OPEN" != 0 ]; then
-            echo "::error::$OPEN open finding(s) from the Claude review: fix each one, or dispute it in a reply"
+            echo "::error::$OPEN open finding(s) from the Claude review: fix each one, or dispute it in a reply and run this workflow again (a push, or by hand with the PR number)"
             exit 1
           fi
           echo "no open findings"
