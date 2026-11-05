@@ -11,9 +11,6 @@ use osiris_server::{
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    // A git-ignored `.env`, when there is one, fills in what the shell doesn't set. Deployed
-    // there is none, and the variables come from the platform.
-    let _ = dotenvy::dotenv();
     osiris_env::logger::init();
     let process = Process::from_env()?;
     let settings = config::load::load()?;

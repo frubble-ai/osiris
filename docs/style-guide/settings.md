@@ -6,7 +6,8 @@ handed to the use cases as `ctx.config`.
 - **Secrets and infrastructure are environment variables** (`config/app_config.rs`,
   `config/integrations/`, `config/database_config.rs`), typed `Secret` when secret. A required one
   that is missing or malformed stops the process at startup, naming it. No file is read, and no
-  code depends on the environment osiris runs in.
+  code depends on the environment osiris runs in. The CLI alone loads a git-ignored `.env`, as a
+  developer tool.
 - **A value that can be tuned** (a batch size, a margin, a delay, a timeout, a retention period, a
   pool size) is a setting: a field of its section in `config/settings/`, with its default in that
   section's `Default`, its line in `config.example.toml`, and a check in `validate` when it must be

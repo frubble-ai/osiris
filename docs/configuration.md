@@ -88,9 +88,11 @@ just dev               # OSIRIS_PROCESS=serve on PORT=8090 and OSIRIS_PROCESS=wo
 
 docker-compose's `postgres-tls` generates the CA and a server certificate in `.local/tls`
 (git-ignored); Postgres refuses plaintext connections. The justfile exports `DB_CA_PEM` from
-`.local/tls/ca.pem`. Outside `just`:
+`.local/tls/ca.pem`, and `just` loads `.env`. The server reads only the environment. Outside
+`just`:
 
 ```sh
+set -a; . ./.env; set +a
 export DB_CA_PEM="$(cat .local/tls/ca.pem)"
 OSIRIS_PROCESS=serve PORT=8090 cargo run -p osiris_server
 ```

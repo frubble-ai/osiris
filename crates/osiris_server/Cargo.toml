@@ -26,7 +26,6 @@ osiris_interfaces.workspace = true
 osiris_providers.workspace = true
 anyhow.workspace = true
 axum.workspace = true
-dotenvy.workspace = true
 reqwest.workspace = true
 serde.workspace = true
 serde_json.workspace = true
