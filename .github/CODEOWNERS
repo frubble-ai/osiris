@@ -1,8 +1,9 @@
 # Review is required specifically on the paths that decide what the automated
-# review lets through: its rules and its workflow's helpers, and this file.
+# review lets through: its workflow, its rules and helpers, and this file.
 #
 # Once the dev ruleset requires code-owner approval, an approval from the
 # automated review never counts toward a merge: only these people's does.
 
-/.github/claude-review/**       @drn1996
-/.github/CODEOWNERS             @drn1996
+/.github/workflows/claude-code-review.yml  @drn1996
+/.github/claude-review/**                 @drn1996
+/.github/CODEOWNERS                       @drn1996

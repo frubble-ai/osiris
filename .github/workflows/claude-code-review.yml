@@ -432,11 +432,15 @@ jobs:
   # contents: write because GitHub requires it to resolve a review thread. This
   # is the check the ruleset requires, so it runs whenever the pull request is
   # in scope and fails unless the analysis succeeded: a skipped or broken
-  # review never counts as a pass.
+  # review never counts as a pass. A gate that failed or was cancelled runs it
+  # too, so the check fails instead of showing as skipped; only a gate that was
+  # switched off or that ruled the pull request out skips it.
   publish:
     name: Review — Claude
     needs: [gate, analyze]
-    if: always() && needs.gate.outputs.allowed == 'true'
+    if: >-
+      always() && needs.gate.result != 'skipped'
+      && (needs.gate.result != 'success' || needs.gate.outputs.allowed == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

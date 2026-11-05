@@ -39,7 +39,7 @@ posting the same defect twice is worse than missing a nuance.
 | resolved by a person | `keep` — their judgement stands | `keep` |
 
 **3. Disputes.** An open, matched thread whose latest reply is from a person, arguing the finding
-does not apply, is a dispute. Judge it against the code — read the lines it is about, and what
+does not apply, is a dispute (`publish.py` resolves one only when that person has write access). Judge it against the code — read the lines it is about, and what
 the reply points to:
 
 - **The reply holds** (a guard handles it, the line does not do that, the rule does not say that):
