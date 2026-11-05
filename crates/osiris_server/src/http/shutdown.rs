@@ -2,7 +2,10 @@
 
 pub async fn signal() {
     let ctrl_c = async {
-        let _ = tokio::signal::ctrl_c().await;
+        if let Err(error) = tokio::signal::ctrl_c().await {
+            tracing::error!(%error, "listening for Ctrl-C failed");
+            std::future::pending::<()>().await;
+        }
     };
     let terminate = async {
         match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()) {

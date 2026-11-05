@@ -242,3 +242,8 @@ async fn refuses_a_keyed_body_over_the_limit(pool: PgPool) {
     let oversized = serde_json::json!({ "alias": "x".repeat(1_100_000) });
     refuses_a_keyed_request(pool, "k1", oversized).await;
 }
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_an_idempotency_key_that_is_not_visible_ascii(pool: PgPool) {
+    refuses_a_keyed_request(pool, "ключ", serde_json::json!({})).await;
+}

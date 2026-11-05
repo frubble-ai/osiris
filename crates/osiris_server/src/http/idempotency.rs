@@ -35,17 +35,16 @@ pub async fn idempotency(
     if !matches!(*request.method(), Method::POST | Method::DELETE) {
         return Ok(next.run(request).await);
     }
-    let Some(key) = request
-        .headers()
-        .get(HEADER)
-        .and_then(|value| value.to_str().ok())
-        .map(str::to_owned)
-    else {
+    let Some(key) = request.headers().get(HEADER) else {
         return Ok(next.run(request).await);
     };
     let Some(caller) = principal(&state, request.headers()) else {
         return Ok(next.run(request).await);
     };
+    let key = key
+        .to_str()
+        .map_err(|_| ApiError::Invalid("Idempotency-Key must be visible ASCII".into()))?
+        .to_owned();
     if key.is_empty() || key.len() > 255 {
         return Err(ApiError::Invalid(
             "Idempotency-Key must be 1 to 255 characters".into(),
