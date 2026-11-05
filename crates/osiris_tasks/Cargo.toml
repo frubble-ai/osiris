@@ -18,6 +18,7 @@ serde_json.workspace = true
 subtle.workspace = true
 thiserror.workspace = true
 time.workspace = true
+rstest.workspace = true
 tokio.workspace = true
 tracing.workspace = true
 fake = { workspace = true, optional = true }
@@ -28,4 +29,5 @@ testing = ["dep:fake"]
 
 [dev-dependencies]
 osiris_tasks = { workspace = true, features = ["testing"] }
+rstest.workspace = true
 tokio.workspace = true

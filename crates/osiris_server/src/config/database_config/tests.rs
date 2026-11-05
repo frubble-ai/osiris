@@ -1,6 +1,7 @@
 //! Tests of `database_config`.
 
 use super::*;
+use rstest::rstest;
 use std::collections::HashMap;
 
 const CA: &str = "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----\n";
@@ -35,26 +36,21 @@ fn builds_a_verify_ca_connection_from_the_db_variables() {
     );
 }
 
-#[test]
-fn refuses_to_start_without_any_db_variable() {
-    for name in [
-        "DB_HOST",
-        "DB_PORT",
-        "DB_NAME",
-        "DB_USER",
-        "DB_PASSWORD",
-        "DB_CA_PEM",
-    ] {
-        for missing in [None, Some("  ")] {
-            let mut vars = vars();
-            match missing {
-                None => vars.remove(name),
-                Some(blank) => vars.insert(name, blank.to_owned()),
-            };
-            let error = read(&vars).err().unwrap().to_string();
-            assert!(error.contains(name), "{name}: {error}");
-        }
-    }
+#[rstest]
+fn refuses_to_start_without_a_db_variable(
+    #[values("DB_HOST", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASSWORD", "DB_CA_PEM")]
+    name: &'static str,
+    #[values(None, Some("  "))] replacement: Option<&str>,
+) {
+    let mut vars = vars();
+    match replacement {
+        None => vars.remove(name),
+        Some(blank) => vars.insert(name, blank.to_owned()),
+    };
+
+    let error = read(&vars).err().unwrap().to_string();
+
+    assert!(error.contains(name), "{error}");
 }
 
 #[test]

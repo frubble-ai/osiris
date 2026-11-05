@@ -2216,6 +2216,7 @@ dependencies = [
  "osiris_domain",
  "osiris_tasks",
  "reqwest",
+ "rstest",
  "serde",
  "serde_json",
  "subtle",
