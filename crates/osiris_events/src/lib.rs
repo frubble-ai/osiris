@@ -11,6 +11,8 @@ pub mod catalog;
 pub mod envelope;
 pub mod message_bus;
 pub mod ports;
+#[cfg(any(test, feature = "testing"))]
+pub mod testing;
 
 pub use catalog::{Channel, Message};
 pub use envelope::Envelope;

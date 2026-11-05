@@ -16,7 +16,13 @@ serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 time.workspace = true
+fake = { workspace = true, optional = true }
 
+
+[features]
+# The contract every transport is held to, and test data, for other crates' tests.
+testing = ["dep:fake"]
 
 [dev-dependencies]
+osiris_events = { workspace = true, features = ["testing"] }
 tokio.workspace = true

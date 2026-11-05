@@ -1,17 +1,13 @@
-//! `/v1/connected-accounts/{id}/actions/…`: each action's answer, typed.
+//! `/v1/connected-accounts/{id}/actions/…`: each action's answer, typed, one module per provider.
 
-pub use osiris_providers::{
-    github::types::{
-        GithubAccountType, GithubInstallation, GithubRepository, GithubRepositorySelection,
-    },
-    linear::types::LinearTeam,
-    slack::types::SlackChannel,
+pub mod action_result;
+pub mod github;
+pub mod linear;
+pub mod slack;
+
+pub use action_result::ActionResult;
+pub use github::{
+    GithubAccountType, GithubInstallation, GithubRepository, GithubRepositorySelection,
 };
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
-
-/// An action's answer: what it read, as `data`.
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct ActionResult<T> {
-    pub data: T,
-}
+pub use linear::LinearTeam;
+pub use slack::SlackChannel;
