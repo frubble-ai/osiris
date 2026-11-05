@@ -61,29 +61,36 @@ fn writes_one_json_line_per_event_with_its_cloud_logging_severity() {
         .collect();
     assert_eq!(lines.len(), 3, "{text}");
     assert_eq!(
-        lines.first().and_then(|l| l.get("severity")),
+        lines.first().and_then(|line| line.get("severity")),
         Some(&"INFO".into())
     );
     assert_eq!(
-        lines.first().and_then(|l| l.get("message")),
+        lines.first().and_then(|line| line.get("message")),
         Some(&"tokens refreshed".into())
     );
     assert_eq!(
-        lines.first().and_then(|l| l.get("connected_account_id")),
+        lines
+            .first()
+            .and_then(|line| line.get("connected_account_id")),
         Some(&"ca_1".into())
     );
     assert_eq!(
-        lines.first().and_then(|l| l.pointer("/span/request_id")),
+        lines
+            .first()
+            .and_then(|line| line.pointer("/span/request_id")),
         Some(&"req_1".into())
     );
-    assert!(lines.first().and_then(|l| l.get("time")).is_some());
+    assert!(lines.first().and_then(|line| line.get("time")).is_some());
     assert_eq!(
-        lines.get(1).and_then(|l| l.get("severity")),
+        lines.get(1).and_then(|line| line.get("severity")),
         Some(&"WARNING".into())
     );
     assert_eq!(
-        lines.get(2).and_then(|l| l.get("severity")),
+        lines.get(2).and_then(|line| line.get("severity")),
         Some(&"ERROR".into())
     );
-    assert_eq!(lines.get(2).and_then(|l| l.get("attempt")), Some(&3.into()));
+    assert_eq!(
+        lines.get(2).and_then(|line| line.get("attempt")),
+        Some(&3.into())
+    );
 }

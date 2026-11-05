@@ -97,7 +97,13 @@ async fn lists_every_repository_once_across_installations_and_pages() {
         .unwrap();
 
     assert_eq!(repositories.len(), 102);
-    assert_eq!(repositories.iter().filter(|r| r.id == "102").count(), 1);
+    assert_eq!(
+        repositories
+            .iter()
+            .filter(|repository| repository.id == "102")
+            .count(),
+        1
+    );
 }
 
 #[tokio::test]

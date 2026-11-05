@@ -89,7 +89,10 @@ async fn pages_forwards_and_back(pool: PgPool) {
         .await
         .unwrap();
     let ids = |page: &osiris_domain::Page<osiris_domain::AuthConfig>| {
-        page.items.iter().map(|c| c.id.clone()).collect::<Vec<_>>()
+        page.items
+            .iter()
+            .map(|config| config.id.clone())
+            .collect::<Vec<_>>()
     };
     assert_eq!(ids(&back), ids(&first));
 }

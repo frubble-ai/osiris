@@ -21,7 +21,9 @@ fn names_follow_what_the_task_is_for() {
 fn names_use_only_what_schedulers_accept(#[case] name: String) {
     assert!(
         name.chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+            .all(|character| character.is_ascii_alphanumeric()
+                || character == '-'
+                || character == '_')
     );
     assert!(name.len() <= 500);
 }

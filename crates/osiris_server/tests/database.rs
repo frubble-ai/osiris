@@ -37,11 +37,12 @@ fn from_env(overrides: &[(&str, &str)]) -> anyhow::Result<DatabaseConfig> {
 async fn connects_over_tls_verified_against_db_ca_pem() {
     let config = from_env(&[]).expect("the DB_* variables are set: run through `just test`");
     let pool = db::connect(&config).await.unwrap();
-    let encrypted: bool =
-        sqlx::query_scalar("SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
+    let encrypted = sqlx::query_scalar!(
+        r#"SELECT ssl AS "ssl!" FROM pg_stat_ssl WHERE pid = pg_backend_pid()"#
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
     assert!(encrypted, "the connection uses TLS");
 }
 

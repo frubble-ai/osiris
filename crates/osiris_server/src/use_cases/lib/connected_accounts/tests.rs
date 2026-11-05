@@ -304,8 +304,15 @@ async fn lists_connections_by_attempt_a_page_at_a_time(pool: PgPool) {
         .await
         .unwrap();
     assert_eq!(
-        back.items.iter().map(|a| &a.id).collect::<Vec<_>>(),
-        first.items.iter().map(|a| &a.id).collect::<Vec<_>>()
+        back.items
+            .iter()
+            .map(|account| &account.id)
+            .collect::<Vec<_>>(),
+        first
+            .items
+            .iter()
+            .map(|account| &account.id)
+            .collect::<Vec<_>>()
     );
 }
 

@@ -39,7 +39,7 @@ async fn connects_through_the_consent_and_sends_the_browser_back_once(pool: PgPo
     assert_eq!(back.host_str(), callback_url.host_str());
     let query: Vec<(String, String)> = back
         .query_pairs()
-        .map(|(k, v)| (k.into_owned(), v.into_owned()))
+        .map(|(name, value)| (name.into_owned(), value.into_owned()))
         .collect();
     let (_, connection) = callback_url
         .query_pairs()
