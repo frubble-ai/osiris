@@ -18,21 +18,25 @@ Nothing else in osiris names one.
    constructor call in `Providers::new`, and its entry in `Providers::get`.
 3. Its URLs: `[providers.<id>]` in `ProvidersSettings` (`config/settings/providers.rs`) and
    `config.example.toml`; its entry in the provider list of `config/settings/validate.rs`; and its
-   `urls()` passed to `Providers::new` in `services/build.rs`.
+   `urls()` passed to `Providers::new` in `use_cases/build_use_case_context.rs`.
 4. Its row: a migration inserting it into `provider` (`just migration add_<id>`).
-5. The server tests' builder: its URLs in `Providers::new` (`crates/osiris_server/tests/support/app.rs`).
-6. Tests against a fake (`crates/osiris_providers/tests/<id>.rs`, wiremock): each action's
-   paging, a rejected token reading as `Unauthorized`, a revoke of a grant already gone.
-7. The docs: this provider in README.md and the release's changelog.
+5. The server tests' builder: its URLs in `Providers::new` (`osiris_server/src/testing/test_context.rs`).
+6. Its faked network and tests: `<id>/mocks/` (a `mock_<id>_network.rs` with an arranger per
+   endpoint, a `generate_*` factory per answer type) and `<id>/tests.rs`: each action's paging, a
+   rejected token reading as `Unauthorized`, a revoke of a grant already gone. Both follow
+   [test organization](style-guide/test-organization.md).
+7. The API models: `osiris_api_models/src/actions/<id>.rs` re-exporting the provider's types.
+8. The docs: this provider in README.md and the release's changelog.
 
 ## An action
 
 1. `<provider>/<action>.rs` with the call, `types.rs` with our answer type, `transformers.rs` with
    the provider's answer and its `From`.
-2. The core: `core/actions/<provider>/<action>.rs` (declared in `core/actions/<provider>.rs`), a
-   `Core::<provider>_<action>` running it through `with_token` (so a rejected token is refreshed
-   once, then the connection revoked).
+2. The use case: `use_cases/cases/list_<provider>_<thing>.rs`, a method on `UseCases` that runs
+   the provider call through `run_connection_action` (so a rejected token is refreshed once, then
+   the connection revoked), declared in `use_cases/cases.rs`
+   ([use cases](style-guide/use-cases.md)).
 3. The route: `routes/actions/<provider>/<action>.rs` (declared in `routes/actions/<provider>.rs`),
    registered in `routes/actions/router.rs`.
-4. `just openapi`, the changelog, and its tests (provider against a fake; the route in
-   `crates/osiris_server/tests/actions.rs`).
+4. `just openapi`, the changelog, and its tests (the provider against its faked network; the use
+   case's and the route's in `services/api/tests/actions.rs`).

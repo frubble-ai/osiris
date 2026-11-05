@@ -7,4 +7,4 @@
 - **Pull requests**: against `dev`, every section of the template filled; CI checks it.
 - **Before pushing**: `just check` (format, clippy with warnings as errors, cargo-deny, spelling,
   `.sqlx/`, the tests, the OpenAPI spec). A migration also runs `just migrations-check`.
-- **Tests** are part of the change: see [testing](docs/style-guide/testing.md).
+- **Tests** are part of the change: see [test organization](docs/style-guide/test-organization.md) and [testing patterns](docs/style-guide/testing-patterns.md).

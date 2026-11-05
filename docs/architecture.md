@@ -21,20 +21,39 @@ One workspace, with one crate per layer. A crate depends only on crates above it
 | `osiris_cloud_tasks` | the `TaskScheduler` implementation for Google Cloud Tasks |
 | `osiris_storage` | Postgres: one module per table, one file per operation; encryption happens inside |
 | `osiris_api_models` | what the API accepts and returns; the OpenAPI spec is generated from these |
-| `osiris_server` | config, the core, the HTTP layer and routes, and the processes |
+| `osiris_server` | config, the use cases, the HTTP layer and routes, and the processes |
 | `osiris_openapi` | writes `api-reference/openapi.json` |
 | `osiris_cli` | `osiris`, the developer CLI |
 
-In `osiris_server`, a request goes **route → `server_wrap` → core → storage / providers / bus /
-task scheduler**. A route parses the request and calls one core function. `server_wrap` checks the
-key, opens the flow's span, logs the outcome and maps errors. The core is the only code that
-reaches the outside world.
+In `osiris_server`, a request goes **route → `server_wrap` → use case → storage / providers / bus /
+task scheduler**. A route parses the request and calls one use case. `server_wrap` checks the key,
+opens the flow's span, logs the outcome and maps errors. A use case is the only code that reaches
+the outside world, and it is the same pattern as the app's backend ([use cases](style-guide/use-cases.md)):
+
+```
+osiris_server/src/
+├── main.rs  services/                 # OSIRIS_PROCESS picks serve or worker; migrate runs db::migrate
+├── config/  config/settings/          # read from the environment once; settings with defaults
+├── http/  routes/                     # server_wrap, keys, errors, idempotency; one route per file
+├── use_cases/
+│   ├── build_use_case_context.rs      # the clients, built once at boot; chooses the adapters
+│   ├── context.rs  use_case.rs        # UseCaseContext (setup only); UseCases and run
+│   ├── cases/                         # one use case per file
+│   └── lib/                           # helpers on parts of the context, by domain
+└── testing/                           # the test context, with its arrangers and observers
+```
+
+- **The context is setup only**: `config`, `store`, `messages`, `tasks`, `providers`, `http`. It
+  is built once, before the process takes traffic. Nothing about a request is on it.
+- **Callers are thin**: routes, the idempotency middleware and the worker call use cases and nothing
+  else.
+- **`lib/` takes parts of the context** and never calls a use case.
 
 ### Ports and adapters
 
-The core never depends on Google Cloud. It publishes events through `MessageBus` (backed by the
-`Transport` trait) and schedules tasks through the `TaskScheduler` trait. The implementation
-behind each trait is chosen in one place, `services/build.rs`, when a process starts:
+A use case never depends on Google Cloud. It publishes events through `MessageBus` (backed by the
+`Transport` trait) and schedules tasks through the `TaskScheduler` trait. The implementation behind
+each trait is chosen in one place, `build_use_case_context`, when a process starts:
 
 | Trait | Deployed | Local development | Tests |
 | --- | --- | --- | --- |
@@ -42,7 +61,8 @@ behind each trait is chosen in one place, `services/build.rs`, when a process st
 | `TaskScheduler` | Cloud Tasks (`osiris_cloud_tasks`) | timers in the process (`OSIRIS_TASKS=local`) | in memory |
 
 This mirrors how the app keeps Composio behind its broker interface. Replacing Pub/Sub or Cloud
-Tasks means writing a new implementation of the trait, without changing the core.
+Tasks means writing a new implementation of the trait, which runs the same contract test, without
+changing a use case ([third-party integrations](style-guide/third-party-integrations.md)).
 
 ## Processes
 
