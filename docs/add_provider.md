@@ -14,7 +14,7 @@ Nothing else in osiris names one.
    200 (Slack's `ok: false`, Linear's GraphQL `errors`) is handled in its own transformers
    (`slack/transformers.rs`, `linear/graphql.rs`), since `call` only hands non-2xx answers to
    `parse_error`.
-2. Register it in `osiris_providers/src/lib.rs`: a field in `Providers`, its argument and
+2. Register it in `osiris_providers/src/providers.rs`: a field in `Providers`, its argument and
    constructor call in `Providers::new`, and its entry in `Providers::get`.
 3. Its URLs: `[providers.<id>]` in `ProvidersSettings` (`config/settings/providers.rs`) and
    `config.example.toml`; its entry in the provider list of `config/settings/validate.rs`; and its

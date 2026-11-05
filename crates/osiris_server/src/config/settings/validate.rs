@@ -43,3 +43,6 @@ impl Settings {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests;

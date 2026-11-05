@@ -29,3 +29,6 @@ impl Default for PaginationSettings {
         }
     }
 }
+
+#[cfg(test)]
+mod tests;

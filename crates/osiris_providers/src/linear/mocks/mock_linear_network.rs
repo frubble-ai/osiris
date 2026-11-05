@@ -30,8 +30,9 @@ impl<'a> MockLinearNetwork<'a> {
         after: Option<&str>,
         teams: &[Value],
         next: Option<&str>,
+        expected_calls: Option<u64>,
     ) {
-        Mock::given(method("POST"))
+        let mock = Mock::given(method("POST"))
             .and(path("/graphql"))
             .and(body_partial_json(
                 json!({ "variables": { "after": after } }),
@@ -41,9 +42,27 @@ impl<'a> MockLinearNetwork<'a> {
                 "nodes": teams,
                 "pageInfo": { "hasNextPage": next.is_some(), "endCursor": next },
             } } })),
-            )
-            .mount(self.server)
-            .await;
+            );
+        match expected_calls {
+            Some(calls) => mock.expect(calls),
+            None => mock,
+        }
+        .mount(self.server)
+        .await;
+    }
+
+    /// Ending a grant answers `status`. With `expected_calls`, the test fails unless it is asked
+    /// exactly that often.
+    pub async fn answer_revoke(&self, status: u16, expected_calls: Option<u64>) {
+        let mock = Mock::given(method("POST"))
+            .and(path("/oauth/revoke"))
+            .respond_with(ResponseTemplate::new(status));
+        match expected_calls {
+            Some(calls) => mock.expect(calls),
+            None => mock,
+        }
+        .mount(self.server)
+        .await;
     }
 
     /// Every team on one page, only for a request made with `token`.
