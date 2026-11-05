@@ -209,3 +209,36 @@ async fn finishes_a_keyed_request_its_caller_gave_up_on(pool: PgPool) {
     assert_eq!(retry.status, StatusCode::OK, "{}", retry.body);
     assert_eq!(retry.headers["idempotent-replayed"], "true");
 }
+
+async fn refuses_a_keyed_request(pool: PgPool, key: &str, body: serde_json::Value) {
+    let app = setup_test_context(pool).await;
+
+    let answer = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            Some(API_KEY),
+            Some(body),
+            &[("idempotency-key", key)],
+        )
+        .await;
+
+    assert_eq!(answer.status, StatusCode::BAD_REQUEST, "{}", answer.body);
+    assert_eq!(answer.body["error"]["code"], "OS_02");
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_an_empty_idempotency_key(pool: PgPool) {
+    refuses_a_keyed_request(pool, "", serde_json::json!({})).await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_an_idempotency_key_of_256_characters(pool: PgPool) {
+    refuses_a_keyed_request(pool, &"k".repeat(256), serde_json::json!({})).await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_a_keyed_body_over_the_limit(pool: PgPool) {
+    let oversized = serde_json::json!({ "alias": "x".repeat(1_100_000) });
+    refuses_a_keyed_request(pool, "k1", oversized).await;
+}
