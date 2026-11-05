@@ -8,6 +8,8 @@
 //! itself (`OidcAuthenticator`), so it never relies on the platform alone.
 
 pub mod config;
+#[cfg(feature = "testing")]
+pub mod mocks;
 pub mod oidc;
 pub mod outcome;
 pub mod scheduler;

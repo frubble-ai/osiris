@@ -8,59 +8,17 @@
     reason = "tests: a failure here is the test failing"
 )]
 
-use aws_lc_rs::{
-    rand::SystemRandom,
-    rsa::{KeyPair, KeySize, PublicKeyComponents},
-    signature::{KeyPair as _, RSA_PKCS1_SHA256},
+use osiris_cloud_tasks::{
+    OidcAuthenticator, OidcConfig,
+    mocks::mock_google_keys::{MockGoogleSigner as Signer, answer_google_keys},
 };
-use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
-use osiris_cloud_tasks::{OidcAuthenticator, OidcConfig};
 use osiris_tasks::TaskAuthenticator;
 use serde_json::{Value, json};
 use std::time::Duration;
-use wiremock::{Mock, MockServer, ResponseTemplate, matchers::method};
+use wiremock::MockServer;
 
 const AUDIENCE: &str = "https://osiris-worker.example.run.app";
 const ACCOUNT: &str = "tasks@project.iam.gserviceaccount.com";
-
-struct Signer {
-    key: KeyPair,
-    kid: &'static str,
-}
-
-impl Signer {
-    fn new(kid: &'static str) -> Self {
-        Self {
-            key: KeyPair::generate(KeySize::Rsa2048).unwrap(),
-            kid,
-        }
-    }
-
-    fn jwk(&self) -> Value {
-        let public = PublicKeyComponents::<Vec<u8>>::from(self.key.public_key());
-        json!({ "kty": "RSA", "alg": "RS256", "use": "sig", "kid": self.kid,
-                "n": URL_SAFE_NO_PAD.encode(&public.n), "e": URL_SAFE_NO_PAD.encode(&public.e) })
-    }
-
-    fn token(&self, claims: &Value) -> String {
-        let header = json!({ "alg": "RS256", "typ": "JWT", "kid": self.kid });
-        let signed = format!(
-            "{}.{}",
-            URL_SAFE_NO_PAD.encode(header.to_string()),
-            URL_SAFE_NO_PAD.encode(claims.to_string())
-        );
-        let mut signature = vec![0; self.key.public_modulus_len()];
-        self.key
-            .sign(
-                &RSA_PKCS1_SHA256,
-                &SystemRandom::new(),
-                signed.as_bytes(),
-                &mut signature,
-            )
-            .unwrap();
-        format!("Bearer {signed}.{}", URL_SAFE_NO_PAD.encode(signature))
-    }
-}
 
 fn claims(overrides: &[(&str, Value)]) -> Value {
     let now = time::OffsetDateTime::now_utc().unix_timestamp();
@@ -74,11 +32,7 @@ fn claims(overrides: &[(&str, Value)]) -> Value {
 
 async fn authenticator(keys: &[&Signer]) -> (OidcAuthenticator, MockServer) {
     let server = MockServer::start().await;
-    let keys: Vec<Value> = keys.iter().map(|signer| signer.jwk()).collect();
-    Mock::given(method("GET"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(json!({ "keys": keys })))
-        .mount(&server)
-        .await;
+    answer_google_keys(&server, keys).await;
     let authenticator = OidcAuthenticator::new(
         OidcConfig {
             keys_url: server.uri(),
