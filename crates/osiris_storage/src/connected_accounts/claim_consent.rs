@@ -6,6 +6,7 @@ use crate::{
     errors::{StorageResult, db},
     rows::decrypt,
 };
+use osiris_common::secret::secret;
 
 impl Store {
     pub async fn claim_consent(&self, state: &str) -> StorageResult<Option<Claimed>> {
@@ -28,7 +29,7 @@ impl Store {
             pkce_verifier: claimed
                 .pkce_verifier
                 .as_deref()
-                .map(|value| decrypt(&cipher, value))
+                .map(|value| decrypt(&cipher, value).map(secret))
                 .transpose()?,
             expired: claimed.expired.unwrap_or(true),
         }))

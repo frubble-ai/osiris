@@ -18,7 +18,13 @@ async fn lets_a_consent_be_claimed_once(pool: PgPool) {
 
     let claimed = store.claim_consent("state-1").await.unwrap().unwrap();
     assert_eq!(claimed.account.id, id);
-    assert_eq!(claimed.pkce_verifier.as_deref(), Some("verifier"));
+    assert_eq!(
+        claimed
+            .pkce_verifier
+            .as_ref()
+            .map(ExposeSecret::expose_secret),
+        Some("verifier")
+    );
     assert!(!claimed.expired);
     assert!(store.claim_consent("state-1").await.unwrap().is_none());
 }
@@ -67,10 +73,11 @@ async fn counts_a_token_without_a_refresh_token_as_complete_without_a_task(pool:
     let id = pending(&store, &config, "org_1", "state-1").await;
     let account = store.connected_account(&id).await.unwrap();
 
-    let active = store
+    store
         .activate(&account, &no_expiry("access-1"), None)
         .await
         .unwrap();
+    let active = store.connected_account(&id).await.unwrap();
     assert!(active.is_complete());
     assert!(active.refresh_task.is_none());
 }

@@ -7,7 +7,7 @@ use crate::{
     errors::{StorageError, StorageResult, db},
     rows::{AccountRow, encrypt},
 };
-use osiris_common::ids;
+use osiris_common::{ids, secret::ExposeSecret};
 use osiris_domain::ConnectedAccount;
 
 impl Store {
@@ -15,8 +15,8 @@ impl Store {
         let cipher = self.cipher_for(&Tenant::user(&new.user_id)).await?;
         let verifier = new
             .pkce_verifier
-            .as_deref()
-            .map(|verifier| encrypt(&cipher, verifier))
+            .as_ref()
+            .map(|verifier| encrypt(&cipher, verifier.expose_secret()))
             .transpose()?;
         sqlx::query_as!(
             AccountRow,

@@ -3,18 +3,19 @@
 
 use crate::{AuthError, TaskAuthenticator};
 use async_trait::async_trait;
+use osiris_common::secret::{ExposeSecret, Secret};
 use subtle::ConstantTimeEq;
 
 /// The shortest token accepted, so it can't be guessed.
 pub const MIN_TOKEN_LENGTH: usize = 32;
 
 pub struct BearerAuthenticator {
-    token: String,
+    token: Secret,
 }
 
 impl BearerAuthenticator {
-    pub fn new(token: String) -> Result<Self, AuthError> {
-        if token.len() < MIN_TOKEN_LENGTH {
+    pub fn new(token: Secret) -> Result<Self, AuthError> {
+        if token.expose_secret().len() < MIN_TOKEN_LENGTH {
             return Err(AuthError::new(format!(
                 "the worker token must be at least {MIN_TOKEN_LENGTH} characters"
             )));
@@ -29,7 +30,7 @@ impl TaskAuthenticator for BearerAuthenticator {
         let sent = authorization
             .and_then(|value| value.strip_prefix("Bearer "))
             .unwrap_or_default();
-        if bool::from(sent.as_bytes().ct_eq(self.token.as_bytes())) {
+        if bool::from(sent.as_bytes().ct_eq(self.token.expose_secret().as_bytes())) {
             Ok(())
         } else {
             Err(AuthError::new("wrong or missing bearer token"))
@@ -40,12 +41,13 @@ impl TaskAuthenticator for BearerAuthenticator {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use osiris_common::secret::secret;
 
     const TOKEN: &str = "a-worker-token-that-is-long-enough!";
 
     #[tokio::test]
     async fn accepts_only_the_token() {
-        let auth = BearerAuthenticator::new(TOKEN.into()).unwrap();
+        let auth = BearerAuthenticator::new(secret(TOKEN)).unwrap();
         assert!(
             auth.authenticate(Some(&format!("Bearer {TOKEN}")))
                 .await
@@ -58,6 +60,6 @@ mod tests {
 
     #[test]
     fn refuses_a_short_token() {
-        assert!(BearerAuthenticator::new("short".into()).is_err());
+        assert!(BearerAuthenticator::new(secret("short")).is_err());
     }
 }

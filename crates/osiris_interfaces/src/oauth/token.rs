@@ -3,6 +3,7 @@
 
 use super::definition::{ClientAuth, OAuth2Definition};
 use crate::{error::ProviderError, oauth_client::OAuthClient, tokens::Tokens};
+use osiris_common::secret::secret;
 use serde_json::{Map, Value};
 use url::Url;
 
@@ -86,6 +87,9 @@ async fn token_request(
     parse_token_answer(provider, status, &body)
 }
 
+/// OAuth error codes that mean "try again" (RFC 6749, section 4.1.2.1), not "this grant is dead".
+const TRANSIENT_ERRORS: &[&str] = &["temporarily_unavailable", "server_error"];
+
 /// A token answer. Some providers refuse with a 200 and an `error` (GitHub), or `ok: false`
 /// (Slack); a token endpoint may echo credentials, so an unreadable body is never repeated.
 fn parse_token_answer(
@@ -128,6 +132,11 @@ fn parse_token_answer(
         let message = text("error_description")
             .or_else(|| text("error"))
             .unwrap_or_else(|| format!("token endpoint answered {status}"));
+        // An error code that says the failure is temporary does not end the grant, whatever the
+        // HTTP status around it.
+        if text("error").is_some_and(|code| TRANSIENT_ERRORS.contains(&code.as_str())) {
+            return Err(ProviderError::unavailable(provider, message));
+        }
         return Err(ProviderError::refused(provider, message));
     }
     let access_token = text("access_token")
@@ -136,8 +145,8 @@ fn parse_token_answer(
             ProviderError::unavailable(provider, "the token answer has no access_token")
         })?;
     Ok(Tokens {
-        access_token,
-        refresh_token: text("refresh_token"),
+        access_token: secret(access_token),
+        refresh_token: text("refresh_token").map(secret),
         expires_in: expires_in(&answer),
         scope: text("scope").filter(|scope| !scope.is_empty()),
     })
@@ -156,6 +165,7 @@ fn expires_in(answer: &Map<String, Value>) -> Option<i64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use osiris_common::secret::ExposeSecret;
     use reqwest::StatusCode;
 
     #[test]
@@ -166,8 +176,14 @@ mod tests {
             r#"{"access_token":"a","refresh_token":"r","expires_in":"3600","scope":"read"}"#,
         )
         .unwrap();
-        assert_eq!(tokens.access_token, "a");
-        assert_eq!(tokens.refresh_token.as_deref(), Some("r"));
+        assert_eq!(tokens.access_token.expose_secret(), "a");
+        assert_eq!(
+            tokens
+                .refresh_token
+                .as_ref()
+                .map(ExposeSecret::expose_secret),
+            Some("r")
+        );
         assert_eq!(tokens.expires_in, Some(3600));
     }
 
@@ -212,5 +228,24 @@ mod tests {
         )
         .unwrap_err();
         assert!(matches!(error, ProviderError::Refused { .. }));
+    }
+
+    #[test]
+    fn treats_an_error_code_that_says_try_again_as_temporary_whatever_the_status() {
+        for (status, code) in [
+            (StatusCode::OK, "temporarily_unavailable"),
+            (StatusCode::BAD_REQUEST, "temporarily_unavailable"),
+            (StatusCode::OK, "server_error"),
+        ] {
+            let body = format!(r#"{{"error":"{code}"}}"#);
+            let error = parse_token_answer("test", status, &body).unwrap_err();
+            assert!(
+                matches!(error, ProviderError::Unavailable { .. }),
+                "{status} {code}"
+            );
+        }
+        let dead =
+            parse_token_answer("test", StatusCode::OK, r#"{"error":"invalid_grant"}"#).unwrap_err();
+        assert!(matches!(dead, ProviderError::Refused { .. }));
     }
 }

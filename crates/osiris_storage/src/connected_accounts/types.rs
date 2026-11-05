@@ -1,7 +1,7 @@
 //! What goes into and comes out of the connected-account operations.
 
 use osiris_common::secret::Secret;
-use osiris_domain::{ConnectedAccount, ConnectionStatus};
+use osiris_domain::ConnectedAccount;
 use time::OffsetDateTime;
 
 /// A connection whose consent has just been opened.
@@ -12,7 +12,7 @@ pub struct NewPending {
     pub callback_url: String,
     pub oauth_state: String,
     pub oauth_state_expires_at: OffsetDateTime,
-    pub pkce_verifier: Option<String>,
+    pub pkce_verifier: Option<Secret>,
 }
 
 /// Tokens a provider just answered.
@@ -24,20 +24,10 @@ pub struct NewTokens {
     pub scope: Option<String>,
 }
 
-/// Which connections to list.
-#[derive(Default)]
-pub struct AccountFilter {
-    pub user_id: Option<String>,
-    pub provider: Option<String>,
-    pub auth_config_id: Option<String>,
-    pub alias: Option<String>,
-    pub status: Option<ConnectionStatus>,
-}
-
 /// A consent the provider sent back: the connection it belongs to, and its PKCE verifier.
 pub struct Claimed {
     pub account: ConnectedAccount,
-    pub pkce_verifier: Option<String>,
+    pub pkce_verifier: Option<Secret>,
     /// The consent came back after its time.
     pub expired: bool,
 }

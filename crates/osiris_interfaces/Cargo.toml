@@ -9,6 +9,7 @@ license.workspace = true
 workspace = true
 
 [dependencies]
+osiris_common.workspace = true
 async-trait.workspace = true
 base64.workspace = true
 rand.workspace = true

@@ -13,7 +13,6 @@ use osiris_api_models::{
     auth_configs::{AuthConfig, UpdateAuthConfig},
     errors::ErrorBody,
 };
-use osiris_common::secret::secret;
 use osiris_env::Flow;
 
 /// Change an app's client, secret or scopes. Connections made before keep the scopes they got.
@@ -36,7 +35,7 @@ pub async fn update_auth_config(
                 .update_auth_config(UpdateAuthConfigArgs {
                     id: &id,
                     client_id: body.client_id,
-                    client_secret: body.client_secret.map(secret),
+                    client_secret: body.client_secret,
                     scopes: body.scopes,
                 })
                 .await

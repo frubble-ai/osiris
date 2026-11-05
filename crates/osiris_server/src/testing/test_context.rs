@@ -93,7 +93,7 @@ pub async fn setup_test_context_with(
         use_cases: use_cases.clone(),
         config: config.clone(),
         authenticator: Arc::new(
-            BearerAuthenticator::new(WORKER_TOKEN.into()).expect("a long enough token"),
+            BearerAuthenticator::new(secret(WORKER_TOKEN)).expect("a long enough token"),
         ),
         draining: draining.clone(),
     });

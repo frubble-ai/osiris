@@ -56,7 +56,7 @@ pub async fn pending(store: &Store, auth_config_id: &str, user_id: &str, state: 
             callback_url: "http://localhost:8080/integrations/callback".into(),
             oauth_state: state.into(),
             oauth_state_expires_at: OffsetDateTime::now_utc() + Duration::minutes(15),
-            pkce_verifier: Some("verifier".into()),
+            pkce_verifier: Some(secret("verifier")),
         })
         .await
         .unwrap()

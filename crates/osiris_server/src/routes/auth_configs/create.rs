@@ -13,7 +13,6 @@ use osiris_api_models::{
     auth_configs::{AuthConfig, CreateAuthConfig},
     errors::ErrorBody,
 };
-use osiris_common::secret::secret;
 use osiris_env::Flow;
 
 /// Register a provider's app.
@@ -28,7 +27,7 @@ pub async fn create_auth_config(
     let new = New {
         provider: body.provider,
         client_id: body.client_id,
-        client_secret: secret(body.client_secret),
+        client_secret: body.client_secret,
         scopes: body.scopes,
     };
     server_wrap(

@@ -1,23 +1,26 @@
 //! `/v1/auth-configs`.
 
+use osiris_common::secret::Secret;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
 
-#[derive(Debug, Deserialize, Serialize, ToSchema)]
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct CreateAuthConfig {
     /// A provider osiris implements: `github`, `linear` or `slack`.
     pub provider: String,
     pub client_id: String,
-    pub client_secret: String,
+    #[schema(value_type = String)]
+    pub client_secret: Secret,
     #[serde(default)]
     pub scopes: Vec<String>,
 }
 
-#[derive(Debug, Default, Deserialize, Serialize, ToSchema)]
+#[derive(Debug, Default, Deserialize, ToSchema)]
 pub struct UpdateAuthConfig {
     pub client_id: Option<String>,
-    pub client_secret: Option<String>,
+    #[schema(value_type = Option<String>)]
+    pub client_secret: Option<Secret>,
     pub scopes: Option<Vec<String>>,
 }
 

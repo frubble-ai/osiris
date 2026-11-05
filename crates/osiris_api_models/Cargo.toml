@@ -9,6 +9,7 @@ license.workspace = true
 workspace = true
 
 [dependencies]
+osiris_common.workspace = true
 osiris_domain.workspace = true
 osiris_providers.workspace = true
 serde.workspace = true

@@ -6,6 +6,7 @@
 
 use crate::{Scheduled, Task, TaskError, TaskScheduler};
 use async_trait::async_trait;
+use osiris_common::secret::{ExposeSecret, Secret};
 use std::{
     collections::{HashMap, HashSet},
     sync::{Arc, Mutex, PoisonError},
@@ -19,7 +20,7 @@ pub struct LocalConfig {
     /// The worker's task endpoint, e.g. `http://localhost:8091/tasks`.
     pub handler_url: String,
     /// Sent as `Authorization: Bearer …`. The worker checks it when it is configured with one.
-    pub token: Option<String>,
+    pub token: Option<Secret>,
     pub retry_delay: Duration,
     pub max_attempts: u32,
 }
@@ -95,7 +96,7 @@ async fn deliver(config: &LocalConfig, http: &reqwest::Client, task: &Task) {
     for attempt in 1..=config.max_attempts {
         let mut request = http.post(&config.handler_url).json(task);
         if let Some(token) = &config.token {
-            request = request.bearer_auth(token);
+            request = request.bearer_auth(token.expose_secret());
         }
         match request.send().await {
             Ok(answer) if answer.status().is_success() => return,

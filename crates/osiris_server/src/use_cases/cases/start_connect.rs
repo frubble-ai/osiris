@@ -10,7 +10,11 @@ use crate::use_cases::{
     },
 };
 use error_stack::ResultExt;
-use osiris_common::{errors::ReportSwitchExt, ids};
+use osiris_common::{
+    errors::ReportSwitchExt,
+    ids,
+    secret::{ExposeSecret, secret},
+};
 use osiris_domain::{ConnectedAccount, DomainError};
 use osiris_interfaces::oauth;
 use osiris_storage::connected_accounts::NewPending;
@@ -53,7 +57,10 @@ impl UseCases {
             let consent = &ctx.config.settings.consent;
             let state = ids::random(consent.state_length);
             let expires_at = OffsetDateTime::now_utc() + consent.ttl();
-            let verifier = provider.oauth().pkce.then(oauth::pkce_verifier);
+            let verifier = provider
+                .oauth()
+                .pkce
+                .then(|| secret(oauth::pkce_verifier()));
             let account = ctx
                 .store
                 .create_pending(NewPending {
@@ -93,7 +100,7 @@ impl UseCases {
                 provider.oauth(),
                 &oauth_client(&config, &redirect_uri),
                 &state,
-                verifier.as_deref(),
+                verifier.as_ref().map(ExposeSecret::expose_secret),
             );
             Ok((account, url.to_string()))
         })

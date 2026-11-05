@@ -19,7 +19,7 @@ use crate::use_cases::{
         tasks::cancel_quietly::cancel_quietly,
     },
 };
-use osiris_common::errors::ReportSwitchExt;
+use osiris_common::{errors::ReportSwitchExt, secret::ExposeSecret};
 use osiris_domain::DomainError;
 use osiris_tasks::names;
 
@@ -78,7 +78,10 @@ impl UseCases {
                         Exchange {
                             config: &config,
                             code: &code,
-                            verifier: claimed.pkce_verifier.as_deref(),
+                            verifier: claimed
+                                .pkce_verifier
+                                .as_ref()
+                                .map(ExposeSecret::expose_secret),
                             redirect_uri: &redirect_uri,
                         },
                     )

@@ -44,13 +44,7 @@ pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCa
         )
     })
     .await?;
-    if let Some(limit) = tasks.max_lead_time() {
-        anyhow::ensure!(
-            settings.refresh.keepalive() < time::Duration::try_from(limit)?,
-            "refresh.keepalive_seconds must be under the task scheduler's limit of {} seconds",
-            limit.as_secs()
-        );
-    }
+    settings.refresh.check_against(tasks.max_lead_time())?;
     Ok(UseCaseContext {
         store: Store::new(pool, master, settings.database.lock_timeout()),
         messages: MessageBus::new(Arc::new(transport)),
@@ -72,7 +66,7 @@ async fn scheduler(config: &Config) -> anyhow::Result<Arc<dyn TaskScheduler>> {
             let local = &config.settings.tasks.local;
             Arc::new(LocalScheduler::new(LocalConfig {
                 handler_url: handler_url.clone(),
-                token: Some(token.expose_secret().to_owned()),
+                token: Some(token.clone()),
                 retry_delay: Duration::from_secs(local.retry_delay_seconds),
                 max_attempts: local.max_attempts,
             }))
