@@ -18,13 +18,11 @@ use osiris_events::{Message, MessageBus, testing::generate_event_message::genera
 use osiris_pubsub::{
     PubSubConfig, PubSubTransport,
     listen::{Listen, listen},
+    mocks::mock_push_endpoint::MockPushEndpoint,
 };
 use std::{sync::Arc, time::Duration};
 use tokio::sync::{mpsc, oneshot};
-use wiremock::{
-    Mock, MockServer, ResponseTemplate,
-    matchers::{method, path},
-};
+use wiremock::MockServer;
 
 const LONG_ENOUGH: Duration = Duration::from_secs(20);
 
@@ -83,11 +81,8 @@ async fn forwards_a_published_event_as_a_push_and_removes_its_subscription() {
         emulator_host: Some(host.clone()),
     };
     let endpoint = MockServer::start().await;
-    Mock::given(method("POST"))
-        .and(path("/events"))
-        .respond_with(ResponseTemplate::new(204))
-        .mount(&endpoint)
-        .await;
+    let push_endpoint = MockPushEndpoint::on(&endpoint);
+    push_endpoint.answer_push(204).await;
     let suffix = format!("test-{}", Word().fake::<String>());
     let subscription = format!(
         "projects/{}/subscriptions/osiris-cli-{suffix}",
@@ -99,7 +94,7 @@ async fn forwards_a_published_event_as_a_push_and_removes_its_subscription() {
         .build()
         .await
         .unwrap();
-    let mut listening = start_listening(&config, format!("{}/events", endpoint.uri()), suffix);
+    let mut listening = start_listening(&config, push_endpoint.url(), suffix);
 
     // An event published before the subscription exists would never reach it.
     tokio::time::timeout(LONG_ENOUGH, async {

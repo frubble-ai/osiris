@@ -2162,6 +2162,7 @@ dependencies = [
  "google-cloud-auth",
  "google-cloud-pubsub",
  "osiris_events",
+ "osiris_pubsub",
  "reqwest",
  "serde_json",
  "tokio",

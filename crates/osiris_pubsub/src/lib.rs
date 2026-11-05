@@ -4,6 +4,8 @@
 
 pub mod config;
 pub mod listen;
+#[cfg(feature = "testing")]
+pub mod mocks;
 pub mod transport;
 
 pub use config::PubSubConfig;
