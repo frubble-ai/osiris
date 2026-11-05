@@ -9,7 +9,7 @@ use super::{
 use crate::ProviderError;
 
 impl Github {
-    /// Every installation, across pages.
+    /// Every installation, across pages, up to `max_items`.
     pub async fn list_installations(
         &self,
         http: &reqwest::Client,
@@ -22,6 +22,10 @@ impl Github {
                 get_page(self, http, token, "/user/installations", page).await?;
             let short = next.installations.len() < PER_PAGE;
             all.extend(next.installations.into_iter().map(GithubInstallation::from));
+            if all.len() >= self.limits.max_items {
+                all.truncate(self.limits.max_items);
+                return Ok(all);
+            }
             if short || u64::try_from(all.len()).unwrap_or(u64::MAX) >= next.total_count {
                 return Ok(all);
             }

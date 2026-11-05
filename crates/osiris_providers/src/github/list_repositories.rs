@@ -19,16 +19,18 @@ impl Github {
         token: &str,
     ) -> Result<Vec<GithubRepository>, ProviderError> {
         let installations = self.list_installations(http, token).await?;
-        let pages: Vec<Vec<GithubRepository>> = stream::iter(installations)
+        let mut pages = stream::iter(installations)
             .map(|installation| self.installation_repositories(http, token, installation.id))
-            .buffer_unordered(self.limits.concurrency.max(1))
-            .try_collect()
-            .await?;
-        let by_id: BTreeMap<_, _> = pages
-            .into_iter()
-            .flatten()
-            .map(|repository| (repository.id.clone(), repository))
-            .collect();
+            .buffer_unordered(self.limits.concurrency.max(1));
+        let mut by_id = BTreeMap::new();
+        // Installations are read until the map holds `max_items`; the rest are never fetched.
+        while by_id.len() < self.limits.max_items
+            && let Some(page) = pages.try_next().await?
+        {
+            for repository in page {
+                by_id.insert(repository.id.clone(), repository);
+            }
+        }
         Ok(by_id.into_values().take(self.limits.max_items).collect())
     }
 

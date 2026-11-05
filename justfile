@@ -44,13 +44,18 @@ migrate:
     cargo build -q -p osiris_server
     OSIRIS_PROCESS=migrate target/debug/osiris-server
 
-# Every migration applied, reverted and applied again, on a throwaway database.
+# Every migration applied, reverted and applied again, on a throwaway database of its own (never
+# the development database).
 migrations-check:
-    sqlx database drop -y || true
-    sqlx database create
-    sqlx migrate run
-    sqlx migrate revert --target-version 0
-    sqlx migrate run
+    #!/usr/bin/env bash
+    set -euo pipefail
+    url="$(printf '%s' "$DATABASE_URL" | sed "s#/${DB_NAME}?#/${DB_NAME}_migrations_check?#")"
+    sqlx database drop -y --database-url "$url"
+    sqlx database create --database-url "$url"
+    sqlx migrate run --database-url "$url"
+    sqlx migrate revert --target-version 0 --database-url "$url"
+    sqlx migrate run --database-url "$url"
+    sqlx database drop -y --database-url "$url"
 
 # Refresh .sqlx/ after changing a query, so CI and the image build without a database.
 sqlx-prepare:

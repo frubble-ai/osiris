@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 /// Every section, each defaulting to the values in its own `Default`.
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct Settings {
     pub server: server::ServerSettings,
     pub api: api::ApiSettings,

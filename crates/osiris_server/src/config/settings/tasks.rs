@@ -4,7 +4,7 @@ use super::seconds;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct TasksSettings {
     /// How long the outcome of a task run is kept.
     pub outcome_retention_seconds: u64,
@@ -22,7 +22,7 @@ pub struct TasksSettings {
 
 /// `[tasks.local]`: the scheduler used in local development (`OSIRIS_TASKS=local`).
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct LocalTasksSettings {
     /// How long to wait before sending a task again after the worker refused it.
     pub retry_delay_seconds: u64,

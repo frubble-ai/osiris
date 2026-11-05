@@ -103,7 +103,7 @@ pub struct ConnectedAccountFilter {
     pub provider: Option<String>,
     pub auth_config_id: Option<String>,
     pub alias: Option<String>,
-    /// `pending`, `active`, `expired` or `failed`.
+    /// `pending`, `active`, `disabled`, `expired` or `failed`.
     pub status: Option<String>,
     /// A batch's `next_cursor`: the batch after it.
     pub after: Option<String>,

@@ -87,7 +87,7 @@ The worker's answer decides what happens next:
   a task).
 - **500**: the queue's retry policy runs the same task again later.
 
-Every run's outcome is saved in `task_outcome`: `refreshed`, `skipped_stale`, `failed`,
+Every run's outcome is saved in `task_outcome`: `refreshed`, `rescheduled`, `skipped_stale`, `failed`,
 `consent_expired` or `published`. Rows older than `[tasks] outcome_retention` are deleted a few
 at a time as new ones are written.
 

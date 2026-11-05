@@ -101,7 +101,8 @@ CREATE TABLE idempotency_key (
 );
 CREATE INDEX idempotency_key_created_idx ON idempotency_key (created_at);
 
--- How each task run ended (refreshed, skipped_stale, failed, consent_expired, published), one row
+-- How each task run ended (refreshed, rescheduled, skipped_stale, failed, consent_expired,
+-- published), one row
 -- per run; rows past `[tasks] outcome_retention` are deleted as new ones are written.
 CREATE TABLE task_outcome (
     id bigserial PRIMARY KEY,

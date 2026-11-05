@@ -8,7 +8,7 @@ use serde_json::json;
 const QUERY: &str = "query Teams($after: String) { teams(after: $after, first: 100, includeArchived: false) { nodes { id name } pageInfo { hasNextPage endCursor } } }";
 
 impl Linear {
-    /// Every team, archived ones left out, across pages.
+    /// Every team, archived ones left out, across pages, up to `max_items`.
     pub async fn list_teams(
         &self,
         http: &reqwest::Client,
@@ -22,6 +22,10 @@ impl Linear {
             let more = page.teams.page_info.has_next_page;
             after.clone_from(&page.teams.page_info.end_cursor);
             teams.extend(page.teams.teams());
+            if teams.len() >= self.limits.max_items {
+                teams.truncate(self.limits.max_items);
+                return Ok(teams);
+            }
             if !more {
                 return Ok(teams);
             }

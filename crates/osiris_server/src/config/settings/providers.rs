@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct ProvidersSettings {
     pub github: ProviderUrlSettings,
     pub linear: ProviderUrlSettings,
@@ -13,7 +13,7 @@ pub struct ProvidersSettings {
 
 /// `[providers.listing]`: how far a list that fans out over a provider's resources goes.
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct ListingSettings {
     /// Resources read at once (e.g. GitHub installations).
     pub concurrency: usize,

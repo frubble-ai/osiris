@@ -325,3 +325,30 @@ async fn keeps_unscheduled_new_tokens_disabled_until_restored(pool: PgPool) {
         "only once"
     );
 }
+
+#[sqlx::test(migrator = "osiris_storage::MIGRATOR")]
+async fn lists_connections_of_several_tenants_each_decrypted_with_its_own_key(pool: PgPool) {
+    let writer = store(pool.clone());
+    for (user, state) in [("org_1", "s1"), ("org_2", "s2"), ("org_3", "s3")] {
+        active(&writer, user, state, Some(3600)).await;
+    }
+    // A fresh store has no key in memory: the page reads them in one go.
+    let reader = store(pool);
+    let page = reader
+        .list_connected_accounts(
+            &AccountFilter::default(),
+            &Cursor {
+                limit: 10,
+                ..Default::default()
+            },
+        )
+        .await
+        .unwrap();
+    assert_eq!(page.items.len(), 3);
+    for account in page.items {
+        assert_eq!(
+            account.tokens.unwrap().access_token.expose_secret(),
+            "access-1"
+        );
+    }
+}

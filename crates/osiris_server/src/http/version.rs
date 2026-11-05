@@ -11,13 +11,9 @@ use axum::{
 };
 use osiris_api_models::version::{HEADER, VERSIONS};
 
-/// The version a request is served at, for version changes to read once there is a second.
-#[derive(Debug, Clone, Copy)]
-pub struct ServedVersion(pub &'static str);
-
 pub async fn version(
     State(state): State<ApiState>,
-    mut request: Request,
+    request: Request,
     next: Next,
 ) -> Result<Response, ApiError> {
     let asked = match request.headers().get(HEADER) {
@@ -32,7 +28,6 @@ pub async fn version(
         .copied()
         .find(|known| *known == asked)
         .ok_or(ApiError::UnknownVersion(asked))?;
-    request.extensions_mut().insert(ServedVersion(served));
     let mut response = next.run(request).await;
     response
         .headers_mut()

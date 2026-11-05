@@ -9,8 +9,11 @@ Nothing else in osiris names one.
    rename `acme`/`Acme`. Fill its OAuth2 definition from the provider's docs (OpenConnector's
    definitions are a good reference), including `issues_refresh_tokens`: true when the provider
    issues refresh tokens (its connections then always get a scheduled refresh), false when its
-   tokens never expire (nothing is scheduled); override `parse_error` if its errors don't read by status
-   (Slack answers `ok: false` beside a 200, Linear puts errors beside a 200).
+   tokens never expire (nothing is scheduled). Override `parse_error` when the provider's error
+   answers (non-2xx) carry their reason in its own shape. A provider that reports errors inside a
+   200 (Slack's `ok: false`, Linear's GraphQL `errors`) is handled in its own transformers
+   (`slack/transformers.rs`, `linear/graphql.rs`), since `call` only hands non-2xx answers to
+   `parse_error`.
 2. Register it in `osiris_providers/src/lib.rs`: a field in `Providers`, its argument and
    constructor call in `Providers::new`, and its entry in `Providers::get`.
 3. Its URLs: `[providers.<id>]` in `ProvidersSettings` (`config/settings/providers.rs`) and

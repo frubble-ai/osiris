@@ -29,8 +29,8 @@ impl Providers {
     ) -> Result<Self, url::ParseError> {
         Ok(Self {
             github: github::Github::new(github, limits)?,
-            linear: linear::Linear::new(linear)?,
-            slack: slack::Slack::new(slack)?,
+            linear: linear::Linear::new(linear, limits)?,
+            slack: slack::Slack::new(slack, limits)?,
         })
     }
 

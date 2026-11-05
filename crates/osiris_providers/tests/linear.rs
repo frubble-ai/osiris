@@ -5,7 +5,7 @@
     reason = "test fixtures: a failure here is the test failing"
 )]
 
-use osiris_providers::{ProviderError, ProviderUrls, linear::Linear};
+use osiris_providers::{ListLimits, ProviderError, ProviderUrls, linear::Linear};
 use serde_json::json;
 use url::Url;
 use wiremock::{
@@ -15,12 +15,20 @@ use wiremock::{
 
 fn linear(server: &MockServer) -> Linear {
     let base = Url::parse(&server.uri()).unwrap();
-    Linear::new(&ProviderUrls {
-        oauth_base: base.clone(),
-        api_base: base,
-    })
+    Linear::new(
+        &ProviderUrls {
+            oauth_base: base.clone(),
+            api_base: base,
+        },
+        LIMITS,
+    )
     .unwrap()
 }
+
+const LIMITS: ListLimits = ListLimits {
+    concurrency: 2,
+    max_items: 5000,
+};
 
 #[tokio::test]
 async fn lists_teams_across_pages() {

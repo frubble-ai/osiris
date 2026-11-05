@@ -5,7 +5,7 @@ use super::seconds;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct RefreshSettings {
     /// How long before an access token expires it is refreshed, both by its task and when an
     /// action uses it.

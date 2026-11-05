@@ -9,7 +9,7 @@ use reqwest::Method;
 const LIMIT: &str = "200";
 
 impl Slack {
-    /// Every channel, archived ones left out, across cursor pages.
+    /// Every channel, archived ones left out, across cursor pages, up to `max_items`.
     pub async fn list_channels(
         &self,
         http: &reqwest::Client,
@@ -42,6 +42,10 @@ impl Slack {
             }
             let next = page.next_cursor();
             channels.extend(page.channels());
+            if channels.len() >= self.limits.max_items {
+                channels.truncate(self.limits.max_items);
+                return Ok(channels);
+            }
             match next {
                 Some(next) => cursor = next,
                 None => return Ok(channels),

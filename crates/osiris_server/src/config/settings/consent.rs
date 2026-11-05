@@ -5,7 +5,7 @@ use super::seconds;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct ConsentSettings {
     pub ttl_seconds: u64,
     pub state_length: usize,

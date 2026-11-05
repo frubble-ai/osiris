@@ -5,7 +5,9 @@
     reason = "test fixtures: a failure here is the test failing"
 )]
 
-use osiris_providers::{OAuthClient, Provider, ProviderError, ProviderUrls, slack::Slack};
+use osiris_providers::{
+    ListLimits, OAuthClient, Provider, ProviderError, ProviderUrls, slack::Slack,
+};
 use serde_json::json;
 use url::Url;
 use wiremock::{
@@ -15,12 +17,20 @@ use wiremock::{
 
 fn slack(server: &MockServer) -> Slack {
     let base = Url::parse(&server.uri()).unwrap();
-    Slack::new(&ProviderUrls {
-        oauth_base: base.clone(),
-        api_base: base.join("/api/").unwrap(),
-    })
+    Slack::new(
+        &ProviderUrls {
+            oauth_base: base.clone(),
+            api_base: base.join("/api/").unwrap(),
+        },
+        LIMITS,
+    )
     .unwrap()
 }
+
+const LIMITS: ListLimits = ListLimits {
+    concurrency: 2,
+    max_items: 5000,
+};
 
 #[tokio::test]
 async fn lists_channels_across_cursor_pages() {
@@ -99,4 +109,34 @@ async fn counts_a_token_already_gone_as_revoked() {
         .revoke(&reqwest::Client::new(), &client, "token")
         .await
         .unwrap();
+}
+
+#[tokio::test]
+async fn stops_reading_channels_at_the_cap() {
+    let server = MockServer::start().await;
+    let channels: Vec<_> = (0..3)
+        .map(|n| json!({ "id": format!("C{n}"), "name": format!("c{n}"), "is_private": false }))
+        .collect();
+    // A first page only: a second request would fail the list.
+    Mock::given(method("GET")).and(path("/api/conversations.list"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({ "ok": true, "channels": channels, "response_metadata": { "next_cursor": "n1" } })))
+        .expect(1)
+        .mount(&server).await;
+    let base = Url::parse(&server.uri()).unwrap();
+    let capped = Slack::new(
+        &ProviderUrls {
+            oauth_base: base.clone(),
+            api_base: base.join("/api/").unwrap(),
+        },
+        ListLimits {
+            concurrency: 1,
+            max_items: 2,
+        },
+    )
+    .unwrap();
+    let channels = capped
+        .list_channels(&reqwest::Client::new(), "token")
+        .await
+        .unwrap();
+    assert_eq!(channels.len(), 2);
 }

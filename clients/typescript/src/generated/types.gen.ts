@@ -456,7 +456,7 @@ export type ListConnectedAccountsData = {
         auth_config_id?: string;
         alias?: string;
         /**
-         * `pending`, `active`, `expired` or `failed`.
+         * `pending`, `active`, `disabled`, `expired` or `failed`.
          */
         status?: string;
         /**

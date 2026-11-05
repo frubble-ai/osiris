@@ -314,7 +314,7 @@
           {
             "name": "status",
             "in": "query",
-            "description": "`pending`, `active`, `expired` or `failed`.",
+            "description": "`pending`, `active`, `disabled`, `expired` or `failed`.",
             "required": false,
             "schema": {
               "type": "string"

@@ -7,7 +7,7 @@ pub mod revoke;
 pub mod transformers;
 pub mod types;
 
-use crate::{OAuthClient, Provider, ProviderCommon, ProviderError, ProviderUrls};
+use crate::{ListLimits, OAuthClient, Provider, ProviderCommon, ProviderError, ProviderUrls};
 use async_trait::async_trait;
 use osiris_interfaces::oauth::{ClientAuth, OAuth2Definition};
 use url::Url;
@@ -15,11 +15,12 @@ use url::Url;
 pub struct Slack {
     oauth: OAuth2Definition,
     api_base: Url,
+    limits: ListLimits,
 }
 
 impl Slack {
     /// `api_base` ends with `/` (`https://slack.com/api/`): methods join onto it.
-    pub fn new(urls: &ProviderUrls) -> Result<Self, url::ParseError> {
+    pub fn new(urls: &ProviderUrls, limits: ListLimits) -> Result<Self, url::ParseError> {
         Ok(Self {
             oauth: OAuth2Definition {
                 authorization_url: urls.oauth_base.join("/oauth/v2_user/authorize")?,
@@ -33,6 +34,7 @@ impl Slack {
                 issues_refresh_tokens: true,
             },
             api_base: urls.api_base.clone(),
+            limits,
         })
     }
 }

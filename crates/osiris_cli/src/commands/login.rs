@@ -3,11 +3,15 @@
 use crate::profile::{self, Profile};
 use clap::Args;
 
+/// Where a new profile points when `--url` is left out.
+const DEFAULT_URL: &str = "http://localhost:8090";
+
 #[derive(Args)]
 pub struct Login {
-    /// Osiris's origin.
-    #[arg(long, default_value = "http://localhost:8090")]
-    url: String,
+    /// Osiris's origin. Left out, the saved one is kept, or `http://localhost:8090` for a new
+    /// profile.
+    #[arg(long)]
+    url: Option<String>,
     #[arg(long, env = "OSIRIS_API_KEY", hide_env_values = true)]
     api_key: Option<String>,
     #[arg(long, env = "OSIRIS_ADMIN_KEY", hide_env_values = true)]
@@ -22,9 +26,15 @@ pub struct Login {
 
 impl Login {
     pub fn run(self) -> anyhow::Result<()> {
-        let old = profile::load().unwrap_or_default();
+        // No profile yet starts an empty one; a profile that can't be read is an error, never
+        // silently replaced.
+        let old = profile::load_if_present()?.unwrap_or_default();
+        let url = self
+            .url
+            .or_else(|| Some(old.url.clone()).filter(|url| !url.is_empty()))
+            .unwrap_or_else(|| DEFAULT_URL.to_owned());
         let path = profile::save(&Profile {
-            url: self.url,
+            url,
             api_key: self.api_key.or(old.api_key),
             admin_key: self.admin_key.or(old.admin_key),
             pubsub_project: self.pubsub_project.or(old.pubsub_project),

@@ -75,10 +75,14 @@ services:
     entrypoint: ["sh", "-ec"]
     command:
       - |
-        curl -sf -X PUT "$$EMULATOR/topics/osiris-events" -o /dev/null || true
+        # 200 created it, 409 it already exists; anything else stops here.
+        created() {
+          case "$$1" in 200|409) ;; *) echo "creating $$2 answered $$1" >&2; exit 1 ;; esac
+        }
+        created "$$(curl -s -o /dev/null -w '%{http_code}' -X PUT "$$EMULATOR/topics/osiris-events")" "the events topic"
         if [ -n "$$EVENTS_ENDPOINT" ]; then
-          curl -sf -X PUT "$$EMULATOR/subscriptions/osiris-events-app" -H 'content-type: application/json' \
-            -d "{\"topic\":\"projects/osiris-local/topics/osiris-events\",\"ackDeadlineSeconds\":60,\"pushConfig\":{\"pushEndpoint\":\"$$EVENTS_ENDPOINT\"}}" -o /dev/null || true
+          created "$$(curl -s -o /dev/null -w '%{http_code}' -X PUT "$$EMULATOR/subscriptions/osiris-events-app" -H 'content-type: application/json' \
+            -d "{\"topic\":\"projects/osiris-local/topics/osiris-events\",\"ackDeadlineSeconds\":60,\"pushConfig\":{\"pushEndpoint\":\"$$EVENTS_ENDPOINT\"}}")" "the events subscription"
         fi
         echo "events topic ready"
 

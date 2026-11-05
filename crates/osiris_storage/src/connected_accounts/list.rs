@@ -3,7 +3,7 @@
 
 use super::AccountFilter;
 use crate::{
-    Cursor, Page, Store,
+    Cursor, Page, Store, Tenant,
     errors::{StorageResult, db},
     rows::AccountRow,
 };
@@ -61,6 +61,8 @@ impl Store {
             .await,
         }
         .map_err(db)?;
+        let tenants: Vec<Tenant> = found.iter().map(|row| Tenant::user(&row.user_id)).collect();
+        self.load_ciphers(&tenants).await?;
         let mut accounts = Vec::with_capacity(found.len());
         for row in found {
             accounts.push(self.decrypt_account(row).await?);

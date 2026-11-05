@@ -5,7 +5,7 @@ use super::seconds;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(default)]
+#[serde(default, deny_unknown_fields)]
 pub struct IdempotencySettings {
     pub retention_seconds: u64,
     /// The most expired keys deleted each time a new key is written.
