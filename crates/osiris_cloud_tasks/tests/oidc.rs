@@ -13,6 +13,7 @@ use osiris_cloud_tasks::{
     mocks::mock_google_keys::{MockGoogleSigner as Signer, answer_google_keys},
 };
 use osiris_tasks::TaskAuthenticator;
+use rstest::rstest;
 use serde_json::{Value, json};
 use std::time::Duration;
 use wiremock::MockServer;
@@ -55,24 +56,22 @@ async fn accepts_a_google_token_for_the_worker_and_the_service_account() {
         .unwrap();
 }
 
+#[rstest]
+#[case::another_audience(vec![("aud", json!("https://someone-else.run.app"))])]
+#[case::another_account(vec![("email", json!("other@project.iam.gserviceaccount.com"))])]
+#[case::unverified_email(vec![("email_verified", json!(false))])]
+#[case::another_issuer(vec![("iss", json!("https://evil.example"))])]
+#[case::expired(vec![("exp", json!(1_000)), ("iat", json!(700))])]
 #[tokio::test]
-async fn refuses_a_token_for_another_audience_account_issuer_or_an_expired_one() {
+async fn refuses_a_token_that_is_not_for_the_worker_from_google(
+    #[case] overrides: Vec<(&str, Value)>,
+) {
     let google = Signer::new("k1");
     let (auth, _server) = authenticator(&[&google]).await;
-    let past = time::OffsetDateTime::now_utc().unix_timestamp() - 3600;
-    for overrides in [
-        vec![("aud", json!("https://someone-else.run.app"))],
-        vec![("email", json!("other@project.iam.gserviceaccount.com"))],
-        vec![("email_verified", json!(false))],
-        vec![("iss", json!("https://evil.example"))],
-        vec![("exp", json!(past)), ("iat", json!(past - 300))],
-    ] {
-        let token = google.token(&claims(&overrides));
-        assert!(
-            auth.authenticate(Some(&token)).await.is_err(),
-            "{overrides:?}"
-        );
-    }
+
+    let token = google.token(&claims(&overrides));
+
+    assert!(auth.authenticate(Some(&token)).await.is_err());
 }
 
 #[tokio::test]

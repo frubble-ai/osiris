@@ -1,6 +1,7 @@
-//! Configuration. Settings (timings, limits) come layered from `config/` and `OSIRIS__…`
-//! variables; secrets and infrastructure come from environment variables of their own. Both are
-//! read once at startup, and a missing or malformed value stops the process naming it.
+//! Configuration. Settings (timings, limits) are the defaults in code, overridden by
+//! `OSIRIS__<SECTION>__<KEY>` variables; secrets and infrastructure come from environment
+//! variables of their own. Both are read once at startup, and a missing or malformed value stops
+//! the process naming it.
 
 pub mod api_config;
 pub mod app_config;

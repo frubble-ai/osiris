@@ -1,6 +1,7 @@
 //! Tests of `process`.
 
 use super::*;
+use rstest::rstest;
 
 #[test]
 fn selects_each_process() {
@@ -10,11 +11,17 @@ fn selects_each_process() {
 }
 
 #[test]
-fn refuses_a_missing_or_unknown_process() {
+fn refuses_a_missing_process() {
     let missing = Process::parse(None).unwrap_err().to_string();
     assert!(missing.contains("OSIRIS_PROCESS is required"), "{missing}");
-    for value in ["", "api", "scheduler", "Serve"] {
-        let error = Process::parse(Some(value)).unwrap_err().to_string();
-        assert!(error.contains("OSIRIS_PROCESS"), "{value}: {error}");
-    }
+}
+
+#[rstest]
+#[case::empty("")]
+#[case::api("api")]
+#[case::scheduler("scheduler")]
+#[case::wrong_case("Serve")]
+fn refuses_an_unknown_process(#[case] value: &str) {
+    let error = Process::parse(Some(value)).unwrap_err().to_string();
+    assert!(error.contains("OSIRIS_PROCESS"), "{error}");
 }

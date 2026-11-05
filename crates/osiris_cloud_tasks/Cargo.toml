@@ -31,6 +31,7 @@ wiremock = { workspace = true, optional = true }
 testing = ["osiris_tasks/testing", "dep:aws-lc-rs", "dep:base64", "dep:google-cloud-auth", "dep:wiremock"]
 
 [dev-dependencies]
+rstest.workspace = true
 osiris_cloud_tasks = { workspace = true, features = ["testing"] }
 osiris_tasks = { workspace = true, features = ["testing"] }
 serde_json.workspace = true
