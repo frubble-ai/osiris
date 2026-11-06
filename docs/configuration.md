@@ -11,7 +11,7 @@ One image runs every process. `OSIRIS_PROCESS` is required and chooses which.
 | --- | --- | --- |
 | `serve` | Cloud Run service, public | the API and the OAuth callback, on `PORT` |
 | `worker` | Cloud Run service, internal | `POST /tasks` for the task scheduler, on `PORT` |
-| `migrate` | Cloud Run job | applies the pending migrations, then exits 0 (non-zero on failure). `OSIRIS_MIGRATE_RESET=true` drops this user's tables and enums first |
+| `migrate` | Cloud Run job | applies the pending migrations, then exits 0 (non-zero on failure). `OSIRIS_MIGRATE_RESET=true` drops this user's tables and enums in `public` first |
 
 A missing or unknown value stops the process with an error naming `OSIRIS_PROCESS`. `serve` and
 `worker` listen on `0.0.0.0:$PORT`. After SIGTERM they stop accepting connections, let requests
@@ -22,7 +22,7 @@ already started finish for at most `[server] shutdown_grace_seconds` (8), then e
 | Variable | Needed by | What |
 | --- | --- | --- |
 | `OSIRIS_PROCESS` | all | `serve`, `worker` or `migrate` |
-| `OSIRIS_MIGRATE_RESET` | migrate, optional | `true` exactly drops the tables and enums this database user owns, then migrates. Any other value, or unset, only migrates. The reset workflow sets it for one execution; the job itself never has it, and a deploy does not set it |
+| `OSIRIS_MIGRATE_RESET` | migrate, optional | `true` exactly drops the tables and enums this database user owns in `public`, then migrates. Any other value, or unset, only migrates. The reset workflow sets it for one execution; the job itself never has it, and a deploy does not set it |
 | `OSIRIS_MIGRATE_RESET_DATABASE` | migrate, when resetting | the database that reset must be connected to. Required with `OSIRIS_MIGRATE_RESET=true`, and it must equal the database the process connects to (`DB_NAME`, and the session's `current_database()`). A missing or different name refuses the reset before anything is dropped |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` | all | where the database is, and who connects |
 | `DB_PASSWORD` | all | the database user's password (a secret) |
@@ -162,7 +162,7 @@ about how the process starts.
 ## Resetting the database
 
 [`.github/workflows/db-reset.yml`](../.github/workflows/db-reset.yml) drops every table and enum the
-database user owns, not only those the migrations made, and runs the migrations again from nothing,
+database user owns in `public`, not only those the migrations made, and runs the migrations again from nothing,
 as one execution of the migration job with `OSIRIS_MIGRATE_RESET=true` and
 `OSIRIS_MIGRATE_RESET_DATABASE` set to that database
 ([`reset-db.sh`](../.github/scripts/deploy/reset-db.sh)), on the image the job already has. It then

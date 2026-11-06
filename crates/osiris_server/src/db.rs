@@ -56,8 +56,9 @@ END
 $$;
 ";
 
-/// Apply every pending migration. With `config.reset`, drop what this user owns first, so the
-/// migrations run on an empty database. Already applied ones are skipped when not resetting.
+/// Apply every pending migration. With `config.reset`, drop what this user owns in `public`
+/// first, so the migrations run on an empty database. Already applied ones are skipped when
+/// not resetting.
 pub async fn migrate(config: &MigrateConfig) -> anyhow::Result<()> {
     let pool = connect(&config.database).await?;
     if config.reset {
@@ -76,7 +77,9 @@ pub async fn migrate(config: &MigrateConfig) -> anyhow::Result<()> {
 }
 
 async fn drop_owned(pool: &PgPool) -> anyhow::Result<()> {
-    tracing::warn!("osiris migrate reset: dropping the tables and types this database user owns");
+    tracing::warn!(
+        "osiris migrate reset: dropping the tables and types this database user owns in public"
+    );
     sqlx::query(DROP_OWNED_SQL)
         .execute(pool)
         .await

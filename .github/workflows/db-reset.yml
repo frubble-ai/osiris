@@ -1,7 +1,7 @@
 name: DB - Reset (drop + migrate)
 
 # Wipes dev or stg's database and migrates it again: every table and enum the
-# migrations made is dropped, then the migration job runs them from nothing,
+# database user owns in public is dropped, then the migration job runs them from nothing,
 # on the image it already has, and the worker, then serve, roll onto that image.
 # For when the schema's history is rewritten (a squashed migration), never as
 # part of a deploy.

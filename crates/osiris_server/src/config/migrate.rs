@@ -1,6 +1,6 @@
 //! What one run of the migrate process does, read once at boot. The database comes from the
 //! `DB_*` variables. `OSIRIS_MIGRATE_RESET=true` exactly drops the tables and enums this database
-//! user owns before migrating. Any other value, including unset, only migrates.
+//! user owns in `public` before migrating. Any other value, including unset, only migrates.
 //!
 //! The reset workflow sets the variable for one Cloud Run execution. The job's own environment
 //! never has it, so a deploy's migration does not reset. The process does not read which
@@ -15,7 +15,7 @@ use anyhow::bail;
 #[derive(Clone)]
 pub struct MigrateConfig {
     pub database: DatabaseConfig,
-    /// Drop this database user's tables and enums before applying the migrations.
+    /// Drop this database user's tables and enums in `public` before applying the migrations.
     pub reset: bool,
     /// The database a reset must be connected to. Required when `reset` is set, and it
     /// must be that connection's database. A reset without it is refused.

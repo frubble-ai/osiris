@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Drops every table and enum the database user owns and runs the migrations
+# Drops every table and enum the database user owns in public and runs the migrations
 # again, as one execution of the migration job, on the image the job already
 # has. The execution sets
 # OSIRIS_MIGRATE_RESET=true and OSIRIS_MIGRATE_RESET_DATABASE to the job's

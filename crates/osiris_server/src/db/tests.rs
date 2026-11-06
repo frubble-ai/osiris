@@ -1,5 +1,5 @@
-//! The reset drops tables and enums this database user owns, including what depends on them, and
-//! leaves a relation someone else owns.
+//! The reset drops tables and enums this database user owns in `public`, including what depends
+//! on them, and leaves a relation someone else owns.
 
 #![allow(
     clippy::unwrap_used,
@@ -14,20 +14,20 @@ use sqlx::PgPool;
 /// Drops `role` when the test ends, including when an assertion fails. `#[sqlx::test]`
 /// drops only the per-test database, so a role would otherwise stay on the shared server.
 struct RoleGuard {
-    pool: PgPool,
+    options: sqlx::postgres::PgConnectOptions,
     role: String,
 }
 
 impl RoleGuard {
     async fn create(pool: &PgPool, role: String) -> Self {
-        drop_role(pool, &role).await;
+        drop_role(pool, &role).await.unwrap();
         let sql = format!("CREATE ROLE {role}");
         sqlx::query(sqlx::AssertSqlSafe(sql))
             .execute(pool)
             .await
             .unwrap();
         Self {
-            pool: pool.clone(),
+            options: (*pool.connect_options()).clone(),
             role,
         }
     }
@@ -35,25 +35,41 @@ impl RoleGuard {
 
 impl Drop for RoleGuard {
     fn drop(&mut self) {
-        let pool = self.pool.clone();
+        // `#[sqlx::test]` is a current-thread runtime, so this cannot `block_in_place` on it,
+        // and it cannot reuse that runtime's pool: joining a thread that waits on the pool
+        // deadlocks the runtime. A new connection on a new runtime does not.
+        let options = self.options.clone();
         let role = self.role.clone();
-        let _ = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            tokio::task::block_in_place(|| {
-                tokio::runtime::Handle::current().block_on(async move {
-                    drop_role(&pool, &role).await;
-                });
-            });
-        }));
+        let already_panicking = std::thread::panicking();
+        let joined = std::thread::spawn(move || {
+            let runtime = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .unwrap();
+            runtime.block_on(async move {
+                let pool = sqlx::postgres::PgPoolOptions::new()
+                    .max_connections(1)
+                    .connect_with(options)
+                    .await?;
+                drop_role(&pool, &role).await
+            })
+        })
+        .join();
+        if already_panicking {
+            return;
+        }
+        joined.unwrap().unwrap();
     }
 }
 
-async fn drop_role(pool: &PgPool, role: &str) {
+async fn drop_role(pool: &PgPool, role: &str) -> Result<(), sqlx::Error> {
     // The role may own the kept table when an assertion fails first. DROP OWNED
     // removes those in this database; it errors when the role is already gone.
     let owned = format!("DROP OWNED BY {role}");
     let _ = sqlx::query(sqlx::AssertSqlSafe(owned)).execute(pool).await;
     let sql = format!("DROP ROLE IF EXISTS {role}");
-    let _ = sqlx::query(sqlx::AssertSqlSafe(sql)).execute(pool).await;
+    sqlx::query(sqlx::AssertSqlSafe(sql)).execute(pool).await?;
+    Ok(())
 }
 
 #[sqlx::test(migrator = "MIGRATOR")]
@@ -220,6 +236,41 @@ async fn migrate_drops_only_when_reset_and_drops_before_applying(pool: PgPool) {
         .await
         .unwrap();
     assert_eq!(providers, 3, "the migrations ran again after the drop");
+}
+
+#[sqlx::test(migrator = "MIGRATOR")]
+async fn migrate_refuses_a_reset_of_another_database(pool: PgPool) {
+    refuse_reset(&pool, Some("not_this_database".to_owned())).await;
+}
+
+#[sqlx::test(migrator = "MIGRATOR")]
+async fn migrate_refuses_a_reset_without_a_database_name(pool: PgPool) {
+    refuse_reset(&pool, None).await;
+}
+
+async fn refuse_reset(pool: &PgPool, reset_database: Option<String>) {
+    let name = sqlx::query_scalar!(r#"SELECT current_database()::text AS "name!" "#)
+        .fetch_one(pool)
+        .await
+        .unwrap();
+    execute(
+        pool,
+        "CREATE TABLE public.reset_marker (id int PRIMARY KEY)",
+    )
+    .await;
+    let mut config = migrate_config(&name, true);
+    config.reset_database = reset_database;
+    let error = migrate(&config).await.unwrap_err();
+    let message = format!("{error:#}");
+    assert!(
+        message.contains("OSIRIS_MIGRATE_RESET_DATABASE"),
+        "{message}"
+    );
+    assert_eq!(
+        marker_tables(pool).await,
+        1,
+        "a refused reset drops nothing"
+    );
 }
 
 fn migrate_config(database_name: &str, reset: bool) -> MigrateConfig {
