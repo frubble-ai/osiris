@@ -1,0 +1,30 @@
+[package]
+name = "osiris_providers"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+osiris_interfaces.workspace = true
+async-trait.workspace = true
+futures.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+url.workspace = true
+utoipa.workspace = true
+fake = { workspace = true, optional = true }
+wiremock = { workspace = true, optional = true }
+
+[features]
+# Each provider's network faked for tests (its `mocks`), for other crates' tests to use.
+testing = ["dep:fake", "dep:wiremock"]
+
+[dev-dependencies]
+osiris_providers = { workspace = true, features = ["testing"] }
+rstest.workspace = true
+tokio.workspace = true

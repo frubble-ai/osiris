@@ -1,0 +1,1741 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Osiris",
+    "description": "Frubble's integrations service: OAuth connections to providers, their tokens kept fresh, and typed actions with them.",
+    "license": {
+      "name": "UNLICENSED",
+      "identifier": "UNLICENSED"
+    },
+    "version": "2026-11-04.anubis"
+  },
+  "paths": {
+    "/v1/auth-configs": {
+      "get": {
+        "tags": [
+          "auth-configs"
+        ],
+        "summary": "The providers' apps, in batches.",
+        "operationId": "list_auth_configs",
+        "parameters": [
+          {
+            "name": "after",
+            "in": "query",
+            "description": "A batch's `next_cursor`: the batch after it.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "A batch's `previous_cursor`: the batch before it.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "How many items a batch holds, within the server's bounds.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/List_AuthConfig"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "auth-configs"
+        ],
+        "summary": "Register a provider's app.",
+        "operationId": "create_auth_config",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Runs the request once; a retry gets the first answer",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAuthConfig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthConfig"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ]
+      }
+    },
+    "/v1/auth-configs/{id}": {
+      "get": {
+        "tags": [
+          "auth-configs"
+        ],
+        "summary": "One provider's app, without its secret.",
+        "operationId": "retrieve_auth_config",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthConfig"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "auth-configs"
+        ],
+        "summary": "Delete an app no connection uses.",
+        "operationId": "delete_auth_config",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Runs the request once; a retry gets the first answer",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deleted"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "auth-configs"
+        ],
+        "summary": "Change an app's client, secret or scopes. Connections made before keep the scopes they got.",
+        "operationId": "update_auth_config",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAuthConfig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthConfig"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ]
+      }
+    },
+    "/v1/connected-accounts": {
+      "get": {
+        "tags": [
+          "connected-accounts"
+        ],
+        "summary": "Connections, filtered, in batches; `alias` finds what an attempt made.",
+        "operationId": "list_connected_accounts",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "auth_config_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "alias",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "`pending`, `active`, `disabled`, `expired` or `failed`.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "A batch's `next_cursor`: the batch after it.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "A batch's `previous_cursor`: the batch before it.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/List_ConnectedAccount"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "connected-accounts"
+        ],
+        "summary": "Start connecting a user: a pending connection and the provider's consent URL. After the\nconsent, osiris sends the browser to `callback_url`.",
+        "operationId": "create_connected_account",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Runs the request once; a retry gets the first answer",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConnectedAccount"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectedAccountCreated"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}": {
+      "get": {
+        "tags": [
+          "connected-accounts"
+        ],
+        "summary": "One connection, without its tokens.",
+        "operationId": "retrieve_connected_account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectedAccount"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "connected-accounts"
+        ],
+        "summary": "End the grant at the provider and forget the connection. A grant already gone there counts.",
+        "operationId": "delete_connected_account",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Runs the request once; a retry gets the first answer",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deleted"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.list_installations": {
+      "post": {
+        "tags": [
+          "actions"
+        ],
+        "summary": "Where the GitHub App is installed, of what the connected user can see.",
+        "operationId": "github_list_installations",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Runs the request once; a retry gets the first answer",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubInstallation"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.list_repositories": {
+      "post": {
+        "tags": [
+          "actions"
+        ],
+        "summary": "Every repository the GitHub App's installations give the connected user, each once.",
+        "operationId": "github_list_repositories",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Runs the request once; a retry gets the first answer",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/linear.list_teams": {
+      "post": {
+        "tags": [
+          "actions"
+        ],
+        "summary": "The Linear teams the connected user can see.",
+        "operationId": "linear_list_teams",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Runs the request once; a retry gets the first answer",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_LinearTeam"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/slack.list_channels": {
+      "post": {
+        "tags": [
+          "actions"
+        ],
+        "summary": "The Slack channels the connected user can see, archived ones left out.",
+        "operationId": "slack_list_channels",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Runs the request once; a retry gets the first answer",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_SlackChannel"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/refresh": {
+      "post": {
+        "tags": [
+          "connected-accounts"
+        ],
+        "summary": "Refresh a connection's tokens now. The immediate refresh task replaces the connection's\nscheduled one; the answer shows it as `refresh_task`. For operators.",
+        "operationId": "refresh_connected_account",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Runs the request once; a retry gets the first answer",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectedAccount"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ]
+      }
+    },
+    "/v1/events/trigger": {
+      "post": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Send a test event for a connection, its state left as it is.",
+        "operationId": "trigger_event",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Runs the request once; a retry gets the first answer",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriggerEvent"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriggeredEvent"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActionResult_Vec_GithubInstallation": {
+        "type": "object",
+        "description": "An action's answer: what it read, as `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "Where our GitHub App is installed: an account or organization.",
+              "required": [
+                "id",
+                "account",
+                "account_type",
+                "repository_selection"
+              ],
+              "properties": {
+                "account": {
+                  "type": "string",
+                  "description": "The account or organization's login."
+                },
+                "account_type": {
+                  "$ref": "#/components/schemas/GithubAccountType"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "repository_selection": {
+                  "$ref": "#/components/schemas/GithubRepositorySelection"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ActionResult_Vec_GithubRepository": {
+        "type": "object",
+        "description": "An action's answer: what it read, as `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "A repository our GitHub App reads, through one of its installations.",
+              "required": [
+                "id",
+                "full_name",
+                "private",
+                "url"
+              ],
+              "properties": {
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "full_name": {
+                  "type": "string",
+                  "description": "`owner/name`."
+                },
+                "id": {
+                  "type": "string"
+                },
+                "private": {
+                  "type": "boolean"
+                },
+                "url": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ActionResult_Vec_LinearTeam": {
+        "type": "object",
+        "description": "An action's answer: what it read, as `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "A Linear team the connected user can see.",
+              "required": [
+                "id",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ActionResult_Vec_SlackChannel": {
+        "type": "object",
+        "description": "An action's answer: what it read, as `data`.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "A channel the connected user can see.",
+              "required": [
+                "id",
+                "name",
+                "is_private"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "is_private": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "num_members": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "format": "int64",
+                  "description": "Absent when Slack leaves it out.",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "AuthConfig": {
+        "type": "object",
+        "description": "An auth config, without its secret.",
+        "required": [
+          "id",
+          "provider",
+          "client_id",
+          "scopes",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "client_id": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "description": "`ac_…`."
+          },
+          "provider": {
+            "type": "string"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ConnectedAccount": {
+        "type": "object",
+        "description": "A connection, without its tokens.",
+        "required": [
+          "id",
+          "auth_config_id",
+          "provider",
+          "user_id",
+          "status",
+          "setup_complete",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "access_token_expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "auth_config_id": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_error": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Why the last refresh or the consent failed."
+          },
+          "provider": {
+            "type": "string"
+          },
+          "refresh_task": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The pending refresh task's name, and when it runs."
+          },
+          "refresh_task_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The scopes the provider granted."
+          },
+          "setup_complete": {
+            "type": "boolean",
+            "description": "Whether setup is complete: osiris holds the tokens and, when they can be refreshed, their\nrefresh is scheduled. When false, the connection can't be used."
+          },
+          "status": {
+            "type": "string",
+            "description": "`pending` (the consent is open), `active`, `disabled` (no refresh is scheduled, so the\nconnection can't be used: after a failed connect the user must connect again; after a\nrefresh, osiris schedules it again by itself), `expired` (the provider refused a refresh\nor the grant is gone: reconnect) or `failed` (the consent failed or was never finished). A\nconnection is only reported `active` when its setup is complete.",
+            "example": "active"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
+      "ConnectedAccountCreated": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "redirect_url"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "`ca_…`."
+          },
+          "redirect_url": {
+            "type": "string",
+            "description": "The provider's own consent page: send the browser here."
+          },
+          "status": {
+            "type": "string",
+            "example": "pending"
+          }
+        }
+      },
+      "CreateAuthConfig": {
+        "type": "object",
+        "required": [
+          "provider",
+          "client_id",
+          "client_secret"
+        ],
+        "properties": {
+          "client_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string",
+            "description": "A provider osiris implements: `github`, `linear` or `slack`."
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateConnectedAccount": {
+        "type": "object",
+        "required": [
+          "auth_config_id",
+          "user_id",
+          "callback_url"
+        ],
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Yours: a mark for this attempt, to find what it made if its answer is lost."
+          },
+          "auth_config_id": {
+            "type": "string",
+            "description": "`ac_…`: the provider's app to connect through."
+          },
+          "callback_url": {
+            "type": "string",
+            "description": "Where the browser goes after the provider's consent, with `connected_account_id` and\n`status` added to its query."
+          },
+          "user_id": {
+            "type": "string",
+            "description": "Yours: who the connection is for, such as an organization's id."
+          }
+        }
+      },
+      "Deleted": {
+        "type": "object",
+        "required": [
+          "id",
+          "deleted"
+        ],
+        "properties": {
+          "deleted": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "ErrorBody": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        }
+      },
+      "ErrorDetail": {
+        "type": "object",
+        "required": [
+          "code",
+          "type",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "`OS_00` unauthorized, `OS_01` not found, `OS_02` invalid request, `OS_03` conflict,\n`OS_04` provider refused, `OS_05` provider unavailable, `OS_06` connection not active,\n`OS_07` unknown version, `OS_08` idempotency key reused, `OS_09` request in flight,\n`OS_99` internal."
+          },
+          "message": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "`unauthorized`, `not_found`, `invalid_request`, `conflict`, `provider_refused`,\n`provider_unavailable`, `connection_not_active`, `unknown_version`, `idempotency_mismatch`,\n`in_flight`, `internal`."
+          }
+        }
+      },
+      "GithubAccountType": {
+        "type": "string",
+        "enum": [
+          "user",
+          "organization"
+        ]
+      },
+      "GithubInstallation": {
+        "type": "object",
+        "description": "Where our GitHub App is installed: an account or organization.",
+        "required": [
+          "id",
+          "account",
+          "account_type",
+          "repository_selection"
+        ],
+        "properties": {
+          "account": {
+            "type": "string",
+            "description": "The account or organization's login."
+          },
+          "account_type": {
+            "$ref": "#/components/schemas/GithubAccountType"
+          },
+          "id": {
+            "type": "string"
+          },
+          "repository_selection": {
+            "$ref": "#/components/schemas/GithubRepositorySelection"
+          }
+        }
+      },
+      "GithubRepository": {
+        "type": "object",
+        "description": "A repository our GitHub App reads, through one of its installations.",
+        "required": [
+          "id",
+          "full_name",
+          "private",
+          "url"
+        ],
+        "properties": {
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "full_name": {
+            "type": "string",
+            "description": "`owner/name`."
+          },
+          "id": {
+            "type": "string"
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "GithubRepositorySelection": {
+        "type": "string",
+        "enum": [
+          "all",
+          "selected"
+        ]
+      },
+      "LinearTeam": {
+        "type": "object",
+        "description": "A Linear team the connected user can see.",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "List_AuthConfig": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "An auth config, without its secret.",
+              "required": [
+                "id",
+                "provider",
+                "client_id",
+                "scopes",
+                "created_at",
+                "updated_at"
+              ],
+              "properties": {
+                "client_id": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "id": {
+                  "type": "string",
+                  "description": "`ac_…`."
+                },
+                "provider": {
+                  "type": "string"
+                },
+                "scopes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `after` for the next batch; null on the last."
+          },
+          "previous_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `before` for the previous batch; null on the first."
+          }
+        }
+      },
+      "List_ConnectedAccount": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "A connection, without its tokens.",
+              "required": [
+                "id",
+                "auth_config_id",
+                "provider",
+                "user_id",
+                "status",
+                "setup_complete",
+                "created_at",
+                "updated_at"
+              ],
+              "properties": {
+                "access_token_expires_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "alias": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "auth_config_id": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "last_error": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Why the last refresh or the consent failed."
+                },
+                "provider": {
+                  "type": "string"
+                },
+                "refresh_task": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The pending refresh task's name, and when it runs."
+                },
+                "refresh_task_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "scope": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The scopes the provider granted."
+                },
+                "setup_complete": {
+                  "type": "boolean",
+                  "description": "Whether setup is complete: osiris holds the tokens and, when they can be refreshed, their\nrefresh is scheduled. When false, the connection can't be used."
+                },
+                "status": {
+                  "type": "string",
+                  "description": "`pending` (the consent is open), `active`, `disabled` (no refresh is scheduled, so the\nconnection can't be used: after a failed connect the user must connect again; after a\nrefresh, osiris schedules it again by itself), `expired` (the provider refused a refresh\nor the grant is gone: reconnect) or `failed` (the consent failed or was never finished). A\nconnection is only reported `active` when its setup is complete.",
+                  "example": "active"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "user_id": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `after` for the next batch; null on the last."
+          },
+          "previous_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Pass as `before` for the previous batch; null on the first."
+          }
+        }
+      },
+      "SlackChannel": {
+        "type": "object",
+        "description": "A channel the connected user can see.",
+        "required": [
+          "id",
+          "name",
+          "is_private"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "is_private": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "num_members": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Absent when Slack leaves it out.",
+            "minimum": 0
+          }
+        }
+      },
+      "TriggerEvent": {
+        "type": "object",
+        "required": [
+          "type",
+          "connected_account_id"
+        ],
+        "properties": {
+          "connected_account_id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "`connection.active`, `connection.expired` or `connection.revoked`."
+          }
+        }
+      },
+      "TriggeredEvent": {
+        "type": "object",
+        "description": "The event as it was sent.",
+        "required": [
+          "event_id",
+          "type",
+          "connected_account_id"
+        ],
+        "properties": {
+          "connected_account_id": {
+            "type": "string"
+          },
+          "event_id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateAuthConfig": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "client_secret": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scopes": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "admin_key": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "api_key": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "auth-configs",
+      "description": "The providers' apps (admin key)"
+    },
+    {
+      "name": "connected-accounts",
+      "description": "Connections and their consent (API key; refreshing one now takes the admin key)"
+    },
+    {
+      "name": "actions",
+      "description": "Reads with a connection (API key)"
+    },
+    {
+      "name": "events",
+      "description": "Test events (admin key)"
+    }
+  ]
+}

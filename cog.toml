@@ -1,0 +1,16 @@
+# Conventional Commits, checked by cocogitto: every commit and the PR title (the squash commit).
+# https://docs.cocogitto.io
+from_latest_tag = false
+ignore_merge_commits = true
+branch_whitelist = ["dev", "stg", "main"]
+
+[commit_types]
+feat = { changelog_title = "Features" }
+fix = { changelog_title = "Fixes" }
+refactor = { changelog_title = "Refactors" }
+perf = { changelog_title = "Performance" }
+docs = { changelog_title = "Docs" }
+test = { changelog_title = "Tests" }
+build = { changelog_title = "Build" }
+ci = { changelog_title = "CI" }
+chore = { changelog_title = "Chores" }

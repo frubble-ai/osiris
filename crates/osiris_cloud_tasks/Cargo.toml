@@ -1,0 +1,40 @@
+[package]
+name = "osiris_cloud_tasks"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+osiris_tasks.workspace = true
+async-trait.workspace = true
+google-cloud-gax.workspace = true
+google-cloud-tasks-v2.workspace = true
+google-cloud-wkt.workspace = true
+jsonwebtoken.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+aws-lc-rs = { version = "1", optional = true }
+base64 = { workspace = true, optional = true }
+google-cloud-auth = { workspace = true, optional = true }
+wiremock = { workspace = true, optional = true }
+
+[features]
+# Cloud Tasks and Google's signing keys faked at the network (`mocks`), for tests.
+testing = ["osiris_tasks/testing", "dep:aws-lc-rs", "dep:base64", "dep:google-cloud-auth", "dep:wiremock"]
+
+[dev-dependencies]
+rstest.workspace = true
+osiris_cloud_tasks = { workspace = true, features = ["testing"] }
+osiris_tasks = { workspace = true, features = ["testing"] }
+serde_json.workspace = true
+time.workspace = true
+tokio.workspace = true
+wiremock.workspace = true

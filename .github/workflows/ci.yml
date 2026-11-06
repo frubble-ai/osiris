@@ -14,50 +14,126 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: always
+  GITLEAKS_VERSION: 8.30.1
+  # Queries are checked against the committed .sqlx/: no database needed to build.
   SQLX_OFFLINE: "true"
 
 jobs:
-  quality:
-    name: Format, lint, dependencies
+  secret-scan:
+    name: Security — Secret Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # The binary, not gitleaks-action: that action requires a paid licence for organisation
+      # repositories. The same as frubble-ai/app's.
+      - name: Install gitleaks
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          tarball="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfLO "$base/$tarball"
+          curl -sSfL "$base/gitleaks_${GITLEAKS_VERSION}_checksums.txt" \
+            | grep " $tarball\$" | sha256sum -c -
+          tar -xzf "$tarball" gitleaks
+          sudo mv gitleaks /usr/local/bin/
+
+      - name: Scan the pull request's commits
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          gitleaks git --redact --verbose \
+            --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+
+      - name: Scan the pushed history
+        if: github.event_name != 'pull_request'
+        run: gitleaks git --redact --verbose
+
+  quality:
+    needs: secret-scan
+    name: Format, lint, dependencies, spelling, commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - run: rustup show # installs the toolchain rust-toolchain.toml pins
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - run: cargo fmt --check
-      - run: cargo clippy --all-targets --locked -- -D warnings
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1
+      - uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2.90.1
+        with:
+          tool: typos,cocogitto
+      - name: Spelling
+        run: typos
+      - name: Every commit is a Conventional Commit
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch -q origin "$BASE_REF"
+          cog check "origin/$BASE_REF..HEAD"
 
   test:
+    needs: secret-scan
     name: Tests
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: osiris
-          POSTGRES_PASSWORD: osiris_dev
-          POSTGRES_DB: osiris
-        ports: ["5433:5432"]
-        options: >-
-          --health-cmd "pg_isready -U osiris -d osiris"
-          --health-interval 2s --health-timeout 3s --health-retries 30
+    # The same Postgres as locally (docker-compose): TLS only, with a generated CA, and the same
+    # DB_* variables osiris reads when deployed.
     env:
-      DATABASE_URL: postgres://osiris:osiris_dev@localhost:5433/osiris
+      DB_HOST: localhost
+      DB_PORT: "5433"
+      DB_NAME: osiris
+      DB_USER: osiris
+      DB_PASSWORD: osiris_dev
+      PUBSUB_EMULATOR_HOST: localhost:8086
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Start Postgres over TLS, and the Pub/Sub emulator with the events topic
+        run: |
+          docker compose up -d --wait postgres pubsub
+          docker compose run --rm pubsub-setup
+          {
+            echo "DB_CA_PEM<<PEM"
+            cat .local/tls/ca.pem
+            echo "PEM"
+            # sqlx's tools and test harness take a URL; osiris itself never reads it.
+            echo "DATABASE_URL=postgres://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME?sslmode=verify-ca&sslrootcert=$GITHUB_WORKSPACE/.local/tls/ca.pem"
+          } >> "$GITHUB_ENV"
       - run: rustup show
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2.90.1
         with:
           tool: cargo-nextest,sqlx-cli
-      - name: Migrations apply to an empty database
-        run: sqlx migrate run
-      - name: .sqlx/ matches the queries
-        run: cargo sqlx prepare --check -- --all-targets
-      - run: cargo nextest run --locked --no-tests=pass
+      - name: Every migration applies, reverts and applies again
+        run: |
+          sqlx migrate run
+          sqlx migrate revert --target-version 0
+          sqlx migrate run
+      - name: .sqlx/ matches the queries and the schema
+        run: cargo sqlx prepare --workspace --check -- --all-targets
+        env:
+          SQLX_OFFLINE: "false"
+      - run: cargo nextest run --workspace --locked
+
+  openapi:
+    needs: secret-scan
+    name: OpenAPI matches the routes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: rustup show
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      - run: cargo run --locked -q -p osiris_openapi target/openapi.json
+      - run: diff -u api-reference/openapi.json target/openapi.json
 
   image:
+    needs: secret-scan
     name: Image
     runs-on: ubuntu-latest
     steps:
@@ -67,5 +143,40 @@ jobs:
         with:
           context: .
           push: false
+          load: true
+          tags: osiris:ci
+          build-args: OSIRIS_COMMIT=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: The image runs as non-root and refuses to start without OSIRIS_PROCESS
+        run: |
+          set -euo pipefail
+          test "$(docker image inspect osiris:ci -f '{{.Config.User}}')" != ""
+          test "$(docker image inspect osiris:ci -f '{{json .Config.Cmd}}')" = "null"
+          if docker run --rm osiris:ci > out.txt 2>&1; then
+            echo "::error::the image started without OSIRIS_PROCESS"; exit 1
+          fi
+          grep -q "OSIRIS_PROCESS is required" out.txt
+
+  summary:
+    name: Osiris - Code Quality Summary
+    if: always()
+    needs: [secret-scan, quality, test, openapi, image]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every check to have passed
+        shell: bash
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+          echo "$RESULTS"
+          failed=$(echo "$RESULTS" | jq -r '
+            to_entries[]
+            | select(.value.result != "success" and .value.result != "skipped")
+            | .key')
+          if [ -n "$failed" ]; then
+            echo "::error::failed or cancelled: $(echo "$failed" | tr '\n' ' ')"
+            exit 1
+          fi
+          echo "all checks passed or were not needed"

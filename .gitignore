@@ -1,2 +1,4 @@
 /target
 .env
+# Local TLS certificates for Postgres (docker-compose generates them).
+/.local

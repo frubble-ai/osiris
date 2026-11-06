@@ -1,0 +1,13 @@
+[package]
+name = "osiris_openapi"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+osiris_server.workspace = true
+anyhow.workspace = true

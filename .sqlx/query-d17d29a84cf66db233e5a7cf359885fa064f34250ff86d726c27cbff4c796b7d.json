@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE connected_account SET refresh_task = $3, refresh_task_at = $4, updated_at = now()\n             WHERE id = $1 AND token_generation = $2 AND status = 'active'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8",
+        "Text",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d17d29a84cf66db233e5a7cf359885fa064f34250ff86d726c27cbff4c796b7d"
+}

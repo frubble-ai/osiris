@@ -1,0 +1,102 @@
+# Every setting osiris reads, with its default. This file is documentation only: osiris never
+# reads it. The defaults live in code, and any of them can be changed with an environment variable
+# named OSIRIS__<SECTION>__<KEY>, for example OSIRIS__REFRESH__MARGIN_SECONDS=600 or
+# OSIRIS__TASKS__LOCAL__MAX_ATTEMPTS=3. Secrets and infrastructure (the DB_* variables, the keys,
+# the topic, the task queue) are environment variables of their own (docs/configuration.md).
+
+[server]
+# A request the API hasn't answered by then answers 408.
+request_timeout_seconds = 30
+# The largest request body the API reads.
+max_body_bytes = 1048576
+# After SIGTERM, how long a process lets requests already started finish before it exits. Keep it
+# under Cloud Run's grace period (10 seconds by default).
+shutdown_grace_seconds = 8
+
+[api]
+# The version a request naming no Osiris-Version is served at: the API key's pinned version.
+pinned_version = "2026-11-04.anubis"
+
+[database]
+# The most connections one process opens. The Cloud SQL instance is shared with other services,
+# so keep this low and within the instance's connection limit.
+max_connections = 5
+# How long to wait for a connection, at startup and afterwards, before giving up.
+connect_timeout_seconds = 10
+# How long a refresh waits for another refresh's row lock before giving up.
+lock_timeout_seconds = 10
+
+[http]
+# Calls to providers.
+connect_timeout_seconds = 5
+timeout_seconds = 20
+
+[consent]
+# How long a provider's consent stays open. Its callback is refused after that, and a scheduled
+# task marks the consent as failed if nobody finished it.
+ttl_seconds = 900
+# Length of the OAuth `state`, in base62 characters (at least 32).
+state_length = 40
+
+[refresh]
+# How long before an access token expires it is refreshed, both by its task and when an action
+# uses it.
+margin_seconds = 300
+# The shortest delay before a refresh task runs.
+min_lead_seconds = 30
+# The longest delay before a refresh task runs: a token that does not expire within it is
+# refreshed anyway, keeping its refresh token valid. Must be under the task scheduler's own limit
+# (30 days for Cloud Tasks), which is checked at startup.
+keepalive_seconds = 2505600
+
+[tasks]
+# How long the outcome of a task run is kept, and the most expired outcomes deleted each time a
+# new one is recorded.
+outcome_retention_seconds = 2592000
+outcome_prune_batch = 100
+# The most tasks the worker runs at once; more wait. At most [database] max_connections.
+max_concurrent = 4
+# How long scheduling one task may take before it counts as failed.
+schedule_timeout_seconds = 10
+# How long Google's keys for checking a task's OIDC token are cached before they are fetched again.
+oidc_keys_ttl_seconds = 3600
+# The shortest time between two fetches of those keys for a key id not yet in the cache, so a caller
+# sending made-up key ids can't make osiris call Google on every request.
+oidc_keys_refetch_seconds = 30
+
+[tasks.local]
+# The local development scheduler (OSIRIS_TASKS=local): how long to wait before sending a task
+# again after the worker refused it, and how many times to send it before giving up. When
+# deployed, the Cloud Tasks queue's retry policy does this instead.
+retry_delay_seconds = 5
+max_attempts = 5
+
+[pagination]
+# A list page's length when the request names none, and the longest one may ask for.
+default_limit = 20
+max_limit = 100
+
+[idempotency]
+# How long an Idempotency-Key's first answer is replayed; after that, the key is treated as unused.
+retention_seconds = 86400
+# The most expired keys deleted each time a new key is written.
+purge_batch = 100
+
+[providers.listing]
+# A list that fans out over a provider's resources (GitHub's installations): how many it reads at
+# once, and how many items it answers at most.
+concurrency = 4
+max_items = 5000
+
+[providers.github]
+oauth_base_url = "https://github.com"
+api_base_url = "https://api.github.com"
+
+[providers.linear]
+oauth_base_url = "https://linear.app"
+api_base_url = "https://api.linear.app"
+
+[providers.slack]
+oauth_base_url = "https://slack.com"
+# Ends with `/`: Slack's methods join onto it.
+api_base_url = "https://slack.com/api/"

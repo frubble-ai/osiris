@@ -1,0 +1,33 @@
+name: Live providers
+
+# The provider actions against the real GitHub, Linear and Slack, with test accounts' tokens.
+# Nightly, and on demand. A test whose token is unset is skipped locally and fails in CI.
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  SQLX_OFFLINE: "true"
+
+jobs:
+  live:
+    name: Live providers
+    runs-on: ubuntu-latest
+    environment: live-providers
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: rustup show
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      - uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2.90.1
+        with:
+          tool: cargo-nextest
+      - run: cargo nextest run -p osiris_providers --run-ignored only --locked
+        env:
+          OSIRIS_LIVE_GITHUB_TOKEN: ${{ secrets.OSIRIS_LIVE_GITHUB_TOKEN }}
+          OSIRIS_LIVE_LINEAR_TOKEN: ${{ secrets.OSIRIS_LIVE_LINEAR_TOKEN }}
+          OSIRIS_LIVE_SLACK_TOKEN: ${{ secrets.OSIRIS_LIVE_SLACK_TOKEN }}

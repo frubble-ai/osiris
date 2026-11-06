@@ -1,0 +1,33 @@
+[package]
+name = "osiris_tasks"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+osiris_common.workspace = true
+osiris_domain.workspace = true
+async-trait.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+subtle.workspace = true
+thiserror.workspace = true
+time.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+fake = { workspace = true, optional = true }
+
+[features]
+# The contract every scheduler is held to, and test data, for other crates' tests.
+testing = ["dep:fake"]
+
+[dev-dependencies]
+osiris_tasks = { workspace = true, features = ["testing"] }
+rstest.workspace = true
+tokio.workspace = true
+wiremock.workspace = true

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM task_outcome WHERE id IN (\n                 SELECT id FROM task_outcome WHERE recorded_at < now() - make_interval(secs => $1) LIMIT $2)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Float8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c539638f2155d62ae56377f13bba57781e66d1e345cda6d43553ff9217913e90"
+}

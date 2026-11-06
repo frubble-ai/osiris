@@ -1,0 +1,28 @@
+{
+	"name": "@frubble-ai/osiris-client",
+	"version": "0.1.0",
+	"description": "Osiris's API client: types, a typed fetch client and Zod schemas, generated from its OpenAPI spec.",
+	"license": "UNLICENSED",
+	"repository": { "type": "git", "url": "https://github.com/frubble-ai/osiris.git", "directory": "clients/typescript" },
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+	},
+	"files": ["dist"],
+	"publishConfig": { "registry": "https://npm.pkg.github.com" },
+	"scripts": {
+		"generate": "openapi-ts",
+		"build": "npm run generate && tsc -p tsconfig.json",
+		"check": "npm run generate && git diff --exit-code src/generated && tsc -p tsconfig.json --noEmit"
+	},
+	"peerDependencies": {
+		"zod": "^4.0.0"
+	},
+	"devDependencies": {
+		"@hey-api/openapi-ts": "0.99.0",
+		"typescript": "~5.7.2",
+		"zod": "^4.6.7"
+	}
+}

@@ -1,0 +1,42 @@
+//! `osiris auth-configs list`.
+
+use crate::{
+    client::{Client, Key, present_params::present_params, print},
+    profile,
+};
+use clap::Args;
+use reqwest::Method;
+
+#[derive(Args)]
+pub struct List {
+    #[arg(long)]
+    after: Option<String>,
+    #[arg(long)]
+    limit: Option<i64>,
+}
+
+impl List {
+    fn query(&self) -> Vec<(&'static str, String)> {
+        present_params([
+            ("after", self.after.clone()),
+            ("limit", self.limit.map(|limit| limit.to_string())),
+        ])
+    }
+
+    pub async fn run(self) -> anyhow::Result<()> {
+        print(
+            &Client::new(profile::load()?)
+                .call(
+                    Key::Admin,
+                    Method::GET,
+                    "/v1/auth-configs",
+                    None,
+                    &self.query(),
+                )
+                .await?,
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests;

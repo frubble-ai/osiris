@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM auth_config WHERE id = $1\n               AND NOT EXISTS (SELECT 1 FROM connected_account WHERE auth_config_id = $1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "23bc5fb3dabbdb4fc31a4b2ae8eeee43b683bb9c35efcec46d6d762c19f5cabc"
+}

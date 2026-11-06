@@ -1,0 +1,93 @@
+name: PR Template
+
+# The title must be a Conventional Commit, since it becomes the squash commit message, and the
+# body must fill every section of the template. `edited` is in the trigger so fixing either
+# re-runs the check. Drafts are checked too, but a draft's failure blocks nothing.
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Quality — PR Template
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2.90.1
+        with:
+          tool: cocogitto
+
+      - name: The title is a Conventional Commit
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: cog verify "$PR_TITLE"
+
+      # From the base branch, never the pull request: a pull request that edits the template must
+      # not weaken what it is checked against. A base branch without a template (the pull request
+      # that first adds it) has nothing to check against, so the body check is skipped.
+      - name: Fetch the template from the base branch
+        id: template
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          status=$(curl -sS -G --data-urlencode "ref=$BASE_REF" \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" \
+            -w '%{http_code}' -o "$RUNNER_TEMP/pull_request_template.md" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/contents/.github/pull_request_template.md")
+          case "$status" in
+            200) echo "found=true" >> "$GITHUB_OUTPUT" ;;
+            404)
+              echo "::notice::$BASE_REF has no pull request template yet; the body check is skipped."
+              echo "found=false" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::fetching the template answered $status"; exit 1 ;;
+          esac
+
+      # The same check as frubble-ai/app's. The body arrives through env, never interpolated.
+      - name: Check every section of the template is filled
+        if: github.event.pull_request.user.type != 'Bot' && steps.template.outputs.found == 'true'
+        env:
+          TEMPLATE: ${{ runner.temp }}/pull_request_template.md
+          PR_BODY: ${{ github.event.pull_request.body }}
+        shell: python
+        run: |
+          import os, re, sys
+
+          strip = lambda s: re.sub(r"<!--.*?-->", "", s, flags=re.S)
+          template = strip(open(os.environ["TEMPLATE"], encoding="utf-8").read())
+          body = strip(os.environ.get("PR_BODY") or "")
+
+          def sections(text):
+              parts = re.split(r"^(## .+)$", text, flags=re.M)
+              return {parts[i].strip(): parts[i + 1].strip() for i in range(1, len(parts), 2)}
+
+          expected, given = sections(template), sections(body)
+          item = re.compile(r"^\s*[-*] \[( |x|X)\] (.*\S)", re.M)
+          na = re.compile(r"\b(n/a|not applicable)\b", re.I)
+
+          problems = []
+          for m in item.finditer(body):
+              if m.group(1) == " " and not na.search(m.group(2)):
+                  problems.append(f"checklist item not ticked or marked n/a: {m.group(2).strip()}")
+          for heading, content in expected.items():
+              if heading not in given:
+                  problems.append(f"section missing: {heading}")
+                  continue
+              if not given[heading]:
+                  problems.append(f"section empty: {heading}")
+                  continue
+              lines = [m.group(2) for m in item.finditer(given[heading])]
+              for m in item.finditer(content):
+                  text = m.group(2).strip()
+                  if not any(text in line for line in lines):
+                      problems.append(f"checklist item missing: {text}")
+
+          for p in problems:
+              print(f"::error::{p}")
+          if problems:
+              print("Fill every section of .github/pull_request_template.md, then edit the pull request.")
+              sys.exit(1)
+          print("The pull request follows the template.")

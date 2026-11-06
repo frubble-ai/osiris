@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE connected_account a SET oauth_state = NULL, oauth_state_expires_at = NULL, pkce_verifier = NULL, updated_at = now()\n               FROM connected_account old\n               WHERE a.id = old.id AND a.oauth_state = $1 AND a.status = 'pending'\n               RETURNING a.id, a.user_id, old.pkce_verifier, old.oauth_state_expires_at < now() AS \"expired?\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "pkce_verifier",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "pkce_verifier"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "expired?",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      null
+    ]
+  },
+  "hash": "19c9348f4db8d8ec8f6d6b0b3ac13b01d0ca61831155c4bd339cda6fe9cd3cbb"
+}

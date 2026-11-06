@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE connected_account SET status = 'failed', oauth_state = NULL, oauth_state_expires_at = NULL,\n                 pkce_verifier = NULL, last_refresh_error = 'the consent was never finished', updated_at = now()\n             WHERE id = $1 AND status = 'pending'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7710a01d702d8c55e25f30c3a90eba80344a99531cb9ce84f0c4addf10d66a59"
+}

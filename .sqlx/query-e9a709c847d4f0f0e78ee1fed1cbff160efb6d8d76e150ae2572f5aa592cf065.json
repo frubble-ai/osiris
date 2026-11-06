@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "ALTER TABLE connected_account DROP CONSTRAINT connected_account_complete",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "e9a709c847d4f0f0e78ee1fed1cbff160efb6d8d76e150ae2572f5aa592cf065"
+}

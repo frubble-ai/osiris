@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO idempotency_key (key, request_hash) VALUES ($1, $2)\n             ON CONFLICT (key) DO UPDATE SET request_hash = EXCLUDED.request_hash, status = NULL, body = NULL, created_at = now()\n             WHERE idempotency_key.created_at < now() - make_interval(secs => $3)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Float8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5eb0dbfc13d9a6e8c2a019a9cdb5237b88df8db7ffeaf750466dd8b6148663c1"
+}

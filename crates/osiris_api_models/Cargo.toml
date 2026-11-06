@@ -1,0 +1,18 @@
+[package]
+name = "osiris_api_models"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+osiris_common.workspace = true
+osiris_domain.workspace = true
+osiris_providers.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+time.workspace = true
+utoipa.workspace = true

@@ -1,0 +1,7 @@
+# Spelling, checked in CI (`typos`). Words the dictionary doesn't know but we mean.
+[default.extend-words]
+# Provider and product names.
+osiris = "osiris"
+
+[files]
+extend-exclude = [".sqlx/", "api-reference/", "Cargo.lock"]

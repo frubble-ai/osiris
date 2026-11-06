@@ -1,45 +1,111 @@
-[package]
-name = "osiris"
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
 publish = false
+license = "UNLICENSED"
 
-[dependencies]
+[workspace.dependencies]
+osiris_common = { path = "crates/osiris_common" }
+osiris_interfaces = { path = "crates/osiris_interfaces" }
+osiris_providers = { path = "crates/osiris_providers" }
+osiris_env = { path = "crates/osiris_env" }
+osiris_events = { path = "crates/osiris_events" }
+osiris_domain = { path = "crates/osiris_domain" }
+osiris_api_models = { path = "crates/osiris_api_models" }
+osiris_tasks = { path = "crates/osiris_tasks" }
+osiris_cloud_tasks = { path = "crates/osiris_cloud_tasks" }
+osiris_pubsub = { path = "crates/osiris_pubsub" }
+osiris_server = { path = "crates/osiris_server" }
+osiris_cli = { path = "crates/osiris_cli" }
+
 aes-gcm = "0.11.1"
 anyhow = "1.0.104"
+async-trait = "0.1.92"
 axum = "0.8.9"
 base64 = "0.23.1"
+config = { version = "0.15.27", default-features = false, features = ["toml"] }
 clap = { version = "4.6.7", features = ["derive", "env"] }
 dotenvy = "0.15.7"
+error-stack = "0.8.0"
+futures = "0.3"
+google-cloud-auth = "1.18.0"
+google-cloud-pubsub = "1.7.0"
+google-cloud-tasks-v2 = "1.13.0"
+google-cloud-gax = "1.15.0"
+jsonwebtoken = { version = "11.1.0", default-features = false, features = ["aws_lc_rs"] }
+google-cloud-wkt = { version = "1.10.0", features = ["time"] }
+hex = "0.4.3"
+hkdf = "0.13.0"
 rand = "0.10.3"
 reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls", "form", "query"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
-sqlx = { version = "0.9.0", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres", "macros", "migrate", "uuid", "time"] }
+secrecy = { version = "0.10.3", features = ["serde"] }
+sha2 = "0.11.1"
+sqlx = { version = "0.9.0", default-features = false, features = ["runtime-tokio", "tls-rustls-aws-lc-rs", "postgres", "macros", "migrate", "uuid", "time"] }
 subtle = "2.6.1"
 thiserror = "2.0.21"
-time = { version = "0.3.55", features = ["serde"] }
+time = { version = "0.3.55", features = ["formatting", "parsing", "serde", "serde-well-known"] }
 tokio = { version = "1.54.1", features = ["full"] }
-tower-http = { version = "0.7.1", features = ["trace", "timeout"] }
+tower = { version = "0.5.3", features = ["util"] }
+tower-http = { version = "0.7.1", features = ["trace", "timeout", "request-id", "util"] }
+http = "1"
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["json", "env-filter"] }
 url = "2.5.8"
 utoipa = { version = "6.0.0", features = ["axum_extras", "uuid", "time"] }
+utoipa-axum = "0.3.0"
 uuid = { version = "1.29.0", features = ["v4", "serde"] }
-
-[dev-dependencies]
-testcontainers-modules = { version = "0.15.0", features = ["postgres"] }
-tower = { version = "0.5.3", features = ["util"] }
 wiremock = "0.6.5"
+fake = "5.1.0"
+rstest = "0.28.0"
 
-[lints.rust]
+# Hyperswitch's workspace lints, as they are (juspay/hyperswitch, Apache-2.0).
+[workspace.lints.rust]
 unsafe_code = "forbid"
+rust_2018_idioms = { level = "warn", priority = -1 }
+unused_qualifications = "warn"
 
-[lints.clippy]
+[workspace.lints.clippy]
+# The skeleton's groups, kept beside Hyperswitch's lints.
 all = { level = "warn", priority = -1 }
 pedantic = { level = "warn", priority = -1 }
 module_name_repetitions = "allow"
 missing_errors_doc = "allow"
+# Every getter would carry #[must_use]; the call sites read fine without it.
+must_use_candidate = "allow"
+as_conversions = "warn"
+cloned_instead_of_copied = "warn"
+dbg_macro = "warn"
+expect_used = "warn"
+fn_params_excessive_bools = "warn"
+index_refutable_slice = "warn"
+indexing_slicing = "warn"
+large_futures = "warn"
+missing_panics_doc = "warn"
+mod_module_files = "warn"
+out_of_bounds_indexing = "warn"
+panic = "warn"
+panic_in_result_fn = "warn"
+panicking_unwrap = "warn"
+print_stderr = "warn"
+print_stdout = "warn"
+todo = "warn"
+trivially_copy_pass_by_ref = "warn"
+unimplemented = "warn"
+unnecessary_self_imports = "warn"
+unreachable = "warn"
+unwrap_in_result = "warn"
+unwrap_used = "warn"
+use_self = "warn"
+wildcard_dependencies = "warn"
+
+# Lints to allow
+option_map_unit_fn = "allow"
 
 [profile.release]
 lto = "thin"

@@ -1,0 +1,56 @@
+[package]
+name = "osiris_server"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+config.workspace = true
+osiris_env.workspace = true
+osiris_events.workspace = true
+osiris_pubsub.workspace = true
+osiris_tasks.workspace = true
+osiris_cloud_tasks.workspace = true
+osiris_domain.workspace = true
+osiris_api_models.workspace = true
+error-stack.workspace = true
+hex.workspace = true
+sha2.workspace = true
+osiris_common.workspace = true
+osiris_interfaces.workspace = true
+osiris_providers.workspace = true
+anyhow.workspace = true
+axum.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sqlx.workspace = true
+subtle.workspace = true
+time.workspace = true
+tokio.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+url.workspace = true
+utoipa.workspace = true
+utoipa-axum.workspace = true
+
+[dev-dependencies]
+fake.workspace = true
+futures.workspace = true
+http-body-util = "0.1"
+osiris_providers = { workspace = true, features = ["testing"] }
+rstest.workspace = true
+tower.workspace = true
+wiremock.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "osiris-server"
+path = "src/main.rs"
