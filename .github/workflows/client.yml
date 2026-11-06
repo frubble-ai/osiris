@@ -1,19 +1,27 @@
 name: Client
 
-# The TypeScript client (clients/typescript): its generated code matches the committed spec and
-# it builds. On a release tag (`v1.2.3`) it is published to GitHub Packages at that version.
+# The TypeScript client's own build and publish. The Cloud Run deploy does not publish it.
+#
+# A push to `dev`, `stg` or `prd` publishes a prerelease of this commit on the dist-tag of that
+# name (`npm install @frubble-ai/osiris-client@dev`). A release tag `v1.2.3` publishes that
+# version on `latest`. A branch publish never moves `latest`: npm refuses a prerelease without
+# an explicit tag, and the tag passed here is the branch name.
+#
+# `stg` and `prd` publish once those branches exist. Install from GitHub Packages with
+# `@frubble-ai:registry=https://npm.pkg.github.com` in `.npmrc`.
 on:
   pull_request:
     paths: ["api-reference/**", "clients/typescript/**", ".github/workflows/client.yml"]
   push:
-    branches: [dev]
+    branches: [dev, stg, prd]
     tags: ["v*"]
 
 permissions:
   contents: read
 
 jobs:
-  # Pull requests and dev: read-only, with no credentials left behind for npm's install scripts.
+  # Pull requests and branch pushes: read-only, with no credentials left behind for npm's
+  # install scripts. A release tag is published by the job below, which checks again itself.
   client:
     name: TypeScript client
     if: "!startsWith(github.ref, 'refs/tags/v')"
@@ -34,10 +42,13 @@ jobs:
       - name: The generated code matches the spec, and it builds
         run: npm run check && npm run build
 
-  # A release tag only: the one job that may publish.
+  # The only job that may publish. Branch channels and a release tag are separate publishes.
   publish:
     name: Publish the TypeScript client
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/stg' ||
+      github.ref == 'refs/heads/prd' || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -56,10 +67,27 @@ jobs:
           scope: "@frubble-ai"
       - run: npm ci
       - run: npm run check && npm run build
-      - name: Publish at the tag's version
+      - name: Publish on this ref's dist-tag
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
         run: |
-          npm version --no-git-tag-version "${TAG#v}"
-          npm publish
+          set -euo pipefail
+          if [ "$REF_TYPE" = "tag" ]; then
+            version="${REF_NAME#v}"
+            dist_tag=latest
+          else
+            case "$REF_NAME" in
+              dev|stg|prd) ;;
+              *) echo "::error::refused to publish from ${REF_NAME}"; exit 1 ;;
+            esac
+            base=$(node -p "require('./package.json').version")
+            sha=$(printf '%s' "$SHA" | cut -c1-12)
+            version="${base}-${REF_NAME}.g${sha}"
+            dist_tag="$REF_NAME"
+          fi
+          npm version --no-git-tag-version "$version"
+          npm publish --tag "$dist_tag"
+          echo "published @frubble-ai/osiris-client@${version} on ${dist_tag}"
