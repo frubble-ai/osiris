@@ -23,18 +23,24 @@ pub struct Create {
 }
 
 impl Create {
+    fn body(&self) -> serde_json::Value {
+        json!({ "provider": self.provider, "client_id": self.client_id, "client_secret": self.client_secret, "scopes": self.scopes })
+    }
+
     pub async fn run(self) -> anyhow::Result<()> {
-        let body = json!({ "provider": self.provider, "client_id": self.client_id, "client_secret": self.client_secret, "scopes": self.scopes });
         print(
             &Client::new(profile::load()?)
                 .call(
                     Key::Admin,
                     Method::POST,
                     "/v1/auth-configs",
-                    Some(body),
+                    Some(self.body()),
                     &[],
                 )
                 .await?,
         )
     }
 }
+
+#[cfg(test)]
+mod tests;

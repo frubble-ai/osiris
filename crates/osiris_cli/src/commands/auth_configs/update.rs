@@ -21,28 +21,31 @@ pub struct Update {
 }
 
 impl Update {
-    pub async fn run(self) -> anyhow::Result<()> {
+    /// Only what was given: a flag left out leaves the app's value as it is, and no `--scope` leaves
+    /// its scopes alone instead of emptying them.
+    fn body(&self) -> Value {
         let mut body = Map::new();
-        if let Some(id) = self.client_id {
-            body.insert("client_id".into(), Value::from(id));
+        if let Some(id) = &self.client_id {
+            body.insert("client_id".into(), Value::from(id.clone()));
         }
-        if let Some(secret) = self.client_secret {
-            body.insert("client_secret".into(), Value::from(secret));
+        if let Some(secret) = &self.client_secret {
+            body.insert("client_secret".into(), Value::from(secret.clone()));
         }
         if !self.scopes.is_empty() {
-            body.insert("scopes".into(), Value::from(self.scopes));
+            body.insert("scopes".into(), Value::from(self.scopes.clone()));
         }
+        Value::Object(body)
+    }
+
+    pub async fn run(self) -> anyhow::Result<()> {
         let path = format!("/v1/auth-configs/{}", self.id);
         print(
             &Client::new(profile::load()?)
-                .call(
-                    Key::Admin,
-                    Method::PATCH,
-                    &path,
-                    Some(Value::Object(body)),
-                    &[],
-                )
+                .call(Key::Admin, Method::PATCH, &path, Some(self.body()), &[])
                 .await?,
         )
     }
 }
+
+#[cfg(test)]
+mod tests;
