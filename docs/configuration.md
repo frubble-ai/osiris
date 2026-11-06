@@ -11,7 +11,7 @@ One image runs every process. `OSIRIS_PROCESS` is required and chooses which.
 | --- | --- | --- |
 | `serve` | Cloud Run service, public | the API and the OAuth callback, on `PORT` |
 | `worker` | Cloud Run service, internal | `POST /tasks` for the task scheduler, on `PORT` |
-| `migrate` | Cloud Run job | applies the pending migrations, then exits 0 (non-zero on failure) |
+| `migrate` | Cloud Run job | applies the pending migrations, then exits 0 (non-zero on failure). `OSIRIS_MIGRATE_RESET=true` drops this user's tables and enums in `public` first |
 
 A missing or unknown value stops the process with an error naming `OSIRIS_PROCESS`. `serve` and
 `worker` listen on `0.0.0.0:$PORT`. After SIGTERM they stop accepting connections, let requests
@@ -22,6 +22,8 @@ already started finish for at most `[server] shutdown_grace_seconds` (8), then e
 | Variable | Needed by | What |
 | --- | --- | --- |
 | `OSIRIS_PROCESS` | all | `serve`, `worker` or `migrate` |
+| `OSIRIS_MIGRATE_RESET` | migrate, optional | `true` exactly drops the tables and enums this database user owns in `public`, then migrates. Any other value, or unset, only migrates. The reset workflow sets it for one execution; the job itself never has it, and a deploy does not set it |
+| `OSIRIS_MIGRATE_RESET_DATABASE` | migrate, when resetting | the database that reset must be connected to. Required with `OSIRIS_MIGRATE_RESET=true`, and it must equal the database the process connects to (`DB_NAME`, and the session's `current_database()`). A missing or different name refuses the reset before anything is dropped |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` | all | where the database is, and who connects |
 | `DB_PASSWORD` | all | the database user's password (a secret) |
 | `DB_CA_PEM` | all | the database server's CA certificate, in PEM (see below) |
@@ -109,7 +111,12 @@ same CA. Osiris does not read it.
   also checks each task's OIDC token (Google's signature, the issuer, `CLOUD_TASKS_AUDIENCE`,
   `CLOUD_TASKS_SERVICE_ACCOUNT`).
 - `migrate`: a Cloud Run job with `OSIRIS_PROCESS=migrate`, run once per deploy before the
-  services.
+  services. The process takes a session advisory lock and runs the drop and the migrations on
+  that same connection, which it keeps open until it exits. A second execution waits for the
+  lock before it drops or migrates. If PostgreSQL closes the session, the lock and the work
+  stop together. GitHub kills a cancelled job's cleanup after five minutes, which releases the
+  workflow's concurrency group; the lock is what still keeps the next execution off the schema
+  while the earlier one is running.
 - The database: the `DB_*` variables, `DB_PASSWORD` from Secret Manager and `DB_CA_PEM` the Cloud
   SQL instance's server CA certificate.
 - One Cloud Tasks queue (`CLOUD_TASKS_QUEUE`). The service accounts of `serve` and `worker` have
@@ -120,3 +127,67 @@ same CA. Osiris does not read it.
   `roles/pubsub.publisher` on it.
 - The image is built with `--build-arg OSIRIS_COMMIT=<commit>`, which `/health` reports, and runs
   with `LOG_FORMAT=json`.
+
+## Continuous deployment
+
+[`.github/workflows/osiris-cd.yml`](../.github/workflows/osiris-cd.yml) builds that image and rolls
+dev or stg onto it. The file name is part of the deploy trust in the platform repository
+(`osiris-cd.yml` in `osiris-dev` from any branch, and in `osiris-stg` from `stg` only). Renaming
+the file stops the Google sign-in.
+
+| Trigger | Environment | Deploys |
+| --- | --- | --- |
+| Push to `dev` that changes the image, the migrations or this workflow | `osiris-dev` | that commit to dev |
+| A run by hand from any branch except `stg` and `prd` | `osiris-dev` | that branch to dev |
+| Push to `stg`, or a run by hand from `stg` | `osiris-stg` | that commit to stg |
+| A tag, or a run from `prd` | refused | |
+
+The repository variable `OSIRIS_CD_ENABLED` must be `true`, or every job is skipped. One rollout
+runs at a time per environment; further runs wait. While the repository variable `STG_ENABLED` is
+exactly `false` (kept in step with the same variable on frubble-ai/platform), a run on `stg` is
+skipped.
+
+The deploy job signs in with Workload Identity as `GCP_DEPLOY_HUB`, then impersonates
+`GCP_DEPLOY_SPOKE`. It pushes `frubble-osiris:<commit>` to `GCP_REGISTRY`, executes
+`GCP_RUN_JOB_MIGRATE` on that image, then rolls `GCP_RUN_SERVICE` (serve) and
+`GCP_RUN_SERVICE_WORKER`. Each service and the job already have `OSIRIS_PROCESS`, so the deploy
+changes the image only. Serve is checked at `https://osiris.<env>.frubble.ai/health`, which
+answers the commit. The worker is internal; its revision must be ready and hold the traffic.
+
+`GCP_WIF_PROVIDER` and `GCP_WIF_AUDIENCE` are read from `vars` (the environment, or the repository
+when the environment leaves them unset). The other `GCP_*` names above are variables on
+`osiris-dev` and `osiris-stg`, the same names `backend-dev` uses, with osiris's own values from
+the platform outputs. Authentication is Workload Identity. The database password and the keys stay
+in Secret Manager, mounted by Terraform.
+
+The image already runs on Cloud Run. The Dockerfile's entrypoint is the binary, Cloud Run's
+`PORT` is 8080, and `/health` is the startup and liveness probe. The deploy sets nothing else
+about how the process starts.
+
+## Resetting the database
+
+[`.github/workflows/db-reset.yml`](../.github/workflows/db-reset.yml) drops every table and enum the
+database user owns in `public`, not only those the migrations made, and runs the migrations again from nothing,
+as one execution of the migration job with `OSIRIS_MIGRATE_RESET=true` and
+`OSIRIS_MIGRATE_RESET_DATABASE` set to that database
+([`reset-db.sh`](../.github/scripts/deploy/reset-db.sh)), on the image the job already has. It then
+rolls the worker, then serve, onto that image. It is for when the migrations' history is rewritten.
+Every connection goes with the tables. A reset whose named database is missing or is not the one
+the process connects to is refused before anything is dropped.
+
+The job must already run an image whose migrate process checks `OSIRIS_MIGRATE_RESET_DATABASE`.
+The script reads that commit's `config/migrate.rs` and refuses to execute when the variable is not
+there: an older image ignores it, migrates and exits 0, and no table is dropped. Deploy first (its
+migration moves the job onto the new image), then reset.
+
+The process does not read which environment it is running in. prd is protected because this
+workflow runs only from `dev` and `stg`, and the platform's trust names `db-reset.yml` only for
+`osiris-dev` and `osiris-stg`. The variable is an override of that one execution, so the next
+migration does not reset. A principal who can execute the migrate job with an environment override
+can reset that job's database; a prd job must not grant that.
+
+It runs by hand only, from `dev` or `stg`, and only for `drn1996`. It shares that environment's
+deploy concurrency group, so it never runs beside a deploy, and it signs in as the deploy
+identity. The trust rule in the platform repository names `db-reset.yml`: `osiris-dev` from `dev`
+only, `osiris-stg` from `stg` only. Renaming the file stops the Google sign-in. A run on `stg`
+while `STG_ENABLED` is exactly `false` is refused.

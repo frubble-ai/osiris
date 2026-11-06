@@ -25,4 +25,4 @@
 
 ## Database
 
-Every query is `query!`/`query_as!`, in tests too ([migrations](./migrations.md)). Tests run against the TLS-only Postgres of local development and CI, with the same `DB_*` variables ([configuration](../configuration.md)).
+Every query is `query!`/`query_as!`, in tests too ([migrations](./migrations.md)). A `DO` block and DDL are the exception recorded there, because `query!` cannot prepare them. Tests run against the TLS-only Postgres of local development and CI, with the same `DB_*` variables ([configuration](../configuration.md)).

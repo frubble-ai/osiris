@@ -1,0 +1,117 @@
+name: DB - Reset (drop + migrate)
+
+# Wipes dev or stg's database and migrates it again: every table and enum the
+# database user owns in public is dropped, then the migration job runs them from nothing,
+# on the image it already has, and the worker, then serve, roll onto that image.
+# For when the schema's history is rewritten (a squashed migration), never as
+# part of a deploy.
+#
+# Run by hand only (Actions → DB - Reset → Run workflow, from `dev` or `stg`),
+# and only by drn1996: the job refuses anyone else and any other branch. `dev`
+# runs in `osiris-dev`, `stg` in `osiris-stg`, as the deploy identity, whose
+# trust rule in `platform` names this file, for dev and stg only. The migrate
+# process does not read which environment it is in. This execution sets
+# OSIRIS_MIGRATE_RESET=true and OSIRIS_MIGRATE_RESET_DATABASE to the job's
+# DB_NAME. The job's own environment has neither.
+on:
+  workflow_dispatch:
+
+# The same group as osiris-cd for that environment, so a reset never runs
+# beside a deploy. queue: max, as there: a later run waits instead of
+# cancelling the one pending. actionlint 1.7.12 still rejects the key;
+# .github/actionlint.yaml ignores that message.
+concurrency:
+  group: osiris-cd-${{ github.ref == 'refs/heads/stg' && 'stg' || 'dev' }}
+  cancel-in-progress: false
+  queue: max
+
+permissions:
+  contents: read
+
+jobs:
+  reset:
+    name: reset
+    if: >-
+      (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/stg')
+      && github.actor == 'drn1996'
+      && github.triggering_actor == 'drn1996'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: osiris-${{ github.ref == 'refs/heads/stg' && 'stg' || 'dev' }}
+    permissions:
+      contents: read
+      id-token: write # the OIDC token Workload Identity Federation exchanges
+    env:
+      PROJECT: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION }}
+      MIGRATE_JOB: ${{ vars.GCP_RUN_JOB_MIGRATE }}
+      SERVICE: ${{ vars.GCP_RUN_SERVICE }}
+      WORKER_SERVICE: ${{ vars.GCP_RUN_SERVICE_WORKER }}
+      # modules/naming `osiris_hostname`. A copy of backend-dev's API_HOSTNAME
+      # is the application's API, so the commit check would ask the wrong host.
+      API_HOSTNAME: osiris.${{ github.ref == 'refs/heads/stg' && 'stg' || 'dev' }}.frubble.ai
+    steps:
+      - name: Refuse stg while it is switched off
+        env:
+          STG_ENABLED: ${{ vars.STG_ENABLED }}
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" = "refs/heads/stg" ] && [ "$STG_ENABLED" = "false" ]; then
+            echo "::error::stg is switched off (STG_ENABLED=false)."
+            exit 1
+          fi
+
+      - name: Require the environment's variables
+        env:
+          WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+          WIF_AUDIENCE: ${{ vars.GCP_WIF_AUDIENCE }}
+          DEPLOY_HUB: ${{ vars.GCP_DEPLOY_HUB }}
+          DEPLOY_SPOKE: ${{ vars.GCP_DEPLOY_SPOKE }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [ -n "$WIF_PROVIDER" ] || missing+=(GCP_WIF_PROVIDER)
+          [ -n "$WIF_AUDIENCE" ] || missing+=(GCP_WIF_AUDIENCE)
+          [ -n "$DEPLOY_HUB" ] || missing+=(GCP_DEPLOY_HUB)
+          [ -n "$DEPLOY_SPOKE" ] || missing+=(GCP_DEPLOY_SPOKE)
+          [ -n "$PROJECT" ] || missing+=(GCP_PROJECT_ID)
+          [ -n "$REGION" ] || missing+=(GCP_REGION)
+          [ -n "$SERVICE" ] || missing+=(GCP_RUN_SERVICE)
+          [ -n "$MIGRATE_JOB" ] || missing+=(GCP_RUN_JOB_MIGRATE)
+          [ -n "$WORKER_SERVICE" ] || missing+=(GCP_RUN_SERVICE_WORKER)
+          [ -n "$API_HOSTNAME" ] || missing+=(API_HOSTNAME)
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::the environment is missing: ${missing[*]}"
+            exit 1
+          fi
+
+      # For the script only; no credentials are kept.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Signs in as the hub, which holds no permissions of its own. Its only
+      # capability is impersonating the spoke, which is what is set next.
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_HUB }}
+          audience: ${{ vars.GCP_WIF_AUDIENCE }}
+
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+
+      - name: Impersonate the deploy spoke
+        run: gcloud config set auth/impersonate_service_account "${{ vars.GCP_DEPLOY_SPOKE }}"
+
+      - name: Drop the database's tables, migrate and roll out
+        env:
+          # Reads the image's commit to confirm that image understands the reset.
+          # The checkout keeps no credentials.
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/deploy/reset-db.sh
+
+      # timeout-minutes cancels this job while the reset execution can still
+      # be dropping tables. Stay in the concurrency group until it has stopped.
+      - name: Stop the reset if this job is no longer waiting
+        if: cancelled()
+        run: .github/scripts/deploy/cancel-execution.sh

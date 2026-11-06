@@ -1,0 +1,46 @@
+name: Install trivy
+description: >-
+  Installs one trivy release after checking its tarball against the sha256
+  committed in checksums.txt beside this action. A version with no line there
+  fails. The checksum file published with the release is not used: it is
+  served from the same place as the tarball.
+
+inputs:
+  version:
+    description: >-
+      trivy release, MAJOR.MINOR.PATCH, without a leading v. checksums.txt
+      must contain that tarball's sha256.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        TRIVY_VERSION: ${{ inputs.version }}
+        ACTION_PATH: ${{ github.action_path }}
+      run: |
+        set -euo pipefail
+        if ! printf '%s\n' "$TRIVY_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+          echo "::error::trivy version must be MAJOR.MINOR.PATCH, got '${TRIVY_VERSION}'"
+          exit 1
+        fi
+        name="trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+        # The directory of this action, so the checksum is the file committed beside it.
+        checksums="${ACTION_PATH}/checksums.txt"
+        if [ ! -f "$checksums" ]; then
+          echo "::error::no committed checksum file at ${checksums}"
+          exit 1
+        fi
+        if ! expected=$(awk -v name="$name" '
+          NF == 2 && $1 ~ /^[0-9a-f]{64}$/ && $2 == name { print $1; n++ }
+          END { if (n != 1) exit 1 }
+        ' "$checksums"); then
+          echo "::error::checksums.txt must contain exactly one sha256 for ${name}"
+          exit 1
+        fi
+        base="https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}"
+        curl -sSfL "${base}/${name}" -o "$name"
+        printf '%s  %s\n' "$expected" "$name" | sha256sum -c -
+        tar -xzf "$name" trivy
+        sudo mv trivy /usr/local/bin/

@@ -45,6 +45,8 @@ osiris_server/src/
   before the process takes traffic and holds nothing about a request.
 - `ctx.db` is the pool, the master key and the data keys. Every query is a `query!` in
   `lib/<domain>/`, an operation of `Db`. Secrets go in encrypted and come out decrypted there.
+  The migrate reset's `DO` block, and the test DDL that checks which objects it drops, are
+  `sqlx::query`: `query!` cannot prepare them ([migrations](style-guide/migrations.md)).
 - Routes, the idempotency middleware and the worker call use cases and nothing else.
 - `lib/` helpers take parts of the context and never call a use case.
 
@@ -63,12 +65,14 @@ Each implementation runs the same contract test ([third-party integrations](styl
 ## Processes
 
 One image runs every process; `OSIRIS_PROCESS` chooses which.
+[`.github/workflows/osiris-cd.yml`](../.github/workflows/osiris-cd.yml) builds that image and rolls
+the two services onto it after the migrate job ([configuration](configuration.md#continuous-deployment)).
 
 | `OSIRIS_PROCESS` | Runs as | Does |
 | --- | --- | --- |
 | `serve` | Cloud Run service, public, scales to zero | the API at `/v1` and the OAuth callback |
 | `worker` | Cloud Run service, internal, scales to zero | `POST /tasks`: runs each scheduled task the task scheduler sends |
-| `migrate` | Cloud Run job, once per deploy | applies the migrations, then exits |
+| `migrate` | Cloud Run job, once per deploy | applies the migrations, then exits, holding an advisory lock until it does, so a second execution waits. `OSIRIS_MIGRATE_RESET=true` (the [reset workflow](configuration.md#resetting-the-database)) drops this user's tables and enums in `public` first |
 
 Configuration comes from environment variables ([configuration](configuration.md)). The database
 connection is built from `DB_*` and always uses TLS, verified against `DB_CA_PEM`. Both services
