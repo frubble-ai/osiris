@@ -49,9 +49,13 @@ fi
 
 # --update-env-vars applies to this execution only. The job's command, its
 # other env, its secrets and its identity stay the platform repository's.
-# --wait returns non-zero when the execution fails.
-gcloud run jobs execute "$MIGRATE_JOB" --project "$PROJECT" --region "$REGION" \
-  --update-env-vars="OSIRIS_MIGRATE_RESET=true,OSIRIS_MIGRATE_RESET_DATABASE=${database}" --wait --quiet
+# The name is recorded before the wait, so a timed-out job can cancel this
+# execution and hold the concurrency group until it has stopped.
+execution=$(gcloud run jobs execute "$MIGRATE_JOB" --project "$PROJECT" --region "$REGION" \
+  --update-env-vars="OSIRIS_MIGRATE_RESET=true,OSIRIS_MIGRATE_RESET_DATABASE=${database}" \
+  --format='value(metadata.name)')
+printf '%s\n' "$execution" > "${RUNNER_TEMP:?}/osiris-job-execution"
+"$(dirname "$0")/wait-execution.sh" "$execution"
 echo "✅ $MIGRATE_JOB reset the database and migrated it on $IMAGE"
 
 # The worker first, so it reads what the new API publishes before the API

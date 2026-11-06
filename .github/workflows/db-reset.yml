@@ -109,3 +109,9 @@ jobs:
           # The checkout keeps no credentials.
           GH_TOKEN: ${{ github.token }}
         run: .github/scripts/deploy/reset-db.sh
+
+      # timeout-minutes cancels this job while the reset execution can still
+      # be dropping tables. Stay in the concurrency group until it has stopped.
+      - name: Stop the reset if this job is no longer waiting
+        if: cancelled()
+        run: .github/scripts/deploy/cancel-execution.sh

@@ -13,7 +13,11 @@ set -euo pipefail
 gcloud run jobs update "$MIGRATE_JOB" --project "$PROJECT" --region "$REGION" \
   --image "$IMAGE" --quiet
 
-# --wait returns non-zero when the execution fails, and prints its name.
-gcloud run jobs execute "$MIGRATE_JOB" --project "$PROJECT" --region "$REGION" \
-  --wait --quiet
+# Record the execution before waiting. If this job times out, the next step
+# cancels that execution and waits until it has stopped, so a queued reset
+# cannot start while the migration is still running. --wait would not.
+execution=$(gcloud run jobs execute "$MIGRATE_JOB" --project "$PROJECT" --region "$REGION" \
+  --format='value(metadata.name)')
+printf '%s\n' "$execution" > "${RUNNER_TEMP:?}/osiris-job-execution"
+"$(dirname "$0")/wait-execution.sh" "$execution"
 echo "✅ $MIGRATE_JOB ran on $IMAGE"

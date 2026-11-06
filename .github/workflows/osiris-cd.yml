@@ -264,6 +264,12 @@ jobs:
       - name: Migrate the database
         run: .github/scripts/deploy/migrate.sh
 
+      # timeout-minutes cancels this job while a Cloud Run execution can still
+      # be going. Stay in the concurrency group until that execution has stopped.
+      - name: Stop the migration if this job is no longer waiting
+        if: cancelled()
+        run: .github/scripts/deploy/cancel-execution.sh
+
       # A new revision with this image and nothing else changed; the service
       # definition is the platform repository's. Traffic moves only once the
       # revision is healthy, and the public hostname is then asked which
