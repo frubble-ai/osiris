@@ -31,6 +31,28 @@ export function alreadyPublished(error) {
 	return text.includes("EPUBLISHCONFLICT") || text.includes("previously published");
 }
 
+// stdio inherit drops the child's output, so a publish conflict never reaches alreadyPublished.
+export function commandError(error) {
+	const stderr = `${error.stderr ?? ""}`;
+	const stdout = `${error.stdout ?? ""}`;
+	const wrapped = new Error(`${error.message ?? ""}\n${stderr}\n${stdout}`);
+	wrapped.stderr = stderr;
+	wrapped.stdout = stdout;
+	return wrapped;
+}
+
+function runNpm(args) {
+	try {
+		const stdout = execFileSync("npm", args, { encoding: "utf8", stdio: ["inherit", "pipe", "pipe"] });
+		if (stdout) process.stdout.write(stdout);
+	} catch (error) {
+		const wrapped = commandError(error);
+		if (wrapped.stderr) process.stderr.write(wrapped.stderr);
+		if (wrapped.stdout) process.stdout.write(wrapped.stdout);
+		throw wrapped;
+	}
+}
+
 // Publish the version either way. Move the branch channel only while this
 // commit is still the branch head, before the upload and again before the move.
 export async function publishCurrent({ refType, sha, target, heads, publishVersion, moveChannel }) {
@@ -93,13 +115,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 		target,
 		heads,
 		publishVersion(version, buildTag) {
-			execFileSync("npm", ["version", "--no-git-tag-version", version], { stdio: "inherit" });
-			execFileSync("npm", ["publish", "--tag", buildTag], { stdio: "inherit" });
+			runNpm(["version", "--no-git-tag-version", "--allow-same-version", version]);
+			runNpm(["publish", "--tag", buildTag]);
 		},
 		moveChannel(version, tag, buildTag) {
-			execFileSync("npm", ["dist-tag", "add", `${pkg.name}@${version}`, tag], { stdio: "inherit" });
+			runNpm(["dist-tag", "add", `${pkg.name}@${version}`, tag]);
 			try {
-				execFileSync("npm", ["dist-tag", "rm", pkg.name, buildTag], { stdio: "inherit" });
+				runNpm(["dist-tag", "rm", pkg.name, buildTag]);
 			} catch {
 				// The channel already points at this version. The build tag is only a spare pointer.
 			}

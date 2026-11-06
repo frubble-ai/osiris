@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { alreadyPublished, publishCurrent, releaseTarget } from "./publish-release.mjs";
+import { alreadyPublished, commandError, publishCurrent, releaseTarget } from "./publish-release.mjs";
 
 const sha = "27ff530956b3e38d57ad4d4c3e2ffc5634857b06";
 const newer = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -112,6 +112,15 @@ test("a retry of a version already published still moves the channel", async () 
 	assert.equal(result.action, "published");
 	assert.deepEqual(moved, [["0.1.0-dev.g27ff530956b3", "dev"]]);
 	assert.equal(alreadyPublished({ stderr: "EPUBLISHCONFLICT" }), true);
+});
+
+test("a publish conflict is visible only once stderr is kept", () => {
+	const failed = { message: "Command failed: npm publish --tag latest" };
+	assert.equal(alreadyPublished(failed), false);
+	assert.equal(
+		alreadyPublished(commandError({ ...failed, stderr: "EPUBLISHCONFLICT previously published versions" })),
+		true,
+	);
 });
 
 test("a release tag does not consult the branch head", async () => {
