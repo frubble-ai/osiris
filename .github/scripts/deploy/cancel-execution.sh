@@ -2,7 +2,9 @@
 # Runs when the job is cancelled, including by timeout-minutes. The step that
 # was waiting may already have been killed, so this repeats the cancel and
 # does not return until the execution has stopped. The concurrency group stays
-# held until then.
+# held until then. A failed cancel or a failed status read is retried: leaving
+# this step while the execution might still be running would let the next
+# deploy or reset start against it.
 set -euo pipefail
 : "${PROJECT:?}" "${REGION:?}" "${RUNNER_TEMP:?}"
 
@@ -11,26 +13,17 @@ file="${RUNNER_TEMP}/osiris-job-execution"
 execution=$(tr -d '[:space:]' < "$file")
 [ -n "$execution" ] || exit 0
 
-gcloud run jobs executions cancel "$execution" --project "$PROJECT" --region "$REGION" --quiet || true
-
-failures=0
-for _ in $(seq 1 60); do
-  completion=$(gcloud run jobs executions describe "$execution" --project "$PROJECT" --region "$REGION" \
-    --format='value(status.completionTime)') && status=0 || status=$?
-  if [ "$status" -ne 0 ]; then
-    failures=$((failures + 1))
-    if [ "$failures" -ge 12 ]; then
-      echo "::error::could not read execution $execution ($failures describe attempts failed)"
-      exit 1
+while true; do
+  if completion=$(gcloud run jobs executions describe "$execution" --project "$PROJECT" --region "$REGION" \
+    --format='value(status.completionTime)'); then
+    if [ -n "$completion" ]; then
+      exit 0
     fi
-    sleep 5
-    continue
+  else
+    echo "::warning::could not read execution $execution"
   fi
-  failures=0
-  if [ -n "$completion" ]; then
-    exit 0
+  if ! gcloud run jobs executions cancel "$execution" --project "$PROJECT" --region "$REGION" --quiet; then
+    echo "::warning::could not cancel execution $execution"
   fi
   sleep 5
 done
-echo "::error::$execution was still running after it was cancelled"
-exit 1
