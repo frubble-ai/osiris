@@ -36,13 +36,10 @@ jobs:
       - name: The generated code matches the spec, and it builds
         run: npm run check && npm run build
 
-  # dev, stg, prd, or a release tag.
+  # Push only. The trigger lists dev, stg, prd, and v* tags; a pull request does not publish.
   publish:
     name: Publish the TypeScript client
-    if: >-
-      github.event_name == 'push' &&
-      (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/stg' ||
-      github.ref == 'refs/heads/prd' || startsWith(github.ref, 'refs/tags/v'))
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -67,21 +64,4 @@ jobs:
           REF_TYPE: ${{ github.ref_type }}
           REF_NAME: ${{ github.ref_name }}
           SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          if [ "$REF_TYPE" = "tag" ]; then
-            version="${REF_NAME#v}"
-            dist_tag=latest
-          else
-            case "$REF_NAME" in
-              dev|stg|prd) ;;
-              *) echo "::error::refused to publish from ${REF_NAME}"; exit 1 ;;
-            esac
-            base=$(node -p "require('./package.json').version")
-            sha=$(printf '%s' "$SHA" | cut -c1-12)
-            version="${base}-${REF_NAME}.g${sha}"
-            dist_tag="$REF_NAME"
-          fi
-          npm version --no-git-tag-version "$version"
-          npm publish --tag "$dist_tag"
-          echo "published @frubble-ai/osiris-client@${version} on ${dist_tag}"
+        run: node publish-release.mjs
