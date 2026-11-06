@@ -6,22 +6,12 @@
 )]
 
 use super::*;
-use crate::client::mocks::mock_osiris_api::MockOsirisApi;
-use fake::{Fake, faker::internet::en::Password};
+use crate::client::mocks::{
+    generate_keys::{Keys, generate_keys},
+    mock_osiris_api::MockOsirisApi,
+};
 use serde_json::json;
 use wiremock::MockServer;
-
-struct Keys {
-    api: String,
-    admin: String,
-}
-
-fn keys() -> Keys {
-    Keys {
-        api: Password(32..40).fake(),
-        admin: Password(32..40).fake(),
-    }
-}
 
 fn client_of(server: &MockServer, url_suffix: &str, keys: &Keys) -> Client {
     Client::new(Profile {
@@ -35,7 +25,7 @@ fn client_of(server: &MockServer, url_suffix: &str, keys: &Keys) -> Client {
 #[tokio::test]
 async fn sends_the_api_key_and_the_version_and_reads_the_answer() {
     let server = MockServer::start().await;
-    let keys = keys();
+    let keys = generate_keys();
     MockOsirisApi::on(&server)
         .answer(
             "GET",
@@ -57,7 +47,7 @@ async fn sends_the_api_key_and_the_version_and_reads_the_answer() {
 #[tokio::test]
 async fn sends_the_admin_key_for_an_admin_call() {
     let server = MockServer::start().await;
-    let keys = keys();
+    let keys = generate_keys();
     MockOsirisApi::on(&server)
         .answer("GET", "/v1/auth-configs", &keys.admin, 200, "{}")
         .await;
@@ -72,7 +62,7 @@ async fn sends_the_admin_key_for_an_admin_call() {
 #[tokio::test]
 async fn joins_the_path_to_a_url_with_a_trailing_slash() {
     let server = MockServer::start().await;
-    let keys = keys();
+    let keys = generate_keys();
     MockOsirisApi::on(&server)
         .answer("GET", "/v1/auth-configs", &keys.admin, 200, "{}")
         .await;
@@ -87,7 +77,7 @@ async fn joins_the_path_to_a_url_with_a_trailing_slash() {
 #[tokio::test]
 async fn reads_an_empty_answer_as_null() {
     let server = MockServer::start().await;
-    let keys = keys();
+    let keys = generate_keys();
     MockOsirisApi::on(&server)
         .answer("DELETE", "/v1/connected-accounts/ca_1", &keys.api, 204, "")
         .await;
@@ -109,7 +99,7 @@ async fn reads_an_empty_answer_as_null() {
 #[tokio::test]
 async fn names_the_error_osiris_answered() {
     let server = MockServer::start().await;
-    let keys = keys();
+    let keys = generate_keys();
     MockOsirisApi::on(&server)
         .answer(
             "GET",

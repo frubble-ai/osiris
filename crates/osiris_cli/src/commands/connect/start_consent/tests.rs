@@ -7,22 +7,15 @@
 )]
 
 use super::*;
-use crate::{client::mocks::mock_osiris_api::MockOsirisApi, profile::Profile};
-use fake::{Fake, faker::internet::en::Password};
+use crate::{
+    client::mocks::{
+        generate_keys::{Keys, generate_keys},
+        mock_osiris_api::MockOsirisApi,
+    },
+    profile::Profile,
+};
 use serde_json::json;
 use wiremock::MockServer;
-
-struct Keys {
-    api: String,
-    admin: String,
-}
-
-fn keys() -> Keys {
-    Keys {
-        api: Password(32..40).fake(),
-        admin: Password(32..40).fake(),
-    }
-}
 
 fn client_of(server: &MockServer, keys: &Keys) -> Client {
     Client::new(Profile {
@@ -47,7 +40,7 @@ async fn sent_bodies(server: &MockServer) -> Vec<Value> {
 #[tokio::test]
 async fn names_the_only_auth_config_of_the_provider_and_answers_the_consent_url() {
     let server = MockServer::start().await;
-    let keys = keys();
+    let keys = generate_keys();
     let api = MockOsirisApi::on(&server);
     api.answer(
         "GET",
@@ -92,7 +85,7 @@ async fn names_the_only_auth_config_of_the_provider_and_answers_the_consent_url(
 #[tokio::test]
 async fn uses_the_named_auth_config_without_listing() {
     let server = MockServer::start().await;
-    let keys = keys();
+    let keys = generate_keys();
     MockOsirisApi::on(&server)
         .answer(
             "POST",
@@ -120,7 +113,7 @@ async fn uses_the_named_auth_config_without_listing() {
 #[tokio::test]
 async fn fails_when_osiris_answers_no_consent_url() {
     let server = MockServer::start().await;
-    let keys = keys();
+    let keys = generate_keys();
     MockOsirisApi::on(&server)
         .answer(
             "POST",
