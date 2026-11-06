@@ -27,7 +27,9 @@ For coding agents working in this repository. Start with README.md.
   [testing patterns](docs/style-guide/testing-patterns.md)).
 - Timings and limits are settings. Configuration comes from the environment; no file is read and no
   code branches on the environment ([settings](docs/style-guide/settings.md)).
-- Every query is a compile-time-checked `query!`/`query_as!`, in tests too. After changing one:
+- Every query is a compile-time-checked `query!`/`query_as!`, in tests too. A `DO` block or DDL
+  is `sqlx::query`, because `query!` prepares the statement and PostgreSQL refuses `PREPARE` of
+  both ([migrations](docs/style-guide/migrations.md)). After changing a checked query:
   `just sqlx-prepare`, and commit `.sqlx/`.
 - Migrations are reversible SQL in `migrations/` (`just migration <name>`), applied by the migrate
   process.

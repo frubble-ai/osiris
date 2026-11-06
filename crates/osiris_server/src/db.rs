@@ -9,6 +9,8 @@ use sqlx::postgres::{PgPool, PgPoolOptions};
 /// The migrations in `migrations/`, compiled in.
 pub static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("../../migrations");
 
+/// Opens the pool. The first connection is made here, so a database that cannot be
+/// reached stops the process at startup.
 pub async fn connect(config: &DatabaseConfig) -> anyhow::Result<PgPool> {
     PgPoolOptions::new()
         .max_connections(config.max_connections)
@@ -59,6 +61,15 @@ $$;
 pub async fn migrate(config: &MigrateConfig) -> anyhow::Result<()> {
     let pool = connect(&config.database).await?;
     if config.reset {
+        let connected = sqlx::query_scalar!(r#"SELECT current_database()::text AS "name!" "#)
+            .fetch_one(&pool)
+            .await
+            .context("reading the connected database")?;
+        crate::config::migrate::require_reset_target(
+            true,
+            config.reset_database.as_deref(),
+            &connected,
+        )?;
         drop_owned(&pool).await?;
     }
     apply(&pool).await

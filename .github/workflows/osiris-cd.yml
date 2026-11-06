@@ -96,6 +96,7 @@ jobs:
     needs: stg-switch
     if: needs.stg-switch.outputs.enabled == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       # Before anything else: a tag or `prd` would otherwise be built for dev.
       - name: Refuse a tag or prd
@@ -142,6 +143,7 @@ jobs:
     name: deploy
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment: osiris-${{ github.ref == 'refs/heads/stg' && 'stg' || 'dev' }}
     permissions:
       contents: read

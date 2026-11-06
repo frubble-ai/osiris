@@ -11,7 +11,8 @@ name: DB - Reset (drop + migrate)
 # runs in `osiris-dev`, `stg` in `osiris-stg`, as the deploy identity, whose
 # trust rule in `platform` names this file, for dev and stg only. The migrate
 # process does not read which environment it is in. This execution sets
-# OSIRIS_MIGRATE_RESET=true; the job's own environment never has it.
+# OSIRIS_MIGRATE_RESET=true and OSIRIS_MIGRATE_RESET_DATABASE to the job's
+# DB_NAME. The job's own environment has neither.
 on:
   workflow_dispatch:
 
@@ -35,6 +36,7 @@ jobs:
       && github.actor == 'drn1996'
       && github.triggering_actor == 'drn1996'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment: osiris-${{ github.ref == 'refs/heads/stg' && 'stg' || 'dev' }}
     permissions:
       contents: read

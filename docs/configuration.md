@@ -23,6 +23,7 @@ already started finish for at most `[server] shutdown_grace_seconds` (8), then e
 | --- | --- | --- |
 | `OSIRIS_PROCESS` | all | `serve`, `worker` or `migrate` |
 | `OSIRIS_MIGRATE_RESET` | migrate, optional | `true` exactly drops the tables and enums this database user owns, then migrates. Any other value, or unset, only migrates. The reset workflow sets it for one execution; the job itself never has it, and a deploy does not set it |
+| `OSIRIS_MIGRATE_RESET_DATABASE` | migrate, when resetting | the database that reset must be connected to. Required with `OSIRIS_MIGRATE_RESET=true`, and it must equal the database the process connects to (`DB_NAME`, and the session's `current_database()`). A missing or different name refuses the reset before anything is dropped |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` | all | where the database is, and who connects |
 | `DB_PASSWORD` | all | the database user's password (a secret) |
 | `DB_CA_PEM` | all | the database server's CA certificate, in PEM (see below) |
@@ -161,15 +162,18 @@ about how the process starts.
 ## Resetting the database
 
 [`.github/workflows/db-reset.yml`](../.github/workflows/db-reset.yml) drops every table and enum the
-migrations made and runs them again from nothing, as one execution of the migration job with
-`OSIRIS_MIGRATE_RESET=true` ([`reset-db.sh`](../.github/scripts/deploy/reset-db.sh)), on the image
-the job already has. It then rolls the worker, then serve, onto that image. It is for when the
-migrations' history is rewritten. Every connection goes with the tables.
+database user owns, not only those the migrations made, and runs the migrations again from nothing,
+as one execution of the migration job with `OSIRIS_MIGRATE_RESET=true` and
+`OSIRIS_MIGRATE_RESET_DATABASE` set to that database
+([`reset-db.sh`](../.github/scripts/deploy/reset-db.sh)), on the image the job already has. It then
+rolls the worker, then serve, onto that image. It is for when the migrations' history is rewritten.
+Every connection goes with the tables. A reset whose named database is missing or is not the one
+the process connects to is refused before anything is dropped.
 
-The job must already run an image whose migrate process reads `OSIRIS_MIGRATE_RESET`. The script
-reads that commit's `config/migrate.rs` and refuses to execute when the variable is not there: an
-older image ignores it, migrates and exits 0, and no table is dropped. Deploy first (its migration
-moves the job onto the new image), then reset.
+The job must already run an image whose migrate process checks `OSIRIS_MIGRATE_RESET_DATABASE`.
+The script reads that commit's `config/migrate.rs` and refuses to execute when the variable is not
+there: an older image ignores it, migrates and exits 0, and no table is dropped. Deploy first (its
+migration moves the job onto the new image), then reset.
 
 The process does not read which environment it is running in. prd is protected because this
 workflow runs only from `dev` and `stg`, and the platform's trust names `db-reset.yml` only for

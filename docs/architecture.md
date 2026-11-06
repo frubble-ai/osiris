@@ -45,6 +45,8 @@ osiris_server/src/
   before the process takes traffic and holds nothing about a request.
 - `ctx.db` is the pool, the master key and the data keys. Every query is a `query!` in
   `lib/<domain>/`, an operation of `Db`. Secrets go in encrypted and come out decrypted there.
+  The migrate reset's `DO` block, and the test DDL that checks which objects it drops, are
+  `sqlx::query`: `query!` cannot prepare them ([migrations](style-guide/migrations.md)).
 - Routes, the idempotency middleware and the worker call use cases and nothing else.
 - `lib/` helpers take parts of the context and never call a use case.
 
