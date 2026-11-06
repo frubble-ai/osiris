@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT count(*) AS \"count!\"\n           FROM pg_type type\n           JOIN pg_namespace namespace ON namespace.oid = type.typnamespace\n           WHERE namespace.nspname = 'public'\n             AND type.typtype = 'e'\n             AND pg_get_userbyid(type.typowner) = current_user",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "24433618ed36ef6b3d6579a3b1543510e2ff5668c4db94daf4a15fc74eec494b"
+}

@@ -9,8 +9,9 @@ name: DB - Reset (drop + migrate)
 # Run by hand only (Actions → DB - Reset → Run workflow, from `dev` or `stg`),
 # and only by drn1996: the job refuses anyone else and any other branch. `dev`
 # runs in `osiris-dev`, `stg` in `osiris-stg`, as the deploy identity, whose
-# trust rule in `platform` names this file. The migrate process refuses
-# `--reset` when OSIRIS_ENV is anything but local, dev or stg.
+# trust rule in `platform` names this file, for dev and stg only. The migrate
+# process does not read which environment it is in. This execution sets
+# OSIRIS_MIGRATE_RESET=true; the job's own environment never has it.
 on:
   workflow_dispatch:
 
@@ -101,4 +102,8 @@ jobs:
         run: gcloud config set auth/impersonate_service_account "${{ vars.GCP_DEPLOY_SPOKE }}"
 
       - name: Drop the database's tables, migrate and roll out
+        env:
+          # Reads the image's commit to confirm that image understands the reset.
+          # The checkout keeps no credentials.
+          GH_TOKEN: ${{ github.token }}
         run: .github/scripts/deploy/reset-db.sh

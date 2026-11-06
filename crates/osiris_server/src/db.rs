@@ -2,7 +2,7 @@
 //! startup, so a database that can't be reached, or whose TLS can't be established against
 //! `DB_CA_PEM`, stops the process right away instead of failing the first request.
 
-use crate::config::DatabaseConfig;
+use crate::config::{DatabaseConfig, MigrateConfig};
 use anyhow::Context;
 use sqlx::postgres::{PgPool, PgPoolOptions};
 
@@ -26,6 +26,10 @@ pub async fn connect(config: &DatabaseConfig) -> anyhow::Result<PgPool> {
 /// Tables and enums this database user owns in `public`. A reset drops only those, so a
 /// relation someone else created stays. `_sqlx_migrations` is one of the tables, and the
 /// migrator then runs every migration again from nothing.
+///
+/// This is `sqlx::query`, not `query!`. `query!` prepares the statement so it can check it,
+/// and PostgreSQL refuses `PREPARE` of a `DO` block. The block's `EXECUTE format(...)` is
+/// dynamic SQL besides, so there is no statement sqlx can describe at compile time.
 const DROP_OWNED_SQL: &str = r"
 DO $$
 DECLARE item record;
@@ -50,32 +54,28 @@ END
 $$;
 ";
 
-/// `OSIRIS_ENV` values a `--reset` may run in. prd is refused here, in the process, so a
-/// caller that can execute the job still cannot wipe it.
-pub fn reset_allowed(environment: Option<&str>) -> bool {
-    matches!(environment, Some("local" | "dev" | "stg"))
+/// Apply every pending migration. With `config.reset`, drop what this user owns first, so the
+/// migrations run on an empty database. Already applied ones are skipped when not resetting.
+pub async fn migrate(config: &MigrateConfig) -> anyhow::Result<()> {
+    let pool = connect(&config.database).await?;
+    if config.reset {
+        drop_owned(&pool).await?;
+    }
+    apply(&pool).await
 }
 
-/// Apply every pending migration. With `reset`, drop what this user owns first, so the
-/// migrations run on an empty database. Already applied ones are skipped when not resetting.
-pub async fn migrate(config: &DatabaseConfig, reset: bool) -> anyhow::Result<()> {
-    let pool = connect(config).await?;
-    if reset {
-        let environment = crate::config::env_vars::optional("OSIRIS_ENV");
-        if !reset_allowed(environment.as_deref()) {
-            anyhow::bail!(
-                "--reset is refused with OSIRIS_ENV '{}': only local, dev and stg reset",
-                environment.as_deref().unwrap_or("unset")
-            );
-        }
-        tracing::warn!("dropping the tables and types this database user owns, then migrating");
-        sqlx::query(DROP_OWNED_SQL)
-            .execute(&pool)
-            .await
-            .context("dropping the database's tables and types")?;
-    }
+async fn drop_owned(pool: &PgPool) -> anyhow::Result<()> {
+    tracing::warn!("osiris migrate reset: dropping the tables and types this database user owns");
+    sqlx::query(DROP_OWNED_SQL)
+        .execute(pool)
+        .await
+        .context("dropping the database's tables and types")?;
+    Ok(())
+}
+
+async fn apply(pool: &PgPool) -> anyhow::Result<()> {
     MIGRATOR
-        .run(&pool)
+        .run(pool)
         .await
         .context("applying the migrations")?;
     tracing::info!("migrations applied");
@@ -83,17 +83,4 @@ pub async fn migrate(config: &DatabaseConfig, reset: bool) -> anyhow::Result<()>
 }
 
 #[cfg(test)]
-mod tests {
-    use super::reset_allowed;
-
-    #[test]
-    fn reset_is_only_local_dev_or_stg() {
-        assert!(reset_allowed(Some("local")));
-        assert!(reset_allowed(Some("dev")));
-        assert!(reset_allowed(Some("stg")));
-        assert!(!reset_allowed(Some("prd")));
-        assert!(!reset_allowed(Some("STG")));
-        assert!(!reset_allowed(Some("")));
-        assert!(!reset_allowed(None));
-    }
-}
+mod tests;
