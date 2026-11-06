@@ -67,6 +67,15 @@ async fn keeps_an_auth_config_change_behind_the_admin_key(
     let app = setup_test_context(pool).await;
     let config = app.github_config().await;
     let path = path.replace("{config}", &config);
+    let before = app
+        .send(
+            "GET",
+            &format!("/v1/auth-configs/{config}"),
+            Some(ADMIN_KEY),
+            None,
+            &[],
+        )
+        .await;
 
     let refused = app.send(method, &path, Some(API_KEY), body, &[]).await;
 
@@ -83,7 +92,7 @@ async fn keeps_an_auth_config_change_behind_the_admin_key(
         )
         .await;
     assert_eq!(read.status, StatusCode::OK);
-    assert_eq!(read.body["client_id"], "client");
+    assert_eq!(read.body, before.body);
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]

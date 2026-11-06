@@ -1,6 +1,7 @@
 //! State a test starts from, arranged the way a client gets there: through the API and the
 //! providers' faked network.
 
+use super::db_fixtures::generate_secret;
 use super::{ADMIN_KEY, API_KEY, TestContext, generate_connect_attempt::generate_connect_attempt};
 use axum::http::StatusCode;
 use osiris_providers::{
@@ -18,7 +19,11 @@ impl TestContext {
                 "POST",
                 "/v1/auth-configs",
                 Some(ADMIN_KEY),
-                Some(json!({ "provider": provider, "client_id": "client", "client_secret": "secret" })),
+                Some(json!({
+                    "provider": provider,
+                    "client_id": generate_secret("client"),
+                    "client_secret": generate_secret("secret"),
+                })),
                 &[],
             )
             .await;

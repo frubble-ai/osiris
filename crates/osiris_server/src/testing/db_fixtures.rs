@@ -47,7 +47,7 @@ pub async fn github_config(db: &Db) -> String {
 pub async fn github_config_with(db: &Db, client_secret: &str) -> String {
     db.create_auth_config(NewAuthConfig {
         provider: "github".into(),
-        client_id: "Iv1.client".into(),
+        client_id: generate_secret("client"),
         client_secret: secret(client_secret),
         scopes: vec![],
     })
