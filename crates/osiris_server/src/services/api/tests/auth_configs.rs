@@ -6,6 +6,7 @@
     reason = "tests: a failure here is the test failing"
 )]
 
+use crate::testing::db_fixtures::generate_secret;
 use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
@@ -30,17 +31,18 @@ async fn manages_auth_configs_without_ever_returning_the_secret(pool: PgPool) {
     assert_eq!(read.body["provider"], "github");
     assert!(read.body.get("client_secret").is_none());
 
+    let client_id = generate_secret("client");
     let updated = app
         .send(
             "PATCH",
             &format!("/v1/auth-configs/{id}"),
             Some(ADMIN_KEY),
-            Some(json!({ "client_id": "Iv1.other", "scopes": ["repo"] })),
+            Some(json!({ "client_id": client_id, "scopes": ["repo"] })),
             &[],
         )
         .await;
     assert_eq!(updated.status, StatusCode::OK, "{}", updated.body);
-    assert_eq!(updated.body["client_id"], "Iv1.other");
+    assert_eq!(updated.body["client_id"], client_id);
     assert_eq!(updated.body["scopes"], json!(["repo"]));
 
     let listed = app
@@ -128,6 +130,23 @@ async fn refuses_an_empty_client_secret(pool: PgPool) {
         |_| json!({ "provider": "github", "client_id": "c", "client_secret": "" }),
     )
     .await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_a_blank_client_id_on_update(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    let id = app.github_config().await;
+    let answer = app
+        .send(
+            "PATCH",
+            &format!("/v1/auth-configs/{id}"),
+            Some(ADMIN_KEY),
+            Some(json!({ "client_id": " " })),
+            &[],
+        )
+        .await;
+    assert_eq!(answer.status, StatusCode::BAD_REQUEST, "{}", answer.body);
+    assert_eq!(answer.body["error"]["code"], "OS_02");
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]

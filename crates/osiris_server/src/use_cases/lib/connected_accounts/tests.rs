@@ -59,11 +59,16 @@ async fn refuses_to_save_a_refreshable_token_without_its_refresh_task(pool: PgPo
 
     // The database's completeness check refuses an active connection whose refresh token has no
     // refresh task.
-    assert!(
-        db.activate(&account, &generate_tokens(Some(3600)), None)
-            .await
-            .is_err()
-    );
+    let refused = db
+        .activate(&account, &generate_tokens(Some(3600)), None)
+        .await
+        .unwrap_err();
+    assert!(matches!(
+        refused.current_context(),
+        osiris_domain::DomainError::Internal
+    ));
+    let detail = format!("{refused:?}");
+    assert!(detail.contains("connected_account_complete"), "{detail}");
     let account = db.connected_account(&id).await.unwrap();
     assert_eq!(account.status, ConnectionStatus::Pending);
     assert!(account.tokens.is_none());

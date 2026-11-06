@@ -13,6 +13,7 @@
 
 use super::{
     NewTokens, ScheduledRefresh,
+    lock_for_refresh::RefreshFlight,
     store_tokens::{Stamped, TokenWrite, store_tokens},
 };
 use crate::use_cases::UseCaseResult;
@@ -20,7 +21,6 @@ use crate::use_cases::lib::database::errors::db;
 use osiris_common::crypto::Cipher;
 use osiris_domain::{ConnectedAccount, ConnectionStatus, Event, EventType, TokenSet};
 use sqlx::{Postgres, Transaction};
-use tokio::sync::OwnedMutexGuard;
 
 pub struct RefreshLock {
     tx: Transaction<'static, Postgres>,
@@ -28,7 +28,7 @@ pub struct RefreshLock {
     pub account: ConnectedAccount,
     /// Held for the lock's life so a second refresh of this connection waits in-process, without a
     /// pool connection, until this one commits or rolls back.
-    _flight: OwnedMutexGuard<()>,
+    _flight: RefreshFlight,
 }
 
 /// The connection as the write left it, so nothing is read back after the commit.
@@ -68,7 +68,7 @@ impl RefreshLock {
         tx: Transaction<'static, Postgres>,
         cipher: Cipher,
         account: ConnectedAccount,
-        flight: OwnedMutexGuard<()>,
+        flight: RefreshFlight,
     ) -> Self {
         Self {
             tx,

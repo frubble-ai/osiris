@@ -8,14 +8,22 @@ use crate::use_cases::lib::database::Tenant;
 use crate::use_cases::lib::database::errors::db;
 use crate::use_cases::lib::database::rows::AccountRow;
 use osiris_domain::DomainError;
-use std::sync::{Arc, PoisonError};
-use tokio::sync::Mutex as AsyncMutex;
+use std::sync::{Arc, Mutex, PoisonError};
+use tokio::sync::{Mutex as AsyncMutex, OwnedMutexGuard};
 
-impl Db {
-    pub async fn lock_for_refresh(&self, id: &str) -> UseCaseResult<RefreshLock> {
-        // Wait in-process first so only one refresh of this connection holds a pool connection.
+/// An in-process flight for one connection: waiters block here before taking a pool connection.
+/// Dropped when the refresh ends; removes its map entry when nothing else holds a clone.
+pub(crate) struct RefreshFlight {
+    id: String,
+    flights: Arc<Mutex<std::collections::HashMap<String, Arc<AsyncMutex<()>>>>>,
+    flight: Arc<AsyncMutex<()>>,
+    guard: Option<OwnedMutexGuard<()>>,
+}
+
+impl RefreshFlight {
+    async fn acquire(db: &Db, id: &str) -> Self {
         let flight = {
-            let mut flights = self
+            let mut flights = db
                 .refresh_flights
                 .lock()
                 .unwrap_or_else(PoisonError::into_inner);
@@ -24,7 +32,31 @@ impl Db {
                 .or_insert_with(|| Arc::new(AsyncMutex::new(())))
                 .clone()
         };
-        let flight = flight.lock_owned().await;
+        let guard = flight.clone().lock_owned().await;
+        Self {
+            id: id.to_owned(),
+            flights: db.refresh_flights.clone(),
+            flight,
+            guard: Some(guard),
+        }
+    }
+}
+
+impl Drop for RefreshFlight {
+    fn drop(&mut self) {
+        self.guard.take();
+        let mut flights = self.flights.lock().unwrap_or_else(PoisonError::into_inner);
+        // map entry + this struct: nothing else is waiting or holding.
+        if Arc::strong_count(&self.flight) == 2 {
+            flights.remove(&self.id);
+        }
+    }
+}
+
+impl Db {
+    pub async fn lock_for_refresh(&self, id: &str) -> UseCaseResult<RefreshLock> {
+        // Wait in-process first so only one refresh of this connection holds a pool connection.
+        let flight = RefreshFlight::acquire(self, id).await;
 
         let mut tx = self.pool.begin().await.map_err(db)?;
         // Cross-instance waiters still give up after `lock_timeout` instead of holding a connection
