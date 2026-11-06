@@ -176,8 +176,9 @@ jobs:
             exit 1
           fi
 
-      # Names only. A missing one would otherwise skip the migration or the
-      # worker and roll serve onto a schema or a worker the new image needs.
+      # Names only. An empty one fails in the script that uses it; this
+      # fails first, before any credential is used, and names every
+      # variable that is missing.
       - name: Require the environment's variables
         env:
           WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}

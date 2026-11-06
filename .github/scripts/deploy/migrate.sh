@@ -8,12 +8,7 @@
 # previous image. sqlx runs each migration in a transaction, so a failed one
 # leaves the schema as it found it.
 set -euo pipefail
-: "${IMAGE:?}" "${REGION:?}" "${PROJECT:?}"
-
-if [ -z "${MIGRATE_JOB:-}" ]; then
-  echo "::notice::GCP_RUN_JOB_MIGRATE is unset; no migration job to run"
-  exit 0
-fi
+: "${IMAGE:?}" "${REGION:?}" "${PROJECT:?}" "${MIGRATE_JOB:?}"
 
 gcloud run jobs update "$MIGRATE_JOB" --project "$PROJECT" --region "$REGION" \
   --image "$IMAGE" --quiet
