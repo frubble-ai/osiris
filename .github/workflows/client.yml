@@ -40,6 +40,9 @@ jobs:
   publish:
     name: Publish the TypeScript client
     if: github.event_name == 'push'
+    concurrency:
+      group: client-publish-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -61,6 +64,7 @@ jobs:
       - name: Publish on this ref's dist-tag
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REF_TYPE: ${{ github.ref_type }}
           REF_NAME: ${{ github.ref_name }}
           SHA: ${{ github.sha }}
