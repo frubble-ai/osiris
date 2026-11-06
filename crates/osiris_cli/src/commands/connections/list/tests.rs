@@ -1,11 +1,13 @@
 //! Tests of `list`.
 
 use super::*;
+use fake::{Fake, faker::internet::en::Username};
 
 #[test]
 fn filters_by_what_it_was_given_naming_the_user_as_osiris_does() {
+    let user: String = Username().fake();
     let list = List {
-        user: Some("org_1".into()),
+        user: Some(user.clone()),
         provider: Some("github".into()),
         status: Some("active".into()),
         after: None,
@@ -15,7 +17,7 @@ fn filters_by_what_it_was_given_naming_the_user_as_osiris_does() {
     assert_eq!(
         list.query(),
         [
-            ("user_id", "org_1".to_owned()),
+            ("user_id", user),
             ("provider", "github".to_owned()),
             ("status", "active".to_owned()),
             ("limit", "5".to_owned()),

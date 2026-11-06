@@ -14,6 +14,7 @@ use crate::{
     },
     profile::Profile,
 };
+use fake::{Fake, faker::internet::en::Username};
 use serde_json::json;
 use wiremock::MockServer;
 
@@ -59,10 +60,11 @@ async fn names_the_only_auth_config_of_the_provider_and_answers_the_consent_url(
     )
     .await;
 
+    let user: String = Username().fake();
     let started = start_consent(
         &client_of(&server, &keys),
         "github",
-        "org_1",
+        &user,
         None,
         "https://app.example/back",
     )
@@ -76,9 +78,11 @@ async fn names_the_only_auth_config_of_the_provider_and_answers_the_consent_url(
     );
     assert_eq!(
         sent_bodies(&server).await,
-        [
-            json!({ "auth_config_id": "ac_github", "user_id": "org_1", "callback_url": "https://app.example/back" })
-        ]
+        [json!({
+            "auth_config_id": "ac_github",
+            "user_id": user,
+            "callback_url": "https://app.example/back"
+        })]
     );
 }
 
@@ -96,10 +100,11 @@ async fn uses_the_named_auth_config_without_listing() {
         )
         .await;
 
+    let user: String = Username().fake();
     start_consent(
         &client_of(&server, &keys),
         "github",
-        "org_1",
+        &user,
         Some("ac_named".into()),
         "https://app.example/back",
     )
@@ -107,6 +112,7 @@ async fn uses_the_named_auth_config_without_listing() {
     .unwrap();
 
     assert_eq!(sent_bodies(&server).await[0]["auth_config_id"], "ac_named");
+    assert_eq!(sent_bodies(&server).await[0]["user_id"], user);
     assert_eq!(server.received_requests().await.unwrap().len(), 1);
 }
 
@@ -124,10 +130,11 @@ async fn fails_when_osiris_answers_no_consent_url() {
         )
         .await;
 
+    let user: String = Username().fake();
     let error = start_consent(
         &client_of(&server, &keys),
         "github",
-        "org_1",
+        &user,
         Some("ac_named".into()),
         "https://app.example/back",
     )

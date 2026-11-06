@@ -2,7 +2,8 @@
 
 use super::AuthConfigChanges;
 use crate::testing::db_fixtures::{
-    db, generate_secret, github_config, github_config_with, pending,
+    db, generate_secret, generate_state, generate_user_id, github_config, github_config_with,
+    pending,
 };
 use osiris_common::secret::ExposeSecret;
 use osiris_domain::Cursor;
@@ -46,7 +47,7 @@ async fn stores_the_client_secret_encrypted_and_reads_it_back(pool: PgPool) {
 async fn refuses_to_delete_an_auth_config_in_use(pool: PgPool) {
     let db = db(pool);
     let id = github_config_with(&db, &generate_secret("client-secret")).await;
-    let account = pending(&db, &id, "org_1", "state-1").await;
+    let account = pending(&db, &id, &generate_user_id(), &generate_state()).await;
 
     let refused = db.delete_auth_config(&id).await.unwrap_err();
     assert!(matches!(

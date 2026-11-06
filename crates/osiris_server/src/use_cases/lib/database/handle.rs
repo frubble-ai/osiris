@@ -10,6 +10,7 @@ use std::{
     sync::{Arc, Mutex},
     time::Duration,
 };
+use tokio::sync::Mutex as AsyncMutex;
 
 #[derive(Clone)]
 pub struct Db {
@@ -19,6 +20,9 @@ pub struct Db {
     pub(crate) keys: Arc<Mutex<HashMap<String, Cipher>>>,
     /// How long a refresh waits for another refresh's row lock before giving up.
     pub(crate) lock_timeout: Duration,
+    /// One in-process flight per connection: waiters do not take a pool connection until they can
+    /// run. Cross-instance contention still uses the row lock and `lock_timeout`.
+    pub(crate) refresh_flights: Arc<Mutex<HashMap<String, Arc<AsyncMutex<()>>>>>,
 }
 
 impl Db {
@@ -28,6 +32,7 @@ impl Db {
             master,
             keys: Arc::default(),
             lock_timeout,
+            refresh_flights: Arc::default(),
         }
     }
 }

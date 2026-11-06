@@ -1,6 +1,8 @@
 //! Each tenant's data key, wrapped by the master key.
 
-use crate::testing::db_fixtures::{active_with, db, generate_tokens};
+use crate::testing::db_fixtures::{
+    active_with, db, generate_state, generate_tokens, generate_user_id,
+};
 use crate::use_cases::lib::database::Db;
 use osiris_common::{crypto::MasterKey, secret::ExposeSecret};
 use sqlx::PgPool;
@@ -8,14 +10,34 @@ use sqlx::PgPool;
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn gives_each_user_a_data_key_of_its_own(pool: PgPool) {
     let db = db(pool.clone());
-    active_with(&db, "org_1", "s1", &generate_tokens(Some(3600))).await;
-    active_with(&db, "org_2", "s2", &generate_tokens(Some(3600))).await;
+    let user_one = generate_user_id();
+    let user_two = generate_user_id();
+    active_with(
+        &db,
+        &user_one,
+        &generate_state(),
+        &generate_tokens(Some(3600)),
+    )
+    .await;
+    active_with(
+        &db,
+        &user_two,
+        &generate_state(),
+        &generate_tokens(Some(3600)),
+    )
+    .await;
 
     let tenants = sqlx::query_scalar!("SELECT tenant FROM data_key ORDER BY tenant")
         .fetch_all(&pool)
         .await
         .unwrap();
-    assert_eq!(tenants, ["osiris", "user:org_1", "user:org_2"]);
+    let mut expected = vec![
+        "osiris".to_owned(),
+        format!("user:{user_one}"),
+        format!("user:{user_two}"),
+    ];
+    expected.sort();
+    assert_eq!(tenants, expected);
     let keys = sqlx::query_scalar!("SELECT wrapped_key FROM data_key")
         .fetch_all(&pool)
         .await
@@ -27,7 +49,7 @@ async fn gives_each_user_a_data_key_of_its_own(pool: PgPool) {
 async fn reads_nothing_with_another_master_key(pool: PgPool) {
     let db = db(pool.clone());
     let tokens = generate_tokens(Some(3600));
-    let id = active_with(&db, "org_1", "s1", &tokens).await;
+    let id = active_with(&db, &generate_user_id(), &generate_state(), &tokens).await;
     let reopened = crate::testing::db_fixtures::db(pool.clone());
     assert_eq!(
         reopened

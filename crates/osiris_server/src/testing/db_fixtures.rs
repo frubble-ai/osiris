@@ -40,6 +40,16 @@ pub fn generate_secret(prefix: &str) -> String {
     format!("{prefix}-{}", 24.fake::<String>())
 }
 
+/// A random tenant id for arranging connections.
+pub fn generate_user_id() -> String {
+    generate_secret("org")
+}
+
+/// A random OAuth `state` for arranging a consent.
+pub fn generate_state() -> String {
+    generate_secret("state")
+}
+
 pub async fn github_config(db: &Db) -> String {
     github_config_with(db, &generate_secret("client-secret")).await
 }
@@ -117,8 +127,12 @@ pub async fn active_with(db: &Db, user_id: &str, state: &str, tokens: &NewTokens
     let config = github_config(db).await;
     let id = pending(db, &config, user_id, state).await;
     let account = db.connected_account(&id).await.unwrap();
-    db.activate(&account, tokens, Some(&refresh_task("refresh-1")))
-        .await
-        .unwrap();
+    db.activate(
+        &account,
+        tokens,
+        Some(&refresh_task(&generate_secret("refresh"))),
+    )
+    .await
+    .unwrap();
     id
 }
