@@ -41,6 +41,22 @@ impl LocalScheduler {
             used: Mutex::default(),
         }
     }
+
+    /// Resolves when every scheduled timer has finished delivering (or been cancelled).
+    #[cfg(test)]
+    pub(crate) async fn wait_until_idle(&self) {
+        loop {
+            if self
+                .timers
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner)
+                .is_empty()
+            {
+                return;
+            }
+            tokio::task::yield_now().await;
+        }
+    }
 }
 
 #[async_trait]

@@ -51,16 +51,12 @@ async fn the_local_scheduler_sends_a_due_task_with_the_token_and_sends_it_again_
     task.run_at = OffsetDateTime::now_utc();
 
     scheduler.schedule(&task).await.unwrap();
-    tokio::time::timeout(LONG_ENOUGH, async {
-        while worker.received().await.len() < 2 {
-            tokio::task::yield_now().await;
-        }
-    })
-    .await
-    .expect("the task is sent again after the refusal");
+    // Deliver ends when the worker answers 2xx (or after max_attempts). Waiting on idle is
+    // how the stop is checked without sleeping to wait for a retry that must not happen.
+    tokio::time::timeout(LONG_ENOUGH, scheduler.wait_until_idle())
+        .await
+        .expect("the task is delivered");
 
-    // A scheduler that kept retrying after the 204 would send again within a retry delay.
-    tokio::time::sleep(RETRY_DELAY * 5).await;
     let sent = worker.received().await;
     assert_eq!(sent.len(), 2, "it stops once the worker answers 2xx");
     for (authorization, body) in sent {
