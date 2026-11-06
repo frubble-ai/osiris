@@ -5,3 +5,6 @@ paths:
   .github/workflows/osiris-cd.yml:
     ignore:
       - 'unexpected key "queue" for "concurrency" section'
+  .github/workflows/db-reset.yml:
+    ignore:
+      - 'unexpected key "queue" for "concurrency" section'

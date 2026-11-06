@@ -11,7 +11,7 @@ One image runs every process. `OSIRIS_PROCESS` is required and chooses which.
 | --- | --- | --- |
 | `serve` | Cloud Run service, public | the API and the OAuth callback, on `PORT` |
 | `worker` | Cloud Run service, internal | `POST /tasks` for the task scheduler, on `PORT` |
-| `migrate` | Cloud Run job | applies the pending migrations, then exits 0 (non-zero on failure) |
+| `migrate` | Cloud Run job | applies the pending migrations, then exits 0 (non-zero on failure). `--reset` drops this user's tables and enums first; the process refuses it unless `OSIRIS_ENV` is `local`, `dev` or `stg` |
 
 A missing or unknown value stops the process with an error naming `OSIRIS_PROCESS`. `serve` and
 `worker` listen on `0.0.0.0:$PORT`. After SIGTERM they stop accepting connections, let requests
@@ -22,6 +22,7 @@ already started finish for at most `[server] shutdown_grace_seconds` (8), then e
 | Variable | Needed by | What |
 | --- | --- | --- |
 | `OSIRIS_PROCESS` | all | `serve`, `worker` or `migrate` |
+| `OSIRIS_ENV` | migrate, only to allow `--reset` | `local`, `dev` or `stg`. The platform sets it on the job. Anything else, or unset, makes `--reset` exit non-zero before it drops anything |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` | all | where the database is, and who connects |
 | `DB_PASSWORD` | all | the database user's password (a secret) |
 | `DB_CA_PEM` | all | the database server's CA certificate, in PEM (see below) |
@@ -156,3 +157,21 @@ in Secret Manager, mounted by Terraform.
 The image already runs on Cloud Run. The Dockerfile's entrypoint is the binary, Cloud Run's
 `PORT` is 8080, and `/health` is the startup and liveness probe. The deploy sets nothing else
 about how the process starts.
+
+## Resetting the database
+
+[`.github/workflows/db-reset.yml`](../.github/workflows/db-reset.yml) drops every table and enum the
+migrations made and runs them again from nothing, as one execution of the migration job with
+`--reset` ([`reset-db.sh`](../.github/scripts/deploy/reset-db.sh)), on the image the job already
+has. It then rolls the worker, then serve, onto that image. It is for when the migrations' history
+is rewritten. Every connection goes with the tables.
+
+The job must already run an image whose migrate process knows `--reset`. Deploy first (its
+migration moves the job onto the new image), then reset. The process refuses `--reset` unless
+`OSIRIS_ENV` is `local`, `dev` or `stg`.
+
+It runs by hand only, from `dev` or `stg`, and only for `drn1996`. It shares that environment's
+deploy concurrency group, so it never runs beside a deploy, and it signs in as the deploy
+identity. The trust rule in the platform repository names `db-reset.yml`: `osiris-dev` from `dev`
+only, `osiris-stg` from `stg` only. Renaming the file stops the Google sign-in. A run on `stg`
+while `STG_ENABLED` is exactly `false` is refused.
