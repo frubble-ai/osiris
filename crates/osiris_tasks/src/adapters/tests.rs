@@ -15,6 +15,7 @@ use time::OffsetDateTime;
 use wiremock::MockServer;
 
 const LONG_ENOUGH: Duration = Duration::from_secs(10);
+const RETRY_DELAY: Duration = Duration::from_millis(20);
 
 #[tokio::test]
 async fn the_memory_scheduler_keeps_the_contract() {
@@ -43,7 +44,7 @@ async fn the_local_scheduler_sends_a_due_task_with_the_token_and_sends_it_again_
     let scheduler = LocalScheduler::new(LocalConfig {
         handler_url: worker.url(),
         token: Some(secret(&token)),
-        retry_delay: Duration::from_millis(10),
+        retry_delay: RETRY_DELAY,
         max_attempts: 3,
     });
     let mut task = generate_task();
@@ -58,6 +59,8 @@ async fn the_local_scheduler_sends_a_due_task_with_the_token_and_sends_it_again_
     .await
     .expect("the task is sent again after the refusal");
 
+    // A scheduler that kept retrying after the 204 would send again within a retry delay.
+    tokio::time::sleep(RETRY_DELAY * 5).await;
     let sent = worker.received().await;
     assert_eq!(sent.len(), 2, "it stops once the worker answers 2xx");
     for (authorization, body) in sent {
