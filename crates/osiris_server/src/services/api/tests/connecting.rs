@@ -2,7 +2,7 @@
 //! with their first refresh task, the event, and the completeness rule.
 
 use crate::testing::generate_connect_attempt::generate_connect_attempt;
-use crate::testing::{API_KEY, setup_test_context};
+use crate::testing::{API_KEY, setup_test_context, setup_test_context_with};
 use axum::http::StatusCode;
 use osiris_domain::EventType;
 use osiris_providers::{
@@ -345,4 +345,97 @@ async fn stores_a_fixed_reason_when_the_consent_comes_back_with_an_unknown_error
     let account = app.account(&id).await;
     assert_eq!(account["status"], "failed");
     assert_eq!(account["last_error"], "the provider refused the consent");
+}
+
+async fn finishes_with(app: &crate::testing::TestContext, query: &str) -> axum::http::HeaderValue {
+    app.send("GET", &format!("/oauth/callback?{query}"), None, None, &[])
+        .await
+        .headers
+        .get("location")
+        .cloned()
+        .unwrap_or_else(|| axum::http::HeaderValue::from_static(""))
+}
+
+async fn assert_consent_failed(app: &crate::testing::TestContext, id: &str, reason: &str) {
+    let account = app.account(id).await;
+    assert_eq!(account["status"], "failed");
+    assert_eq!(account["last_error"], reason);
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_a_callback_without_a_state_or_with_one_never_issued(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+
+    let missing = app
+        .send("GET", "/oauth/callback?code=c", None, None, &[])
+        .await;
+    let unknown = app
+        .send(
+            "GET",
+            "/oauth/callback?state=never-issued&code=c",
+            None,
+            None,
+            &[],
+        )
+        .await;
+
+    assert_eq!(missing.status, StatusCode::BAD_REQUEST);
+    assert_eq!(unknown.status, StatusCode::BAD_REQUEST);
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn fails_a_callback_that_carries_no_code(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    let config = app.github_config().await;
+    let (id, state) = app.start_connect(&config).await;
+
+    let back = finishes_with(&app, &format!("state={state}")).await;
+
+    assert!(back.to_str().unwrap().contains("status=failed"));
+    assert_consent_failed(&app, &id, "the provider sent no code").await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn fails_a_callback_that_came_after_the_consent_expired(pool: PgPool) {
+    let app = setup_test_context_with(pool, |config| {
+        config.settings.consent.ttl_seconds = 0;
+    })
+    .await;
+    let config = app.github_config().await;
+    let (id, state) = app.start_connect(&config).await;
+
+    let back = finishes_with(&app, &format!("state={state}&code=c")).await;
+
+    assert!(back.to_str().unwrap().contains("status=failed"));
+    assert_consent_failed(&app, &id, "the consent took too long").await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn fails_a_consent_whose_code_the_provider_refuses(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    MockGithubNetwork::on(&app.provider)
+        .answer_code_exchange_status(400, serde_json::json!({ "error": "bad_verification_code" }))
+        .await;
+    let config = app.github_config().await;
+    let (id, state) = app.start_connect(&config).await;
+
+    let back = finishes_with(&app, &format!("state={state}&code=c")).await;
+
+    assert!(back.to_str().unwrap().contains("status=failed"));
+    assert_consent_failed(&app, &id, "the provider refused the consent's code").await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn fails_a_consent_when_the_provider_cannot_be_reached(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    MockGithubNetwork::on(&app.provider)
+        .answer_code_exchange_status(503, serde_json::json!({}))
+        .await;
+    let config = app.github_config().await;
+    let (id, state) = app.start_connect(&config).await;
+
+    let back = finishes_with(&app, &format!("state={state}&code=c")).await;
+
+    assert!(back.to_str().unwrap().contains("status=failed"));
+    assert_consent_failed(&app, &id, "the provider could not be reached").await;
 }

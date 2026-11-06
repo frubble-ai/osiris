@@ -20,4 +20,6 @@ pub mod run_tasks;
 pub mod test_config;
 pub mod test_context;
 
-pub use test_context::{ADMIN_KEY, API_KEY, TestContext, WORKER_TOKEN, setup_test_context};
+pub use test_context::{
+    ADMIN_KEY, API_KEY, TestContext, WORKER_TOKEN, setup_test_context, setup_test_context_with,
+};

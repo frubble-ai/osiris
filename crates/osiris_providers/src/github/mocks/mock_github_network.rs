@@ -25,6 +25,16 @@ impl<'a> MockGithubNetwork<'a> {
             .await;
     }
 
+    /// The consent's code is refused: the exchange answers `status` with `answer`.
+    pub async fn answer_code_exchange_status(&self, status: u16, answer: Value) {
+        Mock::given(method("POST"))
+            .and(path("/login/oauth/access_token"))
+            .and(body_string_contains("grant_type=authorization_code"))
+            .respond_with(ResponseTemplate::new(status).set_body_json(answer))
+            .mount(self.server)
+            .await;
+    }
+
     /// A refresh answers `status` with `answer`.
     pub async fn answer_refresh(&self, status: u16, answer: Value) {
         Mock::given(method("POST"))
