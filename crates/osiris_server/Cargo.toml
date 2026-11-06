@@ -9,7 +9,6 @@ license.workspace = true
 workspace = true
 
 [dependencies]
-futures.workspace = true
 config.workspace = true
 osiris_env.workspace = true
 osiris_events.workspace = true
@@ -42,6 +41,7 @@ utoipa-axum.workspace = true
 
 [dev-dependencies]
 fake.workspace = true
+futures.workspace = true
 http-body-util = "0.1"
 osiris_providers = { workspace = true, features = ["testing"] }
 rstest.workspace = true

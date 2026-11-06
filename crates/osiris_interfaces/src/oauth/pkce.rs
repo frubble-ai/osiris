@@ -13,3 +13,6 @@ pub fn pkce_verifier() -> String {
 pub(super) fn pkce_challenge(verifier: &str) -> String {
     URL_SAFE_NO_PAD.encode(Sha256::digest(verifier.as_bytes()))
 }
+
+#[cfg(test)]
+mod tests;
