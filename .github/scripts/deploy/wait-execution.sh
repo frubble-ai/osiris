@@ -14,12 +14,26 @@ on_term() {
 }
 trap on_term TERM INT
 
-completion_time() {
-  gcloud run jobs executions describe "$execution" --project "$PROJECT" --region "$REGION" \
-    --format='value(status.completionTime)' || true
-}
-
-while [ -z "$(completion_time)" ]; do
+# A describe that keeps failing is not "still running". After a minute of
+# consecutive failures, stop instead of holding the concurrency group until
+# the job's own timeout.
+failures=0
+while true; do
+  completion=$(gcloud run jobs executions describe "$execution" --project "$PROJECT" --region "$REGION" \
+    --format='value(status.completionTime)') && status=0 || status=$?
+  if [ "$status" -ne 0 ]; then
+    failures=$((failures + 1))
+    if [ "$failures" -ge 12 ]; then
+      echo "::error::could not read execution $execution ($failures describe attempts failed)"
+      exit 1
+    fi
+    sleep 5
+    continue
+  fi
+  failures=0
+  if [ -n "$completion" ]; then
+    break
+  fi
   sleep 5
 done
 trap - TERM INT

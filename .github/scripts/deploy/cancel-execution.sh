@@ -13,9 +13,20 @@ execution=$(tr -d '[:space:]' < "$file")
 
 gcloud run jobs executions cancel "$execution" --project "$PROJECT" --region "$REGION" --quiet || true
 
+failures=0
 for _ in $(seq 1 60); do
   completion=$(gcloud run jobs executions describe "$execution" --project "$PROJECT" --region "$REGION" \
-    --format='value(status.completionTime)' || true)
+    --format='value(status.completionTime)') && status=0 || status=$?
+  if [ "$status" -ne 0 ]; then
+    failures=$((failures + 1))
+    if [ "$failures" -ge 12 ]; then
+      echo "::error::could not read execution $execution ($failures describe attempts failed)"
+      exit 1
+    fi
+    sleep 5
+    continue
+  fi
+  failures=0
   if [ -n "$completion" ]; then
     exit 0
   fi

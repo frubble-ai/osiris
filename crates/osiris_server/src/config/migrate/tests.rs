@@ -1,7 +1,26 @@
 //! Tests of `migrate`.
 
-use super::reset_requested;
+use super::{MigrateConfig, reset_requested};
+use crate::config::Settings;
 use rstest::rstest;
+
+const PEM: &str = "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----";
+
+fn from_vars(reset: Option<&str>, reset_database: Option<&str>) -> anyhow::Result<MigrateConfig> {
+    MigrateConfig::from_vars(
+        &|key| match key {
+            "DB_HOST" => Some("localhost".to_owned()),
+            "DB_PORT" => Some("5433".to_owned()),
+            "DB_NAME" | "DB_USER" => Some("osiris".to_owned()),
+            "DB_PASSWORD" => Some("secret".to_owned()),
+            "DB_CA_PEM" => Some(PEM.to_owned()),
+            "OSIRIS_MIGRATE_RESET" => reset.map(str::to_owned),
+            "OSIRIS_MIGRATE_RESET_DATABASE" => reset_database.map(str::to_owned),
+            _ => None,
+        },
+        &Settings::default(),
+    )
+}
 
 #[rstest]
 #[case::exact(Some("true"), true)]
@@ -30,4 +49,22 @@ fn reset_names_the_connected_database(
         super::require_reset_target(reset, target, connected).is_ok(),
         allowed
     );
+}
+
+#[rstest]
+#[case::matching(Some("true"), Some("osiris"), true)]
+#[case::missing_name(Some("true"), None, false)]
+#[case::not_resetting(None, None, true)]
+fn from_env_reads_the_reset_and_the_database_name(
+    #[case] reset: Option<&str>,
+    #[case] reset_database: Option<&str>,
+    #[case] allowed: bool,
+) {
+    let result = from_vars(reset, reset_database);
+    assert_eq!(result.is_ok(), allowed);
+    if let Ok(config) = result {
+        assert_eq!(config.reset, reset == Some("true"));
+        assert_eq!(config.reset_database.as_deref(), reset_database);
+        assert_eq!(config.database.name, "osiris");
+    }
 }

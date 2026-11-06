@@ -25,9 +25,18 @@ pub struct MigrateConfig {
 impl MigrateConfig {
     /// Reads `DB_*`, `OSIRIS_MIGRATE_RESET` and `OSIRIS_MIGRATE_RESET_DATABASE`.
     pub fn from_env(settings: &Settings) -> anyhow::Result<Self> {
-        let database = DatabaseConfig::from_env(settings)?;
-        let reset = reset_requested(super::env_vars::optional("OSIRIS_MIGRATE_RESET").as_deref());
-        let reset_database = super::env_vars::optional("OSIRIS_MIGRATE_RESET_DATABASE");
+        Self::from_vars(&super::env_vars::optional, settings)
+    }
+
+    /// Reads the variables through `lookup`, so tests can supply them without the process
+    /// environment.
+    pub fn from_vars(
+        lookup: &dyn Fn(&str) -> Option<String>,
+        settings: &Settings,
+    ) -> anyhow::Result<Self> {
+        let database = DatabaseConfig::from_vars(lookup, settings)?;
+        let reset = reset_requested(lookup("OSIRIS_MIGRATE_RESET").as_deref());
+        let reset_database = lookup("OSIRIS_MIGRATE_RESET_DATABASE");
         require_reset_target(reset, reset_database.as_deref(), &database.name)?;
         Ok(Self {
             database,
