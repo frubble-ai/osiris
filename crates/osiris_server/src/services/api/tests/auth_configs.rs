@@ -150,6 +150,23 @@ async fn refuses_a_blank_client_id_on_update(pool: PgPool) {
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_a_blank_client_secret_on_update(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    let id = app.github_config().await;
+    let answer = app
+        .send(
+            "PATCH",
+            &format!("/v1/auth-configs/{id}"),
+            Some(ADMIN_KEY),
+            Some(json!({ "client_secret": " " })),
+            &[],
+        )
+        .await;
+    assert_eq!(answer.status, StatusCode::BAD_REQUEST, "{}", answer.body);
+    assert_eq!(answer.body["error"]["code"], "OS_02");
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_a_callback_that_is_not_http(pool: PgPool) {
     answers_an_invalid_request_with_os_02(pool, "/v1/connected-accounts", API_KEY, |config| {
         let mut attempt = generate_connect_attempt(config);
