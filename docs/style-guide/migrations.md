@@ -13,3 +13,7 @@
 - Every query is `query!`/`query_as!`, checked at compile time against the schema; `.sqlx/` is
   committed so CI and the image build without a database. After a schema or query change:
   `just sqlx-prepare`.
+- A `DO` block and DDL (`CREATE`, `ALTER`, `DROP`) are `sqlx::query`. `query!` prepares the
+  statement, and PostgreSQL refuses `PREPARE` of both. An identifier cannot be a bind parameter
+  either. The reset's drop is the `DO` block in `crates/osiris_server/src/db.rs`. The test that
+  creates a role, to check the owner filter, is the DDL.

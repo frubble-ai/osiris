@@ -17,10 +17,19 @@ fi
 
 gcloud auth configure-docker "$registry" --quiet
 
-if gcloud artifacts docker images describe "$IMAGE" >/dev/null 2>&1; then
+# A failure that is not "the tag is absent" must stop the push. Treating every
+# error as a missing tag would push over an image a previous run already deployed.
+lookup=$(mktemp)
+trap 'rm -f "$lookup"' EXIT
+if gcloud artifacts docker images describe "$IMAGE" >/dev/null 2>"$lookup"; then
   echo "$IMAGE is already in the registry; scanning it instead of pushing"
   trivy image --severity CRITICAL --exit-code 1 "$IMAGE"
   exit 0
+fi
+if ! grep -qiE 'NOT_FOUND|not found' "$lookup"; then
+  echo "::error::could not tell whether $IMAGE is already in the registry"
+  cat "$lookup" >&2
+  exit 1
 fi
 
 docker load --input "$IMAGE_TAR"
