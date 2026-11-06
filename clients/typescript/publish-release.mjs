@@ -5,13 +5,13 @@ import { pathToFileURL } from "node:url";
 const channels = ["dev", "stg", "prd"];
 
 // A branch publishes <version>-<channel>.g<12 hex>. The g keeps an all-digit
-// commit id from being read as a numeric prerelease identifier. A v* tag
-// publishes that version on latest.
+// commit id from being read as a numeric prerelease identifier. A tag v1.2.3
+// publishes that version on latest. Anything after the patch number is refused.
 // Point a channel back at a known version with:
 // npm dist-tag add <name>@<version> <channel>
 export function releaseTarget({ refType, refName, sha, version }) {
 	if (refType === "tag") {
-		if (!/^v\d+\.\d+\.\d+/.test(refName)) {
+		if (!/^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(refName)) {
 			throw new Error(`release tag must look like v1.2.3, got ${refName}`);
 		}
 		return { version: refName.slice(1), tag: "latest", buildTag: "latest" };

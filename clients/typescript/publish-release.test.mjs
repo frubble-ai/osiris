@@ -33,6 +33,12 @@ test("a release tag publishes that version on latest", () => {
 	});
 });
 
+test("a tag that is not a plain release is refused", () => {
+	for (const refName of ["v1.2.3garbage", "v1.2.3.4", "v1.2.3-rc.1", "v01.2.3"]) {
+		assert.throws(() => releaseTarget({ refType: "tag", refName, sha, version: "0.1.0" }), /v1\.2\.3/);
+	}
+});
+
 test("any other ref is refused", () => {
 	assert.throws(() => releaseTarget({ refType: "branch", refName: "feature", sha, version: "0.1.0" }), /feature/);
 });
