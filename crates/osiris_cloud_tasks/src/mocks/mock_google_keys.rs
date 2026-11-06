@@ -64,3 +64,11 @@ pub async fn answer_google_keys(server: &MockServer, signers: &[&MockGoogleSigne
         .mount(server)
         .await;
 }
+
+/// Makes the server fail every request for the keys.
+pub async fn answer_google_keys_down(server: &MockServer) {
+    Mock::given(method("GET"))
+        .respond_with(ResponseTemplate::new(503))
+        .mount(server)
+        .await;
+}

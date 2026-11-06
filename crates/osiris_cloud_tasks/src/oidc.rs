@@ -3,7 +3,7 @@
 //! checked against Google's published keys, then its issuer, audience, expiry and service account.
 //! The keys are cached for `keys_ttl`. A token naming a key not in the cache fetches them again, but
 //! at most once per `refetch_interval`, and one fetch at a time, so a caller sending made-up key ids
-//! can't make osiris call Google on every request.
+//! can't make osiris call Google on every request. A fetch that fails counts too.
 
 use async_trait::async_trait;
 use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode, decode_header, jwk::JwkSet};
@@ -34,8 +34,9 @@ pub struct OidcAuthenticator {
     config: OidcConfig,
     http: reqwest::Client,
     keys: RwLock<Option<(JwkSet, Instant)>>,
-    /// Held while the keys are fetched, so concurrent callers wait for one fetch.
-    fetching: Mutex<()>,
+    /// Held while the keys are fetched, so concurrent callers wait for one fetch. It holds when
+    /// the last fetch was tried, whether or not it worked.
+    fetching: Mutex<Option<Instant>>,
 }
 
 #[derive(Deserialize)]
@@ -50,7 +51,7 @@ impl OidcAuthenticator {
             config,
             http,
             keys: RwLock::new(None),
-            fetching: Mutex::new(()),
+            fetching: Mutex::new(None),
         }
     }
 
@@ -74,11 +75,15 @@ impl OidcAuthenticator {
         if let Some(key) = self.cached(kid).await? {
             return Ok(key);
         }
-        let _fetching = self.fetching.lock().await;
+        let mut last_attempt = self.fetching.lock().await;
         // Another caller may have fetched while this one waited.
         if let Some(key) = self.cached(kid).await? {
             return Ok(key);
         }
+        if last_attempt.is_some_and(|at| at.elapsed() < self.config.refetch_interval) {
+            return Err(AuthError::new("Google's keys were fetched a moment ago"));
+        }
+        *last_attempt = Some(Instant::now());
         let keys = self.fetch_keys().await?;
         let jwk = keys
             .find(kid)

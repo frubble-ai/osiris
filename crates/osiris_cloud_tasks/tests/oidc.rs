@@ -10,7 +10,9 @@
 
 use osiris_cloud_tasks::{
     OidcAuthenticator, OidcConfig,
-    mocks::mock_google_keys::{MockGoogleSigner as Signer, answer_google_keys},
+    mocks::mock_google_keys::{
+        MockGoogleSigner as Signer, answer_google_keys, answer_google_keys_down,
+    },
 };
 use osiris_tasks::TaskAuthenticator;
 use rstest::rstest;
@@ -108,6 +110,32 @@ async fn fetches_google_s_keys_once_however_many_unknown_key_ids_it_is_sent() {
     auth.authenticate(Some(&google.token(&claims(&[]))))
         .await
         .unwrap();
+
+    assert_eq!(server.received_requests().await.unwrap().len(), 1);
+}
+
+#[tokio::test]
+async fn calls_google_once_however_many_tokens_arrive_while_its_keys_are_down() {
+    let server = MockServer::start().await;
+    answer_google_keys_down(&server).await;
+    let auth = OidcAuthenticator::new(
+        OidcConfig {
+            keys_url: server.uri(),
+            audience: AUDIENCE.into(),
+            service_account_email: ACCOUNT.into(),
+            keys_ttl: Duration::from_secs(3600),
+            refetch_interval: Duration::from_secs(30),
+        },
+        reqwest::Client::new(),
+    );
+
+    for kid in ["k1", "k2", "k3", "k4"] {
+        assert!(
+            auth.authenticate(Some(&Signer::new(kid).token(&claims(&[]))))
+                .await
+                .is_err()
+        );
+    }
 
     assert_eq!(server.received_requests().await.unwrap().len(), 1);
 }
