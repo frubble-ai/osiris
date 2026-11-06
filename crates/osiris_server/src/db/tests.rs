@@ -248,6 +248,73 @@ async fn migrate_refuses_a_reset_without_a_database_name(pool: PgPool) {
     refuse_reset(&pool, None).await;
 }
 
+#[sqlx::test(migrator = "MIGRATOR")]
+async fn a_second_migrate_does_not_drop_while_the_first_holds_the_lock(pool: PgPool) {
+    let name = sqlx::query_scalar!(r#"SELECT current_database()::text AS "name!" "#)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    execute(
+        &pool,
+        "CREATE TABLE public.reset_marker (id int PRIMARY KEY)",
+    )
+    .await;
+    let config = migrate_config(&name, true);
+    let held = super::exclude::MigrateExclusion::acquire(&config.database)
+        .await
+        .unwrap();
+
+    let waiting = config.clone();
+    let started = std::thread::spawn(move || {
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        runtime.block_on(migrate(&waiting))
+    });
+
+    let deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(10);
+    loop {
+        let blocked = sqlx::query_scalar!(
+            r#"SELECT count(*) AS "count!" FROM pg_locks
+               WHERE locktype = 'advisory'
+                 AND classid::int4 = $1
+                 AND objid::int4 = $2
+                 AND NOT granted"#,
+            super::exclude::LOCK_CLASS,
+            super::exclude::LOCK_OBJECT,
+        )
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+        if blocked >= 1 {
+            break;
+        }
+        assert!(
+            tokio::time::Instant::now() < deadline,
+            "the second migrate did not wait on the lock"
+        );
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+    }
+    assert!(
+        !started.is_finished(),
+        "the second migrate finished while the lock was held"
+    );
+    assert_eq!(
+        marker_tables(&pool).await,
+        1,
+        "the second migrate has not dropped yet"
+    );
+
+    drop(held);
+    started.join().unwrap().unwrap();
+    assert_eq!(
+        marker_tables(&pool).await,
+        0,
+        "the second migrate drops once the lock is released"
+    );
+}
+
 async fn refuse_reset(pool: &PgPool, reset_database: Option<String>) {
     let name = sqlx::query_scalar!(r#"SELECT current_database()::text AS "name!" "#)
         .fetch_one(pool)

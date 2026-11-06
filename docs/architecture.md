@@ -72,7 +72,7 @@ the two services onto it after the migrate job ([configuration](configuration.md
 | --- | --- | --- |
 | `serve` | Cloud Run service, public, scales to zero | the API at `/v1` and the OAuth callback |
 | `worker` | Cloud Run service, internal, scales to zero | `POST /tasks`: runs each scheduled task the task scheduler sends |
-| `migrate` | Cloud Run job, once per deploy | applies the migrations, then exits. `OSIRIS_MIGRATE_RESET=true` (the [reset workflow](configuration.md#resetting-the-database)) drops this user's tables and enums in `public` first |
+| `migrate` | Cloud Run job, once per deploy | applies the migrations, then exits, holding an advisory lock until it does, so a second execution waits. `OSIRIS_MIGRATE_RESET=true` (the [reset workflow](configuration.md#resetting-the-database)) drops this user's tables and enums in `public` first |
 
 Configuration comes from environment variables ([configuration](configuration.md)). The database
 connection is built from `DB_*` and always uses TLS, verified against `DB_CA_PEM`. Both services

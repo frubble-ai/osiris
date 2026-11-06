@@ -5,6 +5,7 @@
 mod apply;
 mod connect;
 mod drop_owned;
+mod exclude;
 mod migrate;
 
 pub use connect::connect;

@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Runs when the job is cancelled, including by timeout-minutes. The step that
 # was waiting may already have been killed, so this repeats the cancel and
-# does not return until the execution has stopped. The concurrency group stays
-# held until then. A failed cancel or a failed status read is retried: leaving
-# this step while the execution might still be running would let the next
-# deploy or reset start against it.
+# waits until the execution has stopped. GitHub kills this step five minutes
+# after the cancellation, so the loop cannot hold the concurrency group past
+# that. The migrate process holds a session advisory lock until it exits, and
+# a second execution waits on that lock. A failed cancel or a failed status
+# read is retried for as long as this step is allowed to run.
 set -euo pipefail
 : "${PROJECT:?}" "${REGION:?}" "${RUNNER_TEMP:?}"
 
