@@ -1,5 +1,5 @@
 use anyhow::Context;
-use sqlx::PgPool;
+use sqlx::postgres::PgConnection;
 
 /// Tables and enums this database user owns in `public`. A reset drops only those, so a
 /// relation someone else created stays. `_sqlx_migrations` is one of the tables, and the
@@ -32,12 +32,12 @@ END
 $$;
 ";
 
-pub(crate) async fn drop_owned(pool: &PgPool) -> anyhow::Result<()> {
+pub(crate) async fn drop_owned(connection: &mut PgConnection) -> anyhow::Result<()> {
     tracing::warn!(
         "osiris migrate reset: dropping the tables and types this database user owns in public"
     );
     sqlx::query(DROP_OWNED_SQL)
-        .execute(pool)
+        .execute(&mut *connection)
         .await
         .context("dropping the database's tables and types")?;
     Ok(())

@@ -111,10 +111,12 @@ same CA. Osiris does not read it.
   also checks each task's OIDC token (Google's signature, the issuer, `CLOUD_TASKS_AUDIENCE`,
   `CLOUD_TASKS_SERVICE_ACCOUNT`).
 - `migrate`: a Cloud Run job with `OSIRIS_PROCESS=migrate`, run once per deploy before the
-  services. The process takes a session advisory lock on a connection it keeps open until it
-  exits, and a second execution waits for that lock before it drops or migrates. GitHub kills a
-  cancelled job's cleanup after five minutes, which releases the workflow's concurrency group;
-  the lock is what still keeps the next execution off the schema while the earlier one is running.
+  services. The process takes a session advisory lock and runs the drop and the migrations on
+  that same connection, which it keeps open until it exits. A second execution waits for the
+  lock before it drops or migrates. If PostgreSQL closes the session, the lock and the work
+  stop together. GitHub kills a cancelled job's cleanup after five minutes, which releases the
+  workflow's concurrency group; the lock is what still keeps the next execution off the schema
+  while the earlier one is running.
 - The database: the `DB_*` variables, `DB_PASSWORD` from Secret Manager and `DB_CA_PEM` the Cloud
   SQL instance's server CA certificate.
 - One Cloud Tasks queue (`CLOUD_TASKS_QUEUE`). The service accounts of `serve` and `worker` have

@@ -1,4 +1,4 @@
-use super::{apply, connect, drop_owned, exclude::MigrateExclusion};
+use super::{apply, drop_owned, exclude::MigrateExclusion};
 use crate::config::MigrateConfig;
 use anyhow::Context;
 
@@ -6,13 +6,15 @@ use anyhow::Context;
 /// first, so the migrations run on an empty database. Already applied ones are skipped when
 /// not resetting.
 ///
-/// The exclusion is held before anything is dropped or applied, and until this function
-/// returns. A second execution blocks on it instead of changing the schema at the same time.
+/// The exclusion is acquired before anything is dropped or applied, and the drop and the
+/// migrations run on the connection that holds it. A second execution blocks on the lock
+/// instead of changing the schema at the same time. If that session closes, the work stops
+/// with the lock.
 pub async fn migrate(config: &MigrateConfig) -> anyhow::Result<()> {
-    let pool = connect(&config.database).await?;
+    let mut exclusion = MigrateExclusion::acquire(&config.database).await?;
     if config.reset {
         let connected = sqlx::query_scalar!(r#"SELECT current_database()::text AS "name!" "#)
-            .fetch_one(&pool)
+            .fetch_one(&mut *exclusion.connection())
             .await
             .context("reading the connected database")?;
         crate::config::migrate::require_reset_target(
@@ -20,10 +22,7 @@ pub async fn migrate(config: &MigrateConfig) -> anyhow::Result<()> {
             config.reset_database.as_deref(),
             &connected,
         )?;
+        drop_owned(&mut *exclusion.connection()).await?;
     }
-    let _exclusion = MigrateExclusion::acquire(&config.database).await?;
-    if config.reset {
-        drop_owned(&pool).await?;
-    }
-    apply::apply(&pool).await
+    apply::apply(exclusion.connection()).await
 }

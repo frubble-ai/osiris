@@ -141,7 +141,8 @@ async fn reset_drops_tables_and_enums_this_user_owns(pool: PgPool) {
     )
     .await;
 
-    drop_owned(&pool).await.unwrap();
+    let mut connection = pool.acquire().await.unwrap();
+    drop_owned(&mut connection).await.unwrap();
 
     let owned_tables = sqlx::query_scalar!(
         r#"SELECT count(*) AS "count!" FROM pg_tables WHERE schemaname = 'public' AND tableowner = current_user"#
@@ -312,6 +313,86 @@ async fn a_second_migrate_does_not_drop_while_the_first_holds_the_lock(pool: PgP
         marker_tables(&pool).await,
         0,
         "the second migrate drops once the lock is released"
+    );
+}
+
+#[sqlx::test(migrator = "MIGRATOR")]
+async fn closing_the_lock_session_stops_the_drop(pool: PgPool) {
+    let name = sqlx::query_scalar!(r#"SELECT current_database()::text AS "name!" "#)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    execute(
+        &pool,
+        "CREATE TABLE public.reset_marker (id int PRIMARY KEY)",
+    )
+    .await;
+
+    // Holds the table the reset has to drop, so that reset blocks inside its drop
+    // instead of finishing. LOCK is not a statement query! can prepare.
+    let mut held = pool.begin().await.unwrap();
+    sqlx::query("LOCK TABLE public.reset_marker IN ACCESS EXCLUSIVE MODE")
+        .execute(&mut *held)
+        .await
+        .unwrap();
+
+    let config = migrate_config(&name, true);
+    let resetting = config.clone();
+    let started = std::thread::spawn(move || {
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        runtime.block_on(migrate(&resetting))
+    });
+
+    let deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(10);
+    let pid = loop {
+        let waiting = sqlx::query_scalar!(
+            r#"SELECT pid AS "pid!" FROM pg_stat_activity
+               WHERE datname = current_database()
+                 AND pid <> pg_backend_pid()
+                 AND wait_event_type = 'Lock'
+               LIMIT 1"#
+        )
+        .fetch_optional(&pool)
+        .await
+        .unwrap();
+        if let Some(pid) = waiting {
+            break pid;
+        }
+        assert!(
+            tokio::time::Instant::now() < deadline,
+            "the reset did not block on the held table"
+        );
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+    };
+
+    let terminated =
+        sqlx::query_scalar!(r#"SELECT pg_terminate_backend($1) AS "terminated!""#, pid)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert!(terminated, "pg_terminate_backend refused pid {pid}");
+
+    let error = started.join().unwrap().unwrap_err();
+    let message = format!("{error:#}");
+    assert!(
+        !message.is_empty(),
+        "closing the session must fail the reset"
+    );
+
+    held.rollback().await.unwrap();
+    assert_eq!(
+        marker_tables(&pool).await,
+        1,
+        "the drop rolled back with the session"
+    );
+    migrate(&config).await.unwrap();
+    assert_eq!(
+        marker_tables(&pool).await,
+        0,
+        "a later reset can drop once that session is gone"
     );
 }
 

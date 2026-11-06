@@ -1,10 +1,10 @@
 use super::MIGRATOR;
 use anyhow::Context;
-use sqlx::PgPool;
+use sqlx::postgres::PgConnection;
 
-pub(super) async fn apply(pool: &PgPool) -> anyhow::Result<()> {
+pub(super) async fn apply(connection: &mut PgConnection) -> anyhow::Result<()> {
     MIGRATOR
-        .run(pool)
+        .run(&mut *connection)
         .await
         .context("applying the migrations")?;
     tracing::info!("migrations applied");

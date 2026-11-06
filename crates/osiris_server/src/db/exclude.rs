@@ -6,10 +6,11 @@
 //! that runner: the next execution waits here before it drops or migrates, and the lock
 //! goes when this process does.
 //!
-//! sqlx takes its own advisory lock, one bigint derived from the database name, on whatever
-//! connection applies the migrations, and releases it when that is done. This one uses the
-//! two-integer form, which is a different lock, and it is held on a connection that does
-//! nothing else, so the two cannot block each other.
+//! The drop and the migrations run on this same connection. If PostgreSQL closes the session,
+//! the lock is released and that work stops with it; nothing carries on through another
+//! connection. sqlx takes its own advisory lock on this connection while it applies the
+//! migrations and releases that lock when it finishes. This one uses the two-integer form,
+//! a different lock, and stays until the connection closes.
 
 use crate::config::DatabaseConfig;
 use anyhow::Context;
@@ -21,11 +22,9 @@ pub(crate) const LOCK_CLASS: i32 = 0x0515_1501;
 /// Second key. The pair is the whole lock; the value only has to stay stable.
 pub(crate) const LOCK_OBJECT: i32 = 1;
 
-/// The open connection that holds the lock. Dropping it closes the session, which
-/// releases the lock, including when the migration fails.
+/// The open connection that holds the lock. The drop and the migrations run on it.
+/// Dropping it closes the session, which releases the lock and stops that work.
 pub(crate) struct MigrateExclusion {
-    /// Kept so the session, and the lock, stay open until this value is dropped.
-    #[allow(dead_code, reason = "holding the connection is what holds the lock")]
     connection: PgConnection,
 }
 
@@ -58,5 +57,11 @@ impl MigrateExclusion {
             .await
             .context("waiting for the other migrate execution to finish")?;
         Ok(Self { connection })
+    }
+
+    /// The session that holds the lock. Schema changes go through here, so they cannot
+    /// outlive the lock.
+    pub(crate) fn connection(&mut self) -> &mut PgConnection {
+        &mut self.connection
     }
 }
