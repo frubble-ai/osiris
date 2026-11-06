@@ -12,7 +12,7 @@
 )]
 
 use base64::{Engine, engine::general_purpose::STANDARD};
-use fake::{Fake, faker::lorem::en::Word};
+use fake::Fake;
 use google_cloud_pubsub::client::SubscriptionAdmin;
 use osiris_events::{Message, MessageBus, testing::generate_event_message::generate_event_message};
 use osiris_pubsub::{
@@ -83,7 +83,11 @@ async fn forwards_a_published_event_as_a_push_and_removes_its_subscription() {
     let endpoint = MockServer::start().await;
     let push_endpoint = MockPushEndpoint::on(&endpoint);
     push_endpoint.answer_push(204).await;
-    let suffix = format!("test-{}", Word().fake::<String>());
+    let suffix = format!(
+        "test-{}",
+        16.fake::<String>()
+            .replace(|character: char| !character.is_ascii_alphanumeric(), "x")
+    );
     let subscription = format!(
         "projects/{}/subscriptions/osiris-cli-{suffix}",
         config.project
@@ -114,21 +118,34 @@ async fn forwards_a_published_event_as_a_push_and_removes_its_subscription() {
     let event = generate_event_message();
     bus.send(Message::Event(event.clone())).await.unwrap();
 
-    let (event_type, answer) = tokio::time::timeout(LONG_ENOUGH, listening.forwards.recv())
-        .await
-        .expect("the event is forwarded")
-        .unwrap();
-    assert_eq!(answer, Ok(204));
-    assert_eq!(event_type, event.event_type.as_str());
-    let pushes = endpoint.received_requests().await.unwrap();
-    let push: serde_json::Value = serde_json::from_slice(&pushes[0].body).unwrap();
-    assert_eq!(push["subscription"], subscription);
-    let data = STANDARD
-        .decode(push["message"]["data"].as_str().unwrap())
-        .unwrap();
-    assert!(
-        String::from_utf8_lossy(&data).contains(&event.connected_account_id),
-        "the push carries the event"
+    // The topic is shared, so other events may be forwarded too: wait for the one published here.
+    let ours = tokio::time::timeout(LONG_ENOUGH, async {
+        loop {
+            let (_, answer) = listening
+                .forwards
+                .recv()
+                .await
+                .expect("an event is forwarded");
+            assert_eq!(answer, Ok(204));
+            let pushes = endpoint.received_requests().await.unwrap();
+            let found = pushes.iter().find_map(|request| {
+                let push: serde_json::Value = serde_json::from_slice(&request.body).ok()?;
+                let data = STANDARD.decode(push["message"]["data"].as_str()?).ok()?;
+                String::from_utf8_lossy(&data)
+                    .contains(&event.event_id)
+                    .then_some(push)
+            });
+            if let Some(push) = found {
+                return push;
+            }
+        }
+    })
+    .await
+    .expect("the published event is forwarded");
+    assert_eq!(ours["subscription"], subscription);
+    assert_eq!(
+        ours["message"]["attributes"]["type"],
+        event.event_type.as_str()
     );
 
     listening.stop.send(()).unwrap();

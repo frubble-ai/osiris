@@ -186,13 +186,23 @@ async fn finishes_a_keyed_request_its_caller_gave_up_on(pool: PgPool) {
     let path = format!("/v1/connected-accounts/{id}");
     let key = [("idempotency-key", "k1")];
 
-    // The caller gives up while the provider is still answering.
-    let gave_up = tokio::time::timeout(
-        Duration::from_millis(50),
-        app.send("DELETE", &path, Some(API_KEY), None, &key),
-    )
-    .await;
-    assert!(gave_up.is_err(), "the caller was cut off");
+    // The caller gives up once the provider has the call and is still answering.
+    let provider_has_the_call = async {
+        while !app
+            .provider
+            .received_requests()
+            .await
+            .unwrap()
+            .iter()
+            .any(|request| request.method == wiremock::http::Method::DELETE)
+        {
+            tokio::task::yield_now().await;
+        }
+    };
+    tokio::select! {
+        _ = app.send("DELETE", &path, Some(API_KEY), None, &key) => panic!("the caller was not cut off"),
+        () = provider_has_the_call => {}
+    }
 
     // The request still finishes, so the retry is replayed, never left answering "in flight".
     let retry = tokio::time::timeout(Duration::from_secs(10), async {
