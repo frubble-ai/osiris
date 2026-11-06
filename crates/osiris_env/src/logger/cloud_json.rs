@@ -101,4 +101,6 @@ impl Visit for Fields<'_> {
 }
 
 #[cfg(test)]
+mod mocks;
+#[cfg(test)]
 mod tests;

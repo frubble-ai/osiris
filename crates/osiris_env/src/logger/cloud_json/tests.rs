@@ -1,40 +1,12 @@
 //! Tests of `cloud_json`.
 
+use super::mocks::mock_log_buffer::MockLogBuffer;
 use super::*;
-use std::{
-    io,
-    sync::{Arc, Mutex, PoisonError},
-};
-use tracing_subscriber::fmt::{MakeWriter, format::JsonFields};
-
-#[derive(Clone, Default)]
-struct Buffer(Arc<Mutex<Vec<u8>>>);
-
-impl io::Write for Buffer {
-    fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
-        self.0
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .extend_from_slice(bytes);
-        Ok(bytes.len())
-    }
-
-    fn flush(&mut self) -> io::Result<()> {
-        Ok(())
-    }
-}
-
-impl<'a> MakeWriter<'a> for Buffer {
-    type Writer = Self;
-
-    fn make_writer(&'a self) -> Self::Writer {
-        self.clone()
-    }
-}
+use tracing_subscriber::fmt::format::JsonFields;
 
 #[test]
 fn writes_one_json_line_per_event_with_its_cloud_logging_severity() {
-    let buffer = Buffer::default();
+    let buffer = MockLogBuffer::default();
     let subscriber = tracing_subscriber::fmt()
         .with_writer(buffer.clone())
         .fmt_fields(JsonFields::new())
@@ -47,14 +19,7 @@ fn writes_one_json_line_per_event_with_its_cloud_logging_severity() {
         tracing::warn!("slow");
         tracing::error!(attempt = 3_u64, "failed");
     });
-    let text = String::from_utf8(
-        buffer
-            .0
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .clone(),
-    )
-    .unwrap_or_default();
+    let text = buffer.text();
     let lines: Vec<Value> = text
         .lines()
         .map(|line| serde_json::from_str(line).unwrap_or(Value::Null))

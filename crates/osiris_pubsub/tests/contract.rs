@@ -4,22 +4,11 @@
 
 #![allow(clippy::print_stderr, reason = "a skip is reported on stderr")]
 
-use async_trait::async_trait;
-use osiris_events::{
-    Transport,
-    testing::{TransportHarness, transport_contract},
+use osiris_events::testing::transport_contract;
+use osiris_pubsub::{
+    PubSubConfig, PubSubTransport, mocks::mock_emulator_harness::MockEmulatorHarness,
 };
-use osiris_pubsub::{PubSubConfig, PubSubTransport};
 use std::sync::Arc;
-
-struct Emulator(Arc<PubSubTransport>);
-
-#[async_trait]
-impl TransportHarness for Emulator {
-    fn transport(&self) -> Arc<dyn Transport> {
-        self.0.clone()
-    }
-}
 
 #[tokio::test]
 async fn the_pubsub_transport_keeps_the_contract() {
@@ -41,5 +30,5 @@ async fn the_pubsub_transport_keeps_the_contract() {
     })
     .await
     .expect("the emulator answers");
-    transport_contract(&Emulator(Arc::new(transport))).await;
+    transport_contract(&MockEmulatorHarness(Arc::new(transport))).await;
 }

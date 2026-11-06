@@ -7,4 +7,6 @@ pub mod local;
 pub mod memory;
 
 #[cfg(test)]
+mod mocks;
+#[cfg(test)]
 mod tests;

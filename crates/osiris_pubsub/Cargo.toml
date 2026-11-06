@@ -23,7 +23,7 @@ tokio.workspace = true
 
 [features]
 # The endpoint `osiris listen` forwards to, faked at the network (`mocks`), for tests.
-testing = ["dep:wiremock"]
+testing = ["dep:wiremock", "osiris_events/testing"]
 
 [dev-dependencies]
 osiris_pubsub = { workspace = true, features = ["testing"] }
