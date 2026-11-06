@@ -42,20 +42,18 @@ impl MigrateExclusion {
 
         // A server `lock_timeout` or `statement_timeout` would abort the wait and let this
         // execution proceed while the other is still changing the schema. This session
-        // waits until the lock is free. `set_config` and `pg_advisory_lock` are `sqlx::query`:
-        // the first returns text we do not read, and the second returns void, which `query!`
-        // cannot describe.
-        sqlx::query(
-            "SELECT set_config('lock_timeout', '0', false), \
-             set_config('statement_timeout', '0', false)",
+        // waits until the lock is free.
+        sqlx::query!(
+            "SELECT set_config('lock_timeout', '0', false) AS lock_timeout, \
+                    set_config('statement_timeout', '0', false) AS statement_timeout"
         )
-        .execute(&mut connection)
+        .fetch_one(&mut connection)
         .await
         .context("disabling the lock and statement timeouts on the migrate lock")?;
         tracing::info!("taking the migrate lock");
-        sqlx::query("SELECT pg_advisory_lock($1, $2)")
-            .bind(LOCK_CLASS)
-            .bind(LOCK_OBJECT)
+        // `pg_advisory_lock` returns void. sqlx describes that as an empty row, so `query!`
+        // checks it and `execute` does not read a value.
+        sqlx::query!("SELECT pg_advisory_lock($1, $2)", LOCK_CLASS, LOCK_OBJECT)
             .execute(&mut connection)
             .await
             .context("waiting for the other migrate execution to finish")?;
