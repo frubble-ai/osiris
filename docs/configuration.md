@@ -120,3 +120,39 @@ same CA. Osiris does not read it.
   `roles/pubsub.publisher` on it.
 - The image is built with `--build-arg OSIRIS_COMMIT=<commit>`, which `/health` reports, and runs
   with `LOG_FORMAT=json`.
+
+## Continuous deployment
+
+[`.github/workflows/osiris-cd.yml`](../.github/workflows/osiris-cd.yml) builds that image and rolls
+dev or stg onto it. The file name is part of the deploy trust in the platform repository
+(`osiris-cd.yml` in `osiris-dev` from any branch, and in `osiris-stg` from `stg` only). Renaming
+the file stops the Google sign-in.
+
+| Trigger | Environment | Deploys |
+| --- | --- | --- |
+| Push to `dev` that changes the image, the migrations or this workflow | `osiris-dev` | that commit to dev |
+| A run by hand from any branch except `stg` and `prd` | `osiris-dev` | that branch to dev |
+| Push to `stg`, or a run by hand from `stg` | `osiris-stg` | that commit to stg |
+| A tag, or a run from `prd` | refused | |
+
+The repository variable `OSIRIS_CD_ENABLED` must be `true`, or every job is skipped. One rollout
+runs at a time per environment; further runs wait. While the repository variable `STG_ENABLED` is
+exactly `false` (kept in step with the same variable on frubble-ai/platform), a run on `stg` is
+skipped.
+
+The deploy job signs in with Workload Identity as `GCP_DEPLOY_HUB`, then impersonates
+`GCP_DEPLOY_SPOKE`. It pushes `frubble-osiris:<commit>` to `GCP_REGISTRY`, executes
+`GCP_RUN_JOB_MIGRATE` on that image, then rolls `GCP_RUN_SERVICE` (serve) and
+`GCP_RUN_SERVICE_WORKER`. Each service and the job already have `OSIRIS_PROCESS`, so the deploy
+changes the image only. Serve is checked at `https://osiris.<env>.frubble.ai/health`, which
+answers the commit. The worker is internal; its revision must be ready and hold the traffic.
+
+`GCP_WIF_PROVIDER` and `GCP_WIF_AUDIENCE` are read from `vars` (the environment, or the repository
+when the environment leaves them unset). The other `GCP_*` names above are variables on
+`osiris-dev` and `osiris-stg`, the same names `backend-dev` uses, with osiris's own values from
+the platform outputs. Authentication is Workload Identity. The database password and the keys stay
+in Secret Manager, mounted by Terraform.
+
+The image already runs on Cloud Run. The Dockerfile's entrypoint is the binary, Cloud Run's
+`PORT` is 8080, and `/health` is the startup and liveness probe. The deploy sets nothing else
+about how the process starts.

@@ -1,0 +1,7 @@
+# actionlint 1.7.12 has no `concurrency.queue` in its schema. GitHub accepts
+# `queue: max` (workflow syntax, concurrency), and frubble-ai/app's backend-cd
+# sets it so a pending dev deploy is not cancelled by a later branch run.
+paths:
+  .github/workflows/osiris-cd.yml:
+    ignore:
+      - 'unexpected key "queue" for "concurrency" section'

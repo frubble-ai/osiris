@@ -63,6 +63,8 @@ Each implementation runs the same contract test ([third-party integrations](styl
 ## Processes
 
 One image runs every process; `OSIRIS_PROCESS` chooses which.
+[`.github/workflows/osiris-cd.yml`](../.github/workflows/osiris-cd.yml) builds that image and rolls
+the two services onto it after the migrate job ([configuration](configuration.md#continuous-deployment)).
 
 | `OSIRIS_PROCESS` | Runs as | Does |
 | --- | --- | --- |
