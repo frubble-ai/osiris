@@ -3,6 +3,8 @@
 
 pub mod api_client;
 pub mod error_from_answer;
+#[cfg(test)]
+pub mod mocks;
 pub mod print;
 
 pub use api_client::{Client, Key};

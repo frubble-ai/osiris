@@ -5,7 +5,7 @@ use crate::{
     profile,
 };
 
-use super::choose_auth_config::choose_auth_config;
+use super::{choose_auth_config::choose_auth_config, default_callback_url::default_callback_url};
 use anyhow::Context;
 use clap::Args;
 use reqwest::Method;
@@ -20,9 +20,9 @@ pub struct Connect {
     user: String,
     #[arg(long)]
     auth_config: Option<String>,
-    /// Where the browser goes after the consent.
-    #[arg(long, default_value = "http://localhost:8090/health")]
-    callback_url: String,
+    /// Where the browser goes after the consent. Left out, it is the profile's osiris `/health`.
+    #[arg(long)]
+    callback_url: Option<String>,
     /// Print the consent URL without opening it.
     #[arg(long)]
     no_browser: bool,
@@ -30,7 +30,11 @@ pub struct Connect {
 
 impl Connect {
     pub async fn run(self) -> anyhow::Result<()> {
-        let client = Client::new(profile::load()?);
+        let profile = profile::load()?;
+        let callback_url = self
+            .callback_url
+            .unwrap_or_else(|| default_callback_url(&profile.url));
+        let client = Client::new(profile);
         let auth_config = if let Some(id) = self.auth_config {
             id
         } else {
@@ -45,7 +49,7 @@ impl Connect {
                 .await?;
             choose_auth_config(&self.provider, &configs)?
         };
-        let body = json!({ "auth_config_id": auth_config, "user_id": self.user, "callback_url": self.callback_url });
+        let body = json!({ "auth_config_id": auth_config, "user_id": self.user, "callback_url": callback_url });
         let created = client
             .call(
                 Key::Api,

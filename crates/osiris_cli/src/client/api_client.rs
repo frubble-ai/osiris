@@ -73,3 +73,6 @@ impl Client {
         })
     }
 }
+
+#[cfg(test)]
+mod tests;

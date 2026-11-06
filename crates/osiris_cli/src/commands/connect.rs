@@ -3,5 +3,6 @@
 
 pub mod choose_auth_config;
 pub mod command;
+pub mod default_callback_url;
 
 pub use command::Connect;
