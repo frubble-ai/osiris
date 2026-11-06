@@ -1,14 +1,8 @@
 name: Client
 
-# The TypeScript client's own build and publish. The Cloud Run deploy does not publish it.
-#
-# A push to `dev`, `stg` or `prd` publishes a prerelease of this commit on the dist-tag of that
-# name (`npm install @frubble-ai/osiris-client@dev`). A release tag `v1.2.3` publishes that
-# version on `latest`. A branch publish never moves `latest`: npm refuses a prerelease without
-# an explicit tag, and the tag passed here is the branch name.
-#
-# `stg` and `prd` publish once those branches exist. Install from GitHub Packages with
-# `@frubble-ai:registry=https://npm.pkg.github.com` in `.npmrc`.
+# The TypeScript client (clients/typescript): its generated code matches the committed spec and
+# it builds. A push to dev, stg or prd publishes a prerelease on that dist-tag. A release tag
+# (`v1.2.3`) publishes that version on latest.
 on:
   pull_request:
     paths: ["api-reference/**", "clients/typescript/**", ".github/workflows/client.yml"]
@@ -21,7 +15,7 @@ permissions:
 
 jobs:
   # Pull requests and branch pushes: read-only, with no credentials left behind for npm's
-  # install scripts. A release tag is published by the job below, which checks again itself.
+  # install scripts.
   client:
     name: TypeScript client
     if: "!startsWith(github.ref, 'refs/tags/v')"
@@ -42,7 +36,7 @@ jobs:
       - name: The generated code matches the spec, and it builds
         run: npm run check && npm run build
 
-  # The only job that may publish. Branch channels and a release tag are separate publishes.
+  # dev, stg, prd, or a release tag.
   publish:
     name: Publish the TypeScript client
     if: >-
