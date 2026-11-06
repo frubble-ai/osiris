@@ -21,6 +21,10 @@ pub struct Update {
 }
 
 impl Update {
+    fn path(&self) -> String {
+        format!("/v1/auth-configs/{}", self.id)
+    }
+
     /// Only what was given: a flag left out leaves the app's value as it is, and no `--scope` leaves
     /// its scopes alone instead of emptying them.
     fn body(&self) -> Value {
@@ -38,10 +42,15 @@ impl Update {
     }
 
     pub async fn run(self) -> anyhow::Result<()> {
-        let path = format!("/v1/auth-configs/{}", self.id);
         print(
             &Client::new(profile::load()?)
-                .call(Key::Admin, Method::PATCH, &path, Some(self.body()), &[])
+                .call(
+                    Key::Admin,
+                    Method::PATCH,
+                    &self.path(),
+                    Some(self.body()),
+                    &[],
+                )
                 .await?,
         )
     }

@@ -14,6 +14,11 @@ fn update(client_id: Option<&str>, client_secret: Option<&str>, scopes: &[&str])
 }
 
 #[test]
+fn patches_the_app_by_id() {
+    assert_eq!(update(None, None, &[]).path(), "/v1/auth-configs/ac_1");
+}
+
+#[test]
 fn sends_nothing_for_a_flag_left_out() {
     assert_eq!(update(None, None, &[]).body(), json!({}));
 }

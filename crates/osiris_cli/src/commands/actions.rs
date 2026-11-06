@@ -21,17 +21,25 @@ pub struct Run {
     connection: String,
 }
 
+impl Run {
+    fn path(&self) -> String {
+        format!(
+            "/v1/connected-accounts/{}/actions/{}",
+            self.connection, self.action
+        )
+    }
+}
+
 impl Actions {
     pub async fn run(self) -> anyhow::Result<()> {
         let Self::Run(run) = self;
-        let path = format!(
-            "/v1/connected-accounts/{}/actions/{}",
-            run.connection, run.action
-        );
         print(
             &Client::new(profile::load()?)
-                .call(Key::Api, Method::POST, &path, None, &[])
+                .call(Key::Api, Method::POST, &run.path(), None, &[])
                 .await?,
         )
     }
 }
+
+#[cfg(test)]
+mod tests;

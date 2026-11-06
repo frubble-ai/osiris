@@ -13,17 +13,18 @@ pub struct Delete {
 }
 
 impl Delete {
+    fn path(&self) -> String {
+        format!("/v1/auth-configs/{}", self.id)
+    }
+
     pub async fn run(self) -> anyhow::Result<()> {
         print(
             &Client::new(profile::load()?)
-                .call(
-                    Key::Admin,
-                    Method::DELETE,
-                    &format!("/v1/auth-configs/{}", self.id),
-                    None,
-                    &[],
-                )
+                .call(Key::Admin, Method::DELETE, &self.path(), None, &[])
                 .await?,
         )
     }
 }
+
+#[cfg(test)]
+mod tests;

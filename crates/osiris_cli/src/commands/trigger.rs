@@ -6,7 +6,7 @@ use crate::{
 };
 use clap::Args;
 use reqwest::Method;
-use serde_json::json;
+use serde_json::{Value, json};
 
 #[derive(Args)]
 pub struct Trigger {
@@ -17,18 +17,24 @@ pub struct Trigger {
 }
 
 impl Trigger {
+    fn body(&self) -> Value {
+        json!({ "type": self.event, "connected_account_id": self.connection })
+    }
+
     pub async fn run(self) -> anyhow::Result<()> {
-        let body = json!({ "type": self.event, "connected_account_id": self.connection });
         print(
             &Client::new(profile::load()?)
                 .call(
                     Key::Admin,
                     Method::POST,
                     "/v1/events/trigger",
-                    Some(body),
+                    Some(self.body()),
                     &[],
                 )
                 .await?,
         )
     }
 }
+
+#[cfg(test)]
+mod tests;

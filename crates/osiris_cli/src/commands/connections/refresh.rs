@@ -13,17 +13,18 @@ pub struct Refresh {
 }
 
 impl Refresh {
+    fn path(&self) -> String {
+        format!("/v1/connected-accounts/{}/refresh", self.id)
+    }
+
     pub async fn run(self) -> anyhow::Result<()> {
         print(
             &Client::new(profile::load()?)
-                .call(
-                    Key::Admin,
-                    Method::POST,
-                    &format!("/v1/connected-accounts/{}/refresh", self.id),
-                    None,
-                    &[],
-                )
+                .call(Key::Admin, Method::POST, &self.path(), None, &[])
                 .await?,
         )
     }
 }
+
+#[cfg(test)]
+mod tests;
