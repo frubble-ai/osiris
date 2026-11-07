@@ -9,7 +9,13 @@ pub struct GithubInstallation {
     pub id: String,
     /// The account or organization's login.
     pub account: String,
+    /// `user` or `organization` today. An open string: more values may come without a new
+    /// release, and a client keeps working on one it doesn't know.
+    #[schema(value_type = String)]
     pub account_type: GithubAccountType,
+    /// `all` (every repository of the account) or `selected` (only the ones chosen at install)
+    /// today. An open string: more values may come without a new release.
+    #[schema(value_type = String)]
     pub repository_selection: GithubRepositorySelection,
 }
 

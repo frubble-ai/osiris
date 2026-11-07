@@ -1,0 +1,237 @@
+{
+  "steps": [
+    {
+      "answer": {
+        "body": {
+          "client_id": "golden-github-app",
+          "created_at": "<time>",
+          "id": "<ac_1>",
+          "provider": "github",
+          "scopes": [],
+          "updated_at": "<time>"
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 201
+      },
+      "events": [],
+      "request": {
+        "body": {
+          "client_id": "golden-github-app",
+          "client_secret": "golden-github-secret",
+          "provider": "github"
+        },
+        "headers": [],
+        "key": "admin",
+        "method": "POST",
+        "path": "/v1/auth-configs"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "id": "<ca_1>",
+          "redirect_url": "<provider>/login/oauth/authorize?response_type=code&client_id=golden-github-app&redirect_uri=http%3A%2F%2Fosiris.test%2Foauth%2Fcallback&state=<random>",
+          "status": "pending"
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 201
+      },
+      "events": [],
+      "request": {
+        "body": {
+          "alias": "golden",
+          "auth_config_id": "<ac_1>",
+          "callback_url": "https://app.example/integrations/callback",
+          "user_id": "org_golden"
+        },
+        "headers": [],
+        "key": "api",
+        "method": "POST",
+        "path": "/v1/connected-accounts"
+      }
+    },
+    {
+      "answer": {
+        "body": null,
+        "headers": {
+          "location": "https://app.example/integrations/callback?connected_account_id=<ca_1>&status=active"
+        },
+        "status": 303
+      },
+      "events": [
+        {
+          "connected_account_id": "<ca_1>",
+          "event_id": "<ev_1>",
+          "id": "<msg_1>",
+          "occurred_at": "<time>",
+          "osiris_version": "2026-11-04.anubis",
+          "type": "connection.active",
+          "version": 1
+        }
+      ],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "none",
+        "method": "GET",
+        "path": "/oauth/callback?state=<random>&code=golden"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "access_token_expires_at": "<time>",
+          "alias": "golden",
+          "auth_config_id": "<ac_1>",
+          "created_at": "<time>",
+          "id": "<ca_1>",
+          "last_error": null,
+          "provider": "github",
+          "refresh_task": "<random>",
+          "refresh_task_at": "<time>",
+          "scope": "repo",
+          "setup_complete": true,
+          "status": "active",
+          "updated_at": "<time>",
+          "user_id": "org_golden"
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 200
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "api",
+        "method": "GET",
+        "path": "/v1/connected-accounts/<ca_1>"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "data": [
+            {
+              "access_token_expires_at": "<time>",
+              "alias": "golden",
+              "auth_config_id": "<ac_1>",
+              "created_at": "<time>",
+              "id": "<ca_1>",
+              "last_error": null,
+              "provider": "github",
+              "refresh_task": "<random>",
+              "refresh_task_at": "<time>",
+              "scope": "repo",
+              "setup_complete": true,
+              "status": "active",
+              "updated_at": "<time>",
+              "user_id": "org_golden"
+            }
+          ],
+          "next_cursor": null,
+          "previous_cursor": null
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 200
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "api",
+        "method": "GET",
+        "path": "/v1/connected-accounts?user_id=org_golden"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "access_token_expires_at": "<time>",
+          "alias": "golden",
+          "auth_config_id": "<ac_1>",
+          "created_at": "<time>",
+          "id": "<ca_1>",
+          "last_error": null,
+          "provider": "github",
+          "refresh_task": "<random>",
+          "refresh_task_at": "<time>",
+          "scope": "repo",
+          "setup_complete": true,
+          "status": "active",
+          "updated_at": "<time>",
+          "user_id": "org_golden"
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 202
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "admin",
+        "method": "POST",
+        "path": "/v1/connected-accounts/<ca_1>/refresh"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "deleted": true,
+          "id": "<ca_1>"
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 200
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "api",
+        "method": "DELETE",
+        "path": "/v1/connected-accounts/<ca_1>"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "error": {
+            "code": "OS_01",
+            "message": "connected account not found",
+            "type": "not_found"
+          }
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 404
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "api",
+        "method": "GET",
+        "path": "/v1/connected-accounts/<ca_1>"
+      }
+    }
+  ]
+}

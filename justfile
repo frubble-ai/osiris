@@ -66,9 +66,20 @@ sqlx-prepare:
 sqlx-check:
     SQLX_OFFLINE=false cargo sqlx prepare --workspace --check -- --all-targets
 
-# Regenerate api-reference/openapi.json from the routes.
+# Regenerate api-reference/openapi.json (the current release) and api-reference/versions/ (every
+# release osiris serves) from the routes.
 openapi:
     cargo run -q -p osiris_openapi
+
+# Every stable release against `base` (default origin/dev): its spec may only grow, and its golden
+# transcripts never change. Needs oasdiff on the PATH.
+contract-check base="origin/dev":
+    scripts/api-contract-guard.py {{base}} oasdiff
+
+# Schemathesis against a live osiris at every release and key, on a database of its own.
+schemathesis:
+    cargo build -q -p osiris_server
+    scripts/schemathesis.sh
 
 # Everything CI checks.
 check: fmt-check lint deny typos sqlx-check test openapi-check
@@ -88,10 +99,13 @@ deny:
 typos:
     typos
 
-test:
-    cargo nextest run --workspace
+# The tests; arguments filter them, such as `just test contract_lock`.
+test *filters:
+    cargo nextest run --workspace {{filters}}
 
-# The committed spec is the one the routes describe.
+# The committed specs are the ones the routes describe.
 openapi-check:
-    cargo run -q -p osiris_openapi target/openapi.json
-    diff -u api-reference/openapi.json target/openapi.json
+    rm -rf target/api-reference
+    cargo run -q -p osiris_openapi target/api-reference
+    diff -ru api-reference/openapi.json target/api-reference/openapi.json
+    diff -ru api-reference/versions target/api-reference/versions

@@ -1,0 +1,181 @@
+{
+  "steps": [
+    {
+      "answer": {
+        "body": {
+          "error": {
+            "code": "OS_00",
+            "message": "a valid key is required",
+            "type": "unauthorized"
+          }
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 401
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "none",
+        "method": "GET",
+        "path": "/v1/connected-accounts"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "error": {
+            "code": "OS_00",
+            "message": "a valid key is required",
+            "type": "unauthorized"
+          }
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 401
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "wrong",
+        "method": "GET",
+        "path": "/v1/connected-accounts"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "error": {
+            "code": "OS_00",
+            "message": "a valid key is required",
+            "type": "unauthorized"
+          }
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 401
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "api",
+        "method": "GET",
+        "path": "/v1/auth-configs"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "data": [],
+          "next_cursor": null,
+          "previous_cursor": null
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 200
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [
+          [
+            "osiris-version",
+            "2020-01-01.ra"
+          ]
+        ],
+        "key": "admin",
+        "method": "GET",
+        "path": "/v1/auth-configs"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "error": {
+            "code": "OS_02",
+            "message": "osiris does not implement the provider \"nowhere\"",
+            "type": "invalid_request"
+          }
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 400
+      },
+      "events": [],
+      "request": {
+        "body": {
+          "client_id": "c",
+          "client_secret": "s",
+          "provider": "nowhere"
+        },
+        "headers": [],
+        "key": "admin",
+        "method": "POST",
+        "path": "/v1/auth-configs"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "error": {
+            "code": "OS_02",
+            "message": "Failed to deserialize the JSON body into the target type: missing field `auth_config_id` at line 1 column 24",
+            "type": "invalid_request"
+          }
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 400
+      },
+      "events": [],
+      "request": {
+        "body": {
+          "user_id": "org_golden"
+        },
+        "headers": [],
+        "key": "api",
+        "method": "POST",
+        "path": "/v1/connected-accounts"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "error": {
+            "code": "OS_01",
+            "message": "connected account not found",
+            "type": "not_found"
+          }
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 404
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "api",
+        "method": "GET",
+        "path": "/v1/connected-accounts/<ca_1>"
+      }
+    }
+  ]
+}

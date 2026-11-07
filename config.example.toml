@@ -16,6 +16,9 @@ shutdown_grace_seconds = 8
 [api]
 # The version a request naming no Osiris-Version is served at: the API key's pinned version.
 pinned_version = "2026-11-04.anubis"
+# How many days a release is still served once the next one is out. Its answers carry a Sunset
+# header with that date, and a Deprecation header with the next release's date.
+support_days = 730
 
 [database]
 # The most connections one process opens. The Cloud SQL instance is shared with other services,

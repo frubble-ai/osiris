@@ -4,6 +4,8 @@ export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
 };
 
+export type Webhooks = ReceiveEventWebhookRequest;
+
 /**
  * An action's answer: what it read, as `data`.
  */
@@ -13,9 +15,17 @@ export type ActionResultVecGithubInstallation = {
          * The account or organization's login.
          */
         account: string;
-        account_type: GithubAccountType;
+        /**
+         * `user` or `organization` today. An open string: more values may come without a new
+         * release, and a client keeps working on one it doesn't know.
+         */
+        account_type: string;
         id: string;
-        repository_selection: GithubRepositorySelection;
+        /**
+         * `all` (every repository of the account) or `selected` (only the ones chosen at install)
+         * today. An open string: more values may come without a new release.
+         */
+        repository_selection: string;
     }>;
 };
 
@@ -183,7 +193,36 @@ export type ErrorDetail = {
     type: string;
 };
 
-export type GithubAccountType = 'user' | 'organization';
+/**
+ * An event as a subscriber receives it on the events topic, written in the API key's pinned
+ * release. The type and the connection's id, never its data: fetch the connection for its state.
+ */
+export type EventDelivery = {
+    connected_account_id: string;
+    /**
+     * `ev_…`, the same each time the event is delivered, so a client can drop repeats.
+     */
+    event_id: string;
+    /**
+     * `msg_…`, this delivery's own id.
+     */
+    id: string;
+    occurred_at: string;
+    /**
+     * The API release the event is written in, also the message's `osiris_version` attribute.
+     */
+    osiris_version: string;
+    /**
+     * What happened, also the message's `type` attribute: `connection.active`,
+     * `connection.expired` or `connection.revoked` today. An open string: new types may come
+     * without a new release, and a client ignores a type it doesn't know.
+     */
+    type: string;
+    /**
+     * The envelope's format.
+     */
+    version: number;
+};
 
 /**
  * Where our GitHub App is installed: an account or organization.
@@ -193,9 +232,17 @@ export type GithubInstallation = {
      * The account or organization's login.
      */
     account: string;
-    account_type: GithubAccountType;
+    /**
+     * `user` or `organization` today. An open string: more values may come without a new
+     * release, and a client keeps working on one it doesn't know.
+     */
+    account_type: string;
     id: string;
-    repository_selection: GithubRepositorySelection;
+    /**
+     * `all` (every repository of the account) or `selected` (only the ones chosen at install)
+     * today. An open string: more values may come without a new release.
+     */
+    repository_selection: string;
 };
 
 /**
@@ -211,8 +258,6 @@ export type GithubRepository = {
     private: boolean;
     url: string;
 };
-
-export type GithubRepositorySelection = 'all' | 'selected';
 
 /**
  * A Linear team the connected user can see.
@@ -347,6 +392,31 @@ export type ListAuthConfigsData = {
     url: '/v1/auth-configs';
 };
 
+export type ListAuthConfigsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+};
+
+export type ListAuthConfigsError = ListAuthConfigsErrors[keyof ListAuthConfigsErrors];
+
 export type ListAuthConfigsResponses = {
     200: ListAuthConfig;
 };
@@ -368,6 +438,30 @@ export type CreateAuthConfigData = {
 
 export type CreateAuthConfigErrors = {
     400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The first request with this `Idempotency-Key` is still running
+     */
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type CreateAuthConfigError = CreateAuthConfigErrors[keyof CreateAuthConfigErrors];
@@ -394,7 +488,32 @@ export type DeleteAuthConfigData = {
 };
 
 export type DeleteAuthConfigErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
     409: ErrorBody;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type DeleteAuthConfigError = DeleteAuthConfigErrors[keyof DeleteAuthConfigErrors];
@@ -415,7 +534,27 @@ export type RetrieveAuthConfigData = {
 };
 
 export type RetrieveAuthConfigErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
     404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type RetrieveAuthConfigError = RetrieveAuthConfigErrors[keyof RetrieveAuthConfigErrors];
@@ -436,7 +575,27 @@ export type UpdateAuthConfigData = {
 };
 
 export type UpdateAuthConfigErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
     404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type UpdateAuthConfigError = UpdateAuthConfigErrors[keyof UpdateAuthConfigErrors];
@@ -472,6 +631,31 @@ export type ListConnectedAccountsData = {
     url: '/v1/connected-accounts';
 };
 
+export type ListConnectedAccountsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+};
+
+export type ListConnectedAccountsError = ListConnectedAccountsErrors[keyof ListConnectedAccountsErrors];
+
 export type ListConnectedAccountsResponses = {
     200: ListConnectedAccount;
 };
@@ -493,7 +677,31 @@ export type CreateConnectedAccountData = {
 
 export type CreateConnectedAccountErrors = {
     400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
     404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The first request with this `Idempotency-Key` is still running
+     */
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type CreateConnectedAccountError = CreateConnectedAccountErrors[keyof CreateConnectedAccountErrors];
@@ -520,7 +728,35 @@ export type DeleteConnectedAccountData = {
 };
 
 export type DeleteConnectedAccountErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
     404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The first request with this `Idempotency-Key` is still running
+     */
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
     502: ErrorBody;
 };
 
@@ -542,7 +778,27 @@ export type RetrieveConnectedAccountData = {
 };
 
 export type RetrieveConnectedAccountErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
     404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type RetrieveConnectedAccountError = RetrieveConnectedAccountErrors[keyof RetrieveConnectedAccountErrors];
@@ -569,8 +825,33 @@ export type GithubListInstallationsData = {
 };
 
 export type GithubListInstallationsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
     409: ErrorBody;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
     424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
     502: ErrorBody;
 };
 
@@ -598,8 +879,33 @@ export type GithubListRepositoriesData = {
 };
 
 export type GithubListRepositoriesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
     409: ErrorBody;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
     424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
     502: ErrorBody;
 };
 
@@ -627,8 +933,33 @@ export type LinearListTeamsData = {
 };
 
 export type LinearListTeamsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
     409: ErrorBody;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
     424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
     502: ErrorBody;
 };
 
@@ -656,8 +987,33 @@ export type SlackListChannelsData = {
 };
 
 export type SlackListChannelsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
     409: ErrorBody;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
     424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
     502: ErrorBody;
 };
 
@@ -685,8 +1041,32 @@ export type RefreshConnectedAccountData = {
 };
 
 export type RefreshConnectedAccountErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
     404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
     409: ErrorBody;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type RefreshConnectedAccountError = RefreshConnectedAccountErrors[keyof RefreshConnectedAccountErrors];
@@ -711,7 +1091,35 @@ export type TriggerEventData = {
 };
 
 export type TriggerEventErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
     404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The first request with this `Idempotency-Key` is still running
+     */
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads
+     */
+    413: unknown;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type TriggerEventError = TriggerEventErrors[keyof TriggerEventErrors];
@@ -721,3 +1129,12 @@ export type TriggerEventResponses = {
 };
 
 export type TriggerEventResponse = TriggerEventResponses[keyof TriggerEventResponses];
+
+export type ReceiveEventWebhookPayload = EventDelivery;
+
+export type ReceiveEventWebhookRequest = {
+    body: ReceiveEventWebhookPayload;
+    key: 'events';
+    path?: never;
+    query?: never;
+};

@@ -1,0 +1,133 @@
+#!/usr/bin/env python3
+"""Holds every stable release to its contract, against the base branch.
+
+For each release whose spec in api-reference/versions/ is stable on the base branch:
+
+- its spec must still be there and still be stable, unless the pull request sunsets it
+  (OSIRIS_SUNSET=true, set by CI from the `api-sunset` label);
+- oasdiff must find no breaking change and no warning between its base and head spec, with the
+  events webhook read as an answer osiris sends (oasdiff reads a webhook's payload as a request,
+  whose rules point the other way);
+- its golden transcripts in api-reference/golden/<release>/ must be unchanged: new ones may be
+  added, none changed or removed.
+
+A preview release's changes are listed, never refused. Usage:
+  scripts/api-contract-guard.py <base-ref> [oasdiff binary]
+"""
+
+import json
+import os
+import subprocess
+import sys
+import tempfile
+
+VERSIONS = "api-reference/versions"
+GOLDEN = "api-reference/golden"
+
+
+def git(*args):
+    return subprocess.run(["git", *args], check=True, capture_output=True, text=True).stdout
+
+
+def base_file(base, path):
+    try:
+        return json.loads(git("show", f"{base}:{path}"))
+    except subprocess.CalledProcessError:
+        return None
+
+
+def stability(spec):
+    return (spec or {}).get("info", {}).get("x-osiris-stability", "preview")
+
+
+def as_answers(spec):
+    """The spec with each webhook also written as a route answering its payload, so that oasdiff
+    holds what osiris sends to the rules of what it answers."""
+    spec = json.loads(json.dumps(spec))
+    for name, item in (spec.get("webhooks") or {}).items():
+        for method, operation in item.items():
+            schema = operation["requestBody"]["content"]["application/json"]["schema"]
+            spec.setdefault("paths", {})[f"/webhooks/{name}"] = {
+                "get": {
+                    "operationId": f"webhook_{name}_{method}",
+                    "responses": {
+                        "200": {
+                            "description": "What osiris sends",
+                            "content": {"application/json": {"schema": schema}},
+                        }
+                    },
+                }
+            }
+    spec.pop("webhooks", None)
+    return spec
+
+
+def oasdiff(binary, command, base_spec, head_spec, *flags):
+    with tempfile.TemporaryDirectory() as directory:
+        paths = []
+        for name, spec in (("base", base_spec), ("head", head_spec)):
+            path = os.path.join(directory, f"{name}.json")
+            with open(path, "w") as file:
+                json.dump(as_answers(spec), file)
+            paths.append(path)
+        return subprocess.run([binary, command, *paths, *flags], capture_output=True, text=True)
+
+
+def summary(text):
+    print(text)
+    target = os.environ.get("GITHUB_STEP_SUMMARY")
+    if target:
+        with open(target, "a") as file:
+            file.write(text + "\n")
+
+
+def main():
+    base = sys.argv[1] if len(sys.argv) > 1 else "origin/dev"
+    binary = sys.argv[2] if len(sys.argv) > 2 else "oasdiff"
+    sunset = os.environ.get("OSIRIS_SUNSET") == "true"
+    failures = []
+
+    try:
+        listed = git("ls-tree", "--name-only", f"{base}:{VERSIONS}").split()
+    except subprocess.CalledProcessError:
+        listed = []
+
+    for file in sorted(listed):
+        release = file.removesuffix(".json")
+        path = f"{VERSIONS}/{file}"
+        base_spec = base_file(base, path)
+        head_spec = json.load(open(path)) if os.path.exists(path) else None
+
+        if stability(base_spec) != "stable":
+            if head_spec is not None:
+                changes = oasdiff(binary, "changelog", base_spec, head_spec).stdout.strip()
+                summary(f"### {release} (preview): may change in any way\n\n```\n{changes or 'no changes'}\n```\n")
+            continue
+
+        if head_spec is None:
+            if not sunset:
+                failures.append(f"{release} is stable and its spec was removed; a release is only removed past its sunset, in a pull request labelled api-sunset")
+            continue
+        if stability(head_spec) != "stable":
+            failures.append(f"{release} was stable and is not any more; a stable release stays stable")
+
+        result = oasdiff(binary, "breaking", base_spec, head_spec, "--fail-on", "WARN")
+        if result.returncode != 0:
+            failures.append(f"{release} is stable and this would break it; make it a version change of the next release instead (docs/api-versioning.md):\n{result.stdout}{result.stderr}")
+        else:
+            summary(f"### {release} (stable): nothing breaks\n")
+
+        changed = git("diff", "--name-status", f"{base}...HEAD", "--", f"{GOLDEN}/{release}/").split("\n")
+        for line in filter(None, changed):
+            status, _, name = line.partition("\t")
+            if status != "A":
+                failures.append(f"{release} is stable and its golden transcript {name} was changed ({status}); what a stable release does never changes")
+
+    for failure in failures:
+        print(f"::error::{failure.splitlines()[0]}")
+        print(failure, file=sys.stderr)
+    sys.exit(1 if failures else 0)
+
+
+if __name__ == "__main__":
+    main()

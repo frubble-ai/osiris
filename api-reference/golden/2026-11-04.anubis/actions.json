@@ -1,0 +1,65 @@
+{
+  "steps": [
+    {
+      "answer": {
+        "body": {
+          "data": [
+            {
+              "account": "golden-org",
+              "account_type": "organization",
+              "id": "7",
+              "repository_selection": "selected"
+            }
+          ]
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 200
+      },
+      "events": [
+        {
+          "connected_account_id": "<ca_1>",
+          "event_id": "<ev_1>",
+          "id": "<msg_1>",
+          "occurred_at": "<time>",
+          "osiris_version": "2026-11-04.anubis",
+          "type": "connection.active",
+          "version": 1
+        }
+      ],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "api",
+        "method": "POST",
+        "path": "/v1/connected-accounts/<ca_1>/actions/github.list_installations"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "error": {
+            "code": "OS_02",
+            "message": "slack.list_channels runs on a slack connection; <ca_1> is github",
+            "type": "invalid_request"
+          }
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 400
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "api",
+        "method": "POST",
+        "path": "/v1/connected-accounts/<ca_1>/actions/slack.list_channels"
+      }
+    }
+  ]
+}

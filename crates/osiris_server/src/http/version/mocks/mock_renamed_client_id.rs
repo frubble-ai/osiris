@@ -1,0 +1,95 @@
+//! A version change as a real release writes one: anubis renamed an auth config's `app_id` to
+//! `client_id`, so amun's requests are brought up and anubis's answers, events and spec taken back.
+
+use osiris_api_models::version::{ANUBIS, Release, Route, Stability, VersionChange};
+use serde_json::Value;
+
+pub struct MockRenamedClientId;
+
+/// Moves `from` to `to` in a JSON object, if it is there.
+fn rename(body: &mut Value, from: &str, to: &str) {
+    if let Some(object) = body.as_object_mut()
+        && let Some(value) = object.remove(from)
+    {
+        object.insert(to.to_owned(), value);
+    }
+}
+
+/// Renames `client_id` to `app_id` in every schema that has it, inlined ones too (a list's items).
+fn rename_in_schemas(value: &mut Value) {
+    match value {
+        Value::Object(object) => {
+            if let Some(properties) = object.get_mut("properties")
+                && properties.get("client_id").is_some()
+            {
+                rename(properties, "client_id", "app_id");
+                if let Some(required) = object.get_mut("required").and_then(Value::as_array_mut) {
+                    for name in required.iter_mut().filter(|name| *name == "client_id") {
+                        *name = Value::String("app_id".into());
+                    }
+                }
+            }
+            object.values_mut().for_each(rename_in_schemas);
+        }
+        Value::Array(items) => items.iter_mut().for_each(rename_in_schemas),
+        _ => {}
+    }
+}
+
+impl VersionChange for MockRenamedClientId {
+    fn description(&self) -> &'static str {
+        "An auth config's `app_id` is now `client_id`."
+    }
+
+    fn spec(&self, spec: &mut Value) {
+        if let Some(schemas) = spec.pointer_mut("/components/schemas") {
+            rename_in_schemas(schemas);
+        }
+    }
+
+    fn request(&self, route: &Route<'_>, body: &mut Value) {
+        if route.is("POST", "/v1/auth-configs") || route.is("PATCH", "/v1/auth-configs/{id}") {
+            rename(body, "app_id", "client_id");
+        }
+    }
+
+    fn query(&self, route: &Route<'_>, query: &mut Vec<(String, String)>) {
+        if route.is("GET", "/v1/auth-configs") {
+            for (name, _) in query.iter_mut() {
+                if name == "app_id" {
+                    "client_id".clone_into(name);
+                }
+            }
+        }
+    }
+
+    fn response(&self, route: &Route<'_>, status: u16, body: &mut Value) {
+        if !(200..300).contains(&status) || !route.path.starts_with("/v1/auth-configs") {
+            return;
+        }
+        match body.get_mut("data").and_then(Value::as_array_mut) {
+            Some(items) => items
+                .iter_mut()
+                .for_each(|item| rename(item, "client_id", "app_id")),
+            None => rename(body, "client_id", "app_id"),
+        }
+    }
+
+    fn event(&self, event: &mut Value) {
+        rename(event, "connected_account_id", "connection_id");
+    }
+}
+
+const AMUN: Release = Release {
+    name: "2026-01-01.amun",
+    stability: Stability::Stable,
+    changes: &[],
+};
+
+const ANUBIS_RENAMING: Release = Release {
+    changes: &[&MockRenamedClientId],
+    ..ANUBIS
+};
+
+/// amun, then anubis carrying the rename.
+pub static MOCK_RELEASES: &[Release] = &[AMUN, ANUBIS_RENAMING];

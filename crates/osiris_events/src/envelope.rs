@@ -1,4 +1,5 @@
-//! What every message travels in: a version, its own id and when it happened.
+//! What every message travels in: a version, its own id, when it happened, and the API release
+//! its body is written in.
 
 use crate::Message;
 use serde::{Deserialize, Serialize};
@@ -14,16 +15,20 @@ pub struct Envelope {
     pub id: String,
     #[serde(with = "time::serde::rfc3339")]
     pub occurred_at: OffsetDateTime,
+    /// The API release the message is written in, such as `2026-11-04.anubis`: the API key's
+    /// pinned one. Also sent as the `osiris_version` attribute.
+    pub osiris_version: String,
     #[serde(flatten)]
     pub message: Message,
 }
 
 impl Envelope {
-    pub fn wrap(message: Message) -> Self {
+    pub fn wrap(message: Message, osiris_version: &str) -> Self {
         Self {
             version: VERSION,
             id: osiris_common::ids::id("msg"),
             occurred_at: OffsetDateTime::now_utc(),
+            osiris_version: osiris_version.to_owned(),
             message,
         }
     }

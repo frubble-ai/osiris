@@ -9,6 +9,7 @@ use utoipa::{
 #[openapi(
     info(title = "Osiris", description = "Frubble's integrations service: OAuth connections to providers, their tokens kept fresh, and typed actions with them.", version = "2026-11-04.anubis"),
     modifiers(&SecuritySchemes),
+    components(schemas(osiris_api_models::events::EventDelivery)),
     tags((name = "auth-configs", description = "The providers' apps (admin key)"),
          (name = "connected-accounts", description = "Connections and their consent (API key; refreshing one now takes the admin key)"),
          (name = "actions", description = "Reads with a connection (API key)"),

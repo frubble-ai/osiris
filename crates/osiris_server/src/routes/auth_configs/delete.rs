@@ -13,7 +13,7 @@ use osiris_env::Flow;
 /// Delete an app no connection uses.
 #[utoipa::path(delete, path = "/v1/auth-configs/{id}", tag = "auth-configs", params(("id" = String, Path)),
     params(("Idempotency-Key" = Option<String>, Header, description = "Runs the request once; a retry gets the first answer")),
-    responses((status = 200, body = Deleted), (status = 409, body = ErrorBody)), security(("admin_key" = [])))]
+    responses((status = 200, body = Deleted), (status = 404, body = ErrorBody), (status = 409, body = ErrorBody)), security(("admin_key" = [])))]
 pub async fn delete_auth_config(
     State(state): State<ApiState>,
     headers: HeaderMap,

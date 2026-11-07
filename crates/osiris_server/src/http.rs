@@ -5,6 +5,8 @@ pub mod auth;
 pub mod error;
 pub mod health_answer;
 pub mod idempotency;
+pub mod json_body;
+pub mod query_params;
 pub mod serve_until_stopped;
 pub mod server_wrap;
 pub mod shutdown;

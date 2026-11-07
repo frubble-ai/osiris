@@ -43,6 +43,7 @@ utoipa-axum.workspace = true
 fake.workspace = true
 futures.workspace = true
 http-body-util = "0.1"
+jsonschema.workspace = true
 osiris_providers = { workspace = true, features = ["testing"] }
 rstest.workspace = true
 tower.workspace = true

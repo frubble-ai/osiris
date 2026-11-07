@@ -36,8 +36,11 @@ For coding agents working in this repository. Start with README.md.
 - A token, a client secret or a key is never logged, returned or put in an error. They are `Secret`
   in memory and encrypted at rest with the tenant's data key. A client never reads a provider's
   text.
-- A change to what the API answers keeps old clients working or comes with a new version
-  ([api-versioning](docs/api-versioning.md)); `just openapi`, and commit the spec.
+- A change to what the API answers or the events say keeps every stable release working, or
+  waits for the next release as a version change ([api-versioning](docs/api-versioning.md) says
+  what breaks). Values that grow are open strings, never closed answer enums. Run `just openapi`
+  and commit the specs; record golden transcripts with `OSIRIS_GOLDEN=record just test golden`
+  only for a preview.
 - Docs change in the same pull request as the architecture they describe.
 - `just check` passes before a commit. Branch from `dev`; pull requests target `dev` with the
   template filled. Commit messages and PR titles are Conventional Commits.
@@ -46,7 +49,7 @@ For coding agents working in this repository. Start with README.md.
 
 - [`docs/architecture.md`](docs/architecture.md) — crates, processes, scheduled tasks, the connection and refresh flows, events, encryption.
 - [`docs/configuration.md`](docs/configuration.md) — every env var, the database's TLS, process selection, settings, running locally.
-- [`docs/api-versioning.md`](docs/api-versioning.md) — versions, releases, version changes.
+- [`docs/api-versioning.md`](docs/api-versioning.md) — what breaks, preview and stable releases, version changes, the checks, and how to add, break, cut or remove.
 - [`docs/add_provider.md`](docs/add_provider.md) — a new provider or action, from `provider-template/`.
 - [`docs/style-guide/index.md`](docs/style-guide/index.md) — use cases, placement, integrations, tests, settings, errors, migrations.
 - [`docs/changelog/`](docs/changelog/) — what each release changed for clients.

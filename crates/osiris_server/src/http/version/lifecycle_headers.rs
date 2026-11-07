@@ -1,0 +1,44 @@
+//! A superseded release's answers say so (RFC 9745 and RFC 8594): `Deprecation` is the day the
+//! next release came out, and `Sunset` that day plus `[api] support_days`, after which the release
+//! may be removed. The current release's answers carry neither.
+
+use axum::http::{HeaderMap, HeaderValue};
+use osiris_api_models::version::Release;
+use time::{Duration, OffsetDateTime, format_description::FormatItem, macros::format_description};
+
+/// An HTTP date (RFC 9110), such as `Sun, 06 Nov 1994 08:49:37 GMT`.
+const HTTP_DATE: &[FormatItem<'_>] = format_description!(
+    "[weekday repr:short], [day] [month repr:short] [year] [hour]:[minute]:[second] GMT"
+);
+
+pub fn lifecycle_headers(
+    releases: &[Release],
+    release: &Release,
+    support: Duration,
+    headers: &mut HeaderMap,
+) {
+    let Some(next_release) = releases
+        .iter()
+        .skip_while(|listed| listed.name != release.name)
+        .nth(1)
+    else {
+        return;
+    };
+    let Some(superseded) = next_release
+        .released_on()
+        .map(|day| day.midnight().assume_utc())
+    else {
+        return;
+    };
+    let sunset: OffsetDateTime = superseded.saturating_add(support);
+    if let Ok(value) = HeaderValue::from_str(&format!("@{}", superseded.unix_timestamp())) {
+        headers.insert("deprecation", value);
+    }
+    if let Some(value) = sunset
+        .format(HTTP_DATE)
+        .ok()
+        .and_then(|text| HeaderValue::from_str(&text).ok())
+    {
+        headers.insert("sunset", value);
+    }
+}

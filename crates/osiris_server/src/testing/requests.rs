@@ -1,6 +1,6 @@
 //! Requests to the routers, as clients, Cloud Run's probes and the task scheduler send them.
 
-use super::{TestContext, WORKER_TOKEN};
+use super::{TestContext, WORKER_TOKEN, conformance::assert_answer_conforms};
 use axum::{
     body::Body,
     http::{HeaderMap, Request, StatusCode},
@@ -10,7 +10,8 @@ use osiris_tasks::Task;
 use serde_json::Value;
 use tower::ServiceExt;
 
-/// A request's answer: its status, headers and JSON body (`null` when there is none).
+/// A request's answer: its status, headers and JSON body (`null` when there is none), already
+/// checked against its release's spec.
 pub struct Answer {
     pub status: StatusCode,
     pub headers: HeaderMap,
@@ -52,10 +53,12 @@ impl TestContext {
             .await
             .expect("a body")
             .to_bytes();
+        let body = serde_json::from_slice(&bytes).unwrap_or(Value::Null);
+        assert_answer_conforms(self.releases, method, path, status, &headers, &body);
         Answer {
             status,
             headers,
-            body: serde_json::from_slice(&bytes).unwrap_or(Value::Null),
+            body,
         }
     }
 

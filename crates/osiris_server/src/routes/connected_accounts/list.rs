@@ -5,6 +5,7 @@ use crate::{
     http::{
         auth::Auth,
         error::{ApiError, ApiResult},
+        query_params::QueryParams,
         server_wrap,
         state::ApiState,
     },
@@ -12,7 +13,7 @@ use crate::{
 };
 use axum::{
     Json,
-    extract::{Query, State},
+    extract::State,
     http::{HeaderMap, StatusCode},
 };
 use osiris_api_models::{
@@ -29,7 +30,7 @@ use osiris_env::Flow;
 pub async fn list_connected_accounts(
     State(state): State<ApiState>,
     headers: HeaderMap,
-    Query(query): Query<ConnectedAccountFilter>,
+    QueryParams(query): QueryParams<ConnectedAccountFilter>,
 ) -> ApiResult<(StatusCode, Json<List<ConnectedAccount>>)> {
     let status = match query.status.as_deref() {
         None => None,

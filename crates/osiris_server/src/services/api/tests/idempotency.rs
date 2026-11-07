@@ -151,7 +151,7 @@ async fn runs_a_retry_again_after_the_first_answer_was_a_server_error(pool: PgPo
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
-async fn never_replays_an_answer_that_is_not_json(pool: PgPool) {
+async fn refuses_an_unreadable_body_as_os_02_and_answers_a_retry_the_same(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let send = || async {
         let request = axum::http::Request::builder()
@@ -162,18 +162,25 @@ async fn never_replays_an_answer_that_is_not_json(pool: PgPool) {
             .header("idempotency-key", "k1")
             .body(axum::body::Body::from("not json"))
             .unwrap();
-        tower::ServiceExt::oneshot(app.api.clone(), request)
+        let answer = tower::ServiceExt::oneshot(app.api.clone(), request)
+            .await
+            .unwrap();
+        let status = answer.status();
+        let bytes = http_body_util::BodyExt::collect(answer.into_body())
             .await
             .unwrap()
+            .to_bytes();
+        (
+            status,
+            serde_json::from_slice::<serde_json::Value>(&bytes).unwrap(),
+        )
     };
-    let first = send().await;
-    assert!(first.status().is_client_error());
-    let retry = send().await;
-    assert!(retry.status().is_client_error());
-    assert!(
-        retry.headers().get("idempotent-replayed").is_none(),
-        "the plain-text answer was not stored"
-    );
+    let (first_status, first) = send().await;
+    assert_eq!(first_status, StatusCode::BAD_REQUEST);
+    assert_eq!(first["error"]["code"], "OS_02");
+    let (retry_status, retry) = send().await;
+    assert_eq!(retry_status, StatusCode::BAD_REQUEST);
+    assert_eq!(retry, first);
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
