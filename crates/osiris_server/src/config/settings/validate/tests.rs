@@ -26,6 +26,10 @@ fn accepts_more_concurrent_tasks_than_connections() {
 #[case::a_zero_value("server.max_body_bytes", |settings: &mut Settings| settings.server.max_body_bytes = 0)]
 #[case::a_zero_timeout("http.timeout_seconds", |settings: &mut Settings| settings.http.timeout_seconds = 0)]
 #[case::a_short_consent_state("consent.state_length", |settings: &mut Settings| settings.consent.state_length = 31)]
+#[case::more_tasks_than_a_semaphore_holds(
+    "tasks.max_concurrent",
+    |settings: &mut Settings| settings.tasks.max_concurrent = tokio::sync::Semaphore::MAX_PERMITS + 1
+)]
 #[case::a_margin_past_the_keepalive(
     "refresh.margin_seconds",
     |settings: &mut Settings| settings.refresh.margin_seconds = settings.refresh.keepalive_seconds
