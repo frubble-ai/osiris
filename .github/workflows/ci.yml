@@ -123,14 +123,15 @@ jobs:
 
   openapi:
     needs: secret-scan
-    name: OpenAPI matches the routes
+    name: OpenAPI matches the routes, for every release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: rustup show
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
-      - run: cargo run --locked -q -p osiris_openapi target/openapi.json
-      - run: diff -u api-reference/openapi.json target/openapi.json
+      - run: cargo run --locked -q -p osiris_openapi target/api-reference
+      - run: diff -u api-reference/openapi.json target/api-reference/openapi.json
+      - run: diff -ru api-reference/versions target/api-reference/versions
 
   image:
     needs: secret-scan

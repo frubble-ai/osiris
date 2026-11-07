@@ -9,7 +9,7 @@ use axum::{
     middleware::Next,
     response::Response,
 };
-use osiris_api_models::version::{HEADER, VERSIONS};
+use osiris_api_models::version::{HEADER, find};
 
 pub async fn version(
     State(state): State<ApiState>,
@@ -23,11 +23,7 @@ pub async fn version(
             .to_owned(),
         None => state.config.settings.api.pinned_version.clone(),
     };
-    let served = VERSIONS
-        .iter()
-        .copied()
-        .find(|known| *known == asked)
-        .ok_or(ApiError::UnknownVersion(asked))?;
+    let served = find(&asked).ok_or(ApiError::UnknownVersion(asked))?.name;
     let mut response = next.run(request).await;
     response
         .headers_mut()

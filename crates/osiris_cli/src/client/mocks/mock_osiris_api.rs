@@ -21,7 +21,7 @@ impl<'a> MockOsirisApi<'a> {
         Mock::given(method(verb))
             .and(path(route))
             .and(header("authorization", format!("Bearer {key}").as_str()))
-            .and(header(HEADER, CURRENT))
+            .and(header(HEADER, CURRENT.name))
             .respond_with(ResponseTemplate::new(status).set_body_string(body))
             .mount(self.server)
             .await;

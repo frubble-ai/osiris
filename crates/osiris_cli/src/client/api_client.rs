@@ -52,7 +52,7 @@ impl Client {
             .http
             .request(method, &url)
             .bearer_auth(secret)
-            .header(HEADER, CURRENT)
+            .header(HEADER, CURRENT.name)
             .query(query);
         if let Some(body) = body {
             request = request.json(&body);
