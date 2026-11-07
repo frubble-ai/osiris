@@ -1,7 +1,7 @@
 //! A request's body written for `target`, brought up to the current release.
 
 use super::changes_since;
-use crate::version::{Release, Route};
+use crate::{Release, Route};
 use serde_json::Value;
 
 /// Brings `body` up through each change since `target`, oldest first.

@@ -51,7 +51,7 @@ value outside an enum in an answer.
 
 ## Preview and stable
 
-A release is a **preview** or **stable** (`Stability` in `osiris_api_models::version`).
+A release is a **preview** or **stable** (`Stability` in `osiris_versioning`).
 
 - A **preview**'s contract may still change in any way. Its answers say `Osiris-Stability: preview`
   and its client is published only on the branch channels, never on latest.
@@ -119,12 +119,12 @@ existing transcripts stay as they are. CI's Contract job confirms nothing stable
 - **When the newest release is stable**, the change belongs to the next release:
   1. If there is no next release yet, add one at the end of `RELEASES` as a preview, named with
      the next god, dated the day it is cut, and numbered one after the last release ever made.
-     Point `CURRENT` (`osiris_api_models/src/version/releases.rs`) at it, and the client's
+     Point `CURRENT` (`osiris_versioning/src/releases.rs`) at it, and the client's
      `OSIRIS_VERSION` (`clients/typescript/src/index.ts`) to its name. Give it a `golden_at!` line
      in `services/api/tests/golden/releases.rs` and a changelog file, and move the client's major
      version to its number (`npm run check` says which).
   2. Change the code to the new shape.
-  3. Write a version change under `osiris_api_models/src/version/changes/<release>/`, one file per
+  3. Write a version change under `osiris_versioning/src/changes/<release>/`, one file per
      change, and list it in the release's `changes`. It must give the older release its old
      requests, answers, events and spec back. Its `description` goes in the release's changelog
      word for word; a test checks it is there.

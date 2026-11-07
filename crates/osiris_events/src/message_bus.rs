@@ -4,7 +4,7 @@
 //! are, so a client pinned to an older release reads its events in that release's shape too.
 
 use crate::{Envelope, Message, Transport, TransportError};
-use osiris_api_models::version::{CURRENT, RELEASES, Release, translate::event_down};
+use osiris_versioning::{CURRENT, RELEASES, Release, translate::event_down};
 use std::sync::Arc;
 
 #[derive(Clone)]

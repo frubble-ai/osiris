@@ -2245,6 +2245,7 @@ dependencies = [
  "osiris_api_models",
  "osiris_common",
  "osiris_pubsub",
+ "osiris_versioning",
  "reqwest",
  "rstest",
  "serde",
@@ -2322,10 +2323,10 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "fake",
- "osiris_api_models",
  "osiris_common",
  "osiris_domain",
  "osiris_events",
+ "osiris_versioning",
  "serde",
  "serde_json",
  "thiserror",
@@ -2355,8 +2356,8 @@ name = "osiris_openapi"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "osiris_api_models",
  "osiris_server",
+ "osiris_versioning",
  "serde_json",
 ]
 
@@ -2421,6 +2422,7 @@ dependencies = [
  "osiris_providers",
  "osiris_pubsub",
  "osiris_tasks",
+ "osiris_versioning",
  "reqwest",
  "rstest",
  "serde",
@@ -2458,6 +2460,15 @@ dependencies = [
  "tokio",
  "tracing",
  "wiremock",
+]
+
+[[package]]
+name = "osiris_versioning"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "time",
 ]
 
 [[package]]

@@ -10,7 +10,6 @@ use crate::{
     use_cases::{UseCaseContext, UseCases},
 };
 use axum::Router;
-use osiris_api_models::version::Release;
 use osiris_common::{
     crypto::MasterKey,
     secret::{ExposeSecret, secret},
@@ -18,6 +17,7 @@ use osiris_common::{
 use osiris_events::{MessageBus, adapters::memory::MemoryTransport};
 use osiris_providers::{ProviderUrls, Providers};
 use osiris_tasks::adapters::{bearer::BearerAuthenticator, memory::MemoryScheduler};
+use osiris_versioning::Release;
 use sqlx::PgPool;
 use std::sync::{Arc, atomic::AtomicBool};
 use url::Url;
@@ -97,9 +97,8 @@ pub async fn setup_test_context_with(
             settings.database.lock_timeout(),
         ),
         messages: MessageBus::new(bus.clone()).written_in(
-            osiris_api_models::version::RELEASES,
-            osiris_api_models::version::find(&settings.api.pinned_version)
-                .expect("a release osiris serves"),
+            osiris_versioning::RELEASES,
+            osiris_versioning::find(&settings.api.pinned_version).expect("a release osiris serves"),
         ),
         tasks: tasks.clone(),
         providers: Arc::new(
@@ -110,7 +109,7 @@ pub async fn setup_test_context_with(
         config: config.clone(),
     });
     let draining = Arc::new(AtomicBool::new(false));
-    let api = api_router(&use_cases, &config, osiris_api_models::version::RELEASES);
+    let api = api_router(&use_cases, &config, osiris_versioning::RELEASES);
     let worker = worker::router(worker::state::WorkerState {
         use_cases: use_cases.clone(),
         config: config.clone(),
@@ -128,6 +127,6 @@ pub async fn setup_test_context_with(
         tasks,
         provider,
         draining,
-        releases: osiris_api_models::version::RELEASES,
+        releases: osiris_versioning::RELEASES,
     }
 }

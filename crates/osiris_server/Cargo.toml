@@ -9,6 +9,7 @@ license.workspace = true
 workspace = true
 
 [dependencies]
+osiris_versioning.workspace = true
 config.workspace = true
 osiris_env.workspace = true
 osiris_events.workspace = true

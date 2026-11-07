@@ -17,7 +17,7 @@ impl Default for ApiSettings {
     /// The current release, pinned, and two years of support.
     fn default() -> Self {
         Self {
-            pinned_version: osiris_api_models::version::CURRENT.name.to_owned(),
+            pinned_version: osiris_versioning::CURRENT.name.to_owned(),
             // GitHub's window: two years from the next release.
             support_days: 730,
         }

@@ -16,6 +16,7 @@ osiris_env = { path = "crates/osiris_env" }
 osiris_events = { path = "crates/osiris_events" }
 osiris_domain = { path = "crates/osiris_domain" }
 osiris_api_models = { path = "crates/osiris_api_models" }
+osiris_versioning = { path = "crates/osiris_versioning" }
 osiris_tasks = { path = "crates/osiris_tasks" }
 osiris_cloud_tasks = { path = "crates/osiris_cloud_tasks" }
 osiris_pubsub = { path = "crates/osiris_pubsub" }

@@ -3,7 +3,7 @@
 use super::error_from_answer::error_from_answer;
 use crate::profile::Profile;
 use anyhow::Context;
-use osiris_api_models::version::{CURRENT, HEADER};
+use osiris_versioning::{CURRENT, HEADER};
 use reqwest::Method;
 use serde_json::Value;
 

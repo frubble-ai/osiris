@@ -1,6 +1,6 @@
 //! The changes made after `target` up to the last of `releases`, oldest first.
 
-use crate::version::{Release, VersionChange};
+use crate::{Release, VersionChange};
 
 /// Every change the releases after `target` made, oldest first; none when `target` is the last.
 pub fn changes_since<'a>(

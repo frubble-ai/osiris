@@ -13,10 +13,11 @@ migration job. All state is in Postgres.
 | `osiris_domain` | auth configs, connections, tokens, events, task outcomes, pagination, `DomainError` |
 | `osiris_interfaces` | `ProviderCommon` and `Provider`, the OAuth2 flow a provider's definition drives, `call` |
 | `osiris_providers` | GitHub, Linear and Slack: each one's definition, revoke, transformers, actions, and faked network |
-| `osiris_events` | the event catalog, the envelope, the bus, the `Transport` trait, the in-memory transport |
+| `osiris_events` | the event catalog, the envelope, the bus (which writes each event in the pinned release, through `osiris_versioning`), the `Transport` trait, the in-memory transport |
 | `osiris_pubsub` | `Transport` on Google Pub/Sub |
 | `osiris_tasks` | task payloads and names, the `TaskScheduler` and `TaskAuthenticator` traits, the local and in-memory schedulers |
 | `osiris_cloud_tasks` | `TaskScheduler` on Google Cloud Tasks, and the OIDC `TaskAuthenticator` |
+| `osiris_versioning` | the releases osiris serves, their version changes, and the translation between them; below both the API models and the event bus, which use it |
 | `osiris_api_models` | what the API accepts and returns; the OpenAPI spec is generated from these |
 | `osiris_server` | configuration, the use cases, the HTTP layer and routes, the processes |
 | `osiris_openapi` | writes `api-reference/openapi.json` (the current release) and `api-reference/versions/<release>.json` (every release served) |

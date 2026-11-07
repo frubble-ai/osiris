@@ -9,7 +9,6 @@ use crate::{
     db,
 };
 use anyhow::Context;
-use osiris_api_models::version::{RELEASES, find};
 use osiris_cloud_tasks::CloudTasksScheduler;
 use osiris_common::{crypto::MasterKey, secret::ExposeSecret};
 use osiris_events::MessageBus;
@@ -19,6 +18,7 @@ use osiris_tasks::{
     TaskScheduler,
     adapters::local::{LocalConfig, LocalScheduler},
 };
+use osiris_versioning::{RELEASES, find};
 use std::{sync::Arc, time::Duration};
 
 pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCaseContext> {

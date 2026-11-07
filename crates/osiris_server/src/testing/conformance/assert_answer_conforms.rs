@@ -4,7 +4,7 @@
 use super::release_spec::release_spec;
 use super::{schema_validator::mismatches, template_of::template_of};
 use axum::http::{HeaderMap, StatusCode};
-use osiris_api_models::version::{HEADER, Release};
+use osiris_versioning::{HEADER, Release};
 use serde_json::Value;
 
 /// `~` and `/` escaped for a JSON pointer.

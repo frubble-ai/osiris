@@ -4,8 +4,8 @@
 //! of releases no longer served. CI regenerates them and fails if the committed ones differ.
 
 use anyhow::Context;
-use osiris_api_models::version::RELEASES;
 use osiris_server::services::api::{spec, versioned_spec};
+use osiris_versioning::RELEASES;
 use std::path::Path;
 
 /// Writes every spec under the directory given, `api-reference` by default.

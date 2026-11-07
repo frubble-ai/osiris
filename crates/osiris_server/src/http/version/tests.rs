@@ -9,11 +9,11 @@ use crate::{
     },
 };
 use axum::http::{HeaderMap, StatusCode};
-use osiris_api_models::version::translate::event_down;
 use osiris_events::{
     Message, MessageBus, adapters::memory::MemoryTransport,
     testing::generate_event_message::generate_event_message,
 };
+use osiris_versioning::translate::event_down;
 use serde_json::json;
 use sqlx::PgPool;
 use std::sync::Arc;

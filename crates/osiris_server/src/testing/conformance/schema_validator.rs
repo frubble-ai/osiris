@@ -4,7 +4,7 @@
 
 use super::release_spec::{release_key, release_spec};
 use jsonschema::Validator;
-use osiris_api_models::version::Release;
+use osiris_versioning::Release;
 use serde_json::{Value, json};
 use std::{
     collections::HashMap,

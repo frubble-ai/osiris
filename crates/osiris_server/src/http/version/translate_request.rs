@@ -8,7 +8,7 @@ use axum::{
     extract::Request,
     http::{Uri, header::CONTENT_LENGTH},
 };
-use osiris_api_models::version::{
+use osiris_versioning::{
     Release, Route,
     translate::{query_up, request_up},
 };

@@ -2,7 +2,7 @@
 //! `client_id` and the connections filter `label` to `alias`, so amun's requests are brought up and
 //! anubis's answers, events and spec taken back.
 
-use osiris_api_models::version::{ANUBIS, Release, Route, Stability, VersionChange};
+use osiris_versioning::{ANUBIS, Release, Route, Stability, VersionChange};
 use serde_json::Value;
 
 pub struct MockRenamedClientId;

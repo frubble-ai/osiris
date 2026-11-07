@@ -1,7 +1,7 @@
 //! An event in the current release's shape, taken back to `target`.
 
 use super::changes_since;
-use crate::version::Release;
+use crate::Release;
 use serde_json::Value;
 
 /// Takes `event` back through each change since `target`, newest first.

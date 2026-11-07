@@ -2,7 +2,7 @@
 
 use super::scenarios::SCENARIOS;
 use crate::testing::golden::transcript_file::transcript_path;
-use osiris_api_models::version::RELEASES;
+use osiris_versioning::RELEASES;
 
 #[test]
 fn keeps_every_scenario_s_transcript_for_every_release() {

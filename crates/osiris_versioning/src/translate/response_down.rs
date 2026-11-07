@@ -1,7 +1,7 @@
 //! An answer in the current release's shape, taken back to `target`.
 
 use super::changes_since;
-use crate::version::{Release, Route};
+use crate::{Release, Route};
 use serde_json::Value;
 
 /// Takes `body`, answered with `status`, back through each change since `target`, newest first.

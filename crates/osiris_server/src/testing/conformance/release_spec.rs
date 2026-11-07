@@ -2,7 +2,7 @@
 //! since every request a test sends is checked against it.
 
 use crate::services::api::versioned_spec;
-use osiris_api_models::version::Release;
+use osiris_versioning::Release;
 use serde_json::Value;
 use std::{
     collections::HashMap,

@@ -2,7 +2,7 @@
 //! newest a preview, and every release after the first carrying the changes it made.
 
 use crate::services::api::versioned_spec;
-use osiris_api_models::version::{CURRENT, RELEASES, Stability};
+use osiris_versioning::{CURRENT, RELEASES, Stability};
 
 #[test]
 fn names_releases_in_order_and_serves_the_last_as_the_current_one() {

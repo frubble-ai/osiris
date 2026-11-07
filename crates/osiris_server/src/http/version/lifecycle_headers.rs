@@ -4,7 +4,7 @@
 
 use super::superseded::superseded;
 use axum::http::{HeaderMap, HeaderValue};
-use osiris_api_models::version::Release;
+use osiris_versioning::Release;
 use time::{Duration, format_description::FormatItem, macros::format_description};
 
 /// An HTTP date (RFC 9110), such as `Sun, 06 Nov 1994 08:49:37 GMT`.

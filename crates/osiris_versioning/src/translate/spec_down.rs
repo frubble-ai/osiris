@@ -2,7 +2,7 @@
 //! its stability in `info.x-osiris-stability` and its number in `info.x-osiris-release-number`.
 
 use super::changes_since;
-use crate::version::Release;
+use crate::Release;
 use serde_json::Value;
 
 /// Takes `spec` back through each change since `target`, newest first, and names `target` in its

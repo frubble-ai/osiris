@@ -3,7 +3,7 @@
 
 use super::{assert_answer_conforms, assert_event_conforms};
 use axum::http::{HeaderMap, StatusCode};
-use osiris_api_models::version::RELEASES;
+use osiris_versioning::RELEASES;
 use serde_json::{Value, json};
 
 fn answer(method: &str, path: &str, status: StatusCode, body: &Value) {

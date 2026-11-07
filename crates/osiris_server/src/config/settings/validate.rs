@@ -20,7 +20,7 @@ impl Settings {
             super::api::MAX_SUPPORT_DAYS
         );
         anyhow::ensure!(
-            osiris_api_models::version::is_known(&self.api.pinned_version),
+            osiris_versioning::is_known(&self.api.pinned_version),
             "api.pinned_version {:?} is not a version osiris serves",
             self.api.pinned_version
         );

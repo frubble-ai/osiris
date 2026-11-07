@@ -4,7 +4,7 @@
 //! release's name is written in one place.
 
 use super::{events_webhook::events_webhook, ground_rule_answers::ground_rule_answers, v1::v1};
-use osiris_api_models::version::{RELEASES, translate::spec_down};
+use osiris_versioning::{RELEASES, translate::spec_down};
 use serde_json::Value;
 
 /// The current release's spec, as `api-reference/openapi.json` holds it. Fails only if the

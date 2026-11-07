@@ -1,7 +1,7 @@
 //! Osiris's API as the client sees it: an endpoint answers only a call that carries the expected
 //! key and the version header, so an unmatched call fails the test.
 
-use osiris_api_models::version::{CURRENT, HEADER};
+use osiris_versioning::{CURRENT, HEADER};
 use wiremock::{
     Mock, MockServer, ResponseTemplate,
     matchers::{header, method, path},

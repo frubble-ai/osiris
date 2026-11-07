@@ -2,8 +2,8 @@
 //! releases served.
 
 use crate::{config::Config, use_cases::UseCases};
-use osiris_api_models::version::Release;
 use osiris_common::secret::Secret;
+use osiris_versioning::Release;
 use std::sync::Arc;
 
 #[derive(Clone)]

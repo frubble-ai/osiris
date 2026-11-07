@@ -2,7 +2,7 @@
 //! says it is written in.
 
 use super::schema_validator::mismatches;
-use osiris_api_models::version::Release;
+use osiris_versioning::Release;
 use serde_json::Value;
 
 /// Fails the test unless `event` matches `EventDelivery` in the spec of the release it names.

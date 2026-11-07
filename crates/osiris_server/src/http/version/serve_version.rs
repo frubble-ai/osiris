@@ -13,7 +13,7 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
-use osiris_api_models::version::{HEADER, Route, STABILITY_HEADER};
+use osiris_versioning::{HEADER, Route, STABILITY_HEADER};
 
 /// Serves `request` at the release it names, translating it and its answer when that release
 /// isn't the current one.

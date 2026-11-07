@@ -2,7 +2,7 @@
 
 use crate::http::{error::ApiError, state::ApiState};
 use axum::http::HeaderMap;
-use osiris_api_models::version::{HEADER, Release};
+use osiris_versioning::{HEADER, Release};
 
 /// The release `headers` name in `Osiris-Version`, the pinned one when they name none, or
 /// `OS_07` for one osiris doesn't serve.

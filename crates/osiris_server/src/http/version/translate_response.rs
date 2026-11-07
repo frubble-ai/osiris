@@ -6,7 +6,7 @@ use axum::{
     http::header::CONTENT_LENGTH,
     response::Response,
 };
-use osiris_api_models::version::{Release, Route, translate::response_down};
+use osiris_versioning::{Release, Route, translate::response_down};
 
 /// `response`, in the current release's shape, with its JSON body taken back to `release`.
 pub async fn translate_response(
