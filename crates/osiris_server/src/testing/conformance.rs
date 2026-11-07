@@ -9,3 +9,6 @@ pub mod template_of;
 
 pub use assert_answer_conforms::assert_answer_conforms;
 pub use assert_event_conforms::assert_event_conforms;
+
+#[cfg(test)]
+mod tests;

@@ -92,11 +92,13 @@ impl VersionChange for MockRenamedClientId {
 
 const AMUN: Release = Release {
     name: "2026-01-01.amun",
+    number: 1,
     stability: Stability::Stable,
     changes: &[],
 };
 
 const ANUBIS_RENAMING: Release = Release {
+    number: 2,
     changes: &[&MockRenamedClientId],
     ..ANUBIS
 };

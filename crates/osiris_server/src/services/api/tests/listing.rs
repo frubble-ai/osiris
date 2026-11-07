@@ -166,7 +166,7 @@ async fn pages_connections_forwards_and_refuses_a_cursor_naming_a_deleted_one(po
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
-async fn refuses_a_query_it_cannot_read_as_os_02(pool: PgPool) {
+async fn refuses_a_request_it_cannot_read_as_os_02(pool: PgPool) {
     let app = setup_test_context(pool).await;
 
     for (path, key) in [
@@ -175,6 +175,11 @@ async fn refuses_a_query_it_cannot_read_as_os_02(pool: PgPool) {
         // A cursor is an id: a NUL or a space can't be one, and must not reach the database.
         ("/v1/connected-accounts?before=%00", API_KEY),
         ("/v1/auth-configs?after=not%20an%20id", ADMIN_KEY),
+        // PostgreSQL can't store a NUL as text, wherever a client puts it.
+        ("/v1/connected-accounts?alias=a%00b", API_KEY),
+        ("/v1/connected-accounts?user_id=%00", API_KEY),
+        ("/v1/connected-accounts/ca_%00", API_KEY),
+        ("/v1/auth-configs/ac_%00", ADMIN_KEY),
     ] {
         let refused = app.send("GET", path, Some(key), None, &[]).await;
 
@@ -185,5 +190,37 @@ async fn refuses_a_query_it_cannot_read_as_os_02(pool: PgPool) {
             refused.body
         );
         assert_eq!(refused.body["error"]["code"], "OS_02", "{path}");
+    }
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_a_nul_in_a_body_s_field_as_os_02(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+
+    let refused = app
+        .send(
+            "POST",
+            "/v1/auth-configs",
+            Some(ADMIN_KEY),
+            Some(serde_json::json!({ "provider": "github", "client_id": "a\u{0}b", "client_secret": "s" })),
+            &[],
+        )
+        .await;
+
+    assert_eq!(refused.status, StatusCode::BAD_REQUEST, "{}", refused.body);
+    assert_eq!(refused.body["error"]["code"], "OS_02");
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn reads_an_empty_cursor_as_no_cursor(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+
+    for (path, key) in [
+        ("/v1/connected-accounts?after=", API_KEY),
+        ("/v1/auth-configs?before=", ADMIN_KEY),
+    ] {
+        let answer = app.send("GET", path, Some(key), None, &[]).await;
+
+        assert_eq!(answer.status, StatusCode::OK, "{path}: {}", answer.body);
     }
 }

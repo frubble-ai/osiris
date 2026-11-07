@@ -1,5 +1,5 @@
-//! A named release: its name, whether it is still a preview, and the changes it made to the
-//! release before.
+//! A named release: its name, its number, whether it is still a preview, and the changes it made
+//! to the release before.
 
 use super::{Stability, VersionChange};
 use time::{Date, Month};
@@ -7,6 +7,9 @@ use time::{Date, Month};
 pub struct Release {
     /// `<date>.<name>`, such as `2026-11-04.anubis`.
     pub name: &'static str,
+    /// The release's place among every release ever made, from 1, never reused: anubis 1, bastet
+    /// 2. It stays when older releases are removed, and the client's major version follows it.
+    pub number: u32,
     /// A preview's contract may still change in any way; a stable one's only grows.
     pub stability: Stability,
     /// The changes this release made, oldest first; empty for the first release.

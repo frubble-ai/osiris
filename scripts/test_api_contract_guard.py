@@ -16,11 +16,12 @@ import unittest
 GUARD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "api-contract-guard.py")
 OASDIFF = os.environ.get("OASDIFF", "oasdiff")
 RELEASE = "2026-11-04.anubis"
+NEXT = "2027-03-01.bastet"
 SPEC = f"api-reference/versions/{RELEASE}.json"
 GOLDEN = f"api-reference/golden/{RELEASE}/refusals.json"
 
 
-def spec(stability):
+def spec(stability, release=RELEASE):
     """A release's spec, as small as a real one's shape allows: one answer and the events webhook."""
     thing = {
         "type": "object",
@@ -34,7 +35,7 @@ def spec(stability):
     }
     return {
         "openapi": "3.1.0",
-        "info": {"title": "Osiris", "version": RELEASE, "x-osiris-stability": stability},
+        "info": {"title": "Osiris", "version": release, "x-osiris-stability": stability},
         "paths": {
             "/v1/things/{id}": {
                 "get": {
@@ -71,7 +72,7 @@ class Repository:
     def __init__(self, directory, base_files):
         self.directory = directory
         self.git("init", "-q", "-b", "main")
-        self.write(base_files)
+        self.write({"config.example.toml": "[api]\nsupport_days = 730\n", **base_files})
         self.commit("base")
         self.base = self.git("rev-parse", "HEAD").strip()
 
@@ -98,8 +99,9 @@ class Repository:
         self.git("add", "-A")
         self.git("commit", "-q", "--allow-empty", "-m", message)
 
-    def guard(self, base=None, sunset=False):
-        environment = dict(os.environ, OSIRIS_SUNSET="true" if sunset else "false")
+    def guard(self, base=None, sunset=False, today="2026-11-07"):
+        environment = dict(os.environ, OSIRIS_SUNSET="true" if sunset else "false", OSIRIS_TODAY=today)
+        environment.pop("OSIRIS_SUPPORT_DAYS", None)
         environment.pop("GITHUB_STEP_SUMMARY", None)
         return subprocess.run(
             ["python3", GUARD, base or self.base, OASDIFF],
@@ -184,11 +186,31 @@ class ContractGuardTest(unittest.TestCase):
         new_transcript = {f"api-reference/golden/{RELEASE}/notion.json": '{"steps": []}\n'}
         self.assert_passed(self.head(self.repository(), add, files=new_transcript))
 
-    def test_passes_a_stable_release_removed_with_the_sunset_label(self):
+    def sunset_repository(self):
+        """anubis stable, and bastet out after it: anubis's sunset is bastet's date plus 730 days."""
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        next_spec = f"api-reference/versions/{NEXT}.json"
+        repository = Repository(
+            directory.name,
+            {SPEC: spec("stable"), next_spec: spec("preview", NEXT), GOLDEN: '{"steps": []}\n'},
+        )
+        repository.write({SPEC: None, GOLDEN: None})
+        repository.commit("head")
+        return repository
+
+    def test_passes_a_stable_release_removed_past_its_sunset_with_the_label(self):
+        self.assert_passed(self.sunset_repository().guard(sunset=True, today="2029-03-01"))
+
+    def test_refuses_a_release_removed_before_its_sunset_even_with_the_label(self):
+        result = self.sunset_repository().guard(sunset=True, today="2029-02-27")
+        self.assert_refused(result, "advertise a sunset of 2029-02-28")
+
+    def test_refuses_the_newest_release_removed_even_with_the_label(self):
         repository = self.repository()
         repository.write({SPEC: None, GOLDEN: None})
         repository.commit("head")
-        self.assert_passed(repository.guard(sunset=True))
+        self.assert_refused(repository.guard(sunset=True, today="2100-01-01"), "no sunset yet")
 
     def test_passes_a_breaking_change_to_a_preview(self):
         repository = self.repository(stability="preview")

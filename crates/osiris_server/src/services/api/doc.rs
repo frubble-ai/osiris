@@ -7,7 +7,7 @@ use utoipa::{
 
 #[derive(OpenApi)]
 #[openapi(
-    info(title = "Osiris", description = "Frubble's integrations service: OAuth connections to providers, their tokens kept fresh, and typed actions with them.", version = "2026-11-04.anubis"),
+    info(title = "Osiris", description = "Frubble's integrations service: OAuth connections to providers, their tokens kept fresh, and typed actions with them."),
     modifiers(&SecuritySchemes),
     components(schemas(osiris_api_models::events::EventDelivery)),
     tags((name = "auth-configs", description = "The providers' apps (admin key)"),

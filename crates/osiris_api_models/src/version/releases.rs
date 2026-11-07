@@ -6,6 +6,7 @@ use super::{Release, Stability};
 
 pub const ANUBIS: Release = Release {
     name: "2026-11-04.anubis",
+    number: 1,
     // The first release is a preview while the app is its only client; it becomes stable in the
     // pull request that cuts it, before a client depends on it in production.
     stability: Stability::Preview,

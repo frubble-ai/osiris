@@ -22,6 +22,11 @@ fn names_releases_in_order_and_serves_the_last_as_the_current_one() {
             !newer.changes.is_empty(),
             "{newer:?} must carry the changes it made"
         );
+        assert_eq!(
+            newer.number,
+            older.number + 1,
+            "{newer:?} must be numbered after {older:?}"
+        );
     }
     for release in RELEASES {
         assert!(
@@ -57,5 +62,13 @@ fn names_each_release_and_its_stability_in_its_spec() {
             spec["info"]["x-osiris-stability"],
             release.stability.as_str()
         );
+        assert_eq!(spec["info"]["x-osiris-release-number"], release.number);
     }
+}
+
+#[test]
+fn names_the_current_release_in_the_current_spec() {
+    let spec = crate::services::api::spec();
+    assert_eq!(spec["info"]["version"], CURRENT.name);
+    assert_eq!(spec, versioned_spec(RELEASES, CURRENT));
 }

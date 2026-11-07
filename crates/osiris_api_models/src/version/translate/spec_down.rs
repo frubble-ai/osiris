@@ -1,5 +1,5 @@
-//! The current `OpenAPI` document taken back to `target`'s, its version named in `info.version`
-//! and its stability in `info.x-osiris-stability`.
+//! The current `OpenAPI` document taken back to `target`'s, its version named in `info.version`,
+//! its stability in `info.x-osiris-stability` and its number in `info.x-osiris-release-number`.
 
 use super::changes_since;
 use crate::version::Release;
@@ -15,5 +15,6 @@ pub fn spec_down(releases: &[Release], target: &Release, spec: &mut Value) {
             "x-osiris-stability".into(),
             Value::String(target.stability.as_str().into()),
         );
+        info.insert("x-osiris-release-number".into(), Value::from(target.number));
     }
 }

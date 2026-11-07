@@ -3,8 +3,10 @@
 
 For each release whose spec in api-reference/versions/ is stable on the base branch:
 
-- its spec must still be there and still be stable, unless the pull request sunsets it
-  (OSIRIS_SUNSET=true, set by CI from the `api-sunset` label);
+- its spec must still be there and still be stable, unless the pull request sunsets it: it is
+  labelled `api-sunset` (OSIRIS_SUNSET=true, set by CI) and the release is past the sunset its
+  answers advertise, the next release's date plus `support_days` (config.example.toml's default,
+  or OSIRIS_SUPPORT_DAYS for a deployment that sets its own; OSIRIS_TODAY sets the day, for tests);
 - oasdiff must find no breaking change and no warning between its base and head spec, with the
   events webhook read as an answer osiris sends (oasdiff reads a webhook's payload as a request,
   whose rules point the other way);
@@ -18,8 +20,10 @@ A base ref that can't be read exits 2, so a missing fetch never reads as a clean
 scripts/test_api_contract_guard.py holds the script to each case.
 """
 
+import datetime
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -41,6 +45,34 @@ def base_file(base, path):
 
 def stability(spec):
     return (spec or {}).get("info", {}).get("x-osiris-stability", "preview")
+
+
+def support_days():
+    """The support window: OSIRIS_SUPPORT_DAYS, or the default config.example.toml documents."""
+    if os.environ.get("OSIRIS_SUPPORT_DAYS"):
+        return int(os.environ["OSIRIS_SUPPORT_DAYS"])
+    with open("config.example.toml") as file:
+        found = re.search(r"^support_days\s*=\s*(\d+)", file.read(), re.M)
+    if not found:
+        sys.exit("::error::config.example.toml documents no support_days")
+    return int(found.group(1))
+
+
+def released_on(release):
+    return datetime.date.fromisoformat(release[:10])
+
+
+def sunset_problem(release, listed):
+    """Why `release` can't be removed yet, or None once it is past its sunset."""
+    names = [file.removesuffix(".json") for file in sorted(listed)]
+    later = names[names.index(release) + 1:]
+    if not later:
+        return f"{release} is the newest release, so it has no sunset yet"
+    sunset = released_on(later[0]) + datetime.timedelta(days=support_days())
+    today = datetime.date.fromisoformat(os.environ["OSIRIS_TODAY"]) if os.environ.get("OSIRIS_TODAY") else datetime.date.today()
+    if today < sunset:
+        return f"{release}'s answers advertise a sunset of {sunset}, and it is {today}"
+    return None
 
 
 def as_answers(spec):
@@ -115,6 +147,8 @@ def main():
         if head_spec is None:
             if not sunset:
                 failures.append(f"{release} is stable and its spec was removed; a release is only removed past its sunset, in a pull request labelled api-sunset")
+            elif problem := sunset_problem(release, listed):
+                failures.append(f"{release} can't be removed yet: {problem}")
             continue
         if stability(head_spec) != "stable":
             failures.append(f"{release} was stable and is not any more; a stable release stays stable")

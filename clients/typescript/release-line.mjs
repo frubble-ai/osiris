@@ -2,9 +2,10 @@ import { readFileSync, readdirSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 // The client follows osiris's releases. It sends the release it was generated for, and its major
-// version is that release's place in the list (anubis 1, bastet 2), so a client for a release that
-// broke something is never an upgrade within the same major. While the first release is still a
-// preview there is no stable line yet, so the major is 0. A preview's client is only published on
+// version is that release's number (`info.x-osiris-release-number`: anubis 1, bastet 2, never
+// reused, kept when older releases are removed), so a client for a release that broke something is
+// never an upgrade within the same major. While the first release is still a preview there is no
+// stable line yet, so the major is 0. A preview's client is only published on
 // the branch channels as a prerelease, never on latest from a tag.
 
 const versions = new URL("../../api-reference/versions/", import.meta.url);
@@ -17,16 +18,21 @@ export function readReleases(directory = versions) {
 		.sort()
 		.map((file) => {
 			const spec = JSON.parse(readFileSync(new URL(file, directory), "utf8"));
-			return { name: file.slice(0, -".json".length), stability: spec.info["x-osiris-stability"] ?? "preview" };
+			return {
+				name: file.slice(0, -".json".length),
+				number: spec.info["x-osiris-release-number"],
+				stability: spec.info["x-osiris-stability"] ?? "preview",
+			};
 		});
 }
 
 // The major version the client must carry for `release`, one of `releases`.
 export function expectedMajor(releases, release) {
-	const position = releases.findIndex((listed) => listed.name === release);
-	if (position < 0) throw new Error(`${release} is not a release osiris serves`);
-	if (position === 0 && releases[0].stability === "preview") return 0;
-	return position + 1;
+	const listed = releases.find((candidate) => candidate.name === release);
+	if (!listed) throw new Error(`${release} is not a release osiris serves`);
+	if (!Number.isInteger(listed.number)) throw new Error(`${release}'s spec names no x-osiris-release-number`);
+	if (listed.number === 1 && listed.stability === "preview") return 0;
+	return listed.number;
 }
 
 // The problems with publishing `version` (package.json's) for `osirisVersion` (OSIRIS_VERSION),

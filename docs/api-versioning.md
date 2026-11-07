@@ -91,11 +91,11 @@ is still served until a pull request removes it.
 | --- | --- | --- |
 | Conformance | every API test (`testing/conformance`) | an answer whose status the spec doesn't document, or whose body doesn't match its schema; an event that doesn't match `EventDelivery` |
 | Golden transcripts | `services/api/tests/golden` | a release no longer doing what was recorded for it: a field gone or changed, a status, a header, an event |
-| Release rules | `services/api/tests/releases.rs` | releases out of date or name order, a preview that isn't the newest, a later release without its changes |
+| Release rules | `services/api/tests/releases.rs` | releases out of date, name or number order, a preview that isn't the newest, a later release without its changes, a current spec that doesn't name the current release |
 | Specs match the routes | `just openapi-check`, CI | a committed spec that isn't what the code generates |
-| Stable releases break nothing | `just contract-check`, CI's Contract job | an oasdiff error or warning in a stable release's spec, a stable release made a preview or removed, a stable release's golden transcript changed |
+| Stable releases break nothing | `just contract-check`, CI's Contract job | an oasdiff error or warning in a stable release's spec, a stable release made a preview, removed without the label or before its sunset, a stable release's golden transcript changed |
 | Schemathesis | `just schemathesis` (`scripts/schemathesis/`), CI's Tests job | a live osiris answering a generated request at any release and key with an undocumented status, content type or body, or a server error |
-| Client release line | `npm run check`, the publish step | a client sending another release than its spec's, a major version that isn't its release's, a preview published on latest |
+| Client release line | `npm run check`, the publish step | a client sending another release than its spec's, a major version that isn't its release's number (`info.x-osiris-release-number`), a preview published on latest |
 
 Golden transcripts live in `api-reference/golden/<release>/`, with ids, times and random tokens
 masked. A field osiris adds later passes; anything recorded that changes fails.
@@ -116,7 +116,9 @@ existing transcripts stay as they are. CI's Contract job confirms nothing stable
   transcripts again, and note it in the release's changelog.
 - **When the newest release is stable**, the change belongs to the next release:
   1. If there is no next release yet, add one at the end of `RELEASES` as a preview, named with
-     the next god and dated the day it is cut. Give it a `golden_at!` line and a changelog file.
+     the next god, dated the day it is cut, and numbered one after the last release ever made.
+     Give it a `golden_at!` line and a changelog file, and move the client's major version to its
+     number (`npm run check` says which).
   2. Change the code to the new shape.
   3. Write a version change under `osiris_api_models/src/version/changes/<release>/`, one file per
      change, and list it in the release's `changes`. It must give the older release its old
@@ -133,13 +135,17 @@ One pull request:
 1. Set its `stability` to `Stability::Stable`.
 2. Run `just openapi` and record its transcripts.
 3. Finish its changelog.
-4. Move the client's major version to the release's place (`npm run check` says which).
+4. For the first release, move the client's major version from 0 to 1 (`npm run check` says
+   which). A later release's client already carries its number.
 
 From its date, the release before is deprecated, and its sunset is `support_days` later.
 
 ### Removing a release
 
-Only past its sunset, in a pull request labelled `api-sunset`:
+Only past its sunset, in a pull request labelled `api-sunset`. The Contract job checks both: the
+label, and that the day is past the next release's date plus `support_days` (the default in
+`config.example.toml`; a deployment that sets its own sets `OSIRIS_SUPPORT_DAYS` for the job). The
+newest release has no sunset, so it is never removed.
 1. Remove it from `RELEASES`, along with its `golden_at!` line, its spec and its transcripts.
 2. If it was the oldest, the next release becomes the first: delete the version changes that only
    served the removed one, and empty that release's `changes`.

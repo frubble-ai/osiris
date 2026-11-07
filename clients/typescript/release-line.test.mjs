@@ -6,21 +6,21 @@ const anubis = "2026-11-04.anubis";
 const bastet = "2027-03-01.bastet";
 
 test("the first release's client is major 0 while it is a preview, and 1 once stable", () => {
-	assert.equal(expectedMajor([{ name: anubis, stability: "preview" }], anubis), 0);
-	assert.equal(expectedMajor([{ name: anubis, stability: "stable" }], anubis), 1);
+	assert.equal(expectedMajor([{ name: anubis, number: 1, stability: "preview" }], anubis), 0);
+	assert.equal(expectedMajor([{ name: anubis, number: 1, stability: "stable" }], anubis), 1);
 });
 
-test("a later release's client is its place in the list, preview or not", () => {
+test("a later release's client is its number, preview or not", () => {
 	const releases = [
-		{ name: anubis, stability: "stable" },
-		{ name: bastet, stability: "preview" },
+		{ name: anubis, number: 1, stability: "stable" },
+		{ name: bastet, number: 2, stability: "preview" },
 	];
 	assert.equal(expectedMajor(releases, bastet), 2);
 });
 
 test("a client must send the release it was generated for", () => {
 	const problems = releaseLineProblems({
-		releases: [{ name: anubis, stability: "preview" }],
+		releases: [{ name: anubis, number: 1, stability: "preview" }],
 		version: "0.1.0",
 		osirisVersion: bastet,
 		specVersion: anubis,
@@ -33,8 +33,8 @@ test("a client must send the release it was generated for", () => {
 test("a client whose major doesn't match its release is refused", () => {
 	const problems = releaseLineProblems({
 		releases: [
-			{ name: anubis, stability: "stable" },
-			{ name: bastet, stability: "preview" },
+			{ name: anubis, number: 1, stability: "stable" },
+			{ name: bastet, number: 2, stability: "preview" },
 		],
 		version: "1.4.0",
 		osirisVersion: bastet,
@@ -46,7 +46,7 @@ test("a client whose major doesn't match its release is refused", () => {
 
 test("a preview's client is never published from a tag", () => {
 	const problems = releaseLineProblems({
-		releases: [{ name: anubis, stability: "preview" }],
+		releases: [{ name: anubis, number: 1, stability: "preview" }],
 		version: "0.1.0",
 		osirisVersion: anubis,
 		specVersion: anubis,
@@ -61,11 +61,16 @@ test("the client in the repository follows its release", () => {
 
 test("a client whose OSIRIS_VERSION can't be found says so", () => {
 	const problems = releaseLineProblems({
-		releases: [{ name: anubis, stability: "preview" }],
+		releases: [{ name: anubis, number: 1, stability: "preview" }],
 		version: "0.1.0",
 		osirisVersion: undefined,
 		specVersion: anubis,
 		refType: "branch",
 	});
 	assert.deepEqual(problems, ['src/index.ts declares no OSIRIS_VERSION = "<release>"']);
+});
+
+test("a release keeps its major when the releases before it are removed", () => {
+	assert.equal(expectedMajor([{ name: bastet, number: 2, stability: "stable" }], bastet), 2);
+	assert.equal(expectedMajor([{ name: bastet, number: 2, stability: "preview" }], bastet), 2);
 });

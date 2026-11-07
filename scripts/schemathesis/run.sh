@@ -16,7 +16,7 @@ venv="target/schemathesis-venv"
 if [ ! -x "$venv/bin/schemathesis" ] || ! cmp -s "$here/requirements.txt" "$venv/requirements.txt"; then
   rm -rf "$venv"
   if command -v uv >/dev/null; then
-    uv venv --quiet --python 3.12 "$venv"
+    uv venv --quiet --python 3.11 "$venv"
     uv pip install --quiet --python "$venv/bin/python" --require-hashes -r "$here/requirements.txt"
   else
     python3 -m venv "$venv"

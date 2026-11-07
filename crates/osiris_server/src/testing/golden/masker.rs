@@ -85,3 +85,6 @@ impl Masker {
         word.to_owned()
     }
 }
+
+#[cfg(test)]
+mod tests;
