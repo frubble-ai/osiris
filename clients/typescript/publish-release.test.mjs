@@ -1,9 +1,18 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { alreadyPublished, branchHead, commandError, npmSteps, publishCurrent, releaseTarget } from "./publish-release.mjs";
+import {
+	alreadyPublished,
+	changesClient,
+	clientPaths,
+	commandError,
+	laterClientChange,
+	npmSteps,
+	publishCurrent,
+	releaseTarget,
+} from "./publish-release.mjs";
 
 const sha = "27ff530956b3e38d57ad4d4c3e2ffc5634857b06";
-const newer = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 test("a branch publishes a prerelease on its dist-tag", () => {
 	for (const channel of ["dev", "stg", "prd"]) {
@@ -49,13 +58,12 @@ test("any other ref is refused", () => {
 	assert.throws(() => releaseTarget({ refType: "branch", refName: "feature", sha, version: "0.1.0" }), /feature/);
 });
 
-test("a run whose branch has moved does not publish", async () => {
+test("a run superseded by a later client change does not publish", async () => {
 	let published = false;
 	const result = await publishCurrent({
 		refType: "branch",
-		sha,
 		target: { version: "0.1.0-dev.g27ff530956b3", tag: "dev", buildTag: "g27ff530956b3", name: "@frubble-ai/osiris-client" },
-		heads: async () => newer,
+		superseded: async () => true,
 		publishVersion() {
 			published = true;
 		},
@@ -71,9 +79,8 @@ test("a branch that is still current is published and then tagged", async () => 
 	const moved = [];
 	const result = await publishCurrent({
 		refType: "branch",
-		sha,
 		target: { version: "0.1.0-dev.g27ff530956b3", tag: "dev", buildTag: "g27ff530956b3", name: "@frubble-ai/osiris-client" },
-		heads: async () => sha,
+		superseded: async () => false,
 		publishVersion() {},
 		moveChannel(version, tag) {
 			moved.push([version, tag]);
@@ -83,13 +90,12 @@ test("a branch that is still current is published and then tagged", async () => 
 	assert.deepEqual(moved, [["0.1.0-dev.g27ff530956b3", "dev"]]);
 });
 
-test("a branch that moves during upload does not move the channel", async () => {
+test("a client change that lands during upload does not move the channel", async () => {
 	let reads = 0;
 	const result = await publishCurrent({
 		refType: "branch",
-		sha,
 		target: { version: "0.1.0-dev.g27ff530956b3", tag: "dev", buildTag: "g27ff530956b3", name: "@frubble-ai/osiris-client" },
-		heads: async () => (reads++ === 0 ? sha : newer),
+		superseded: async () => reads++ > 0,
 		publishVersion() {},
 		moveChannel() {
 			throw new Error("channel moved");
@@ -103,9 +109,8 @@ test("a retry of a version already published still moves the channel", async () 
 	const moved = [];
 	const result = await publishCurrent({
 		refType: "branch",
-		sha,
 		target: { version: "0.1.0-dev.g27ff530956b3", tag: "dev", buildTag: "g27ff530956b3", name: "@frubble-ai/osiris-client" },
-		heads: async () => sha,
+		superseded: async () => false,
 		publishVersion() {
 			const error = new Error("cannot publish over the previously published versions");
 			error.stderr = "EPUBLISHCONFLICT";
@@ -129,12 +134,11 @@ test("a publish conflict is visible only once stderr is kept", () => {
 	);
 });
 
-test("a release tag does not consult the branch head", async () => {
+test("a release tag does not consult the branch", async () => {
 	const result = await publishCurrent({
 		refType: "tag",
-		sha,
 		target: { version: "1.2.3", tag: "latest", buildTag: "latest", name: "@frubble-ai/osiris-client" },
-		heads: async () => {
+		superseded: async () => {
 			throw new Error("branch was read");
 		},
 		publishVersion() {},
@@ -150,9 +154,8 @@ test("a publish failure that is not a conflict stops the job before the channel 
 	await assert.rejects(
 		publishCurrent({
 			refType: "branch",
-			sha,
 			target: { version: "0.1.0-dev.g27ff530956b3", tag: "dev", buildTag: "g27ff530956b3", name: "@frubble-ai/osiris-client" },
-			heads: async () => sha,
+			superseded: async () => false,
 			publishVersion() {
 				const error = new Error("Command failed: npm publish --tag g27ff530956b3");
 				error.stderr = "npm error code E401\nnpm error 401 Unauthorized";
@@ -184,25 +187,65 @@ function answering(status, body) {
 	return { calls, fetchImpl };
 }
 
-test("the branch head is the sha the GitHub API returns", async () => {
-	const { calls, fetchImpl } = answering(200, { sha });
-	const head = await branchHead({ repository: "frubble-ai/osiris", refName: "dev", token: "t", fetchImpl });
-	assert.equal(head, sha);
-	assert.equal(calls[0].url, "https://api.github.com/repos/frubble-ai/osiris/commits/dev");
+const compare = (body) => laterClientChange({ repository: "frubble-ai/osiris", refName: "dev", sha, token: "t", ...answering(200, body) });
+
+test("the branch is compared from the run's commit to its head", async () => {
+	const { calls, fetchImpl } = answering(200, { status: "identical", files: [] });
+	assert.equal(await laterClientChange({ repository: "frubble-ai/osiris", refName: "dev", sha, token: "t", fetchImpl }), false);
+	assert.equal(calls[0].url, `https://api.github.com/repos/frubble-ai/osiris/compare/${sha}...dev`);
 	assert.equal(calls[0].init.headers.Authorization, "Bearer t");
 });
 
-test("a failed branch read stops the job, naming the status", async () => {
-	const { fetchImpl } = answering(404, { message: "Not Found" });
-	await assert.rejects(branchHead({ repository: "frubble-ai/osiris", refName: "dev", token: "t", fetchImpl }), /404/);
+test("later commits that leave the client alone keep the channel with this run", async () => {
+	assert.equal(await compare({ status: "ahead", files: [{ filename: ".github/workflows/claude-code-review.yml" }] }), false);
 });
 
-test("a branch read without a commit sha stops the job", async () => {
-	const { fetchImpl } = answering(200, { sha: 42 });
-	await assert.rejects(
-		branchHead({ repository: "frubble-ai/osiris", refName: "dev", token: "t", fetchImpl }),
-		/did not return a commit/,
-	);
+test("a later commit that changes the client hands the channel to its own run", async () => {
+	for (const filename of ["clients/typescript/src/index.ts", "api-reference/openapi.json", ".github/workflows/client.yml"]) {
+		assert.equal(await compare({ status: "ahead", files: [{ filename: "README.md" }, { filename }] }), true);
+	}
+});
+
+test("a later rename into or out of the client counts as a client change", async () => {
+	const out = { filename: "archive/index.ts", previous_filename: "clients/typescript/src/index.ts", status: "renamed" };
+	const into = { filename: "clients/typescript/src/index.ts", previous_filename: "archive/index.ts", status: "renamed" };
+	assert.equal(await compare({ status: "ahead", files: [out] }), true);
+	assert.equal(await compare({ status: "ahead", files: [into] }), true);
+	const elsewhere = { filename: "docs/b.md", previous_filename: "docs/a.md", status: "renamed" };
+	assert.equal(await compare({ status: "ahead", files: [elsewhere] }), false);
+});
+
+test("a commit no longer on the branch counts as superseded", async () => {
+	for (const status of ["behind", "diverged"]) {
+		assert.equal(await compare({ status, files: [] }), true);
+	}
+});
+
+test("a comparison too large to list in full counts as superseded", async () => {
+	const files = Array.from({ length: 300 }, (_, i) => ({ filename: `docs/${i}.md` }));
+	assert.equal(await compare({ status: "ahead", files }), true);
+});
+
+test("a failed comparison stops the job, naming the status", async () => {
+	const { fetchImpl } = answering(404, { message: "Not Found" });
+	await assert.rejects(laterClientChange({ repository: "frubble-ai/osiris", refName: "dev", sha, token: "t", fetchImpl }), /404/);
+});
+
+test("a comparison without a file list stops the job", async () => {
+	await assert.rejects(compare({ status: "ahead" }), /did not list the changed files/);
+});
+
+test("a path matches only inside the client paths", () => {
+	assert.equal(changesClient("clients/typescript/package.json"), true);
+	assert.equal(changesClient("clients/typescript-old/package.json"), false);
+	assert.equal(changesClient(".github/workflows/client.yml.bak"), false);
+});
+
+test("the client paths match the workflow's push trigger", () => {
+	const workflow = readFileSync(new URL("../../.github/workflows/client.yml", import.meta.url), "utf8");
+	const push = workflow.slice(workflow.indexOf("  push:"));
+	const paths = JSON.parse(push.match(/^\s+paths: (\[.*\])$/m)[1]);
+	assert.deepEqual(paths, clientPaths);
 });
 
 const name = "@frubble-ai/osiris-client";

@@ -4,6 +4,13 @@ import { pathToFileURL } from "node:url";
 
 const channels = ["dev", "stg", "prd"];
 
+// The paths whose change publishes a branch. They match the push trigger in
+// .github/workflows/client.yml, and a test holds the two together.
+export const clientPaths = ["api-reference/**", "clients/typescript/**", ".github/workflows/client.yml"];
+
+// The compare API lists at most this many changed files.
+const compareFileLimit = 300;
+
 // A branch publishes <version>-<channel>.g<12 hex>. The g keeps an all-digit
 // commit id from being read as a numeric prerelease identifier. A tag v1.2.3
 // publishes that version on latest. Anything after the patch number is refused.
@@ -57,10 +64,12 @@ function runNpm(args) {
 	}
 }
 
-// Publish the version either way. Move the branch channel only while this
-// commit is still the branch head, before the upload and again before the move.
-export async function publishCurrent({ refType, sha, target, heads, publishVersion, moveChannel }) {
-	if (refType !== "tag" && (await heads()) !== sha) {
+// Publish the version either way. Move the branch channel only while no later
+// commit on the branch has changed the client, checked before the upload and
+// again before the move. A later commit that leaves the client alone starts no
+// run, so this run is still the one that has to move the channel.
+export async function publishCurrent({ refType, target, superseded, publishVersion, moveChannel }) {
+	if (refType !== "tag" && (await superseded())) {
 		return { action: "skip" };
 	}
 	try {
@@ -71,7 +80,7 @@ export async function publishCurrent({ refType, sha, target, heads, publishVersi
 	if (refType === "tag") {
 		return { action: "published", version: target.version, tag: target.tag };
 	}
-	if ((await heads()) !== sha) {
+	if (await superseded()) {
 		return {
 			action: "left-channel",
 			version: target.version,
@@ -81,6 +90,12 @@ export async function publishCurrent({ refType, sha, target, heads, publishVersi
 	}
 	await moveChannel(target.version, target.tag, target.buildTag);
 	return { action: "published", version: target.version, tag: target.tag };
+}
+
+export function changesClient(filename) {
+	return clientPaths.some((path) =>
+		path.endsWith("/**") ? filename.startsWith(path.slice(0, -2)) : filename === path,
+	);
 }
 
 // The npm commands that upload a version and move a channel. `run` takes one npm argument list.
@@ -101,22 +116,35 @@ export function npmSteps({ name, run }) {
 	};
 }
 
-export async function branchHead({ repository, refName, token, fetchImpl = globalThis.fetch }) {
-	const response = await fetchImpl(`https://api.github.com/repos/${repository}/commits/${encodeURIComponent(refName)}`, {
-		headers: {
-			Authorization: `Bearer ${token}`,
-			Accept: "application/vnd.github+json",
-			"X-GitHub-Api-Version": "2022-11-28",
+// Whether the branch has moved on from sha in a way that hands the channel to
+// another run: a later commit changed the client, or sha is no longer on the
+// branch. A comparison too large to list in full counts as superseded, since
+// the files it leaves out may change the client.
+export async function laterClientChange({ repository, refName, sha, token, fetchImpl = globalThis.fetch }) {
+	const response = await fetchImpl(
+		`https://api.github.com/repos/${repository}/compare/${sha}...${encodeURIComponent(refName)}`,
+		{
+			headers: {
+				Authorization: `Bearer ${token}`,
+				Accept: "application/vnd.github+json",
+				"X-GitHub-Api-Version": "2022-11-28",
+			},
 		},
-	});
+	);
 	if (!response.ok) {
-		throw new Error(`reading ${refName} answered ${response.status}`);
+		throw new Error(`comparing ${sha} with ${refName} answered ${response.status}`);
 	}
 	const body = await response.json();
-	if (typeof body.sha !== "string") {
-		throw new Error(`reading ${refName} did not return a commit`);
+	if (body.status === "identical") return false;
+	if (body.status !== "ahead") return true;
+	if (!Array.isArray(body.files)) {
+		throw new Error(`comparing ${sha} with ${refName} did not list the changed files`);
 	}
-	return body.sha;
+	if (body.files.length >= compareFileLimit) return true;
+	// A rename counts by either name, as the push path filter does.
+	return body.files.some(
+		(file) => changesClient(file.filename) || (file.previous_filename !== undefined && changesClient(file.previous_filename)),
+	);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -125,21 +153,21 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 	const refName = process.env.REF_NAME;
 	const refType = process.env.REF_TYPE;
 	const target = { ...releaseTarget({ refType, refName, sha, version: pkg.version }), name: pkg.name };
-	const heads = () =>
-		branchHead({
+	const superseded = () =>
+		laterClientChange({
 			repository: process.env.GITHUB_REPOSITORY,
 			refName,
+			sha,
 			token: process.env.GITHUB_TOKEN,
 		});
 	const result = await publishCurrent({
 		refType,
-		sha,
 		target,
-		heads,
+		superseded,
 		...npmSteps({ name: pkg.name, run: runNpm }),
 	});
 	if (result.action === "skip") {
-		console.log(`skipping publish; ${refName} has moved past ${sha}`);
+		console.log(`skipping publish; a later commit on ${refName} changed the client`);
 	} else if (result.action === "left-channel") {
 		console.log(`published ${result.version} without moving ${result.tag}; restore with: ${result.restore}`);
 	} else {
