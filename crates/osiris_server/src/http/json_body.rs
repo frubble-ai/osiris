@@ -19,6 +19,7 @@ where
 {
     type Rejection = ApiError;
 
+    /// Reads the body as `T`, or refuses it as `OS_02` naming why.
     async fn from_request(request: Request, state: &S) -> Result<Self, Self::Rejection> {
         Json::<T>::from_request(request, state)
             .await

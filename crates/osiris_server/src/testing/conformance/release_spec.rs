@@ -29,7 +29,7 @@ pub fn release_spec(releases: &[Release], release: &Release) -> Arc<Value> {
     {
         return spec.clone();
     }
-    let spec = Arc::new(versioned_spec(releases, release));
+    let spec = Arc::new(versioned_spec(releases, release).expect("a release's spec serializes"));
     cache
         .lock()
         .unwrap_or_else(PoisonError::into_inner)

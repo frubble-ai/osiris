@@ -14,6 +14,7 @@ pub struct ApiSettings {
 }
 
 impl Default for ApiSettings {
+    /// The current release, pinned, and two years of support.
     fn default() -> Self {
         Self {
             pinned_version: osiris_api_models::version::CURRENT.name.to_owned(),

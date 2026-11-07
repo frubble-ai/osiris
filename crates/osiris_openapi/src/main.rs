@@ -8,12 +8,13 @@ use osiris_api_models::version::RELEASES;
 use osiris_server::services::api::{spec, versioned_spec};
 use std::path::Path;
 
+/// Writes every spec under the directory given, `api-reference` by default.
 fn main() -> anyhow::Result<()> {
     let root = std::env::args()
         .nth(1)
         .unwrap_or_else(|| "api-reference".to_owned());
     let root = Path::new(&root);
-    write(&root.join("openapi.json"), &spec())?;
+    write(&root.join("openapi.json"), &spec()?)?;
     // A release no longer served leaves no spec behind.
     let versions = root.join("versions");
     if versions.exists() {
@@ -23,7 +24,7 @@ fn main() -> anyhow::Result<()> {
     for release in RELEASES {
         write(
             &versions.join(format!("{}.json", release.name)),
-            &versioned_spec(RELEASES, release),
+            &versioned_spec(RELEASES, release)?,
         )?;
     }
     Ok(())

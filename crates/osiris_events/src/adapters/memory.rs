@@ -49,6 +49,7 @@ impl MemoryTransport {
 
 #[async_trait]
 impl Transport for MemoryTransport {
+    /// Keeps the message as it was sent, or fails while `fail(true)` is set.
     async fn publish(
         &self,
         channel: Channel,

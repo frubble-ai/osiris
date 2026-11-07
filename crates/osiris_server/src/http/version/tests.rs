@@ -120,11 +120,18 @@ async fn leaves_an_older_release_s_errors_and_untouched_routes_as_they_are(pool:
 #[test]
 fn takes_the_spec_and_events_back_to_the_older_release() {
     let amun = &MOCK_RELEASES[0];
-    let spec = versioned_spec(MOCK_RELEASES, amun);
+    let spec = versioned_spec(MOCK_RELEASES, amun).unwrap();
     let properties = &spec["components"]["schemas"]["AuthConfig"]["properties"];
     assert!(properties.get("app_id").is_some());
     assert!(properties.get("client_id").is_none());
     assert_eq!(spec["info"]["version"], AMUN);
+    // amun's clients were promised anubis's date plus the default 730 days.
+    assert_eq!(spec["info"]["x-osiris-sunset"], "2028-11-03");
+    assert!(
+        versioned_spec(MOCK_RELEASES, &MOCK_RELEASES[1]).unwrap()["info"]
+            .get("x-osiris-sunset")
+            .is_none()
+    );
 
     let mut event = json!({ "type": "connection.active", "connected_account_id": "ca_1" });
     event_down(MOCK_RELEASES, amun, &mut event);
@@ -205,6 +212,7 @@ async fn refuses_a_body_too_large_the_same_at_every_release(pool: PgPool) {
             .await;
         assert_eq!(refused.status, StatusCode::BAD_REQUEST, "at {release}");
         assert_eq!(refused.body["error"]["code"], "OS_02", "at {release}");
+        assert_eq!(refused.headers["osiris-version"], release);
     }
 }
 

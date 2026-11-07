@@ -7,6 +7,7 @@
 pub mod lifecycle_headers;
 pub mod resolve_release;
 pub mod serve_version;
+pub mod superseded;
 pub mod translate_request;
 pub mod translate_response;
 

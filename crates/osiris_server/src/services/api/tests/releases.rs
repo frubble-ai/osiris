@@ -56,7 +56,7 @@ fn keeps_every_release_but_the_newest_stable() {
 #[test]
 fn names_each_release_and_its_stability_in_its_spec() {
     for release in RELEASES {
-        let spec = versioned_spec(RELEASES, release);
+        let spec = versioned_spec(RELEASES, release).unwrap();
         assert_eq!(spec["info"]["version"], release.name);
         assert_eq!(
             spec["info"]["x-osiris-stability"],
@@ -68,9 +68,9 @@ fn names_each_release_and_its_stability_in_its_spec() {
 
 #[test]
 fn names_the_current_release_in_the_current_spec() {
-    let spec = crate::services::api::spec();
+    let spec = crate::services::api::spec().unwrap();
     assert_eq!(spec["info"]["version"], CURRENT.name);
-    assert_eq!(spec, versioned_spec(RELEASES, CURRENT));
+    assert_eq!(spec, versioned_spec(RELEASES, CURRENT).unwrap());
 }
 
 #[test]

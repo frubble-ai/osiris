@@ -221,6 +221,49 @@ class ContractGuardTest(unittest.TestCase):
         result = repository.guard(sunset=True, today="2029-03-01", extra=environment)
         self.assert_refused(result, "advertise a sunset of 2029-11-25")
 
+    def test_refuses_a_transcript_edited_while_its_release_is_removed(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        next_spec = f"api-reference/versions/{NEXT}.json"
+        repository = Repository(
+            directory.name,
+            {SPEC: spec("stable"), next_spec: spec("preview", NEXT), GOLDEN: '{"steps": []}\n'},
+        )
+        repository.write({SPEC: None, GOLDEN: '{"steps": [1]}\n'})
+        repository.commit("head")
+        result = repository.guard(sunset=True, today="2029-03-01")
+        self.assert_refused(result, "golden transcript")
+
+    def test_keeps_the_sunset_a_release_s_spec_recorded(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        next_spec = f"api-reference/versions/{NEXT}.json"
+        promised = spec("stable")
+        promised["info"]["x-osiris-sunset"] = "2030-01-01"
+        repository = Repository(
+            directory.name,
+            {SPEC: promised, next_spec: spec("preview", NEXT), GOLDEN: '{"steps": []}\n'},
+        )
+        repository.write({SPEC: None, GOLDEN: None})
+        repository.commit("head")
+        # Past bastet's date plus 730 days, but not past the sunset anubis's spec recorded.
+        result = repository.guard(sunset=True, today="2029-03-01")
+        self.assert_refused(result, "advertise a sunset of 2030-01-01")
+
+    def test_refuses_a_recorded_sunset_brought_forward(self):
+        repository = self.repository()
+        promised = spec("stable")
+        promised["info"]["x-osiris-sunset"] = "2030-01-01"
+        repository.write({SPEC: promised})
+        repository.commit("record the sunset")
+        repository.base = repository.git("rev-parse", "HEAD").strip()
+
+        def bring_forward(changed):
+            changed["info"]["x-osiris-sunset"] = "2029-01-01"
+            return changed
+
+        self.assert_refused(self.head(repository, bring_forward), "never brought forward")
+
     def test_refuses_a_removal_whose_window_is_unknown(self):
         self.assert_refused(
             self.sunset_repository(config=False).guard(sunset=True, today="2100-01-01"),

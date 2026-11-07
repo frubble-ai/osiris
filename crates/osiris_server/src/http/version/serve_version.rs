@@ -11,7 +11,7 @@ use axum::{
     extract::{MatchedPath, Request, State},
     http::HeaderValue,
     middleware::Next,
-    response::Response,
+    response::{IntoResponse, Response},
 };
 use osiris_api_models::version::{HEADER, Route, STABILITY_HEADER};
 
@@ -19,7 +19,7 @@ use osiris_api_models::version::{HEADER, Route, STABILITY_HEADER};
 /// isn't the current one.
 pub async fn serve_version(
     State(state): State<ApiState>,
-    mut request: Request,
+    request: Request,
     next: Next,
 ) -> Result<Response, ApiError> {
     let release = resolve_release(&state, request.headers())?;
@@ -36,14 +36,19 @@ pub async fn serve_version(
         .releases
         .last()
         .is_some_and(|last| last.name == release.name);
-    if !current {
+    let mut response = if current {
+        next.run(request).await
+    } else {
         let max_body = state.config.settings.server.max_body();
-        request = translate_request(state.releases, release, &route, max_body, request).await?;
-    }
-    let mut response = next.run(request).await;
-    if !current {
-        response = translate_response(state.releases, release, &route, response).await;
-    }
+        // A request refused while it is brought up is still an answer at its release, named so.
+        match translate_request(state.releases, release, &route, max_body, request).await {
+            Ok(request) => {
+                let answer = next.run(request).await;
+                translate_response(state.releases, release, &route, answer).await
+            }
+            Err(error) => error.into_response(),
+        }
+    };
     let headers = response.headers_mut();
     lifecycle_headers(
         state.releases,

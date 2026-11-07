@@ -82,7 +82,9 @@ about. The idempotency middleware runs inside the version middleware, so it keys
 current release's shape.
 
 An answer at a superseded release carries `Deprecation` (RFC 9745, the next release's date) and
-`Sunset` (RFC 8594, that date plus `[api] support_days`, 730 by default). Past its sunset, a release
+`Sunset` (RFC 8594, that date plus `[api] support_days`, 730 by default). The release's spec
+records that sunset at the default window as `info.x-osiris-sunset`; it may only stay or move
+later, and a removal is held to it. Past its sunset, a release
 is still served until a pull request removes it.
 
 ## What holds it

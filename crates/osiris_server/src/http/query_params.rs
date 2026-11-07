@@ -19,6 +19,7 @@ where
 {
     type Rejection = ApiError;
 
+    /// Reads the query as `T`, or refuses it as `OS_02`.
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         Query::<T>::from_request_parts(parts, state)
             .await

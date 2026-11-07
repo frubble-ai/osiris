@@ -38,11 +38,13 @@ fn rename_in_schemas(value: &mut Value) {
 }
 
 impl VersionChange for MockRenamedClientId {
+    /// The change as amun's clients would read it.
     fn description(&self) -> &'static str {
         "An auth config's `app_id` is now `client_id`, and the connections filter `label` is now \
          `alias`."
     }
 
+    /// Names the fields and the filter as amun did, in every schema that has them.
     fn spec(&self, spec: &mut Value) {
         if let Some(schemas) = spec.pointer_mut("/components/schemas") {
             rename_in_schemas(schemas);
@@ -57,12 +59,14 @@ impl VersionChange for MockRenamedClientId {
         }
     }
 
+    /// An amun auth config body, with `app_id` as `client_id`.
     fn request(&self, route: &Route<'_>, body: &mut Value) {
         if route.is("POST", "/v1/auth-configs") || route.is("PATCH", "/v1/auth-configs/{id}") {
             rename(body, "app_id", "client_id");
         }
     }
 
+    /// An amun connections filter, with `label` as `alias`.
     fn query(&self, route: &Route<'_>, query: &mut Vec<(String, String)>) {
         if route.is("GET", "/v1/connected-accounts") {
             for (name, _) in query.iter_mut() {
@@ -73,6 +77,7 @@ impl VersionChange for MockRenamedClientId {
         }
     }
 
+    /// An auth config answer, one or a list, with `client_id` as `app_id`.
     fn response(&self, route: &Route<'_>, status: u16, body: &mut Value) {
         if !(200..300).contains(&status) || !route.path.starts_with("/v1/auth-configs") {
             return;
@@ -85,6 +90,7 @@ impl VersionChange for MockRenamedClientId {
         }
     }
 
+    /// An event with `connected_account_id` as amun's `connection_id`.
     fn event(&self, event: &mut Value) {
         rename(event, "connected_account_id", "connection_id");
     }

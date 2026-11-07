@@ -42,6 +42,7 @@ pub struct RepositoryAnswer {
 }
 
 impl From<InstallationAnswer> for GithubInstallation {
+    /// The installation in our terms, its account type and selection passed on as open strings.
     fn from(answer: InstallationAnswer) -> Self {
         Self {
             id: answer.id.to_string(),
@@ -53,6 +54,7 @@ impl From<InstallationAnswer> for GithubInstallation {
 }
 
 impl From<RepositoryAnswer> for GithubRepository {
+    /// The repository in our terms.
     fn from(answer: RepositoryAnswer) -> Self {
         Self {
             id: answer.id.to_string(),

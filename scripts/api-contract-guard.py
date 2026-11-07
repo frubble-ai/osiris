@@ -8,8 +8,11 @@ For each release whose spec in api-reference/versions/ is stable on the base bra
   answers advertised: the next release's date plus `support_days`. The window is the longest of the
   base's documented default (config.example.toml, what clients were told), the head's, and
   OSIRIS__API__SUPPORT_DAYS (the setting a deployment overrides it with), so a pull request can't
-  shorten the promise it is checked against; with none of them known, the removal is refused.
-  OSIRIS_TODAY sets the day, for tests;
+  shorten the promise it is checked against; with none of them known, the removal is refused. The
+  sunset a superseded release's spec recorded (`info.x-osiris-sunset`) is kept as the promise:
+  a later window shorter than it never brings the removal forward. OSIRIS_TODAY sets the day, for
+  tests. A removal deletes the release's transcripts; it never edits one;
+- a sunset its spec recorded may only stay or move later;
 - oasdiff must find no breaking change and no warning between its base and head spec, with the
   events webhook read as an answer osiris sends (oasdiff reads a webhook's payload as a request,
   whose rules point the other way);
@@ -78,8 +81,15 @@ def released_on(release):
     return datetime.date.fromisoformat(release[:10])
 
 
-def sunset_problem(base, release, listed):
-    """Why `release` can't be removed yet, or None once it is past its sunset."""
+def recorded_sunset(spec):
+    """The sunset a superseded release's spec recorded, or None."""
+    recorded = (spec or {}).get("info", {}).get("x-osiris-sunset")
+    return datetime.date.fromisoformat(recorded) if recorded else None
+
+
+def sunset_problem(base, release, listed, base_spec):
+    """Why `release` can't be removed yet, or None once it is past its sunset: the later of the
+    sunset its spec recorded and the next release's date plus the longest window known."""
     names = [file.removesuffix(".json") for file in sorted(listed)]
     later = names[names.index(release) + 1:]
     if not later:
@@ -87,7 +97,8 @@ def sunset_problem(base, release, listed):
     days = support_days(base)
     if days is None:
         return "no support_days is documented or set, so its sunset is unknown"
-    sunset = released_on(later[0]) + datetime.timedelta(days=days)
+    candidates = [released_on(later[0]) + datetime.timedelta(days=days), recorded_sunset(base_spec)]
+    sunset = max(day for day in candidates if day is not None)
     today = datetime.date.fromisoformat(os.environ["OSIRIS_TODAY"]) if os.environ.get("OSIRIS_TODAY") else datetime.date.today()
     if today < sunset:
         return f"{release}'s answers advertise a sunset of {sunset}, and it is {today}"
@@ -126,6 +137,17 @@ def oasdiff(binary, command, base_spec, head_spec, *flags):
                 json.dump(as_answers(spec), file)
             paths.append(path)
         return subprocess.run([binary, command, *paths, *flags], capture_output=True, text=True)
+
+
+def check_transcripts(base, release, failures, removed):
+    """Adds a failure for each of `release`'s transcripts changed since `base`: a new one may be
+    added, and a removed release's are deleted, but none is ever edited."""
+    allowed = {"A", "D"} if removed else {"A"}
+    changed = git("diff", "--name-status", f"{base}...HEAD", "--", f"{GOLDEN}/{release}/").split("\n")
+    for line in filter(None, changed):
+        status, _, name = line.partition("\t")
+        if status not in allowed:
+            failures.append(f"{release} is stable and its golden transcript {name} was changed ({status}); what a stable release does never changes")
 
 
 def summary(text):
@@ -169,11 +191,15 @@ def main():
         if head_spec is None:
             if not sunset:
                 failures.append(f"{release} is stable and its spec was removed; a release is only removed past its sunset, in a pull request labelled api-sunset")
-            elif problem := sunset_problem(base, release, listed):
+            elif problem := sunset_problem(base, release, listed, base_spec):
                 failures.append(f"{release} can't be removed yet: {problem}")
+            check_transcripts(base, release, failures, removed=True)
             continue
         if stability(head_spec) != "stable":
             failures.append(f"{release} was stable and is not any more; a stable release stays stable")
+        promised, now = recorded_sunset(base_spec), recorded_sunset(head_spec)
+        if promised and (now is None or now < promised):
+            failures.append(f"{release}'s spec recorded a sunset of {promised}, and this moves it to {now}; a promised sunset is never brought forward")
 
         result = oasdiff(binary, "breaking", base_spec, head_spec, "--fail-on", "WARN")
         if result.returncode != 0:
@@ -181,11 +207,7 @@ def main():
         else:
             summary(f"### {release} (stable): nothing breaks\n")
 
-        changed = git("diff", "--name-status", f"{base}...HEAD", "--", f"{GOLDEN}/{release}/").split("\n")
-        for line in filter(None, changed):
-            status, _, name = line.partition("\t")
-            if status != "A":
-                failures.append(f"{release} is stable and its golden transcript {name} was changed ({status}); what a stable release does never changes")
+        check_transcripts(base, release, failures, removed=False)
 
     for failure in failures:
         print(f"::error::{failure.splitlines()[0]}")
