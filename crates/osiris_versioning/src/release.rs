@@ -38,3 +38,6 @@ impl std::fmt::Debug for Release {
         formatter.write_str(self.name)
     }
 }
+
+#[cfg(test)]
+mod tests;

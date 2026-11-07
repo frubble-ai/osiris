@@ -12,7 +12,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  # A label change runs only the contract job, in a group of its own, so it never cancels a run of
+  # the code's checks that it would then skip.
+  group: ci-${{ github.ref }}-${{ (github.event.action == 'labeled' || github.event.action == 'unlabeled') && 'labels' || 'code' }}
   cancel-in-progress: true
 
 env:
@@ -59,6 +61,8 @@ jobs:
 
   quality:
     needs: secret-scan
+    # A label change only re-runs the contract job, which reads the labels.
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
     name: Format, lint, dependencies, spelling, commits
     runs-on: ubuntu-latest
     steps:
@@ -85,6 +89,8 @@ jobs:
 
   test:
     needs: secret-scan
+    # A label change only re-runs the contract job, which reads the labels.
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
     name: Tests
     runs-on: ubuntu-latest
     # The same Postgres as locally (docker-compose): TLS only, with a generated CA, and the same
@@ -136,6 +142,8 @@ jobs:
 
   openapi:
     needs: secret-scan
+    # A label change only re-runs the contract job, which reads the labels.
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
     name: OpenAPI matches the routes, for every release
     runs-on: ubuntu-latest
     steps:
@@ -180,6 +188,8 @@ jobs:
 
   image:
     needs: secret-scan
+    # A label change only re-runs the contract job, which reads the labels.
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
     name: Image
     runs-on: ubuntu-latest
     steps:

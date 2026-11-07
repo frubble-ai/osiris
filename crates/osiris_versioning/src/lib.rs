@@ -9,10 +9,13 @@
 //! served at once from one current model.
 
 pub mod header;
+#[cfg(test)]
+pub mod mocks;
 pub mod release;
 pub mod releases;
 pub mod route;
 pub mod stability;
+pub mod superseded;
 pub mod translate;
 pub mod version_change;
 
@@ -21,4 +24,5 @@ pub use release::Release;
 pub use releases::{ANUBIS, CURRENT, RELEASES, find, is_known};
 pub use route::Route;
 pub use stability::Stability;
+pub use superseded::superseded;
 pub use version_change::VersionChange;

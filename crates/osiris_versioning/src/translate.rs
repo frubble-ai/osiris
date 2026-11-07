@@ -14,3 +14,6 @@ pub use query_up::query_up;
 pub use request_up::request_up;
 pub use response_down::response_down;
 pub use spec_down::spec_down;
+
+#[cfg(test)]
+mod tests;

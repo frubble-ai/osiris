@@ -4,8 +4,8 @@
 //! the contract guard holds a removal to, and which may never be shortened.
 
 use super::spec::spec;
-use crate::{config::settings::api::ApiSettings, http::version::superseded::superseded};
-use osiris_versioning::{Release, translate::spec_down};
+use crate::config::settings::api::ApiSettings;
+use osiris_versioning::{Release, superseded, translate::spec_down};
 use serde_json::Value;
 use time::macros::format_description;
 
