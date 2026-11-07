@@ -1,7 +1,7 @@
 //! A version change as a real release writes one: anubis renamed an auth config's `app_id` to
 //! `client_id`, so amun's requests are brought up and anubis's answers, events and spec taken back.
 
-use osiris_api_models::version::{ANUBIS, Release, Route, VersionChange};
+use osiris_api_models::version::{ANUBIS, Release, Route, Stability, VersionChange};
 use serde_json::Value;
 
 pub struct MockRenamedClientId;
@@ -73,7 +73,7 @@ impl VersionChange for MockRenamedClientId {
 
 const AMUN: Release = Release {
     name: "2026-01-01.amun",
-    contract_sha256: "",
+    stability: Stability::Stable,
     changes: &[],
 };
 

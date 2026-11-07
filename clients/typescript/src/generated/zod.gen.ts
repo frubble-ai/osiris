@@ -5,6 +5,18 @@ import * as z from 'zod';
 /**
  * An action's answer: what it read, as `data`.
  */
+export const zActionResultVecGithubInstallation = z.object({
+    data: z.array(z.object({
+        account: z.string(),
+        account_type: z.string(),
+        id: z.string(),
+        repository_selection: z.string()
+    }))
+});
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
 export const zActionResultVecGithubRepository = z.object({
     data: z.array(z.object({
         description: z.string().nullish(),
@@ -104,7 +116,29 @@ export const zErrorBody = z.object({
     error: zErrorDetail
 });
 
-export const zGithubAccountType = z.enum(['user', 'organization']);
+/**
+ * An event as a subscriber receives it on the events topic, written in the API key's pinned
+ * release. The type and the connection's id, never its data: fetch the connection for its state.
+ */
+export const zEventDelivery = z.object({
+    connected_account_id: z.string(),
+    event_id: z.string(),
+    id: z.string(),
+    occurred_at: z.iso.datetime(),
+    osiris_version: z.string(),
+    type: z.string(),
+    version: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' })
+});
+
+/**
+ * Where our GitHub App is installed: an account or organization.
+ */
+export const zGithubInstallation = z.object({
+    account: z.string(),
+    account_type: z.string(),
+    id: z.string(),
+    repository_selection: z.string()
+});
 
 /**
  * A repository our GitHub App reads, through one of its installations.
@@ -115,30 +149,6 @@ export const zGithubRepository = z.object({
     id: z.string(),
     private: z.boolean(),
     url: z.string()
-});
-
-export const zGithubRepositorySelection = z.enum(['all', 'selected']);
-
-/**
- * An action's answer: what it read, as `data`.
- */
-export const zActionResultVecGithubInstallation = z.object({
-    data: z.array(z.object({
-        account: z.string(),
-        account_type: zGithubAccountType,
-        id: z.string(),
-        repository_selection: zGithubRepositorySelection
-    }))
-});
-
-/**
- * Where our GitHub App is installed: an account or organization.
- */
-export const zGithubInstallation = z.object({
-    account: z.string(),
-    account_type: zGithubAccountType,
-    id: z.string(),
-    repository_selection: zGithubRepositorySelection
 });
 
 /**
@@ -347,3 +357,9 @@ export const zTriggerEventHeaders = z.object({
 });
 
 export const zTriggerEventResponse = zTriggeredEvent;
+
+export const zReceiveEventWebhookRequest = z.object({
+    body: zEventDelivery,
+    path: z.never().optional(),
+    query: z.never().optional()
+});

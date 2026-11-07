@@ -89,8 +89,9 @@ deny:
 typos:
     typos
 
-test:
-    cargo nextest run --workspace
+# The tests; arguments filter them, such as `just test contract_lock`.
+test *filters:
+    cargo nextest run --workspace {{filters}}
 
 # The committed specs are the ones the routes describe.
 openapi-check:

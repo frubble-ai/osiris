@@ -2006,7 +2006,6 @@ dependencies = [
  "osiris_providers",
  "serde",
  "serde_json",
- "sha2 0.11.1",
  "time",
  "utoipa",
 ]
@@ -2099,6 +2098,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "fake",
+ "osiris_api_models",
  "osiris_common",
  "osiris_domain",
  "osiris_events",

@@ -2,6 +2,7 @@
 //! `server_wrap`; the OAuth callback and `/health` in the open.
 
 pub mod doc;
+pub mod events_webhook;
 pub mod ground_rule_answers;
 pub mod router;
 pub mod serve;

@@ -1,5 +1,6 @@
 //! The version middleware: resolves the release a request is served at, translates the request
-//! and its answer when that release is not the current one, and names the release on the answer.
+//! and its answer when that release is not the current one, and names the release and whether it
+//! is a preview on the answer.
 
 use super::{
     ServedRelease, lifecycle_headers::lifecycle_headers, resolve_release::resolve_release,
@@ -12,7 +13,7 @@ use axum::{
     middleware::Next,
     response::Response,
 };
-use osiris_api_models::version::{HEADER, Route};
+use osiris_api_models::version::{HEADER, Route, STABILITY_HEADER};
 
 pub async fn serve_version(
     State(state): State<ApiState>,
@@ -50,5 +51,9 @@ pub async fn serve_version(
         headers,
     );
     headers.insert(HEADER, HeaderValue::from_static(release.name));
+    headers.insert(
+        STABILITY_HEADER,
+        HeaderValue::from_static(release.stability.as_str()),
+    );
     Ok(response)
 }

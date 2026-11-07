@@ -4,7 +4,6 @@
 mod actions;
 mod auth_configs;
 mod connecting;
-mod contract_lock;
 mod disconnecting;
 mod events;
 mod health;
@@ -12,3 +11,4 @@ mod idempotency;
 mod keys_and_versions;
 mod listing;
 mod refreshing;
+mod releases;

@@ -4,6 +4,8 @@ export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
 };
 
+export type Webhooks = ReceiveEventWebhookRequest;
+
 /**
  * An action's answer: what it read, as `data`.
  */
@@ -13,9 +15,17 @@ export type ActionResultVecGithubInstallation = {
          * The account or organization's login.
          */
         account: string;
-        account_type: GithubAccountType;
+        /**
+         * `user` or `organization` today. An open string: more values may come without a new
+         * release, and a client keeps working on one it doesn't know.
+         */
+        account_type: string;
         id: string;
-        repository_selection: GithubRepositorySelection;
+        /**
+         * `all` (every repository of the account) or `selected` (only the ones chosen at install)
+         * today. An open string: more values may come without a new release.
+         */
+        repository_selection: string;
     }>;
 };
 
@@ -183,7 +193,36 @@ export type ErrorDetail = {
     type: string;
 };
 
-export type GithubAccountType = 'user' | 'organization';
+/**
+ * An event as a subscriber receives it on the events topic, written in the API key's pinned
+ * release. The type and the connection's id, never its data: fetch the connection for its state.
+ */
+export type EventDelivery = {
+    connected_account_id: string;
+    /**
+     * `ev_…`, the same each time the event is delivered, so a client can drop repeats.
+     */
+    event_id: string;
+    /**
+     * `msg_…`, this delivery's own id.
+     */
+    id: string;
+    occurred_at: string;
+    /**
+     * The API release the event is written in, also the message's `osiris_version` attribute.
+     */
+    osiris_version: string;
+    /**
+     * What happened, also the message's `type` attribute: `connection.active`,
+     * `connection.expired` or `connection.revoked` today. An open string: new types may come
+     * without a new release, and a client ignores a type it doesn't know.
+     */
+    type: string;
+    /**
+     * The envelope's format.
+     */
+    version: number;
+};
 
 /**
  * Where our GitHub App is installed: an account or organization.
@@ -193,9 +232,17 @@ export type GithubInstallation = {
      * The account or organization's login.
      */
     account: string;
-    account_type: GithubAccountType;
+    /**
+     * `user` or `organization` today. An open string: more values may come without a new
+     * release, and a client keeps working on one it doesn't know.
+     */
+    account_type: string;
     id: string;
-    repository_selection: GithubRepositorySelection;
+    /**
+     * `all` (every repository of the account) or `selected` (only the ones chosen at install)
+     * today. An open string: more values may come without a new release.
+     */
+    repository_selection: string;
 };
 
 /**
@@ -211,8 +258,6 @@ export type GithubRepository = {
     private: boolean;
     url: string;
 };
-
-export type GithubRepositorySelection = 'all' | 'selected';
 
 /**
  * A Linear team the connected user can see.
@@ -1019,3 +1064,12 @@ export type TriggerEventResponses = {
 };
 
 export type TriggerEventResponse = TriggerEventResponses[keyof TriggerEventResponses];
+
+export type ReceiveEventWebhookPayload = EventDelivery;
+
+export type ReceiveEventWebhookRequest = {
+    body: ReceiveEventWebhookPayload;
+    key: 'events';
+    path?: never;
+    query?: never;
+};

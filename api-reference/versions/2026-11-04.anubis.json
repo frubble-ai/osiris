@@ -13,13 +13,15 @@
                   "type": "string"
                 },
                 "account_type": {
-                  "$ref": "#/components/schemas/GithubAccountType"
+                  "description": "`user` or `organization` today. An open string: more values may come without a new\nrelease, and a client keeps working on one it doesn't know.",
+                  "type": "string"
                 },
                 "id": {
                   "type": "string"
                 },
                 "repository_selection": {
-                  "$ref": "#/components/schemas/GithubRepositorySelection"
+                  "description": "`all` (every repository of the account) or `selected` (only the ones chosen at install)\ntoday. An open string: more values may come without a new release.",
+                  "type": "string"
                 }
               },
               "required": [
@@ -398,12 +400,50 @@
         ],
         "type": "object"
       },
-      "GithubAccountType": {
-        "enum": [
-          "user",
-          "organization"
+      "EventDelivery": {
+        "additionalProperties": false,
+        "description": "An event as a subscriber receives it on the events topic, written in the API key's pinned\nrelease. The type and the connection's id, never its data: fetch the connection for its state.",
+        "properties": {
+          "connected_account_id": {
+            "type": "string"
+          },
+          "event_id": {
+            "description": "`ev_…`, the same each time the event is delivered, so a client can drop repeats.",
+            "type": "string"
+          },
+          "id": {
+            "description": "`msg_…`, this delivery's own id.",
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "osiris_version": {
+            "description": "The API release the event is written in, also the message's `osiris_version` attribute.",
+            "type": "string"
+          },
+          "type": {
+            "description": "What happened, also the message's `type` attribute: `connection.active`,\n`connection.expired` or `connection.revoked` today. An open string: new types may come\nwithout a new release, and a client ignores a type it doesn't know.",
+            "type": "string"
+          },
+          "version": {
+            "description": "The envelope's format.",
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "id",
+          "occurred_at",
+          "osiris_version",
+          "event_id",
+          "type",
+          "connected_account_id"
         ],
-        "type": "string"
+        "type": "object"
       },
       "GithubInstallation": {
         "description": "Where our GitHub App is installed: an account or organization.",
@@ -413,13 +453,15 @@
             "type": "string"
           },
           "account_type": {
-            "$ref": "#/components/schemas/GithubAccountType"
+            "description": "`user` or `organization` today. An open string: more values may come without a new\nrelease, and a client keeps working on one it doesn't know.",
+            "type": "string"
           },
           "id": {
             "type": "string"
           },
           "repository_selection": {
-            "$ref": "#/components/schemas/GithubRepositorySelection"
+            "description": "`all` (every repository of the account) or `selected` (only the ones chosen at install)\ntoday. An open string: more values may come without a new release.",
+            "type": "string"
           }
         },
         "required": [
@@ -460,13 +502,6 @@
           "url"
         ],
         "type": "object"
-      },
-      "GithubRepositorySelection": {
-        "enum": [
-          "all",
-          "selected"
-        ],
-        "type": "string"
       },
       "LinearTeam": {
         "description": "A Linear team the connected user can see.",
@@ -768,7 +803,8 @@
       "name": "UNLICENSED"
     },
     "title": "Osiris",
-    "version": "2026-11-04.anubis"
+    "version": "2026-11-04.anubis",
+    "x-osiris-stability": "preview"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -2247,5 +2283,29 @@
       "description": "Test events (admin key)",
       "name": "events"
     }
-  ]
+  ],
+  "webhooks": {
+    "events": {
+      "post": {
+        "description": "Published on the events topic, with the `type` and `osiris_version` attributes, written in the release the API key is pinned to.",
+        "operationId": "receive_event",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventDelivery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Received"
+          }
+        },
+        "summary": "An event on the events topic"
+      }
+    }
+  }
 }

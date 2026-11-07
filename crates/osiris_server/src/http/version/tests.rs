@@ -8,8 +8,13 @@ use crate::{
 };
 use axum::http::{HeaderMap, StatusCode};
 use osiris_api_models::version::translate::event_down;
+use osiris_events::{
+    Message, MessageBus, adapters::memory::MemoryTransport,
+    testing::generate_event_message::generate_event_message,
+};
 use serde_json::json;
 use sqlx::PgPool;
+use std::sync::Arc;
 use time::Duration;
 
 const AMUN: &str = "2026-01-01.amun";
@@ -87,6 +92,8 @@ async fn marks_a_superseded_release_s_answers_with_its_deprecation_and_sunset(po
     assert_eq!(old.headers["sunset"], "Fri, 03 Nov 2028 00:00:00 GMT");
     assert!(current.headers.get("deprecation").is_none());
     assert!(current.headers.get("sunset").is_none());
+    assert_eq!(old.headers["osiris-stability"], "stable");
+    assert_eq!(current.headers["osiris-stability"], "preview");
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
@@ -122,6 +129,27 @@ fn takes_the_spec_and_events_back_to_the_older_release() {
     assert_eq!(
         event,
         json!({ "type": "connection.active", "connection_id": "ca_1" })
+    );
+}
+
+#[tokio::test]
+async fn writes_events_in_the_pinned_release() {
+    let transport = Arc::new(MemoryTransport::default());
+    let bus = MessageBus::new(transport.clone()).written_in(MOCK_RELEASES, &MOCK_RELEASES[0]);
+    let event = generate_event_message();
+
+    bus.send(Message::Event(event.clone()))
+        .await
+        .expect("published");
+
+    let sent = transport.sent().pop().expect("one message");
+    let body: serde_json::Value = serde_json::from_slice(&sent.data).expect("JSON");
+    assert_eq!(body["osiris_version"], AMUN);
+    assert_eq!(body["connection_id"], event.connected_account_id);
+    assert!(body.get("connected_account_id").is_none());
+    assert!(
+        sent.attributes
+            .contains(&("osiris_version".to_owned(), AMUN.to_owned()))
     );
 }
 

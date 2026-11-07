@@ -1,15 +1,14 @@
-//! A named release: its name, the digest of its contract, and the changes it made to the release
-//! before.
+//! A named release: its name, whether it is still a preview, and the changes it made to the
+//! release before.
 
-use super::VersionChange;
+use super::{Stability, VersionChange};
 use time::{Date, Month};
 
 pub struct Release {
     /// `<date>.<name>`, such as `2026-11-04.anubis`.
     pub name: &'static str,
-    /// The SHA-256 of the release's contract ([`super::contract`]). A test regenerates it from the
-    /// code and fails when they differ, so a released contract can't change unnoticed.
-    pub contract_sha256: &'static str,
+    /// A preview's contract may still change in any way; a stable one's only grows.
+    pub stability: Stability,
     /// The changes this release made, oldest first; empty for the first release.
     pub changes: &'static [&'static dyn VersionChange],
 }

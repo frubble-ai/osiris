@@ -93,7 +93,11 @@ pub async fn setup_test_context_with(
             MasterKey::from_secret(config.encryption_key.expose_secret()).expect("the test key"),
             settings.database.lock_timeout(),
         ),
-        messages: MessageBus::new(bus.clone()),
+        messages: MessageBus::new(bus.clone()).written_in(
+            osiris_api_models::version::RELEASES,
+            osiris_api_models::version::find(&settings.api.pinned_version)
+                .expect("a release osiris serves"),
+        ),
         tasks: tasks.clone(),
         providers: Arc::new(
             Providers::new(&urls, &urls, &slack, settings.providers.listing.limits())
