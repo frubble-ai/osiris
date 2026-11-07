@@ -44,6 +44,9 @@ jobs:
       group: client-publish-${{ github.ref }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
+    # A stalled npm or GitHub API call ends here. A version uploaded before the stall stays
+    # published, and its channel is moved by hand with `npm dist-tag add`.
+    timeout-minutes: 10
     permissions:
       contents: read
       packages: write
