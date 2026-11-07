@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { alreadyPublished, branchHead, commandError, publishCurrent, releaseTarget } from "./publish-release.mjs";
+import { alreadyPublished, branchHead, commandError, npmSteps, publishCurrent, releaseTarget } from "./publish-release.mjs";
 
 const sha = "27ff530956b3e38d57ad4d4c3e2ffc5634857b06";
 const newer = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -36,6 +36,12 @@ test("a release tag publishes that version on latest", () => {
 test("a tag that is not a plain release is refused", () => {
 	for (const refName of ["v1.2.3garbage", "v1.2.3.4", "v1.2.3-rc.1", "v01.2.3"]) {
 		assert.throws(() => releaseTarget({ refType: "tag", refName, sha, version: "0.1.0" }), /v1\.2\.3/);
+	}
+});
+
+test("a commit id that is not 12 hex characters is refused", () => {
+	for (const bad of ["xyz", "27ff530956b", "27ff530956bZ"]) {
+		assert.throws(() => releaseTarget({ refType: "branch", refName: "dev", sha: bad, version: "0.1.0" }), /12 hex/);
 	}
 });
 
@@ -197,4 +203,41 @@ test("a branch read without a commit sha stops the job", async () => {
 		branchHead({ repository: "frubble-ai/osiris", refName: "dev", token: "t", fetchImpl }),
 		/did not return a commit/,
 	);
+});
+
+const name = "@frubble-ai/osiris-client";
+
+test("a version is set and then uploaded under its build tag", () => {
+	const calls = [];
+	npmSteps({ name, run: (args) => calls.push(args) }).publishVersion("0.1.0-dev.g27ff530956b3", "g27ff530956b3");
+	assert.deepEqual(calls, [
+		["version", "--no-git-tag-version", "--allow-same-version", "0.1.0-dev.g27ff530956b3"],
+		["publish", "--tag", "g27ff530956b3"],
+	]);
+});
+
+test("moving a channel points it at the version and then drops the build tag", () => {
+	const calls = [];
+	npmSteps({ name, run: (args) => calls.push(args) }).moveChannel("0.1.0-dev.g27ff530956b3", "dev", "g27ff530956b3");
+	assert.deepEqual(calls, [
+		["dist-tag", "add", `${name}@0.1.0-dev.g27ff530956b3`, "dev"],
+		["dist-tag", "rm", name, "g27ff530956b3"],
+	]);
+});
+
+test("a failed build tag removal does not fail the move", () => {
+	const calls = [];
+	const run = (args) => {
+		calls.push(args);
+		if (args[1] === "rm") throw new Error("Command failed: npm dist-tag rm");
+	};
+	npmSteps({ name, run }).moveChannel("0.1.0-dev.g27ff530956b3", "dev", "g27ff530956b3");
+	assert.equal(calls.length, 2);
+});
+
+test("a failed channel move fails the job", () => {
+	const run = (args) => {
+		if (args[1] === "add") throw new Error("Command failed: npm dist-tag add");
+	};
+	assert.throws(() => npmSteps({ name, run }).moveChannel("0.1.0-dev.g27ff530956b3", "dev", "g27ff530956b3"), /dist-tag add/);
 });

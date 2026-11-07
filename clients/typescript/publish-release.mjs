@@ -83,6 +83,24 @@ export async function publishCurrent({ refType, sha, target, heads, publishVersi
 	return { action: "published", version: target.version, tag: target.tag };
 }
 
+// The npm commands that upload a version and move a channel. `run` takes one npm argument list.
+export function npmSteps({ name, run }) {
+	return {
+		publishVersion(version, buildTag) {
+			run(["version", "--no-git-tag-version", "--allow-same-version", version]);
+			run(["publish", "--tag", buildTag]);
+		},
+		moveChannel(version, tag, buildTag) {
+			run(["dist-tag", "add", `${name}@${version}`, tag]);
+			try {
+				run(["dist-tag", "rm", name, buildTag]);
+			} catch {
+				// The channel already points at this version. The build tag is only a spare pointer.
+			}
+		},
+	};
+}
+
 export async function branchHead({ repository, refName, token, fetchImpl = globalThis.fetch }) {
 	const response = await fetchImpl(`https://api.github.com/repos/${repository}/commits/${encodeURIComponent(refName)}`, {
 		headers: {
@@ -118,18 +136,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 		sha,
 		target,
 		heads,
-		publishVersion(version, buildTag) {
-			runNpm(["version", "--no-git-tag-version", "--allow-same-version", version]);
-			runNpm(["publish", "--tag", buildTag]);
-		},
-		moveChannel(version, tag, buildTag) {
-			runNpm(["dist-tag", "add", `${pkg.name}@${version}`, tag]);
-			try {
-				runNpm(["dist-tag", "rm", pkg.name, buildTag]);
-			} catch {
-				// The channel already points at this version. The build tag is only a spare pointer.
-			}
-		},
+		...npmSteps({ name: pkg.name, run: runNpm }),
 	});
 	if (result.action === "skip") {
 		console.log(`skipping publish; ${refName} has moved past ${sha}`);
