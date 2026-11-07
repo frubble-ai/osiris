@@ -26,9 +26,13 @@ export function releaseTarget({ refType, refName, sha, version }) {
 	return { version: `${version}-${refName}.g${id}`, tag: refName, buildTag: `g${id}` };
 }
 
+// npmjs.org answers a repeat publish with EPUBLISHCONFLICT. GitHub Packages answers
+// with E409 and "Cannot publish over existing version".
+const conflicts = ["EPUBLISHCONFLICT", "previously published", "E409", "Cannot publish over existing version"];
+
 export function alreadyPublished(error) {
 	const text = [error.stderr, error.stdout, error.message].map((part) => `${part ?? ""}`).join("\n");
-	return text.includes("EPUBLISHCONFLICT") || text.includes("previously published");
+	return conflicts.some((conflict) => text.includes(conflict));
 }
 
 // stdio inherit drops the child's output, so a publish conflict never reaches alreadyPublished.

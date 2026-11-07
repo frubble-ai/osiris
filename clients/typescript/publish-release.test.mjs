@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { alreadyPublished, commandError, publishCurrent, releaseTarget } from "./publish-release.mjs";
+import { alreadyPublished, branchHead, commandError, publishCurrent, releaseTarget } from "./publish-release.mjs";
 
 const sha = "27ff530956b3e38d57ad4d4c3e2ffc5634857b06";
 const newer = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -19,10 +19,10 @@ test("an all-digit commit id is not a numeric prerelease identifier", () => {
 	const { version } = releaseTarget({
 		refType: "branch",
 		refName: "dev",
-		sha: "0123456789abcdef",
+		sha: `123456789012${"0".repeat(28)}`,
 		version: "0.1.0",
 	});
-	assert.equal(version, "0.1.0-dev.g0123456789ab");
+	assert.equal(version, "0.1.0-dev.g123456789012");
 });
 
 test("a release tag publishes that version on latest", () => {
@@ -137,4 +137,64 @@ test("a release tag does not consult the branch head", async () => {
 		},
 	});
 	assert.deepEqual(result, { action: "published", version: "1.2.3", tag: "latest" });
+});
+
+test("a publish failure that is not a conflict stops the job before the channel moves", async () => {
+	let moved = false;
+	await assert.rejects(
+		publishCurrent({
+			refType: "branch",
+			sha,
+			target: { version: "0.1.0-dev.g27ff530956b3", tag: "dev", buildTag: "g27ff530956b3", name: "@frubble-ai/osiris-client" },
+			heads: async () => sha,
+			publishVersion() {
+				const error = new Error("Command failed: npm publish --tag g27ff530956b3");
+				error.stderr = "npm error code E401\nnpm error 401 Unauthorized";
+				throw error;
+			},
+			moveChannel() {
+				moved = true;
+			},
+		}),
+		/Command failed/,
+	);
+	assert.equal(moved, false);
+});
+
+test("a GitHub Packages publish conflict counts as already published", () => {
+	const stderr = [
+		"npm error code E409",
+		"npm error 409 Conflict - PUT https://npm.pkg.github.com/@frubble-ai%2fosiris-client - Cannot publish over existing version",
+	].join("\n");
+	assert.equal(alreadyPublished(commandError({ message: "Command failed: npm publish --tag g27ff530956b3", stderr })), true);
+});
+
+function answering(status, body) {
+	const calls = [];
+	const fetchImpl = async (url, init) => {
+		calls.push({ url, init });
+		return { ok: status >= 200 && status < 300, status, json: async () => body };
+	};
+	return { calls, fetchImpl };
+}
+
+test("the branch head is the sha the GitHub API returns", async () => {
+	const { calls, fetchImpl } = answering(200, { sha });
+	const head = await branchHead({ repository: "frubble-ai/osiris", refName: "dev", token: "t", fetchImpl });
+	assert.equal(head, sha);
+	assert.equal(calls[0].url, "https://api.github.com/repos/frubble-ai/osiris/commits/dev");
+	assert.equal(calls[0].init.headers.Authorization, "Bearer t");
+});
+
+test("a failed branch read stops the job, naming the status", async () => {
+	const { fetchImpl } = answering(404, { message: "Not Found" });
+	await assert.rejects(branchHead({ repository: "frubble-ai/osiris", refName: "dev", token: "t", fetchImpl }), /404/);
+});
+
+test("a branch read without a commit sha stops the job", async () => {
+	const { fetchImpl } = answering(200, { sha: 42 });
+	await assert.rejects(
+		branchHead({ repository: "frubble-ai/osiris", refName: "dev", token: "t", fetchImpl }),
+		/did not return a commit/,
+	);
 });
