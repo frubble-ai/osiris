@@ -216,7 +216,9 @@ jobs:
 
   summary:
     name: Osiris - Code Quality Summary
-    if: always()
+    # Not on a label change: the code's jobs are skipped there, and a skip would read as a pass
+    # over a code run that failed. The contract job reports on its own.
+    if: always() && github.event.action != 'labeled' && github.event.action != 'unlabeled'
     needs: [secret-scan, quality, test, openapi, contract, image]
     runs-on: ubuntu-latest
     steps:
