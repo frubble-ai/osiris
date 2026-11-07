@@ -18,7 +18,7 @@ PR title = squash commit message. Use Conventional Commits: feat|fix|chore|docs|
 
 <!-- What could break and who notices. How to undo it.
 For deploys: a migration, new settings, env vars or secrets that must exist first? An API change
-that needs a new version (docs/api-versioning.md)? -->
+that breaks a stable release, or a preview changed (docs/api-versioning.md says what breaks)? -->
 
 ## Checklist
 
