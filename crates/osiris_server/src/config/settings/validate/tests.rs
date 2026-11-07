@@ -14,6 +14,14 @@ fn accepts_the_defaults() {
     Settings::default().validate().unwrap();
 }
 
+#[test]
+fn accepts_more_concurrent_tasks_than_connections() {
+    let mut settings = Settings::default();
+    settings.tasks.max_concurrent = usize::try_from(settings.database.max_connections).unwrap() + 1;
+
+    settings.validate().unwrap();
+}
+
 #[rstest]
 #[case::a_zero_value("server.max_body_bytes", |settings: &mut Settings| settings.server.max_body_bytes = 0)]
 #[case::a_zero_timeout("http.timeout_seconds", |settings: &mut Settings| settings.http.timeout_seconds = 0)]

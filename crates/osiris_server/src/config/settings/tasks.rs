@@ -10,7 +10,9 @@ pub struct TasksSettings {
     pub outcome_retention_seconds: u64,
     /// The most expired outcomes deleted each time a new one is recorded.
     pub outcome_prune_batch: i64,
-    /// The most tasks the worker runs at once; more wait.
+    /// The most tasks the worker runs at once; more wait. A task beyond
+    /// `database.max_connections` waits for a connection up to
+    /// `database.connect_timeout_seconds`, then fails.
     pub max_concurrent: usize,
     /// How long scheduling one task may take before it counts as failed.
     pub schedule_timeout_seconds: u64,
