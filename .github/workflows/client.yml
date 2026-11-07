@@ -5,8 +5,10 @@ name: Osiris Client - CD Publish
 # (`v1.2.3`) publishes that version on latest.
 #
 # A branch push publishes only when it changes the spec, the client or this file, so the channel
-# points at the last commit that changed the client. GitHub does not apply the path filter to a
-# tag push, so every release tag still publishes.
+# points at the last commit that changed the client. A later push that leaves the client alone
+# starts no run, so a publish still in progress moves the channel unless a later commit changed
+# the client too. GitHub does not apply the path filter to a tag push, so every release tag still
+# publishes.
 on:
   pull_request:
     paths: ["api-reference/**", "clients/typescript/**", ".github/workflows/client.yml"]
