@@ -1,7 +1,8 @@
 //! The answers any `/v1` operation can give before its route runs, added to the spec so each
 //! documents every status it can answer: a missing or wrong key (401), an unknown version or a bad
 //! `Idempotency-Key` (400), a request that takes too long (408) or a body that is too large (413),
-//! and on a POST or DELETE, a reused or busy `Idempotency-Key` (422, 409).
+//! an internal error (500, `OS_99`), and on a POST or DELETE, a reused or busy `Idempotency-Key`
+//! (422, 409).
 
 use serde_json::{Value, json};
 
@@ -36,6 +37,10 @@ pub fn ground_rule_answers(spec: &mut Value) {
                 (
                     "413",
                     json!({ "description": "The body is larger than the server reads" }),
+                ),
+                (
+                    "500",
+                    error("An internal error; the request may be retried"),
                 ),
             ];
             if matches!(method.as_str(), "post" | "delete") {

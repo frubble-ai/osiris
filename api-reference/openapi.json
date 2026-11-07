@@ -875,6 +875,16 @@
           },
           "413": {
             "description": "The body is larger than the server reads"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           }
         },
         "security": [
@@ -967,6 +977,16 @@
               }
             },
             "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           }
         },
         "security": [
@@ -1059,6 +1079,16 @@
               }
             },
             "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           }
         },
         "security": [
@@ -1127,6 +1157,16 @@
           },
           "413": {
             "description": "The body is larger than the server reads"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           }
         },
         "security": [
@@ -1205,6 +1245,16 @@
           },
           "413": {
             "description": "The body is larger than the server reads"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           }
         },
         "security": [
@@ -1326,6 +1376,16 @@
           },
           "413": {
             "description": "The body is larger than the server reads"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           }
         },
         "security": [
@@ -1427,6 +1487,16 @@
               }
             },
             "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           }
         },
         "security": [
@@ -1530,6 +1600,16 @@
             },
             "description": "This `Idempotency-Key` was used for another request"
           },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
           "502": {
             "content": {
               "application/json": {
@@ -1606,6 +1686,16 @@
           },
           "413": {
             "description": "The body is larger than the server reads"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           }
         },
         "security": [
@@ -1707,6 +1797,16 @@
                 }
               }
             }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           },
           "502": {
             "content": {
@@ -1818,6 +1918,16 @@
               }
             }
           },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
           "502": {
             "content": {
               "application/json": {
@@ -1927,6 +2037,16 @@
                 }
               }
             }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           },
           "502": {
             "content": {
@@ -2038,6 +2158,16 @@
               }
             }
           },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
           "502": {
             "content": {
               "application/json": {
@@ -2147,6 +2277,16 @@
               }
             },
             "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           }
         },
         "security": [
@@ -2251,6 +2391,16 @@
               }
             },
             "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
           }
         },
         "security": [

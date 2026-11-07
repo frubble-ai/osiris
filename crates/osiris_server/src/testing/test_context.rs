@@ -40,6 +40,8 @@ pub struct TestContext {
     pub provider: MockServer,
     /// The worker's draining flag, as SIGTERM sets it.
     pub draining: Arc<AtomicBool>,
+    /// The releases the API serves, which its answers are checked against.
+    pub releases: &'static [Release],
 }
 
 impl TestContext {
@@ -47,6 +49,7 @@ impl TestContext {
     #[must_use]
     pub fn serving(mut self, releases: &'static [Release]) -> Self {
         self.api = api_router(&self.use_cases, &self.config, releases);
+        self.releases = releases;
         self
     }
 }
@@ -125,5 +128,6 @@ pub async fn setup_test_context_with(
         tasks,
         provider,
         draining,
+        releases: osiris_api_models::version::RELEASES,
     }
 }

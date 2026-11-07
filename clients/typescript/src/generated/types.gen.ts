@@ -409,6 +409,10 @@ export type ListAuthConfigsErrors = {
      * The body is larger than the server reads
      */
     413: unknown;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type ListAuthConfigsError = ListAuthConfigsErrors[keyof ListAuthConfigsErrors];
@@ -454,6 +458,10 @@ export type CreateAuthConfigErrors = {
      * This `Idempotency-Key` was used for another request
      */
     422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type CreateAuthConfigError = CreateAuthConfigErrors[keyof CreateAuthConfigErrors];
@@ -501,6 +509,10 @@ export type DeleteAuthConfigErrors = {
      * This `Idempotency-Key` was used for another request
      */
     422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type DeleteAuthConfigError = DeleteAuthConfigErrors[keyof DeleteAuthConfigErrors];
@@ -538,6 +550,10 @@ export type RetrieveAuthConfigErrors = {
      * The body is larger than the server reads
      */
     413: unknown;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type RetrieveAuthConfigError = RetrieveAuthConfigErrors[keyof RetrieveAuthConfigErrors];
@@ -575,6 +591,10 @@ export type UpdateAuthConfigErrors = {
      * The body is larger than the server reads
      */
     413: unknown;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type UpdateAuthConfigError = UpdateAuthConfigErrors[keyof UpdateAuthConfigErrors];
@@ -627,6 +647,10 @@ export type ListConnectedAccountsErrors = {
      * The body is larger than the server reads
      */
     413: unknown;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type ListConnectedAccountsError = ListConnectedAccountsErrors[keyof ListConnectedAccountsErrors];
@@ -673,6 +697,10 @@ export type CreateConnectedAccountErrors = {
      * This `Idempotency-Key` was used for another request
      */
     422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type CreateConnectedAccountError = CreateConnectedAccountErrors[keyof CreateConnectedAccountErrors];
@@ -724,6 +752,10 @@ export type DeleteConnectedAccountErrors = {
      * This `Idempotency-Key` was used for another request
      */
     422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
     502: ErrorBody;
 };
 
@@ -762,6 +794,10 @@ export type RetrieveConnectedAccountErrors = {
      * The body is larger than the server reads
      */
     413: unknown;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type RetrieveConnectedAccountError = RetrieveConnectedAccountErrors[keyof RetrieveConnectedAccountErrors];
@@ -810,6 +846,10 @@ export type GithubListInstallationsErrors = {
      */
     422: ErrorBody;
     424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
     502: ErrorBody;
 };
 
@@ -859,6 +899,10 @@ export type GithubListRepositoriesErrors = {
      */
     422: ErrorBody;
     424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
     502: ErrorBody;
 };
 
@@ -908,6 +952,10 @@ export type LinearListTeamsErrors = {
      */
     422: ErrorBody;
     424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
     502: ErrorBody;
 };
 
@@ -957,6 +1005,10 @@ export type SlackListChannelsErrors = {
      */
     422: ErrorBody;
     424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
     502: ErrorBody;
 };
 
@@ -1006,6 +1058,10 @@ export type RefreshConnectedAccountErrors = {
      * This `Idempotency-Key` was used for another request
      */
     422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type RefreshConnectedAccountError = RefreshConnectedAccountErrors[keyof RefreshConnectedAccountErrors];
@@ -1055,6 +1111,10 @@ export type TriggerEventErrors = {
      * This `Idempotency-Key` was used for another request
      */
     422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
 };
 
 export type TriggerEventError = TriggerEventErrors[keyof TriggerEventErrors];

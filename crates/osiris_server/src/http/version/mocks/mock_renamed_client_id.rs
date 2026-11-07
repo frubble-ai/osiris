@@ -15,26 +15,35 @@ fn rename(body: &mut Value, from: &str, to: &str) {
     }
 }
 
+/// Renames `client_id` to `app_id` in every schema that has it, inlined ones too (a list's items).
+fn rename_in_schemas(value: &mut Value) {
+    match value {
+        Value::Object(object) => {
+            if let Some(properties) = object.get_mut("properties")
+                && properties.get("client_id").is_some()
+            {
+                rename(properties, "client_id", "app_id");
+                if let Some(required) = object.get_mut("required").and_then(Value::as_array_mut) {
+                    for name in required.iter_mut().filter(|name| *name == "client_id") {
+                        *name = Value::String("app_id".into());
+                    }
+                }
+            }
+            object.values_mut().for_each(rename_in_schemas);
+        }
+        Value::Array(items) => items.iter_mut().for_each(rename_in_schemas),
+        _ => {}
+    }
+}
+
 impl VersionChange for MockRenamedClientId {
     fn description(&self) -> &'static str {
         "An auth config's `app_id` is now `client_id`."
     }
 
     fn spec(&self, spec: &mut Value) {
-        for schema in ["AuthConfig", "CreateAuthConfig", "UpdateAuthConfig"] {
-            let Some(schema) = spec.pointer_mut(&format!("/components/schemas/{schema}")) else {
-                continue;
-            };
-            if let Some(properties) = schema.get_mut("properties") {
-                rename(properties, "client_id", "app_id");
-            }
-            if let Some(required) = schema.get_mut("required").and_then(Value::as_array_mut) {
-                for name in required.iter_mut() {
-                    if name == "client_id" {
-                        *name = Value::String("app_id".into());
-                    }
-                }
-            }
+        if let Some(schemas) = spec.pointer_mut("/components/schemas") {
+            rename_in_schemas(schemas);
         }
     }
 
