@@ -1,4 +1,4 @@
-name: Client
+name: Osiris Client - CD Publish
 
 # The TypeScript client (clients/typescript): its generated code matches the committed spec and
 # it builds. A push to dev, stg or prd publishes a prerelease on that dist-tag. A release tag
