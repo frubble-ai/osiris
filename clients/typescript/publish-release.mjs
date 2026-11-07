@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
+import { checkRepository } from "./release-line.mjs";
 
 const channels = ["dev", "stg", "prd"];
 
@@ -152,6 +153,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 	const sha = process.env.SHA;
 	const refName = process.env.REF_NAME;
 	const refType = process.env.REF_TYPE;
+	const problems = checkRepository(refType);
+	if (problems.length > 0) throw new Error(`refused to publish: ${problems.join("; ")}`);
 	const target = { ...releaseTarget({ refType, refName, sha, version: pkg.version }), name: pkg.name };
 	const superseded = () =>
 		laterClientChange({

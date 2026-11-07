@@ -127,7 +127,7 @@ jobs:
       - name: Schemathesis against every release
         run: |
           set -a; source .env.example; set +a
-          pipx install -q "schemathesis==$SCHEMATHESIS_VERSION"
+          pipx install "schemathesis==$SCHEMATHESIS_VERSION"
           cargo build --locked -q -p osiris_server
           SCHEMATHESIS=schemathesis scripts/schemathesis.sh
 
