@@ -31,10 +31,11 @@ impl Settings {
             self.consent.state_length >= 32,
             "consent.state_length must be at least 32"
         );
+        // The worker's concurrency limit is a Tokio semaphore, which panics on more permits.
         anyhow::ensure!(
-            self.tasks.max_concurrent
-                <= usize::try_from(self.database.max_connections).unwrap_or(usize::MAX),
-            "tasks.max_concurrent must not exceed database.max_connections"
+            self.tasks.max_concurrent <= tokio::sync::Semaphore::MAX_PERMITS,
+            "tasks.max_concurrent must be at most {}",
+            tokio::sync::Semaphore::MAX_PERMITS
         );
         anyhow::ensure!(
             self.refresh.margin_seconds < self.refresh.keepalive_seconds,

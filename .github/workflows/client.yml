@@ -1,19 +1,21 @@
 name: Client
 
 # The TypeScript client (clients/typescript): its generated code matches the committed spec and
-# it builds. On a release tag (`v1.2.3`) it is published to GitHub Packages at that version.
+# it builds. A push to dev, stg or prd publishes a prerelease on that dist-tag. A release tag
+# (`v1.2.3`) publishes that version on latest.
 on:
   pull_request:
     paths: ["api-reference/**", "clients/typescript/**", ".github/workflows/client.yml"]
   push:
-    branches: [dev]
+    branches: [dev, stg, prd]
     tags: ["v*"]
 
 permissions:
   contents: read
 
 jobs:
-  # Pull requests and dev: read-only, with no credentials left behind for npm's install scripts.
+  # Pull requests and branch pushes: read-only, with no credentials left behind for npm's
+  # install scripts.
   client:
     name: TypeScript client
     if: "!startsWith(github.ref, 'refs/tags/v')"
@@ -34,11 +36,17 @@ jobs:
       - name: The generated code matches the spec, and it builds
         run: npm run check && npm run build
 
-  # A release tag only: the one job that may publish.
+  # Push only. The trigger lists dev, stg, prd, and v* tags; a pull request does not publish.
   publish:
     name: Publish the TypeScript client
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push'
+    concurrency:
+      group: client-publish-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
+    # A stalled npm or GitHub API call ends here. A version uploaded before the stall stays
+    # published, and its channel is moved by hand with `npm dist-tag add`.
+    timeout-minutes: 10
     permissions:
       contents: read
       packages: write
@@ -56,10 +64,11 @@ jobs:
           scope: "@frubble-ai"
       - run: npm ci
       - run: npm run check && npm run build
-      - name: Publish at the tag's version
+      - name: Publish on this ref's dist-tag
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
-        run: |
-          npm version --no-git-tag-version "${TAG#v}"
-          npm publish
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        run: node publish-release.mjs

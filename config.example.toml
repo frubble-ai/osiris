@@ -54,7 +54,8 @@ keepalive_seconds = 2505600
 # new one is recorded.
 outcome_retention_seconds = 2592000
 outcome_prune_batch = 100
-# The most tasks the worker runs at once; more wait. At most [database] max_connections.
+# The most tasks the worker runs at once; more wait. A task beyond [database] max_connections
+# waits for a connection up to [database] connect_timeout_seconds, then fails.
 max_concurrent = 4
 # How long scheduling one task may take before it counts as failed.
 schedule_timeout_seconds = 10
