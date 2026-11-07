@@ -17,3 +17,6 @@ pub fn superseded(
     let since = next_release.released_on()?.midnight().assume_utc();
     Some((since, since.saturating_add(support)))
 }
+
+#[cfg(test)]
+mod tests;

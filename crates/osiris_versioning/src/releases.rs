@@ -28,3 +28,6 @@ pub fn find(name: &str) -> Option<&'static Release> {
 pub fn is_known(name: &str) -> bool {
     find(name).is_some()
 }
+
+#[cfg(test)]
+mod tests;

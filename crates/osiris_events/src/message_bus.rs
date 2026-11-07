@@ -4,7 +4,10 @@
 //! are, so a client pinned to an older release reads its events in that release's shape too.
 
 use crate::{Envelope, Message, Transport, TransportError};
-use osiris_versioning::{CURRENT, RELEASES, Release, translate::event_down};
+use osiris_versioning::{
+    CURRENT, RELEASES, Release,
+    translate::{changes_since, event_down},
+};
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -40,9 +43,14 @@ impl MessageBus {
             channel: channel.as_str(),
             message: error.to_string(),
         };
-        let mut json = serde_json::to_value(&envelope).map_err(failed)?;
-        event_down(self.releases, self.release, &mut json);
-        let data = serde_json::to_vec(&json).map_err(failed)?;
+        // Written once as it is when no change applies, as for the current release.
+        let data = if changes_since(self.releases, self.release).next().is_none() {
+            serde_json::to_vec(&envelope).map_err(failed)?
+        } else {
+            let mut json = serde_json::to_value(&envelope).map_err(failed)?;
+            event_down(self.releases, self.release, &mut json);
+            serde_json::to_vec(&json).map_err(failed)?
+        };
         self.transport
             .publish(
                 channel,

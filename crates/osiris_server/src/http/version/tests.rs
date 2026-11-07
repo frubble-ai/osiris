@@ -6,6 +6,7 @@ use crate::{
     services::api::versioned_spec,
     testing::{
         ADMIN_KEY, API_KEY, generate_connect_attempt::generate_connect_attempt, setup_test_context,
+        setup_test_context_with,
     },
 };
 use axum::http::{HeaderMap, StatusCode};
@@ -214,6 +215,38 @@ async fn refuses_a_body_too_large_the_same_at_every_release(pool: PgPool) {
         assert_eq!(refused.body["error"]["code"], "OS_02", "at {release}");
         assert_eq!(refused.headers["osiris-version"], release);
     }
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn answers_500_rather_than_an_older_release_s_answer_it_cannot_read_whole(pool: PgPool) {
+    let app = setup_test_context_with(pool, |config| config.settings.server.max_answer_bytes = 8)
+        .await
+        .serving(MOCK_RELEASES);
+
+    let old = app
+        .send(
+            "GET",
+            "/v1/auth-configs",
+            Some(ADMIN_KEY),
+            None,
+            &[("osiris-version", AMUN)],
+        )
+        .await;
+    let current = app
+        .send(
+            "GET",
+            "/v1/auth-configs",
+            Some(ADMIN_KEY),
+            None,
+            &[("osiris-version", ANUBIS)],
+        )
+        .await;
+
+    assert_eq!(old.status, StatusCode::INTERNAL_SERVER_ERROR);
+    assert_eq!(old.body["error"]["code"], "OS_99");
+    assert_eq!(old.headers["osiris-version"], AMUN);
+    // The current release's answer is never read whole, so the limit doesn't touch it.
+    assert_eq!(current.status, StatusCode::OK);
 }
 
 #[tokio::test]

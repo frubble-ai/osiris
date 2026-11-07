@@ -44,7 +44,8 @@ pub async fn serve_version(
         match translate_request(state.releases, release, &route, max_body, request).await {
             Ok(request) => {
                 let answer = next.run(request).await;
-                translate_response(state.releases, release, &route, answer).await
+                let max_answer = state.config.settings.server.max_answer();
+                translate_response(state.releases, release, &route, max_answer, answer).await
             }
             Err(error) => error.into_response(),
         }

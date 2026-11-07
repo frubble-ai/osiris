@@ -1,4 +1,4 @@
-//! `[server]`: the API's request limits, and how long a process takes to stop. Where a process
+//! `[server]`: the API's request and answer limits, and how long a process takes to stop. Where a process
 //! listens is not a setting: Cloud Run's `PORT` (see `config/listen.rs`).
 
 use serde::{Deserialize, Serialize};
@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 pub struct ServerSettings {
     pub request_timeout_seconds: u64,
     pub max_body_bytes: u64,
+    /// The largest answer read whole to take it back to an older release; a larger one answers 500.
+    pub max_answer_bytes: u64,
     /// After SIGTERM, how long requests already started may take to finish before the process
     /// exits. Under Cloud Run's grace period.
     pub shutdown_grace_seconds: u64,
@@ -22,6 +24,10 @@ impl ServerSettings {
         usize::try_from(self.max_body_bytes).unwrap_or(usize::MAX)
     }
 
+    pub fn max_answer(&self) -> usize {
+        usize::try_from(self.max_answer_bytes).unwrap_or(usize::MAX)
+    }
+
     pub fn shutdown_grace(&self) -> std::time::Duration {
         std::time::Duration::from_secs(self.shutdown_grace_seconds)
     }
@@ -32,6 +38,7 @@ impl Default for ServerSettings {
         Self {
             request_timeout_seconds: 30,
             max_body_bytes: 1_048_576,
+            max_answer_bytes: 16_777_216,
             shutdown_grace_seconds: 8,
         }
     }

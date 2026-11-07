@@ -1,8 +1,8 @@
 //! A release's date and god come from its name; a name that isn't `<date>.<god>` has neither.
 
-use crate::{Release, Stability, mocks::MOCK_RELEASES, superseded};
+use crate::{Release, Stability};
 use rstest::rstest;
-use time::{Date, Duration, Month};
+use time::{Date, Month};
 
 fn named(name: &'static str) -> Release {
     Release {
@@ -29,19 +29,4 @@ fn reads_a_release_s_date_and_god_from_its_name(
         date.map(|(year, month, day)| Date::from_calendar_date(year, month, day).unwrap());
     assert_eq!(release.released_on(), expected);
     assert_eq!(release.god(), god);
-}
-
-#[test]
-fn supersedes_a_release_on_the_next_one_s_date_until_the_window_ends() {
-    let (since, sunset) = superseded(MOCK_RELEASES, &MOCK_RELEASES[0], Duration::days(30)).unwrap();
-
-    assert_eq!(
-        since.date(),
-        Date::from_calendar_date(2026, Month::February, 1).unwrap()
-    );
-    assert_eq!(
-        sunset.date(),
-        Date::from_calendar_date(2026, Month::March, 3).unwrap()
-    );
-    assert!(superseded(MOCK_RELEASES, &MOCK_RELEASES[2], Duration::days(30)).is_none());
 }

@@ -17,7 +17,7 @@ migration job. All state is in Postgres.
 | `osiris_pubsub` | `Transport` on Google Pub/Sub |
 | `osiris_tasks` | task payloads and names, the `TaskScheduler` and `TaskAuthenticator` traits, the local and in-memory schedulers |
 | `osiris_cloud_tasks` | `TaskScheduler` on Google Cloud Tasks, and the OIDC `TaskAuthenticator` |
-| `osiris_versioning` | the releases osiris serves, their version changes, and the translation between them; below both the API models and the event bus, which use it |
+| `osiris_versioning` | the releases osiris serves, their version changes, and the translation between them; used by `osiris_events`, `osiris_server`, `osiris_cli` and `osiris_openapi` |
 | `osiris_api_models` | what the API accepts and returns; the OpenAPI spec is generated from these |
 | `osiris_server` | configuration, the use cases, the HTTP layer and routes, the processes |
 | `osiris_openapi` | writes `api-reference/openapi.json` (the current release) and `api-reference/versions/<release>.json` (every release served) |

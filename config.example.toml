@@ -9,6 +9,9 @@
 request_timeout_seconds = 30
 # The largest request body the API reads.
 max_body_bytes = 1048576
+# The largest answer the API reads whole to take it back to an older release (16 MiB); a larger one
+# answers 500. Today's answers are bounded by pagination, far below it.
+max_answer_bytes = 16777216
 # After SIGTERM, how long a process lets requests already started finish before it exits. Keep it
 # under Cloud Run's grace period (10 seconds by default).
 shutdown_grace_seconds = 8
