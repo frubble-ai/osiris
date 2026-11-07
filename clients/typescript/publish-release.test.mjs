@@ -206,6 +206,15 @@ test("a later commit that changes the client hands the channel to its own run", 
 	}
 });
 
+test("a later rename into or out of the client counts as a client change", async () => {
+	const out = { filename: "archive/index.ts", previous_filename: "clients/typescript/src/index.ts", status: "renamed" };
+	const into = { filename: "clients/typescript/src/index.ts", previous_filename: "archive/index.ts", status: "renamed" };
+	assert.equal(await compare({ status: "ahead", files: [out] }), true);
+	assert.equal(await compare({ status: "ahead", files: [into] }), true);
+	const elsewhere = { filename: "docs/b.md", previous_filename: "docs/a.md", status: "renamed" };
+	assert.equal(await compare({ status: "ahead", files: [elsewhere] }), false);
+});
+
 test("a commit no longer on the branch counts as superseded", async () => {
 	for (const status of ["behind", "diverged"]) {
 		assert.equal(await compare({ status, files: [] }), true);

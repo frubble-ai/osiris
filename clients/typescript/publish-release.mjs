@@ -141,7 +141,10 @@ export async function laterClientChange({ repository, refName, sha, token, fetch
 		throw new Error(`comparing ${sha} with ${refName} did not list the changed files`);
 	}
 	if (body.files.length >= compareFileLimit) return true;
-	return body.files.some((file) => changesClient(file.filename));
+	// A rename counts by either name, as the push path filter does.
+	return body.files.some(
+		(file) => changesClient(file.filename) || (file.previous_filename !== undefined && changesClient(file.previous_filename)),
+	);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
