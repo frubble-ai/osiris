@@ -24,7 +24,7 @@ pub async fn list_auth_configs(
     headers: HeaderMap,
     QueryParams(params): QueryParams<ListParams>,
 ) -> ApiResult<(StatusCode, Json<List<AuthConfig>>)> {
-    let cursor = cursor(&state, params.after, params.before, params.limit);
+    let cursor = cursor(&state, params.after, params.before, params.limit)?;
     server_wrap(
         Flow::AuthConfigsList,
         &state,

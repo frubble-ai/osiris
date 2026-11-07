@@ -13,6 +13,9 @@ For each release whose spec in api-reference/versions/ is stable on the base bra
 
 A preview release's changes are listed, never refused. Usage:
   scripts/api-contract-guard.py <base-ref> [oasdiff binary]
+
+A base ref that can't be read exits 2, so a missing fetch never reads as a clean pass.
+scripts/test_api_contract_guard.py holds the script to each case.
 """
 
 import json
@@ -87,10 +90,15 @@ def main():
     sunset = os.environ.get("OSIRIS_SUNSET") == "true"
     failures = []
 
+    # A base that can't be read must fail, never look like one with nothing to check.
     try:
-        listed = git("ls-tree", "--name-only", f"{base}:{VERSIONS}").split()
+        git("rev-parse", "--verify", "--quiet", f"{base}^{{commit}}")
     except subprocess.CalledProcessError:
-        listed = []
+        print(f"::error::the base {base!r} is not a commit this checkout has; fetch it first")
+        sys.exit(2)
+    # Only a base that has no releases yet has nothing to check.
+    has_versions = subprocess.run(["git", "cat-file", "-e", f"{base}:{VERSIONS}"], capture_output=True).returncode == 0
+    listed = git("ls-tree", "--name-only", f"{base}:{VERSIONS}/").split() if has_versions else []
 
     for file in sorted(listed):
         release = file.removesuffix(".json")

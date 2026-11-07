@@ -1,8 +1,6 @@
 //! GitHub's answers as it sends them, and into our types.
 
-use super::types::{
-    GithubAccountType, GithubInstallation, GithubRepository, GithubRepositorySelection,
-};
+use super::types::{GithubInstallation, GithubRepository};
 use serde::Deserialize;
 
 /// A page of `GET /user/installations`.
@@ -16,7 +14,8 @@ pub struct InstallationsPage {
 pub struct InstallationAnswer {
     id: u64,
     account: AccountAnswer,
-    repository_selection: SelectionAnswer,
+    /// `all` or `selected` today, passed on as GitHub sends it.
+    repository_selection: String,
 }
 
 #[derive(Deserialize)]
@@ -24,13 +23,6 @@ struct AccountAnswer {
     login: String,
     #[serde(rename = "type")]
     kind: String,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "snake_case")]
-enum SelectionAnswer {
-    All,
-    Selected,
 }
 
 /// A page of `GET /user/installations/{id}/repositories`.
@@ -54,16 +46,8 @@ impl From<InstallationAnswer> for GithubInstallation {
         Self {
             id: answer.id.to_string(),
             account: answer.account.login,
-            // GitHub also answers "Enterprise"; it holds organizations, so it reads as one.
-            account_type: if answer.account.kind == "User" {
-                GithubAccountType::User
-            } else {
-                GithubAccountType::Organization
-            },
-            repository_selection: match answer.repository_selection {
-                SelectionAnswer::All => GithubRepositorySelection::All,
-                SelectionAnswer::Selected => GithubRepositorySelection::Selected,
-            },
+            account_type: account_type(&answer.account.kind),
+            repository_selection: answer.repository_selection,
         }
     }
 }
@@ -77,5 +61,16 @@ impl From<RepositoryAnswer> for GithubRepository {
             url: answer.html_url,
             description: answer.description,
         }
+    }
+}
+
+/// GitHub's account `type` in our words: `User` and `Organization` as `user` and `organization`.
+/// `Enterprise` holds organizations, so it reads as one; any other type GitHub adds is passed on in
+/// lower case, since the field is an open string.
+fn account_type(kind: &str) -> String {
+    match kind {
+        "User" => "user".to_owned(),
+        "Organization" | "Enterprise" => "organization".to_owned(),
+        other => other.to_ascii_lowercase(),
     }
 }

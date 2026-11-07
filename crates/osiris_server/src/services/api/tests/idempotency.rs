@@ -184,6 +184,33 @@ async fn refuses_an_unreadable_body_as_os_02_and_answers_a_retry_the_same(pool: 
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn never_replays_an_answer_that_is_not_json(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    // `/v1/auth-configs` has no DELETE: axum's method router answers 405 with no body, inside
+    // the idempotency middleware, so the key is begun and the answer can't be stored.
+    let send = || async {
+        let request = axum::http::Request::builder()
+            .method("DELETE")
+            .uri("/v1/auth-configs")
+            .header("authorization", format!("Bearer {ADMIN_KEY}"))
+            .header("idempotency-key", "k1")
+            .body(axum::body::Body::empty())
+            .unwrap();
+        tower::ServiceExt::oneshot(app.api.clone(), request)
+            .await
+            .unwrap()
+    };
+    let first = send().await;
+    assert_eq!(first.status(), StatusCode::METHOD_NOT_ALLOWED);
+    let retry = send().await;
+    assert_eq!(retry.status(), StatusCode::METHOD_NOT_ALLOWED);
+    assert!(
+        retry.headers().get("idempotent-replayed").is_none(),
+        "the answer that is not JSON was not stored"
+    );
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn finishes_a_keyed_request_its_caller_gave_up_on(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;

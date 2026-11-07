@@ -15,6 +15,11 @@ impl Settings {
             "pagination.default_limit must be between 1 and pagination.max_limit"
         );
         anyhow::ensure!(
+            self.api.support_days <= super::api::MAX_SUPPORT_DAYS,
+            "api.support_days must be at most {}",
+            super::api::MAX_SUPPORT_DAYS
+        );
+        anyhow::ensure!(
             osiris_api_models::version::is_known(&self.api.pinned_version),
             "api.pinned_version {:?} is not a version osiris serves",
             self.api.pinned_version

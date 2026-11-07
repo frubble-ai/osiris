@@ -23,8 +23,16 @@ impl Default for ApiSettings {
     }
 }
 
+/// The longest support window a release can be given: a century.
+pub const MAX_SUPPORT_DAYS: u64 = 36_500;
+
 impl ApiSettings {
+    /// The support window; `validate` keeps `support_days` within `MAX_SUPPORT_DAYS`, and a larger
+    /// value saturates rather than overflowing.
     pub fn support(&self) -> Duration {
-        Duration::days(i64::try_from(self.support_days).unwrap_or(i64::MAX))
+        i64::try_from(self.support_days)
+            .ok()
+            .and_then(|days| days.checked_mul(86_400))
+            .map_or(Duration::MAX, Duration::seconds)
     }
 }

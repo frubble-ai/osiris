@@ -8,7 +8,7 @@
 ## What is tested where
 
 - **Use cases** (`use_cases/cases/tests/`): behaviour, on a real Postgres with a fresh database per test (`#[sqlx::test(migrator = "crate::db::MIGRATOR")]`), the providers' network faked, and in-memory adapters to read what was published and scheduled. State is arranged through the use cases and the routes.
-- **The API** (`services/api/tests/`): the contract through `api::router`: statuses, error codes, redirects, keys, versions, idempotency. Requests are real, sent through the router, not to handlers.
+- **The API** (`services/api/tests/`): the contract through `api::router`: statuses, error codes, redirects, keys, versions, idempotency. Requests are real, sent through the router, not to handlers, and every answer is checked against its release's spec. Each release's golden transcripts are replayed there too ([API versioning](../api-versioning.md)).
 - **The worker** (`services/worker/tests/`): who may send a task, a body that is not a task, `/health` while draining.
 - **Providers** (`osiris_providers`): each against its faked network, with the provider's real answer shapes, its paging and its error forms.
 - **Adapters of our traits**: the contract, run for each implementation.
@@ -19,7 +19,9 @@
 ## What a test avoids
 
 - Internal state, and whether a library works.
-- Snapshots of a response.
+- Snapshots of a response, except a release's golden transcripts (`testing/golden`, one set per
+  release): ids and times are masked, a field added later passes, and they hold what a release
+  promises clients rather than how the code happens to answer today.
 - Sleeping to wait; it asserts on the outcome or waits on the condition.
 - Writing rows to arrange state when a use case or route can.
 

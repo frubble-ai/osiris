@@ -1,5 +1,6 @@
 //! A version change as a real release writes one: anubis renamed an auth config's `app_id` to
-//! `client_id`, so amun's requests are brought up and anubis's answers, events and spec taken back.
+//! `client_id` and the connections filter `label` to `alias`, so amun's requests are brought up and
+//! anubis's answers, events and spec taken back.
 
 use osiris_api_models::version::{ANUBIS, Release, Route, Stability, VersionChange};
 use serde_json::Value;
@@ -38,12 +39,21 @@ fn rename_in_schemas(value: &mut Value) {
 
 impl VersionChange for MockRenamedClientId {
     fn description(&self) -> &'static str {
-        "An auth config's `app_id` is now `client_id`."
+        "An auth config's `app_id` is now `client_id`, and the connections filter `label` is now \
+         `alias`."
     }
 
     fn spec(&self, spec: &mut Value) {
         if let Some(schemas) = spec.pointer_mut("/components/schemas") {
             rename_in_schemas(schemas);
+        }
+        let parameters = spec
+            .pointer_mut("/paths/~1v1~1connected-accounts/get/parameters")
+            .and_then(Value::as_array_mut);
+        for parameter in parameters.into_iter().flatten() {
+            if parameter["name"] == "alias" {
+                parameter["name"] = Value::String("label".into());
+            }
         }
     }
 
@@ -54,10 +64,10 @@ impl VersionChange for MockRenamedClientId {
     }
 
     fn query(&self, route: &Route<'_>, query: &mut Vec<(String, String)>) {
-        if route.is("GET", "/v1/auth-configs") {
+        if route.is("GET", "/v1/connected-accounts") {
             for (name, _) in query.iter_mut() {
-                if name == "app_id" {
-                    "client_id".clone_into(name);
+                if name == "label" {
+                    "alias".clone_into(name);
                 }
             }
         }

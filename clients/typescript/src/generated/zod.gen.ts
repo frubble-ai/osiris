@@ -119,6 +119,8 @@ export const zErrorBody = z.object({
 /**
  * An event as a subscriber receives it on the events topic, written in the API key's pinned
  * release. The type and the connection's id, never its data: fetch the connection for its state.
+ *
+ * Fields may be added without a new release, so a subscriber ignores one it doesn't know.
  */
 export const zEventDelivery = z.object({
     connected_account_id: z.string(),

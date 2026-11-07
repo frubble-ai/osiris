@@ -7,7 +7,7 @@
 )]
 
 use crate::testing::generate_connect_attempt::generate_connect_attempt;
-use crate::testing::{API_KEY, TestContext, setup_test_context};
+use crate::testing::{ADMIN_KEY, API_KEY, TestContext, setup_test_context};
 use axum::http::StatusCode;
 use osiris_providers::github::mocks::MockGithubNetwork;
 use sqlx::PgPool;
@@ -163,4 +163,27 @@ async fn pages_connections_forwards_and_refuses_a_cursor_naming_a_deleted_one(po
         .await;
     assert_eq!(refused.status, StatusCode::BAD_REQUEST);
     assert_eq!(refused.body["error"]["code"], "OS_02", "{}", refused.body);
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_a_query_it_cannot_read_as_os_02(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+
+    for (path, key) in [
+        ("/v1/connected-accounts?limit=abc", API_KEY),
+        ("/v1/auth-configs?limit=9223372036854775808", ADMIN_KEY),
+        // A cursor is an id: a NUL or a space can't be one, and must not reach the database.
+        ("/v1/connected-accounts?before=%00", API_KEY),
+        ("/v1/auth-configs?after=not%20an%20id", ADMIN_KEY),
+    ] {
+        let refused = app.send("GET", path, Some(key), None, &[]).await;
+
+        assert_eq!(
+            refused.status,
+            StatusCode::BAD_REQUEST,
+            "{path}: {}",
+            refused.body
+        );
+        assert_eq!(refused.body["error"]["code"], "OS_02", "{path}");
+    }
 }

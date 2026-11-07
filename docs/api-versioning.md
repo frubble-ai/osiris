@@ -94,7 +94,7 @@ is still served until a pull request removes it.
 | Release rules | `services/api/tests/releases.rs` | releases out of date or name order, a preview that isn't the newest, a later release without its changes |
 | Specs match the routes | `just openapi-check`, CI | a committed spec that isn't what the code generates |
 | Stable releases break nothing | `just contract-check`, CI's Contract job | an oasdiff error or warning in a stable release's spec, a stable release made a preview or removed, a stable release's golden transcript changed |
-| Schemathesis | `just schemathesis`, CI's Tests job | a live osiris answering a generated request at any release and key with an undocumented status, content type or body, or a server error |
+| Schemathesis | `just schemathesis` (`scripts/schemathesis/`), CI's Tests job | a live osiris answering a generated request at any release and key with an undocumented status, content type or body, or a server error |
 | Client release line | `npm run check`, the publish step | a client sending another release than its spec's, a major version that isn't its release's, a preview published on latest |
 
 Golden transcripts live in `api-reference/golden/<release>/`, with ids, times and random tokens

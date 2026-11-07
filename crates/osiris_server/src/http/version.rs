@@ -7,12 +7,10 @@
 pub mod lifecycle_headers;
 pub mod resolve_release;
 pub mod serve_version;
-pub mod served_release;
 pub mod translate_request;
 pub mod translate_response;
 
 pub use serve_version::serve_version;
-pub use served_release::ServedRelease;
 
 #[cfg(test)]
 pub mod mocks;

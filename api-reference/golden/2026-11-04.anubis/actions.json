@@ -18,17 +18,7 @@
         },
         "status": 200
       },
-      "events": [
-        {
-          "connected_account_id": "<ca_1>",
-          "event_id": "<ev_1>",
-          "id": "<msg_1>",
-          "occurred_at": "<time>",
-          "osiris_version": "2026-11-04.anubis",
-          "type": "connection.active",
-          "version": 1
-        }
-      ],
+      "events": [],
       "request": {
         "body": null,
         "headers": [],

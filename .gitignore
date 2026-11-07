@@ -2,3 +2,6 @@
 .env
 # Local TLS certificates for Postgres (docker-compose generates them).
 /.local
+
+# Schemathesis's local run state (scripts/schemathesis/run.sh).
+.schemathesis/

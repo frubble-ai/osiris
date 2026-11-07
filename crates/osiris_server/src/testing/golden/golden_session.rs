@@ -72,8 +72,14 @@ impl<'a> GoldenSession<'a> {
         body: Option<Value>,
         extra: &[(&str, &str)],
     ) -> Answer {
-        let mut headers = vec![("osiris-version", self.release)];
-        headers.extend_from_slice(extra);
+        // A step that names its own version (to try an unknown one) sends only that one.
+        let mut headers = Vec::from(extra);
+        if !extra
+            .iter()
+            .any(|(name, _)| name.eq_ignore_ascii_case("osiris-version"))
+        {
+            headers.push(("osiris-version", self.release));
+        }
         let answer = self
             .app
             .send(method, path, key.secret(), body.clone(), &headers)

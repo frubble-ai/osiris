@@ -58,3 +58,14 @@ test("a preview's client is never published from a tag", () => {
 test("the client in the repository follows its release", () => {
 	assert.deepEqual(checkRepository("branch"), []);
 });
+
+test("a client whose OSIRIS_VERSION can't be found says so", () => {
+	const problems = releaseLineProblems({
+		releases: [{ name: anubis, stability: "preview" }],
+		version: "0.1.0",
+		osirisVersion: undefined,
+		specVersion: anubis,
+		refType: "branch",
+	});
+	assert.deepEqual(problems, ['src/index.ts declares no OSIRIS_VERSION = "<release>"']);
+});

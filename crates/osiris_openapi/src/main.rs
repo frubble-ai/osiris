@@ -1,7 +1,7 @@
 //! Writes osiris's `OpenAPI` documents, generated from its routes, under `api-reference/` (or the
 //! directory given): `openapi.json` at the current release, and `versions/<release>.json` for every
-//! release osiris serves, each taken back through the changes made since. CI regenerates them and
-//! fails if the committed ones differ.
+//! release osiris serves, each taken back through the changes made since, after clearing the specs
+//! of releases no longer served. CI regenerates them and fails if the committed ones differ.
 
 use anyhow::Context;
 use osiris_api_models::version::RELEASES;
@@ -14,9 +14,15 @@ fn main() -> anyhow::Result<()> {
         .unwrap_or_else(|| "api-reference".to_owned());
     let root = Path::new(&root);
     write(&root.join("openapi.json"), &spec())?;
+    // A release no longer served leaves no spec behind.
+    let versions = root.join("versions");
+    if versions.exists() {
+        std::fs::remove_dir_all(&versions)
+            .with_context(|| format!("clearing {}", versions.display()))?;
+    }
     for release in RELEASES {
         write(
-            &root.join("versions").join(format!("{}.json", release.name)),
+            &versions.join(format!("{}.json", release.name)),
             &versioned_spec(RELEASES, release),
         )?;
     }

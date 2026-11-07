@@ -3,7 +3,7 @@
 //! is a preview on the answer.
 
 use super::{
-    ServedRelease, lifecycle_headers::lifecycle_headers, resolve_release::resolve_release,
+    lifecycle_headers::lifecycle_headers, resolve_release::resolve_release,
     translate_request::translate_request, translate_response::translate_response,
 };
 use crate::http::{error::ApiError, state::ApiState};
@@ -34,7 +34,6 @@ pub async fn serve_version(
         .releases
         .last()
         .is_some_and(|last| last.name == release.name);
-    request.extensions_mut().insert(ServedRelease(release));
     if !current {
         let max_body = state.config.settings.server.max_body();
         request = translate_request(state.releases, release, &route, max_body, request).await?;

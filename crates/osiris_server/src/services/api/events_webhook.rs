@@ -1,6 +1,6 @@
 //! The events topic, written into the spec as its one webhook (`OpenAPI` 3.1's `webhooks`), so the
-//! events clients receive are part of each release's contract, its digest and its breaking-change
-//! checks, like any answer.
+//! events clients receive are part of each release's contract and its breaking-change checks, like any
+//! answer.
 
 use serde_json::{Value, json};
 

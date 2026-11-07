@@ -12,7 +12,6 @@ use super::{
         MockGithubNetwork, generate_github_installation::generate_github_installation,
         generate_github_repository::generate_github_repository,
     },
-    types::GithubAccountType,
 };
 use crate::{ListLimits, OAuthClient, Provider, ProviderError, ProviderUrls};
 use rstest::rstest;
@@ -53,11 +52,39 @@ async fn lists_the_installations_the_user_can_see_with_their_token() {
         .unwrap();
 
     assert_eq!(listed.len(), 2);
-    assert_eq!(listed[0].account_type, GithubAccountType::User);
+    assert_eq!(listed[0].account_type, "user");
+    assert_eq!(listed[1].account_type, "organization");
+    assert_eq!(listed[1].repository_selection, "selected");
     assert_eq!(
         listed[1].account,
         installations[1]["account"]["login"].as_str().unwrap()
     );
+}
+
+#[rstest]
+#[case::enterprise("Enterprise", "everything_new", "organization")]
+#[case::a_new_type("Bot", "all", "bot")]
+#[tokio::test]
+async fn passes_values_github_adds_on_instead_of_refusing_the_page(
+    #[case] kind: &str,
+    #[case] selection: &str,
+    #[case] account_type: &str,
+) {
+    let server = MockServer::start().await;
+    let mut installation = generate_github_installation(1, true);
+    installation["account"]["type"] = kind.into();
+    installation["repository_selection"] = selection.into();
+    MockGithubNetwork::on(&server)
+        .answer_installations_for_token("the-token", &[installation])
+        .await;
+
+    let listed = github(&server, LIMITS)
+        .list_installations(&reqwest::Client::new(), "the-token")
+        .await
+        .unwrap();
+
+    assert_eq!(listed[0].account_type, account_type);
+    assert_eq!(listed[0].repository_selection, selection);
 }
 
 #[tokio::test]

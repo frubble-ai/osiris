@@ -33,7 +33,9 @@ export function expectedMajor(releases, release) {
 // generated from a spec at `specVersion`, from a ref of `refType`; empty when there are none.
 export function releaseLineProblems({ releases, version, osirisVersion, specVersion, refType }) {
 	const problems = [];
-	if (osirisVersion !== specVersion) {
+	if (osirisVersion === undefined) {
+		problems.push('src/index.ts declares no OSIRIS_VERSION = "<release>"');
+	} else if (osirisVersion !== specVersion) {
 		problems.push(`OSIRIS_VERSION is ${osirisVersion}, but the client is generated for ${specVersion}`);
 	}
 	const release = releases.find((listed) => listed.name === specVersion);

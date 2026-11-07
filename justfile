@@ -74,12 +74,13 @@ openapi:
 # Every stable release against `base` (default origin/dev): its spec may only grow, and its golden
 # transcripts never change. Needs oasdiff on the PATH.
 contract-check base="origin/dev":
+    python3 -m unittest scripts/test_api_contract_guard.py
     scripts/api-contract-guard.py {{base}} oasdiff
 
 # Schemathesis against a live osiris at every release and key, on a database of its own.
 schemathesis:
     cargo build -q -p osiris_server
-    scripts/schemathesis.sh
+    scripts/schemathesis/run.sh
 
 # Everything CI checks.
 check: fmt-check lint deny typos sqlx-check test openapi-check
@@ -99,7 +100,7 @@ deny:
 typos:
     typos
 
-# The tests; arguments filter them, such as `just test contract_lock`.
+# The tests; arguments filter them, such as `just test golden`.
 test *filters:
     cargo nextest run --workspace {{filters}}
 

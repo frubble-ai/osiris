@@ -19,7 +19,7 @@ migration job. All state is in Postgres.
 | `osiris_cloud_tasks` | `TaskScheduler` on Google Cloud Tasks, and the OIDC `TaskAuthenticator` |
 | `osiris_api_models` | what the API accepts and returns; the OpenAPI spec is generated from these |
 | `osiris_server` | configuration, the use cases, the HTTP layer and routes, the processes |
-| `osiris_openapi` | writes `api-reference/openapi.json` |
+| `osiris_openapi` | writes `api-reference/openapi.json` (the current release) and `api-reference/versions/<release>.json` (every release served) |
 | `osiris_cli` | `osiris`, the developer CLI |
 
 ## The server

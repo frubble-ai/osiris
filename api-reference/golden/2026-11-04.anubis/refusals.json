@@ -75,15 +75,14 @@
     {
       "answer": {
         "body": {
-          "data": [],
-          "next_cursor": null,
-          "previous_cursor": null
+          "error": {
+            "code": "OS_07",
+            "message": "Osiris-Version \"2020-01-01.ra\" is not one osiris serves",
+            "type": "unknown_version"
+          }
         },
-        "headers": {
-          "osiris-stability": "preview",
-          "osiris-version": "2026-11-04.anubis"
-        },
-        "status": 200
+        "headers": {},
+        "status": 400
       },
       "events": [],
       "request": {
@@ -132,7 +131,7 @@
         "body": {
           "error": {
             "code": "OS_02",
-            "message": "Failed to deserialize the JSON body into the target type: missing field `auth_config_id` at line 1 column 24",
+            "message": "the body does not match the request: a field is missing or has the wrong type",
             "type": "invalid_request"
           }
         },

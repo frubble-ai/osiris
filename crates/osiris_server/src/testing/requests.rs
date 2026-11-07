@@ -28,6 +28,19 @@ impl TestContext {
         body: Option<Value>,
         extra: &[(&str, &str)],
     ) -> Answer {
+        let body = body.map(|body| body.to_string()).unwrap_or_default();
+        self.send_raw(method, path, key, body, extra).await
+    }
+
+    /// Sends `body` as it is, JSON or not, as a request with a JSON content type.
+    pub async fn send_raw(
+        &self,
+        method: &str,
+        path: &str,
+        key: Option<&str>,
+        body: String,
+        extra: &[(&str, &str)],
+    ) -> Answer {
         let mut request = Request::builder()
             .method(method)
             .uri(path)
@@ -38,7 +51,11 @@ impl TestContext {
         for (name, value) in extra {
             request = request.header(*name, *value);
         }
-        let body = body.map_or_else(Body::empty, |body| Body::from(body.to_string()));
+        let body = if body.is_empty() {
+            Body::empty()
+        } else {
+            Body::from(body)
+        };
         let response = self
             .api
             .clone()

@@ -8,6 +8,8 @@ use serde_json::json;
 
 pub async fn run(app: &TestContext, session: &mut GoldenSession<'_>) {
     let id = app.connected(28800).await;
+    // The connection's own `connection.active` is arranged, not part of the transcript.
+    session.skip_events();
     let github = MockGithubNetwork::on(&app.provider);
     github
         .answer_installations(&[json!({

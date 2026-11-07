@@ -4,7 +4,9 @@
 use super::{lifecycle_headers::lifecycle_headers, mocks::MOCK_RELEASES};
 use crate::{
     services::api::versioned_spec,
-    testing::{ADMIN_KEY, setup_test_context},
+    testing::{
+        ADMIN_KEY, API_KEY, generate_connect_attempt::generate_connect_attempt, setup_test_context,
+    },
 };
 use axum::http::{HeaderMap, StatusCode};
 use osiris_api_models::version::translate::event_down;
@@ -130,6 +132,80 @@ fn takes_the_spec_and_events_back_to_the_older_release() {
         event,
         json!({ "type": "connection.active", "connection_id": "ca_1" })
     );
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn brings_an_older_release_s_query_up_to_the_current_one(pool: PgPool) {
+    let app = setup_test_context(pool).await.serving(MOCK_RELEASES);
+    let config = app.github_config().await;
+    let attempt = generate_connect_attempt(&config);
+    let (id, _) = app.start_connect_with(&attempt).await;
+    let alias = attempt["alias"].as_str().expect("an alias");
+
+    let found = app
+        .send(
+            "GET",
+            &format!("/v1/connected-accounts?label={alias}"),
+            Some(API_KEY),
+            None,
+            &[("osiris-version", AMUN)],
+        )
+        .await;
+    let missed = app
+        .send(
+            "GET",
+            "/v1/connected-accounts?label=no-such-alias",
+            Some(API_KEY),
+            None,
+            &[("osiris-version", AMUN)],
+        )
+        .await;
+
+    assert_eq!(found.status, StatusCode::OK, "{}", found.body);
+    assert_eq!(found.body["data"][0]["id"], id.as_str());
+    assert_eq!(missed.body["data"], json!([]));
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn passes_an_older_release_s_unreadable_body_on_for_the_route_to_refuse(pool: PgPool) {
+    let app = setup_test_context(pool).await.serving(MOCK_RELEASES);
+
+    let refused = app
+        .send_raw(
+            "POST",
+            "/v1/auth-configs",
+            Some(ADMIN_KEY),
+            "not json".into(),
+            &[("osiris-version", AMUN)],
+        )
+        .await;
+
+    assert_eq!(refused.status, StatusCode::BAD_REQUEST);
+    assert_eq!(refused.body["error"]["code"], "OS_02");
+    assert_eq!(
+        refused.body["error"]["message"],
+        "the body is not valid JSON"
+    );
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_a_body_too_large_the_same_at_every_release(pool: PgPool) {
+    let app = setup_test_context(pool).await.serving(MOCK_RELEASES);
+    let too_large = "x".repeat(app.config.settings.server.max_body() + 1);
+
+    for release in [AMUN, ANUBIS] {
+        let refused = app
+            .send_raw(
+                "POST",
+                "/v1/auth-configs",
+                Some(ADMIN_KEY),
+                too_large.clone(),
+                &[("osiris-version", release)],
+            )
+            .await;
+        assert_eq!(refused.status, StatusCode::BAD_REQUEST, "at {release}");
+        assert_eq!(refused.body["error"]["code"], "OS_02", "at {release}");
+    }
 }
 
 #[tokio::test]

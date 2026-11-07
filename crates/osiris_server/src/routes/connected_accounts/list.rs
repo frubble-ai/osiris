@@ -46,7 +46,7 @@ pub async fn list_connected_accounts(
         alias: query.alias,
         status,
     };
-    let cursor = cursor(&state, query.after, query.before, query.limit);
+    let cursor = cursor(&state, query.after, query.before, query.limit)?;
     server_wrap(
         Flow::ConnectedAccountsList,
         &state,

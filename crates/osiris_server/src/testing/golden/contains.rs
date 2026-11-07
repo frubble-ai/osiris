@@ -38,3 +38,6 @@ fn walk(recorded: &Value, actual: &Value, at: &str, found: &mut Vec<String>) {
         (recorded, actual) => found.push(format!("{at}: was {recorded}, is {actual}")),
     }
 }
+
+#[cfg(test)]
+mod tests;
