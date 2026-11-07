@@ -3,12 +3,17 @@ name: Osiris Client - CD Publish
 # The TypeScript client (clients/typescript): its generated code matches the committed spec and
 # it builds. A push to dev, stg or prd publishes a prerelease on that dist-tag. A release tag
 # (`v1.2.3`) publishes that version on latest.
+#
+# A branch push publishes only when it changes the spec, the client or this file, so the channel
+# points at the last commit that changed the client. GitHub does not apply the path filter to a
+# tag push, so every release tag still publishes.
 on:
   pull_request:
     paths: ["api-reference/**", "clients/typescript/**", ".github/workflows/client.yml"]
   push:
     branches: [dev, stg, prd]
     tags: ["v*"]
+    paths: ["api-reference/**", "clients/typescript/**", ".github/workflows/client.yml"]
 
 permissions:
   contents: read
