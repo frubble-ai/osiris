@@ -5,6 +5,7 @@ use super::schema_validator::mismatches;
 use osiris_api_models::version::Release;
 use serde_json::Value;
 
+/// Fails the test unless `event` matches `EventDelivery` in the spec of the release it names.
 pub fn assert_event_conforms(releases: &[Release], event: &Value) {
     let named = event["osiris_version"].as_str().unwrap_or_default();
     let release = releases

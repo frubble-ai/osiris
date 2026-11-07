@@ -5,6 +5,7 @@ use super::contains::contains;
 use serde_json::Value;
 use std::path::PathBuf;
 
+/// Where `scenario`'s transcript at `release` is kept.
 pub fn transcript_path(release: &str, scenario: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../../api-reference/golden")

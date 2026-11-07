@@ -10,6 +10,7 @@ pub fn contains(recorded: &Value, actual: &Value) -> Vec<String> {
     found
 }
 
+/// Adds to `found` each place under `at` where `actual` departs from `recorded`.
 fn walk(recorded: &Value, actual: &Value, at: &str, found: &mut Vec<String>) {
     match (recorded, actual) {
         (Value::Object(recorded), Value::Object(actual)) => {

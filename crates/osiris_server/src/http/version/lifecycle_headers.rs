@@ -11,6 +11,7 @@ const HTTP_DATE: &[FormatItem<'_>] = format_description!(
     "[weekday repr:short], [day] [month repr:short] [year] [hour]:[minute]:[second] GMT"
 );
 
+/// Adds `Deprecation` and `Sunset` to `headers` when a release after `release` is out.
 pub fn lifecycle_headers(
     releases: &[Release],
     release: &Release,

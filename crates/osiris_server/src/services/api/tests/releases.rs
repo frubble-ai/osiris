@@ -72,3 +72,27 @@ fn names_the_current_release_in_the_current_spec() {
     assert_eq!(spec["info"]["version"], CURRENT.name);
     assert_eq!(spec, versioned_spec(RELEASES, CURRENT));
 }
+
+#[test]
+fn describes_every_version_change_in_its_release_s_changelog() {
+    for release in RELEASES {
+        let path = format!(
+            "{}/../../docs/changelog/{}.md",
+            env!("CARGO_MANIFEST_DIR"),
+            release.god()
+        );
+        let changelog = std::fs::read_to_string(&path)
+            .unwrap_or_else(|_| panic!("{release:?} has no changelog at {path}"));
+        for change in release.changes {
+            let description = change.description();
+            assert!(
+                !description.is_empty(),
+                "{release:?} has a change without a description"
+            );
+            assert!(
+                changelog.contains(description),
+                "{release:?}'s changelog ({path}) must say what this change says: {description}"
+            );
+        }
+    }
+}

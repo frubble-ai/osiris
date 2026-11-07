@@ -4,6 +4,7 @@
 
 use serde_json::Value;
 
+/// The path template of `spec` that `path` was sent to, if any.
 pub fn template_of<'a>(spec: &'a Value, path: &str) -> Option<&'a str> {
     let segments: Vec<&str> = path.split('/').collect();
     spec.get("paths")?

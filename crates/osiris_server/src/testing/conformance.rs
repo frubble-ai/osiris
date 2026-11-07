@@ -4,6 +4,7 @@
 
 pub mod assert_answer_conforms;
 pub mod assert_event_conforms;
+pub mod release_spec;
 pub mod schema_validator;
 pub mod template_of;
 

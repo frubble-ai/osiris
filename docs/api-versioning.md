@@ -117,14 +117,20 @@ existing transcripts stay as they are. CI's Contract job confirms nothing stable
 - **When the newest release is stable**, the change belongs to the next release:
   1. If there is no next release yet, add one at the end of `RELEASES` as a preview, named with
      the next god, dated the day it is cut, and numbered one after the last release ever made.
-     Give it a `golden_at!` line and a changelog file, and move the client's major version to its
-     number (`npm run check` says which).
+     Point `CURRENT` (`osiris_api_models/src/version/releases.rs`) at it, and the client's
+     `OSIRIS_VERSION` (`clients/typescript/src/index.ts`) to its name. Give it a `golden_at!` line
+     in `services/api/tests/golden/releases.rs` and a changelog file, and move the client's major
+     version to its number (`npm run check` says which).
   2. Change the code to the new shape.
   3. Write a version change under `osiris_api_models/src/version/changes/<release>/`, one file per
      change, and list it in the release's `changes`. It must give the older release its old
-     requests, answers, events and spec back.
-  4. Run `just openapi` and `OSIRIS_GOLDEN=record just test golden`. The stable release's spec and
-     transcripts must come out unchanged, which the Contract job checks.
+     requests, answers, events and spec back. Its `description` goes in the release's changelog
+     word for word; a test checks it is there.
+  4. Run `just openapi`, then record only the new release's transcripts:
+     `OSIRIS_GOLDEN=record just test golden::releases::<god>` (its `golden_at!` module). Recording
+     the older ones would write their new `Deprecation` and `Sunset` headers into transcripts that
+     may not change. `just test golden` then replays every release, and the stable release's spec
+     and transcripts must come out unchanged, which the Contract job checks.
 
 Breaking changes collect in the next release until it is cut. Releases are cut on demand, not on a
 schedule.
@@ -133,7 +139,8 @@ schedule.
 
 One pull request:
 1. Set its `stability` to `Stability::Stable`.
-2. Run `just openapi` and record its transcripts.
+2. Run `just openapi` and record its transcripts (`OSIRIS_GOLDEN=record just test
+   golden::releases::<god>`).
 3. Finish its changelog.
 4. For the first release, move the client's major version from 0 to 1 (`npm run check` says
    which). A later release's client already carries its number.
@@ -142,13 +149,16 @@ From its date, the release before is deprecated, and its sunset is `support_days
 
 ### Removing a release
 
-Only past its sunset, in a pull request labelled `api-sunset`. The Contract job checks both: the
-label, and that the day is past the next release's date plus `support_days` (the default in
-`config.example.toml`; a deployment that sets its own sets `OSIRIS_SUPPORT_DAYS` for the job). The
+Only the oldest release, only past its sunset, in a pull request labelled `api-sunset`. Releases
+are removed oldest first, so the ones left keep consecutive numbers, which the release rules check.
+The Contract job checks the label and that the day is past the next release's date plus the
+longest support window clients were promised: the base branch's documented `support_days`
+(`config.example.toml`), the pull request's, or `OSIRIS__API__SUPPORT_DAYS` when a deployment
+sets its own (set it for the job too). With none of them known, the removal is refused. The
 newest release has no sunset, so it is never removed.
 1. Remove it from `RELEASES`, along with its `golden_at!` line, its spec and its transcripts.
-2. If it was the oldest, the next release becomes the first: delete the version changes that only
-   served the removed one, and empty that release's `changes`.
+2. The next release becomes the first: delete the version changes that only served the removed
+   one, and empty that release's `changes`.
 
 Clients still pinned to it get `OS_07`, so move the API key's `pinned_version` first.
 

@@ -15,6 +15,7 @@ pub enum Key {
 }
 
 impl Key {
+    /// The bearer key sent, if any.
     fn secret(self) -> Option<&'static str> {
         match self {
             Self::Api => Some(API_KEY),
@@ -24,6 +25,7 @@ impl Key {
         }
     }
 
+    /// The key as a transcript names it.
     fn label(self) -> &'static str {
         match self {
             Self::Api => "api",
@@ -52,6 +54,7 @@ pub struct GoldenSession<'a> {
 }
 
 impl<'a> GoldenSession<'a> {
+    /// A session sending `app`'s requests at `release`.
     pub fn new(app: &'a TestContext, release: &'static str) -> Self {
         Self {
             app,

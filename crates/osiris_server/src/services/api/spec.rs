@@ -7,6 +7,7 @@ use super::{events_webhook::events_webhook, ground_rule_answers::ground_rule_ans
 use osiris_api_models::version::{RELEASES, translate::spec_down};
 use serde_json::Value;
 
+/// The current release's spec, as `api-reference/openapi.json` holds it.
 pub fn spec() -> Value {
     let mut spec = serde_json::to_value(v1().split_for_parts().1).unwrap_or_default();
     ground_rule_answers(&mut spec);

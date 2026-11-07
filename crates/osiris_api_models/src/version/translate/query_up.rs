@@ -3,6 +3,7 @@
 use super::changes_since;
 use crate::version::{Release, Route};
 
+/// Brings `query` up through each change since `target`, oldest first.
 pub fn query_up(
     releases: &[Release],
     target: &Release,

@@ -1,8 +1,8 @@
 //! An API answer, checked against its release's spec: the status is documented for the operation,
 //! and a JSON body matches that answer's schema.
 
+use super::release_spec::release_spec;
 use super::{schema_validator::mismatches, template_of::template_of};
-use crate::services::api::versioned_spec;
 use axum::http::{HeaderMap, StatusCode};
 use osiris_api_models::version::{HEADER, Release};
 use serde_json::Value;
@@ -12,6 +12,8 @@ fn escape(part: &str) -> String {
     part.replace('~', "~0").replace('/', "~1")
 }
 
+/// Fails the test unless `body`, answered with `status` to `method path`, is what the spec of the
+/// release it was served at promises.
 pub fn assert_answer_conforms(
     releases: &[Release],
     method: &str,
@@ -32,7 +34,7 @@ pub fn assert_answer_conforms(
     else {
         return;
     };
-    let spec = versioned_spec(releases, release);
+    let spec = release_spec(releases, release);
     let template = template_of(&spec, path)
         .unwrap_or_else(|| panic!("{method} {path} is not a route of {release:?}'s spec"));
     let method = method.to_ascii_lowercase();

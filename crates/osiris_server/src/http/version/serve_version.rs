@@ -15,6 +15,8 @@ use axum::{
 };
 use osiris_api_models::version::{HEADER, Route, STABILITY_HEADER};
 
+/// Serves `request` at the release it names, translating it and its answer when that release
+/// isn't the current one.
 pub async fn serve_version(
     State(state): State<ApiState>,
     mut request: Request,

@@ -2,7 +2,7 @@
 //! pointer. The spec itself is the root, so the schema's `$ref`s to `#/components/schemas/…`
 //! resolve.
 
-use crate::services::api::versioned_spec;
+use super::release_spec::{release_key, release_spec};
 use jsonschema::Validator;
 use osiris_api_models::version::Release;
 use serde_json::{Value, json};
@@ -13,12 +13,10 @@ use std::{
 
 type Cache = Mutex<HashMap<(String, String), Arc<Validator>>>;
 
+/// The validator for the schema at `pointer` in `release`'s spec, built once.
 pub fn schema_validator(releases: &[Release], release: &Release, pointer: &str) -> Arc<Validator> {
     static CACHE: OnceLock<Cache> = OnceLock::new();
-    let key = (
-        format!("{}:{:?}", release.name, releases),
-        pointer.to_owned(),
-    );
+    let key = (release_key(releases, release), pointer.to_owned());
     let cache = CACHE.get_or_init(Cache::default);
     if let Some(validator) = cache
         .lock()
@@ -27,7 +25,7 @@ pub fn schema_validator(releases: &[Release], release: &Release, pointer: &str) 
     {
         return validator.clone();
     }
-    let mut root = versioned_spec(releases, release);
+    let mut root = (*release_spec(releases, release)).clone();
     if let Some(document) = root.as_object_mut() {
         // A `$ref` is a URI, so the braces of a path template are percent-encoded.
         let fragment = pointer.replace('{', "%7B").replace('}', "%7D");

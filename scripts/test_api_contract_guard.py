@@ -69,10 +69,11 @@ def spec(stability, release=RELEASE):
 class Repository:
     """A throwaway repository with a base commit holding `base_files`."""
 
-    def __init__(self, directory, base_files):
+    def __init__(self, directory, base_files, config=True):
         self.directory = directory
         self.git("init", "-q", "-b", "main")
-        self.write({"config.example.toml": "[api]\nsupport_days = 730\n", **base_files})
+        documented = {"config.example.toml": "[api]\nsupport_days = 730\n"} if config else {}
+        self.write({**documented, **base_files})
         self.commit("base")
         self.base = self.git("rev-parse", "HEAD").strip()
 
@@ -99,9 +100,9 @@ class Repository:
         self.git("add", "-A")
         self.git("commit", "-q", "--allow-empty", "-m", message)
 
-    def guard(self, base=None, sunset=False, today="2026-11-07"):
-        environment = dict(os.environ, OSIRIS_SUNSET="true" if sunset else "false", OSIRIS_TODAY=today)
-        environment.pop("OSIRIS_SUPPORT_DAYS", None)
+    def guard(self, base=None, sunset=False, today="2026-11-07", extra=None):
+        environment = {name: value for name, value in os.environ.items() if name != "OSIRIS__API__SUPPORT_DAYS"}
+        environment.update(OSIRIS_SUNSET="true" if sunset else "false", OSIRIS_TODAY=today, **(extra or {}))
         environment.pop("GITHUB_STEP_SUMMARY", None)
         return subprocess.run(
             ["python3", GUARD, base or self.base, OASDIFF],
@@ -186,7 +187,7 @@ class ContractGuardTest(unittest.TestCase):
         new_transcript = {f"api-reference/golden/{RELEASE}/notion.json": '{"steps": []}\n'}
         self.assert_passed(self.head(self.repository(), add, files=new_transcript))
 
-    def sunset_repository(self):
+    def sunset_repository(self, config=True):
         """anubis stable, and bastet out after it: anubis's sunset is bastet's date plus 730 days."""
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
@@ -194,6 +195,7 @@ class ContractGuardTest(unittest.TestCase):
         repository = Repository(
             directory.name,
             {SPEC: spec("stable"), next_spec: spec("preview", NEXT), GOLDEN: '{"steps": []}\n'},
+            config=config,
         )
         repository.write({SPEC: None, GOLDEN: None})
         repository.commit("head")
@@ -205,6 +207,25 @@ class ContractGuardTest(unittest.TestCase):
     def test_refuses_a_release_removed_before_its_sunset_even_with_the_label(self):
         result = self.sunset_repository().guard(sunset=True, today="2029-02-27")
         self.assert_refused(result, "advertise a sunset of 2029-02-28")
+
+    def test_holds_a_removal_to_the_base_s_window_when_the_head_shortens_it(self):
+        repository = self.sunset_repository()
+        repository.write({"config.example.toml": "[api]\nsupport_days = 1\n"})
+        repository.commit("shorten the window")
+        result = repository.guard(sunset=True, today="2027-03-05")
+        self.assert_refused(result, "advertise a sunset of 2029-02-28")
+
+    def test_holds_a_removal_to_a_deployment_s_longer_window(self):
+        repository = self.sunset_repository()
+        environment = {"OSIRIS__API__SUPPORT_DAYS": "1000"}
+        result = repository.guard(sunset=True, today="2029-03-01", extra=environment)
+        self.assert_refused(result, "advertise a sunset of 2029-11-25")
+
+    def test_refuses_a_removal_whose_window_is_unknown(self):
+        self.assert_refused(
+            self.sunset_repository(config=False).guard(sunset=True, today="2100-01-01"),
+            "sunset is unknown",
+        )
 
     def test_refuses_the_newest_release_removed_even_with_the_label(self):
         repository = self.repository()

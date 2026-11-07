@@ -27,6 +27,7 @@ where
     }
 }
 
+/// The `OS_02` message for why a body couldn't be read, in osiris's words.
 fn message(rejection: &JsonRejection) -> &'static str {
     match rejection {
         JsonRejection::MissingJsonContentType(_) => "the body must be sent as application/json",

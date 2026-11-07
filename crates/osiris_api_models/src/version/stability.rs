@@ -14,6 +14,7 @@ pub enum Stability {
 }
 
 impl Stability {
+    /// The stability as answers and specs name it: `preview` or `stable`.
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Preview => "preview",

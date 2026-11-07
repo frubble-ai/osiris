@@ -24,6 +24,7 @@ pub fn find(name: &str) -> Option<&'static Release> {
     RELEASES.iter().find(|release| release.name == name)
 }
 
+/// Whether osiris serves the release named `name`.
 pub fn is_known(name: &str) -> bool {
     find(name).is_some()
 }

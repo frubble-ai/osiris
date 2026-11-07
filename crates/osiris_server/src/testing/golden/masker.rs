@@ -23,6 +23,7 @@ impl Masker {
         }
     }
 
+    /// `value` with every string masked.
     pub fn mask(&mut self, value: &Value) -> Value {
         match value {
             Value::String(text) => Value::String(self.mask_text(text)),
@@ -36,6 +37,7 @@ impl Masker {
         }
     }
 
+    /// `text` with its times, ids, long tokens and the providers' origin masked.
     pub fn mask_text(&mut self, text: &str) -> String {
         if OffsetDateTime::parse(text, &Rfc3339).is_ok() {
             return "<time>".into();
@@ -59,6 +61,7 @@ impl Masker {
         masked
     }
 
+    /// One word, masked when it is an id or a long token.
     fn mask_word(&mut self, word: &str) -> String {
         if let Some((prefix, rest)) = word.split_once('_')
             && (2..=5).contains(&prefix.len())

@@ -4,6 +4,8 @@ use crate::http::{error::ApiError, state::ApiState};
 use axum::http::HeaderMap;
 use osiris_api_models::version::{HEADER, Release};
 
+/// The release `headers` name in `Osiris-Version`, the pinned one when they name none, or
+/// `OS_07` for one osiris doesn't serve.
 pub fn resolve_release(
     state: &ApiState,
     headers: &HeaderMap,

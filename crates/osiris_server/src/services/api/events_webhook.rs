@@ -4,6 +4,7 @@
 
 use serde_json::{Value, json};
 
+/// Adds the events topic to `spec` as its `events` webhook.
 pub fn events_webhook(spec: &mut Value) {
     let Some(document) = spec.as_object_mut() else {
         return;

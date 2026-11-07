@@ -2,6 +2,7 @@
 
 use crate::version::{Release, VersionChange};
 
+/// Every change the releases after `target` made, oldest first; none when `target` is the last.
 pub fn changes_since<'a>(
     releases: &'a [Release],
     target: &Release,

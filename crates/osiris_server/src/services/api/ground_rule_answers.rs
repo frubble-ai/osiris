@@ -6,6 +6,7 @@
 
 use serde_json::{Value, json};
 
+/// Adds the answers every `/v1` operation can give before its route runs to each one in `spec`.
 pub fn ground_rule_answers(spec: &mut Value) {
     let Some(paths) = spec.get_mut("paths").and_then(Value::as_object_mut) else {
         return;
@@ -60,6 +61,7 @@ pub fn ground_rule_answers(spec: &mut Value) {
     }
 }
 
+/// An answer described by `description`, whose body is the error shape.
 fn error(description: &str) -> Value {
     json!({
         "description": description,

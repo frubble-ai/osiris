@@ -9,7 +9,8 @@ use super::Route;
 use serde_json::Value;
 
 pub trait VersionChange: Sync {
-    /// What changed, in the words of the release's changelog.
+    /// What changed, as clients read it: a test requires these words in the release's changelog
+    /// (`docs/changelog/<god>.md`), so the changelog lists every breaking change.
     fn description(&self) -> &'static str;
 
     /// The `OpenAPI` document at this release, turned into the one of the release before.

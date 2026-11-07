@@ -5,8 +5,11 @@ For each release whose spec in api-reference/versions/ is stable on the base bra
 
 - its spec must still be there and still be stable, unless the pull request sunsets it: it is
   labelled `api-sunset` (OSIRIS_SUNSET=true, set by CI) and the release is past the sunset its
-  answers advertise, the next release's date plus `support_days` (config.example.toml's default,
-  or OSIRIS_SUPPORT_DAYS for a deployment that sets its own; OSIRIS_TODAY sets the day, for tests);
+  answers advertised: the next release's date plus `support_days`. The window is the longest of the
+  base's documented default (config.example.toml, what clients were told), the head's, and
+  OSIRIS__API__SUPPORT_DAYS (the setting a deployment overrides it with), so a pull request can't
+  shorten the promise it is checked against; with none of them known, the removal is refused.
+  OSIRIS_TODAY sets the day, for tests;
 - oasdiff must find no breaking change and no warning between its base and head spec, with the
   events webhook read as an answer osiris sends (oasdiff reads a webhook's payload as a request,
   whose rules point the other way);
@@ -33,10 +36,12 @@ GOLDEN = "api-reference/golden"
 
 
 def git(*args):
+    """Runs git with `args` and answers what it printed."""
     return subprocess.run(["git", *args], check=True, capture_output=True, text=True).stdout
 
 
 def base_file(base, path):
+    """The JSON file at `path` on `base`, or None when the base has none."""
     try:
         return json.loads(git("show", f"{base}:{path}"))
     except subprocess.CalledProcessError:
@@ -44,31 +49,45 @@ def base_file(base, path):
 
 
 def stability(spec):
+    """A spec's stability, `preview` when it names none."""
     return (spec or {}).get("info", {}).get("x-osiris-stability", "preview")
 
 
-def support_days():
-    """The support window: OSIRIS_SUPPORT_DAYS, or the default config.example.toml documents."""
-    if os.environ.get("OSIRIS_SUPPORT_DAYS"):
-        return int(os.environ["OSIRIS_SUPPORT_DAYS"])
-    with open("config.example.toml") as file:
-        found = re.search(r"^support_days\s*=\s*(\d+)", file.read(), re.M)
-    if not found:
-        sys.exit("::error::config.example.toml documents no support_days")
-    return int(found.group(1))
+def documented_support_days(text):
+    """The `support_days` a config.example.toml documents, or None."""
+    found = re.search(r"^support_days\s*=\s*(\d+)", text or "", re.M)
+    return int(found.group(1)) if found else None
+
+
+def support_days(base):
+    """The longest support window clients may have been promised, or None when none is known."""
+    try:
+        base_text = git("show", f"{base}:config.example.toml")
+    except subprocess.CalledProcessError:
+        base_text = None
+    head_text = open("config.example.toml").read() if os.path.exists("config.example.toml") else None
+    known = [documented_support_days(base_text), documented_support_days(head_text)]
+    if os.environ.get("OSIRIS__API__SUPPORT_DAYS"):
+        known.append(int(os.environ["OSIRIS__API__SUPPORT_DAYS"]))
+    known = [days for days in known if days is not None]
+    return max(known) if known else None
 
 
 def released_on(release):
+    """The day a release came out: the date its name starts with."""
     return datetime.date.fromisoformat(release[:10])
 
 
-def sunset_problem(release, listed):
+def sunset_problem(base, release, listed):
     """Why `release` can't be removed yet, or None once it is past its sunset."""
     names = [file.removesuffix(".json") for file in sorted(listed)]
     later = names[names.index(release) + 1:]
     if not later:
         return f"{release} is the newest release, so it has no sunset yet"
-    sunset = released_on(later[0]) + datetime.timedelta(days=support_days())
+    days = support_days(base)
+    if days is None:
+        return "no support_days is documented or set, so its sunset is unknown"
+    sunset = released_on(later[0]) + datetime.timedelta(days=days)
     today = datetime.date.fromisoformat(os.environ["OSIRIS_TODAY"]) if os.environ.get("OSIRIS_TODAY") else datetime.date.today()
     if today < sunset:
         return f"{release}'s answers advertise a sunset of {sunset}, and it is {today}"
@@ -98,6 +117,7 @@ def as_answers(spec):
 
 
 def oasdiff(binary, command, base_spec, head_spec, *flags):
+    """Runs oasdiff's `command` between the two specs, each with its webhooks read as answers."""
     with tempfile.TemporaryDirectory() as directory:
         paths = []
         for name, spec in (("base", base_spec), ("head", head_spec)):
@@ -109,6 +129,7 @@ def oasdiff(binary, command, base_spec, head_spec, *flags):
 
 
 def summary(text):
+    """Prints `text`, and adds it to the job's summary on GitHub."""
     print(text)
     target = os.environ.get("GITHUB_STEP_SUMMARY")
     if target:
@@ -117,6 +138,7 @@ def summary(text):
 
 
 def main():
+    """Checks every release stable on the base, and exits 1 on any failure."""
     base = sys.argv[1] if len(sys.argv) > 1 else "origin/dev"
     binary = sys.argv[2] if len(sys.argv) > 2 else "oasdiff"
     sunset = os.environ.get("OSIRIS_SUNSET") == "true"
@@ -147,7 +169,7 @@ def main():
         if head_spec is None:
             if not sunset:
                 failures.append(f"{release} is stable and its spec was removed; a release is only removed past its sunset, in a pull request labelled api-sunset")
-            elif problem := sunset_problem(release, listed):
+            elif problem := sunset_problem(base, release, listed):
                 failures.append(f"{release} can't be removed yet: {problem}")
             continue
         if stability(head_spec) != "stable":

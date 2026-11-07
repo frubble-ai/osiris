@@ -4,6 +4,7 @@ use super::changes_since;
 use crate::version::{Release, Route};
 use serde_json::Value;
 
+/// Takes `body`, answered with `status`, back through each change since `target`, newest first.
 pub fn response_down(
     releases: &[Release],
     target: &Release,

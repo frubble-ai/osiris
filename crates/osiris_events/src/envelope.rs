@@ -23,6 +23,7 @@ pub struct Envelope {
 }
 
 impl Envelope {
+    /// `message` in a new envelope: a fresh id, now, and the release it is written in.
     pub fn wrap(message: Message, osiris_version: &str) -> Self {
         Self {
             version: VERSION,

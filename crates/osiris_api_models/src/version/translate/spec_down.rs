@@ -5,6 +5,8 @@ use super::changes_since;
 use crate::version::Release;
 use serde_json::Value;
 
+/// Takes `spec` back through each change since `target`, newest first, and names `target` in its
+/// `info`.
 pub fn spec_down(releases: &[Release], target: &Release, spec: &mut Value) {
     for change in changes_since(releases, target).rev() {
         change.spec(spec);

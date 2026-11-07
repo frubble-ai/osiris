@@ -29,6 +29,7 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
+/// Writes `spec` to `path` as pretty JSON, creating its directory.
 fn write(path: &Path, spec: &serde_json::Value) -> anyhow::Result<()> {
     if let Some(directory) = path.parent() {
         std::fs::create_dir_all(directory)

@@ -13,6 +13,8 @@ use osiris_api_models::version::{
     translate::{query_up, request_up},
 };
 
+/// `request`, written for `release`, with its query and JSON body brought up to the current
+/// release; a body over `max_body` is refused.
 pub async fn translate_request(
     releases: &[Release],
     release: &Release,

@@ -6,6 +6,7 @@
 use crate::http::{error::ApiError, state::ApiState};
 use osiris_domain::Cursor;
 
+/// The cursor a list request asks for, its limit bounded; a cursor no id could be is refused.
 pub fn cursor(
     state: &ApiState,
     after: Option<String>,
