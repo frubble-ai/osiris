@@ -18,7 +18,7 @@ use osiris_env::Flow;
 /// Every repository the GitHub App's installations give the connected user, each once.
 #[utoipa::path(post, path = "/v1/connected-accounts/{id}/actions/github.list_repositories", tag = "actions", params(("id" = String, Path)),
     params(("Idempotency-Key" = Option<String>, Header, description = "Runs the request once; a retry gets the first answer")),
-    responses((status = 200, body = ActionResult<Vec<GithubRepository>>), (status = 409, body = ErrorBody), (status = 424, body = ErrorBody), (status = 502, body = ErrorBody)),
+    responses((status = 200, body = ActionResult<Vec<GithubRepository>>), (status = 404, body = ErrorBody), (status = 409, body = ErrorBody), (status = 424, body = ErrorBody), (status = 502, body = ErrorBody)),
     security(("api_key" = [])))]
 pub async fn github_list_repositories(
     State(state): State<ApiState>,

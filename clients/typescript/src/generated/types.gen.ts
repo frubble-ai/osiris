@@ -496,6 +496,7 @@ export type DeleteAuthConfigErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    404: ErrorBody;
     /**
      * The request took longer than the server waits
      */
@@ -832,6 +833,7 @@ export type GithubListInstallationsErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    404: ErrorBody;
     /**
      * The request took longer than the server waits
      */
@@ -885,6 +887,7 @@ export type GithubListRepositoriesErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    404: ErrorBody;
     /**
      * The request took longer than the server waits
      */
@@ -938,6 +941,7 @@ export type LinearListTeamsErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    404: ErrorBody;
     /**
      * The request took longer than the server waits
      */
@@ -991,6 +995,7 @@ export type SlackListChannelsErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    404: ErrorBody;
     /**
      * The request took longer than the server waits
      */

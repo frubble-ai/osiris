@@ -18,7 +18,7 @@ use osiris_env::Flow;
 /// Where the GitHub App is installed, of what the connected user can see.
 #[utoipa::path(post, path = "/v1/connected-accounts/{id}/actions/github.list_installations", tag = "actions", params(("id" = String, Path)),
     params(("Idempotency-Key" = Option<String>, Header, description = "Runs the request once; a retry gets the first answer")),
-    responses((status = 200, body = ActionResult<Vec<GithubInstallation>>), (status = 409, body = ErrorBody), (status = 424, body = ErrorBody), (status = 502, body = ErrorBody)),
+    responses((status = 200, body = ActionResult<Vec<GithubInstallation>>), (status = 404, body = ErrorBody), (status = 409, body = ErrorBody), (status = 424, body = ErrorBody), (status = 502, body = ErrorBody)),
     security(("api_key" = [])))]
 pub async fn github_list_installations(
     State(state): State<ApiState>,

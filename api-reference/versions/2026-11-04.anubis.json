@@ -1056,6 +1056,15 @@
             },
             "description": "A missing or wrong key"
           },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
           "408": {
             "description": "The request took longer than the server waits"
           },
@@ -1765,6 +1774,15 @@
             },
             "description": "A missing or wrong key"
           },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
           "408": {
             "description": "The request took longer than the server waits"
           },
@@ -1884,6 +1902,15 @@
               }
             },
             "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
           },
           "408": {
             "description": "The request took longer than the server waits"
@@ -2005,6 +2032,15 @@
             },
             "description": "A missing or wrong key"
           },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
           "408": {
             "description": "The request took longer than the server waits"
           },
@@ -2124,6 +2160,15 @@
               }
             },
             "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
           },
           "408": {
             "description": "The request took longer than the server waits"

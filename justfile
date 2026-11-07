@@ -71,6 +71,16 @@ sqlx-check:
 openapi:
     cargo run -q -p osiris_openapi
 
+# Every stable release against `base` (default origin/dev): its spec may only grow, and its golden
+# transcripts never change. Needs oasdiff on the PATH.
+contract-check base="origin/dev":
+    scripts/api-contract-guard.py {{base}} oasdiff
+
+# Schemathesis against a live osiris at every release and key, on a database of its own.
+schemathesis:
+    cargo build -q -p osiris_server
+    scripts/schemathesis.sh
+
 # Everything CI checks.
 check: fmt-check lint deny typos sqlx-check test openapi-check
 
