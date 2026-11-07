@@ -27,8 +27,15 @@ restore_previous() {
   status=$?
   if [ "$status" -ne 0 ]; then
     echo "::warning::deploy failed; restoring traffic to $previous"
+    # update-traffic exits non-zero while the latest revision is not ready, even when the
+    # traffic did move. The traffic itself decides whether the restore worked.
     gcloud run services update-traffic "$SERVICE" --project "$PROJECT" --region "$REGION" \
-      --to-revisions "$previous=100" --quiet || echo "::error::could not restore $previous"
+      --to-revisions "$previous=100" --quiet || true
+    if [ "$(serving_revision)" = "$previous" ]; then
+      echo "traffic is back on $previous"
+    else
+      echo "::error::could not restore $previous"
+    fi
   fi
   exit "$status"
 }
