@@ -1,0 +1,136 @@
+{
+  "steps": [
+    {
+      "answer": {
+        "body": {
+          "connected_account_id": "<ca_1>",
+          "event_id": "<ev_1>",
+          "type": "connection.active"
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 201
+      },
+      "events": [
+        {
+          "connected_account_id": "<ca_1>",
+          "event_id": "<ev_1>",
+          "id": "<msg_1>",
+          "occurred_at": "<time>",
+          "osiris_version": "2026-11-04.anubis",
+          "type": "connection.active",
+          "version": 1
+        }
+      ],
+      "request": {
+        "body": {
+          "connected_account_id": "<ca_1>",
+          "type": "connection.active"
+        },
+        "headers": [],
+        "key": "admin",
+        "method": "POST",
+        "path": "/v1/events/trigger"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "connected_account_id": "<ca_1>",
+          "event_id": "<ev_2>",
+          "type": "connection.expired"
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 201
+      },
+      "events": [
+        {
+          "connected_account_id": "<ca_1>",
+          "event_id": "<ev_2>",
+          "id": "<msg_2>",
+          "occurred_at": "<time>",
+          "osiris_version": "2026-11-04.anubis",
+          "type": "connection.expired",
+          "version": 1
+        }
+      ],
+      "request": {
+        "body": {
+          "connected_account_id": "<ca_1>",
+          "type": "connection.expired"
+        },
+        "headers": [],
+        "key": "admin",
+        "method": "POST",
+        "path": "/v1/events/trigger"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "connected_account_id": "<ca_1>",
+          "event_id": "<ev_3>",
+          "type": "connection.revoked"
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 201
+      },
+      "events": [
+        {
+          "connected_account_id": "<ca_1>",
+          "event_id": "<ev_3>",
+          "id": "<msg_3>",
+          "occurred_at": "<time>",
+          "osiris_version": "2026-11-04.anubis",
+          "type": "connection.revoked",
+          "version": 1
+        }
+      ],
+      "request": {
+        "body": {
+          "connected_account_id": "<ca_1>",
+          "type": "connection.revoked"
+        },
+        "headers": [],
+        "key": "admin",
+        "method": "POST",
+        "path": "/v1/events/trigger"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "error": {
+            "code": "OS_01",
+            "message": "connected account not found",
+            "type": "not_found"
+          }
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 404
+      },
+      "events": [],
+      "request": {
+        "body": {
+          "connected_account_id": "<ca_2>",
+          "type": "connection.active"
+        },
+        "headers": [],
+        "key": "admin",
+        "method": "POST",
+        "path": "/v1/events/trigger"
+      }
+    }
+  ]
+}

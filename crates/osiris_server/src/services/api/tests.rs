@@ -6,6 +6,7 @@ mod auth_configs;
 mod connecting;
 mod disconnecting;
 mod events;
+mod golden;
 mod health;
 mod idempotency;
 mod keys_and_versions;
