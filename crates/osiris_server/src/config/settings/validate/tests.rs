@@ -26,6 +26,17 @@ fn accepts_more_concurrent_tasks_than_connections() {
 #[rstest]
 #[case::a_zero_value("server.max_body_bytes", |settings: &mut Settings| settings.server.max_body_bytes = 0)]
 #[case::a_zero_timeout("http.timeout_seconds", |settings: &mut Settings| settings.http.timeout_seconds = 0)]
+#[case::a_zero_check_interval("triggers.check_seconds", |settings: &mut Settings| settings.triggers.check_seconds = 0)]
+#[case::no_delivery_size("triggers.max_delivery_bytes", |settings: &mut Settings| settings.triggers.max_delivery_bytes = 0)]
+#[case::no_delivery_at_once("triggers.max_concurrent_deliveries", |settings: &mut Settings| settings.triggers.max_concurrent_deliveries = 0)]
+#[case::no_event_data("triggers.max_event_data_bytes", |settings: &mut Settings| settings.triggers.max_event_data_bytes = 0)]
+#[case::no_time_to_read_a_delivery("triggers.delivery_read_seconds", |settings: &mut Settings| settings.triggers.delivery_read_seconds = 0)]
+#[case::no_token_margin(
+    "providers.installation_tokens.margin_seconds",
+    |settings: &mut Settings| settings.providers.installation_tokens.margin_seconds = 0
+)]
+#[case::no_log_bytes("providers.listing.max_log_bytes", |settings: &mut Settings| settings.providers.listing.max_log_bytes = 0)]
+#[case::no_scan_pages("providers.listing.max_scan_pages", |settings: &mut Settings| settings.providers.listing.max_scan_pages = 0)]
 #[case::a_short_consent_state("consent.state_length", |settings: &mut Settings| settings.consent.state_length = 31)]
 #[case::more_tasks_than_a_semaphore_holds(
     "tasks.max_concurrent",
