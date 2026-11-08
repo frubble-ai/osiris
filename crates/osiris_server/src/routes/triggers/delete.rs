@@ -2,7 +2,7 @@
 
 use crate::{
     http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
-    use_cases::cases::triggers::delete_trigger::DeleteTriggerArgs,
+    use_cases::cases::delete_trigger::DeleteTriggerArgs,
 };
 use axum::{
     Json,

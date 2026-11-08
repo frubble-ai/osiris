@@ -81,6 +81,8 @@ jobs:
           tool: typos,cocogitto
       - name: Spelling
         run: typos
+      - name: The actions are what the generator writes
+        run: python3 scripts/actions/check.py
       - name: No provider named outside its folders
         run: |
           python3 -m unittest scripts/test_placement_check.py

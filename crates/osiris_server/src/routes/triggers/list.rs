@@ -1,6 +1,6 @@
 //! `GET /v1/triggers`: triggers, of one connection or of all, in batches.
 
-use crate::use_cases::cases::triggers::list_triggers::ListTriggersArgs;
+use crate::use_cases::cases::list_triggers::ListTriggersArgs;
 use crate::{
     http::{auth::Auth, error::ApiResult, query_params::QueryParams, server_wrap, state::ApiState},
     routes::{cursor::cursor, list::list},

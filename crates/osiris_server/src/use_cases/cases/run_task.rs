@@ -5,8 +5,8 @@
 use crate::use_cases::{
     UseCaseResult, UseCases,
     cases::{
-        expire_consent::ExpireConsentArgs, publish_event_retry::PublishEventRetryArgs,
-        run_refresh_task::RunRefreshTaskArgs, triggers::check_trigger::CheckTriggerArgs,
+        check_trigger::CheckTriggerArgs, expire_consent::ExpireConsentArgs,
+        publish_event_retry::PublishEventRetryArgs, run_refresh_task::RunRefreshTaskArgs,
     },
     lib::tasks::record_outcome::record_outcome,
 };

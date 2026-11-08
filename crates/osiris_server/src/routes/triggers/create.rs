@@ -2,7 +2,7 @@
 
 use crate::{
     http::{auth::Auth, error::ApiResult, json_body::JsonBody, server_wrap, state::ApiState},
-    use_cases::cases::triggers::create_trigger::CreateTriggerArgs,
+    use_cases::cases::create_trigger::CreateTriggerArgs,
 };
 use axum::{
     Json,

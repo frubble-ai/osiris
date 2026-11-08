@@ -4,8 +4,7 @@
 //! exist is, so a guess learns nothing. A signed one is answered 202, published or ignored.
 
 use crate::{
-    http::state::ApiState,
-    use_cases::cases::triggers::receive_trigger_delivery::ReceiveTriggerDeliveryArgs,
+    http::state::ApiState, use_cases::cases::receive_trigger_delivery::ReceiveTriggerDeliveryArgs,
 };
 use axum::{
     body::Bytes,

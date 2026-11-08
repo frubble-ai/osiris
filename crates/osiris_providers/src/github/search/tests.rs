@@ -22,10 +22,7 @@ use super::{
 use crate::github::mocks::{MockGithubNetwork, generate_github::generate_github};
 use rstest::rstest;
 use serde_json::json;
-use wiremock::{
-    Mock, MockServer, ResponseTemplate,
-    matchers::{method, path, query_param, query_param_is_missing},
-};
+use wiremock::MockServer;
 
 #[rstest]
 #[case::complete(false)]
@@ -275,16 +272,13 @@ async fn a_search_answer_without_items_reads_as_none_found() {
 #[tokio::test]
 async fn sends_the_sort_trimmed_and_leaves_out_a_blank_order() {
     let server = MockServer::start().await;
-    Mock::given(method("GET"))
-        .and(path("/search/repositories"))
-        .and(query_param("q", "osiris"))
-        .and(query_param("sort", "stars"))
-        .and(query_param_is_missing("order"))
-        .respond_with(
-            ResponseTemplate::new(200).set_body_json(generate_github_search_page(&[], false)),
+    MockGithubNetwork::on(&server)
+        .answer_filtered(
+            "/search/repositories",
+            &[("q", "osiris"), ("sort", "stars")],
+            &["order"],
+            generate_github_search_page(&[], false),
         )
-        .expect(1)
-        .mount(&server)
         .await;
     let input = SearchRepositories {
         query: "osiris".into(),

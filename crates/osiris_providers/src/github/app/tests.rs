@@ -9,16 +9,13 @@
 
 use super::{AppCredentials, app_jwt::app_jwt};
 use crate::github::mocks::{
-    generate_github::generate_github, mock_github_app_key::MockGithubAppKey,
+    MockGithubNetwork, generate_github::generate_github, mock_github_app_key::MockGithubAppKey,
 };
 use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode};
 use osiris_common::secret::ExposeSecret;
 use rstest::rstest;
 use serde_json::{Value, json};
-use wiremock::{
-    Mock, MockServer, ResponseTemplate,
-    matchers::{header_regex, method, path},
-};
+use wiremock::MockServer;
 
 #[derive(serde::Deserialize)]
 struct Claims {
@@ -92,19 +89,8 @@ fn signs_a_jwt_the_app_s_public_key_verifies_issued_by_the_app() {
 #[tokio::test]
 async fn mints_an_installation_token_as_the_app() {
     let server = MockServer::start().await;
-    Mock::given(method("POST"))
-        .and(path("/app/installations/678/access_tokens"))
-        .and(header_regex(
-            "authorization",
-            r"^Bearer [\w-]+\.[\w-]+\.[\w-]+$",
-        ))
-        .respond_with(ResponseTemplate::new(201).set_body_json(json!({
-            "token": "ghs_installation",
-            "expires_at": "2026-11-08T04:00:00Z",
-            "permissions": { "contents": "read" },
-        })))
-        .expect(1)
-        .mount(&server)
+    MockGithubNetwork::on(&server)
+        .answer_installation_token("678", "ghs_installation", 1)
         .await;
     let credentials = AppCredentials {
         app_id: "12345".into(),
@@ -117,5 +103,5 @@ async fn mints_an_installation_token_as_the_app() {
         .unwrap();
 
     assert_eq!(minted.token.expose_secret(), "ghs_installation");
-    assert_eq!(minted.expires_at, "2026-11-08T04:00:00Z");
+    assert_eq!(minted.expires_at, "2999-01-01T00:00:00Z");
 }

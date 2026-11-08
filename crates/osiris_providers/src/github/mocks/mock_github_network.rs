@@ -3,7 +3,10 @@
 use serde_json::{Value, json};
 use wiremock::{
     Mock, MockGuard, MockServer, ResponseTemplate,
-    matchers::{body_json, body_string_contains, header, method, path, path_regex, query_param},
+    matchers::{
+        body_json, body_partial_json, body_string_contains, header, header_regex, method, path,
+        path_regex, query_param, query_param_is_missing,
+    },
 };
 
 pub struct MockGithubNetwork<'a> {
@@ -141,6 +144,48 @@ impl<'a> MockGithubNetwork<'a> {
         .await;
     }
 
+    /// `GET route` with every `(name, value)` of `query` and none of `missing` answers `status`
+    /// with `body`; the test fails unless it is asked exactly once. It shows what a filter sends,
+    /// and what it leaves out.
+    pub async fn answer_filtered(
+        &self,
+        route: &str,
+        query: &[(&str, &str)],
+        missing: &[&str],
+        body: Value,
+    ) {
+        let mut mock = Mock::given(method("GET")).and(path(route));
+        for (name, value) in query {
+            mock = mock.and(query_param(*name, *value));
+        }
+        for name in missing {
+            mock = mock.and(query_param_is_missing(*name));
+        }
+        mock.respond_with(ResponseTemplate::new(200).set_body_json(body))
+            .expect(1)
+            .mount(self.server)
+            .await;
+    }
+
+    /// `verb route` whose JSON body holds at least `request` answers `status` with `body`; the
+    /// test fails unless it is asked exactly once.
+    pub async fn answer_with_partial_body(
+        &self,
+        verb: &str,
+        route: &str,
+        request: Value,
+        status: u16,
+        body: Value,
+    ) {
+        Mock::given(method(verb))
+            .and(path(route))
+            .and(body_partial_json(request))
+            .respond_with(ResponseTemplate::new(status).set_body_json(body))
+            .expect(1)
+            .mount(self.server)
+            .await;
+    }
+
     /// No request may reach `route`; the test fails if one does.
     pub async fn expect_nothing_at(&self, route: &str) {
         Mock::given(path(route))
@@ -158,10 +203,15 @@ impl<'a> MockGithubNetwork<'a> {
         token: &str,
         expected_calls: u64,
     ) {
+        // Only a request signed as the app, with a JWT as its bearer, is answered.
         Mock::given(method("POST"))
             .and(path(format!(
                 "/app/installations/{installation}/access_tokens"
             )))
+            .and(header_regex(
+                "authorization",
+                r"^Bearer [\w-]+\.[\w-]+\.[\w-]+$",
+            ))
             .respond_with(ResponseTemplate::new(201).set_body_json(json!({
                 "token": token,
                 "expires_at": "2999-01-01T00:00:00Z",

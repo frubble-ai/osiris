@@ -5,7 +5,7 @@
 
 use crate::use_cases::{
     UseCaseResult, UseCases,
-    cases::triggers::check_trigger::CheckTriggerArgs,
+    cases::check_trigger::CheckTriggerArgs,
     lib::events::{publish::publish, trigger_event_id::trigger_event_id},
 };
 use axum::http::HeaderMap;

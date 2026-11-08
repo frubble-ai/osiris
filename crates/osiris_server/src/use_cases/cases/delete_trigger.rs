@@ -3,7 +3,7 @@
 //! cancelled, and the trigger removed.
 
 use crate::use_cases::{
-    UseCaseResult, UseCases, cases::triggers::end_trigger_subscription::EndTriggerSubscriptionArgs,
+    UseCaseResult, UseCases, cases::end_trigger_subscription::EndTriggerSubscriptionArgs,
 };
 
 pub struct DeleteTriggerArgs<'a> {

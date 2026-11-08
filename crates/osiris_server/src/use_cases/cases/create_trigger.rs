@@ -7,9 +7,9 @@
 use crate::use_cases::{
     UseCaseResult, UseCases,
     cases::{
+        end_trigger_subscription::EndTriggerSubscriptionArgs,
         get_connected_account::GetConnectedAccountArgs,
         run_connected_account_action::RunConnectedAccountActionArgs,
-        triggers::end_trigger_subscription::EndTriggerSubscriptionArgs,
     },
     lib::{
         tasks::{

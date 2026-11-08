@@ -41,10 +41,7 @@ use crate::{
 use fake::{Fake, faker::lorem::en::Word};
 use rstest::rstest;
 use serde_json::{Value, json};
-use wiremock::{
-    Mock, MockServer, ResponseTemplate,
-    matchers::{method, path, query_param, query_param_is_missing},
-};
+use wiremock::MockServer;
 
 fn http() -> reqwest::Client {
     reqwest::Client::new()
@@ -145,15 +142,13 @@ async fn asks_for_github_s_default_page_size_when_none_is_given() {
 #[tokio::test]
 async fn sends_the_issue_filters_trimmed_and_leaves_out_the_blank_ones() {
     let server = MockServer::start().await;
-    Mock::given(method("GET"))
-        .and(path("/repos/octo/hello/issues"))
-        .and(query_param("state", "closed"))
-        .and(query_param("since", "2026-11-01T00:00:00Z"))
-        .and(query_param_is_missing("sort"))
-        .and(query_param_is_missing("direction"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(json!([])))
-        .expect(1)
-        .mount(&server)
+    MockGithubNetwork::on(&server)
+        .answer_filtered(
+            "/repos/octo/hello/issues",
+            &[("state", "closed"), ("since", "2026-11-01T00:00:00Z")],
+            &["sort", "direction"],
+            json!([]),
+        )
         .await;
     let input = ListRepositoryIssues {
         owner: "octo".into(),

@@ -40,7 +40,8 @@ Every provider's actions share one shape, so their use cases, routes and list ar
    and when they apply `list`, `no_input`, `user_only` (it only works as a user, so an installation
    connection is refused before the call) and `acting` (the call is told what the token acts as).
    A new provider also has `scripts/actions/<id>/provider.json` with its type and display name.
-3. `python3 scripts/actions/generate.py`, then `cargo fmt`. This writes
+3. `python3 scripts/actions/generate.py`, then `cargo fmt` (`just actions-check` fails a build whose
+   generated files differ from what it writes). This writes
    `use_cases/cases/<id>/<group>/<action>.rs`, `routes/actions/<id>/<group>/<action>.rs`, their
    parent modules, the routers and `docs/providers/<id>/actions.md`. A new provider's use cases
    and routes are declared once in `use_cases/cases.rs` and `routes/actions.rs`; the server's

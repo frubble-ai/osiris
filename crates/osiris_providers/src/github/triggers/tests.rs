@@ -23,10 +23,7 @@ use aws_lc_rs::hmac;
 use reqwest::header::{HeaderMap, HeaderValue};
 use rstest::rstest;
 use serde_json::{Value, json};
-use wiremock::{
-    Mock, MockServer, ResponseTemplate,
-    matchers::{body_partial_json, method, path},
-};
+use wiremock::MockServer;
 
 const SECRET: &str = "a-trigger-secret-0123456789abcdef";
 
@@ -176,16 +173,18 @@ fn checks_a_watched_pull_request_only_on_its_own_deliveries() {
 #[tokio::test]
 async fn creates_the_webhook_delivering_to_the_trigger() {
     let server = MockServer::start().await;
-    Mock::given(method("POST"))
-        .and(path("/repos/octo/hello/hooks"))
-        .and(body_partial_json(json!({
-            "name": "web",
-            "events": ["push"],
-            "config": { "url": "https://osiris.test/webhooks/triggers/tr_1", "secret": SECRET, "content_type": "json", "insecure_ssl": "0" },
-        })))
-        .respond_with(ResponseTemplate::new(201).set_body_json(json!({ "id": 99 })))
-        .expect(1)
-        .mount(&server)
+    MockGithubNetwork::on(&server)
+        .answer_with_partial_body(
+            "POST",
+            "/repos/octo/hello/hooks",
+            json!({
+                "name": "web",
+                "events": ["push"],
+                "config": { "url": "https://osiris.test/webhooks/triggers/tr_1", "secret": SECRET, "content_type": "json", "insecure_ssl": "0" },
+            }),
+            201,
+            json!({ "id": 99 }),
+        )
         .await;
 
     let id = generate_github(&server)
@@ -209,13 +208,14 @@ async fn creates_the_webhook_delivering_to_the_trigger() {
 async fn aligns_the_webhook_github_says_already_exists() {
     let server = MockServer::start().await;
     let url = "https://osiris.test/webhooks/triggers/tr_1";
-    Mock::given(method("POST"))
-        .and(path("/repos/octo/hello/hooks"))
-        .respond_with(
-            ResponseTemplate::new(422)
-                .set_body_json(json!({ "message": "Hook already exists on this repository" })),
+    MockGithubNetwork::on(&server)
+        .answer_times(
+            "POST",
+            "/repos/octo/hello/hooks",
+            422,
+            json!({ "message": "Hook already exists on this repository" }),
+            1,
         )
-        .mount(&server)
         .await;
     MockGithubNetwork::on(&server)
         .answer(
@@ -226,11 +226,14 @@ async fn aligns_the_webhook_github_says_already_exists() {
             json!([{ "id": 5, "config": { "url": "https://elsewhere.test" } }, { "id": 6, "config": { "url": url } }]),
         )
         .await;
-    Mock::given(method("PATCH"))
-        .and(path("/repos/octo/hello/hooks/6"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(json!({ "id": 6 })))
-        .expect(1)
-        .mount(&server)
+    MockGithubNetwork::on(&server)
+        .answer_times(
+            "PATCH",
+            "/repos/octo/hello/hooks/6",
+            200,
+            json!({ "id": 6 }),
+            1,
+        )
         .await;
 
     let id = generate_github(&server)
@@ -290,12 +293,15 @@ async fn sees_each_change_to_a_watched_pull_request_once() {
     };
     let github = generate_github(&server);
     let http = reqwest::Client::new();
-    let answer = |body: Value| ResponseTemplate::new(200).set_body_json(body);
 
-    let first_mock = Mock::given(method("GET"))
-        .and(path("/repos/octo/hello/pulls/7"))
-        .respond_with(answer(pull_request.clone()))
-        .mount_as_scoped(&server)
+    let first_mock = MockGithubNetwork::on(&server)
+        .answer_while(
+            "GET",
+            "/repos/octo/hello/pulls/7",
+            200,
+            pull_request.clone(),
+            None,
+        )
         .await;
     // The first check records the state, firing nothing.
     let first = github
@@ -313,10 +319,8 @@ async fn sees_each_change_to_a_watched_pull_request_once() {
     drop(first_mock);
 
     pull_request["head"]["sha"] = json!(generate_sha());
-    Mock::given(method("GET"))
-        .and(path("/repos/octo/hello/pulls/7"))
-        .respond_with(answer(pull_request))
-        .mount(&server)
+    MockGithubNetwork::on(&server)
+        .answer_times("GET", "/repos/octo/hello/pulls/7", 200, pull_request, 1)
         .await;
     let changed = github
         .check_pull_request(&http, "token", &config, Some(&first.checkpoint))

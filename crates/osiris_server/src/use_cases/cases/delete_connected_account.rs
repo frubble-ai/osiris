@@ -7,7 +7,7 @@
 
 use crate::use_cases::{
     UseCaseResult, UseCases,
-    cases::triggers::end_trigger_subscription::EndTriggerSubscriptionArgs,
+    cases::end_trigger_subscription::EndTriggerSubscriptionArgs,
     lib::{
         oauth::oauth_client::oauth_client,
         shared::{domain_errors::provider as provider_error, redirect_uri::redirect_uri},
