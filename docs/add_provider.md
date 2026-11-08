@@ -40,3 +40,23 @@ Nothing else in osiris names one.
    registered in `routes/actions/router.rs`.
 4. `just openapi`, the changelog, and its tests (the provider against its faked network; the use
    case's and the route's in `services/api/tests/actions.rs`).
+
+### A GitHub action
+
+GitHub's actions all share one shape, so their use cases and routes are generated:
+
+1. By hand, in `osiris_providers/src/github/<group>/<action>.rs`: the input type, with its
+   `SCOPES` and its call to GitHub, and its answer type in `github/types/`, read from GitHub's
+   answer in `github/transformers/`.
+2. Its entry in `scripts/github-actions/actions/<group>.json`: `group`, `name`, `input`, `output`,
+   `summary`, and `list` or `no_input` when they apply.
+3. `python3 scripts/github-actions/generate.py . scripts/github-actions/actions`, then `cargo fmt`.
+   This writes `use_cases/cases/github/<group>/<action>.rs`,
+   `routes/actions/github/<group>/<action>.rs`, their parent modules and each group's router.
+
+## A trigger kind
+
+A provider answers for its own kinds through `Provider`'s trigger methods: `validate_trigger`,
+`subscribe_trigger`, `unsubscribe_trigger`, `receive_trigger` (check the delivery's signature and
+say whether it fires, is ignored or asks for a check) and, for a kind that checks on a schedule,
+`trigger_checks_on_schedule` and `check_trigger`. GitHub's live in `github/triggers/`.

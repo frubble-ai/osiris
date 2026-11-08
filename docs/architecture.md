@@ -91,6 +91,7 @@ that job (`osiris_tasks::names`), so scheduling the same job twice creates one t
 | `connection.refresh` | `connection-refresh-{connection}-{generation}` | when tokens are saved | tenant, connection, token generation, reason (`expiry`, `keepalive`, `retry`) |
 | `consent.expire` | `consent-expire-{connection}` | when a consent opens, due when it expires | tenant, connection |
 | `event.publish` | `event-publish-{event}` | when publishing an event fails | the whole event |
+| `trigger.poll` | `trigger-poll-{trigger}-{check}` | when a trigger that checks on a schedule is created, then by each check | trigger, connection, check number |
 
 Cloud Tasks posts a due task as JSON to the worker's `/tasks` with an OIDC token for the configured
 service account. The worker checks the token (Google's signature, issuer, `CLOUD_TASKS_AUDIENCE`,
@@ -102,7 +103,7 @@ worker answers:
 - **500**: the queue's retry policy runs the same task again.
 
 Every run's outcome is saved in `task_outcome`: `refreshed`, `rescheduled`, `skipped_stale`,
-`failed`, `consent_expired` or `published`. Rows older than `[tasks] outcome_retention` are deleted
+`failed`, `consent_expired`, `published` or `trigger_checked`. Rows older than `[tasks] outcome_retention` are deleted
 a few at a time as new ones are written.
 
 ## A connection
@@ -177,6 +178,41 @@ event publishes it again. If that task cannot be scheduled either, the event is 
 logged. Clients ignore an event they have already received, by its `event_id`. An event is written
 in the instance's pinned release (`osiris_version`), taken back through the same version changes as
 answers ([API versioning](api-versioning.md)).
+
+## Installation connections
+
+A GitHub App's auth config can hold the app's id in `settings` and its private key in
+`secret_settings`, encrypted like a client secret. The provider validates both when the auth
+config is saved. A connection made with an `installation_id` is `app_installation`: it holds no
+tokens. When an action runs, osiris signs a short JWT with the app's key (RS256) and asks GitHub
+for the installation's token. The token is kept in memory (`InstallationTokenCache`) until
+`[providers.installation_tokens] margin_seconds` before it expires. A token GitHub refuses is
+minted again and the call runs once more; a second refusal makes the connection `expired`.
+
+## Scopes
+
+Each action declares the OAuth scopes it needs. Before the provider is called, the connection's
+granted scopes are compared with them (`missing_scopes`, using the provider's `scope_covers` for
+nested scopes such as GitHub's `repo` covering `public_repo`). A connection without them is refused
+as `OS_11` (403). A token that reports no scopes is not checked.
+
+## Triggers
+
+A trigger (`tr_…`) subscribes at a connection's provider and publishes what it receives as
+`trigger.fired` events. The provider validates its kind and config, creates its subscription
+(`subscribe_trigger`) and removes it on delete (`unsubscribe_trigger`).
+
+- **Deliveries**: a GitHub repository webhook posts to `{public_url}/webhooks/triggers/{id}`,
+  signed with the trigger's own random secret (HMAC-SHA256), which is encrypted at rest. The route
+  is public and trusts only the signature: a delivery not signed with the secret is answered 404,
+  as a missing trigger is. A signed delivery is answered 202, whether it is published or ignored.
+- **Event ids**: a fired event's id is derived from the trigger and the provider's delivery id, so
+  a delivery sent twice is published with the same `event_id`.
+- **Checks on a schedule**: a kind like `github.watch_pull_request` records the state it starts
+  from when it is created, then checks again on its own deliveries and on its `trigger.poll` task,
+  every `[triggers] check_seconds`. Each check keeps a checkpoint and publishes only a change it
+  has not seen. Each scheduled check is numbered and schedules the next. A check the provider
+  refuses for good makes the trigger `failed`; an outage is tried again.
 
 ## Idempotency keys
 

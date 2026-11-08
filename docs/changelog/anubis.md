@@ -9,9 +9,30 @@ The first release, a **preview**: its contract may still change until it is cut 
   `setup_complete`. A connection to a provider that issues refresh tokens is only `active` when its
   tokens and their scheduled refresh are both saved; otherwise it is `disabled`. `refresh_task` and
   `refresh_task_at` show the pending refresh.
-- Actions: `github.list_installations`, `github.list_repositories`, `linear.list_teams`,
-  `slack.list_channels`.
-- Events: `connection.active`, `connection.expired`, `connection.revoked`; test events with
+- Actions: `linear.list_teams`, `slack.list_channels`, and 149 GitHub actions, with the same
+  functions as OpenConnector v1.9.4's GitHub provider but answering in osiris's own shapes:
+  repositories (contents, branches, commits, collaborators, forks, topics), issues, pull requests
+  and reviews, releases and their assets, Actions workflows, runs, jobs and logs, check runs,
+  activity (notifications, stars, watching), search, users and installations. Each runs at
+  `POST /v1/connected-accounts/{id}/actions/github.<name>`, and a list answers in osiris's
+  pages.
+- Scopes: an action whose connection's token lacks the scopes it needs is refused before GitHub is
+  called, as `OS_11` (403), with the missing scopes named. GitHub's nested scopes count (`repo`
+  covers `public_repo`). A token that reports no scopes, such as a GitHub App's, is not checked.
+- GitHub App installations: an auth config can hold the app's `settings` (`app_id`) and
+  `secret_settings` (`private_key`, encrypted and never returned; `has_secret_settings` says
+  whether it is set). `POST /v1/connected-accounts` with `installation_id` connects as that
+  installation, with no consent, and is `active` at once. Its tokens are minted when an action runs,
+  reused until `[providers.installation_tokens] margin_seconds` before they expire, and minted once
+  more when GitHub refuses one. A connection reports `credential_kind` (`oauth` or
+  `app_installation`) and `installation_id`.
+- Triggers: `/v1/triggers` creates, lists, reads and deletes a connection's triggers.
+  `github.on_repo_event` creates a repository webhook for the chosen events (or `*`).
+  `github.watch_pull_request` watches one pull request, checked on its own deliveries and every
+  `[triggers] check_seconds`. Each delivery or change is published as a `trigger.fired` event
+  carrying `trigger_id`, `trigger` and `data`. Deleting a trigger removes its webhook. A trigger
+  the provider refuses for good turns `failed`.
+- Events: `connection.active`, `connection.expired`, `connection.revoked`, `trigger.fired`; test events with
   `POST /v1/events/trigger` (admin key).
 - Versions: every answer names its release in `Osiris-Version` and its stability in
   `Osiris-Stability`. An answer at a superseded release carries `Deprecation` and `Sunset`.
