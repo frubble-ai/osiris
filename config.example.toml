@@ -118,3 +118,5 @@ margin_seconds = 300
 check_seconds = 300
 # The largest delivery body a trigger reads; a larger one is answered 413.
 max_delivery_bytes = 26214400
+# Deliveries read at once; more wait their turn before their body is read.
+max_concurrent_deliveries = 32

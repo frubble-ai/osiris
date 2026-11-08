@@ -11,6 +11,9 @@ pub struct TriggersSettings {
     pub check_seconds: u64,
     /// The largest delivery body read at `/webhooks/triggers/{id}`; a larger one is answered 413.
     pub max_delivery_bytes: u64,
+    /// Deliveries read at once; more wait their turn before their body is read, so the route's
+    /// memory stays under this many times `max_delivery_bytes`.
+    pub max_concurrent_deliveries: usize,
 }
 
 impl TriggersSettings {
@@ -20,6 +23,18 @@ impl TriggersSettings {
 
     pub fn max_delivery(&self) -> usize {
         usize::try_from(self.max_delivery_bytes).unwrap_or(usize::MAX)
+    }
+
+    /// Its settings that must be greater than zero, by name.
+    pub fn positive_values(&self) -> [(&'static str, u64); 3] {
+        [
+            ("triggers.check_seconds", self.check_seconds),
+            ("triggers.max_delivery_bytes", self.max_delivery_bytes),
+            (
+                "triggers.max_concurrent_deliveries",
+                u64::try_from(self.max_concurrent_deliveries).unwrap_or(u64::MAX),
+            ),
+        ]
     }
 
     /// Refuses a check interval the task scheduler can't schedule that far ahead.
@@ -42,6 +57,8 @@ impl Default for TriggersSettings {
             check_seconds: 300,
             // 25 MiB: the largest webhook payload the providers osiris implements send.
             max_delivery_bytes: 26_214_400,
+            // A burst of a repository's events fits; a flood waits instead of filling memory.
+            max_concurrent_deliveries: 32,
         }
     }
 }

@@ -14141,6 +14141,7 @@ export type DeleteTriggerErrors = {
      * An internal error; the request may be retried
      */
     500: ErrorBody;
+    502: ErrorBody;
 };
 
 export type DeleteTriggerError = DeleteTriggerErrors[keyof DeleteTriggerErrors];

@@ -4,13 +4,12 @@ use super::Settings;
 
 impl Settings {
     pub(crate) fn positive_values(&self) -> Vec<(&'static str, u64)> {
-        vec![
+        let mut values = vec![
             (
                 "server.request_timeout_seconds",
                 self.server.request_timeout_seconds,
             ),
             ("server.max_body_bytes", self.server.max_body_bytes),
-            ("triggers.check_seconds", self.triggers.check_seconds),
             ("server.max_answer_bytes", self.server.max_answer_bytes),
             ("api.support_days", self.api.support_days),
             (
@@ -43,10 +42,6 @@ impl Settings {
             (
                 "providers.listing.max_log_bytes",
                 u64::try_from(self.providers.listing.max_log_bytes).unwrap_or(u64::MAX),
-            ),
-            (
-                "triggers.max_delivery_bytes",
-                self.triggers.max_delivery_bytes,
             ),
             (
                 "providers.listing.max_scan_pages",
@@ -100,6 +95,8 @@ impl Settings {
                 "tasks.oidc_keys_refetch_seconds",
                 self.tasks.oidc_keys_refetch_seconds,
             ),
-        ]
+        ];
+        values.extend(self.triggers.positive_values());
+        values
     }
 }

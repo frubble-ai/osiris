@@ -38074,6 +38074,15 @@
               }
             },
             "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -38081,7 +38090,7 @@
             "api_key": []
           }
         ],
-        "summary": "Delete a trigger: its subscription is removed at the provider (a webhook, for example)\nwhen its connection still reaches it, and it is deleted either way.",
+        "summary": "Delete a trigger: its subscription is removed at the provider (a webhook, for example). A\nprovider that can't be reached is answered 502 and the trigger kept, to delete again. A\nsubscription the provider refuses to remove, or that the connection no longer reaches, is\nleft, and the trigger deleted all the same.",
         "tags": [
           "triggers"
         ]

@@ -1,13 +1,15 @@
 //! Ends what a trigger subscribed to at its provider (a webhook, for example) through its
-//! connection, and cancels its scheduled check. A failure at the provider is logged and nothing
-//! more: the trigger is being removed either way, and a subscription osiris no longer knows of
-//! can only be ended at the provider by hand.
+//! connection, and cancels its scheduled check. A provider that can't be reached fails the call,
+//! so the caller tries again with the trigger still there. A refusal, or a connection that can't
+//! be used, is logged and nothing more: no retry would end the subscription, which then can only
+//! be ended at the provider by hand.
 
 use crate::use_cases::{
     UseCaseResult, UseCases, cases::run_connected_account_action::RunConnectedAccountActionArgs,
     lib::tasks::cancel_quietly::cancel_quietly,
 };
 use osiris_common::secret::{ExposeSecret, Secret};
+use osiris_domain::DomainError;
 use osiris_interfaces::ActingAs;
 
 pub struct EndTriggerSubscriptionArgs<'a> {
@@ -52,8 +54,23 @@ impl UseCases {
                         },
                     })
                     .await;
-                if let Err(report) = ended {
-                    tracing::warn!(error = ?report, trigger_id = args.trigger_id, "the trigger's subscription could not be ended at the provider");
+                match ended {
+                    Ok(()) => {}
+                    // The provider can't be reached now: the trigger stays as it is, so the
+                    // caller can try again and its subscription isn't left behind.
+                    Err(report)
+                        if matches!(
+                            report.current_context(),
+                            DomainError::ProviderUnavailable(_)
+                        ) =>
+                    {
+                        return Err(report);
+                    }
+                    // Refused for good, or a connection that can't be used: nothing osiris can
+                    // retry ends it, so it is logged and the trigger removed all the same.
+                    Err(report) => {
+                        tracing::warn!(error = ?report, trigger_id = args.trigger_id, "the trigger's subscription could not be ended at the provider");
+                    }
                 }
             }
             if let Some(task) = args.poll_task {

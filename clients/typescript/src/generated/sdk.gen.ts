@@ -3909,8 +3909,10 @@ export const createTrigger = <ThrowOnError extends boolean = false>(options: Opt
 });
 
 /**
- * Delete a trigger: its subscription is removed at the provider (a webhook, for example)
- * when its connection still reaches it, and it is deleted either way.
+ * Delete a trigger: its subscription is removed at the provider (a webhook, for example). A
+ * provider that can't be reached is answered 502 and the trigger kept, to delete again. A
+ * subscription the provider refuses to remove, or that the connection no longer reaches, is
+ * left, and the trigger deleted all the same.
  */
 export const deleteTrigger = <ThrowOnError extends boolean = false>(options: Options<DeleteTriggerData, ThrowOnError>): RequestResult<DeleteTriggerResponses, DeleteTriggerErrors, ThrowOnError> => (options.client ?? client).delete<DeleteTriggerResponses, DeleteTriggerErrors, ThrowOnError>({
     requestValidator: async (data) => await z.object({

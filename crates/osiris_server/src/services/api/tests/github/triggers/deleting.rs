@@ -40,11 +40,11 @@ async fn removes_the_webhook_when_the_trigger_is_deleted(pool: PgPool) {
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
-async fn deletes_the_trigger_even_when_github_fails_to_remove_its_webhook(pool: PgPool) {
+async fn deletes_the_trigger_even_when_github_refuses_to_remove_its_webhook(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let (_, id, watched) = watching_repo_events(&app).await;
     MockGithubNetwork::on(&app.provider)
-        .answer_empty("DELETE", &watched.hook(), 500)
+        .answer_empty("DELETE", &watched.hook(), 403)
         .await;
 
     let deleted = delete_trigger(&app, &id).await;
@@ -52,6 +52,22 @@ async fn deletes_the_trigger_even_when_github_fails_to_remove_its_webhook(pool: 
     assert_eq!(deleted.status, StatusCode::OK, "{}", deleted.body);
     assert_eq!(deleted.body["deleted"], true);
     assert_eq!(get_trigger(&app, &id).await.status, StatusCode::NOT_FOUND);
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn keeps_the_trigger_to_delete_again_while_github_can_t_be_reached(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    let (_, id, watched) = watching_repo_events(&app).await;
+    MockGithubNetwork::on(&app.provider)
+        .answer_empty("DELETE", &watched.hook(), 503)
+        .await;
+
+    let kept = delete_trigger(&app, &id).await;
+
+    assert_ne!(kept.status, StatusCode::OK, "{}", kept.body);
+    let trigger = get_trigger(&app, &id).await;
+    assert_eq!(trigger.status, StatusCode::OK, "{}", trigger.body);
+    assert_eq!(trigger.body["status"], "active");
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]

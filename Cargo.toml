@@ -56,7 +56,7 @@ subtle = "2.6.1"
 thiserror = "2.0.21"
 time = { version = "0.3.55", features = ["formatting", "macros", "parsing", "serde", "serde-well-known"] }
 tokio = { version = "1.54.1", features = ["full"] }
-tower = { version = "0.5.3", features = ["util"] }
+tower = { version = "0.5.3", features = ["limit", "util"] }
 tower-http = { version = "0.7.1", features = ["trace", "timeout", "request-id", "util"] }
 http = "1"
 tracing = "0.1.44"
