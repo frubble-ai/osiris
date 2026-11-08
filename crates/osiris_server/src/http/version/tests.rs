@@ -1,12 +1,12 @@
 //! Two releases served at once from one current model: amun's requests brought up, anubis's
 //! answers taken back, and each answer naming the release and, when superseded, its sunset.
 
-use super::{lifecycle_headers::lifecycle_headers, mocks::MOCK_RELEASES};
+use super::lifecycle_headers::lifecycle_headers;
 use crate::{
     services::api::versioned_spec,
     testing::{
-        ADMIN_KEY, API_KEY, generate_connect_attempt::generate_connect_attempt, setup_test_context,
-        setup_test_context_with,
+        ADMIN_KEY, API_KEY, generate_connect_attempt::generate_connect_attempt,
+        mock_releases::MOCK_RELEASES, setup_test_context, setup_test_context_with,
     },
 };
 use axum::{

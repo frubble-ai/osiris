@@ -2,7 +2,7 @@
 //! doesn't serve.
 
 use super::build_message_bus;
-use crate::http::version::mocks::MOCK_RELEASES;
+use crate::testing::mock_releases::MOCK_RELEASES;
 use osiris_events::{
     Message, adapters::memory::MemoryTransport,
     testing::generate_event_message::generate_event_message,

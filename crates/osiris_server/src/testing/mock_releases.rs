@@ -1,4 +1,6 @@
-//! A version change as a real release writes one: anubis renamed an auth config's `app_id` to
+//! A pretend history for the tests of serving older releases (the version middleware, the event
+//! bus): an older release, amun, and anubis as the release that changed it. Its version change is
+//! written as a real release writes one: anubis renamed an auth config's `app_id` to
 //! `client_id` and the connections filter `label` to `alias`, and dropped two of amun's defaults (a
 //! page of one auth config, a refresh's reason), so amun's requests are brought up and anubis's
 //! answers, events and spec taken back.

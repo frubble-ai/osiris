@@ -2,7 +2,7 @@
 //! older release had; a request a change leaves alone keeps its empty body.
 
 use super::translate_request;
-use crate::http::version::mocks::MOCK_RELEASES;
+use crate::testing::mock_releases::MOCK_RELEASES;
 use axum::{body::Body, extract::Request};
 use http_body_util::BodyExt;
 use osiris_versioning::Route;

@@ -13,6 +13,4 @@ pub mod translate_response;
 pub use serve_version::serve_version;
 
 #[cfg(test)]
-pub mod mocks;
-#[cfg(test)]
 mod tests;
