@@ -1,4 +1,4 @@
-//! Change an app's client, secret or scopes.
+//! Change an app's client, secret, scopes or settings.
 
 use super::AuthConfigChanges;
 use crate::use_cases::UseCaseResult;
@@ -22,15 +22,22 @@ impl Db {
             .client_secret
             .map(|secret| encrypt(&cipher, secret.expose_secret()))
             .transpose()?;
+        let secret_settings = changes
+            .secret_settings
+            .map(|settings| encrypt(&cipher, settings.expose_secret()))
+            .transpose()?;
         sqlx::query_as!(
             AuthConfigRow,
             "UPDATE auth_config SET client_id = COALESCE($2, client_id), client_secret = COALESCE($3, client_secret),
-                 scopes = COALESCE($4, scopes), updated_at = now()
-             WHERE id = $1 RETURNING id, provider, client_id, client_secret, scopes, created_at, updated_at",
+                 scopes = COALESCE($4, scopes), settings = COALESCE($5, settings),
+                 secret_settings = COALESCE($6, secret_settings), updated_at = now()
+             WHERE id = $1 RETURNING id, provider, client_id, client_secret, scopes, settings, secret_settings, created_at, updated_at",
             id,
             changes.client_id,
             secret,
             changes.scopes.as_deref(),
+            changes.settings,
+            secret_settings,
         )
         .fetch_optional(&self.pool)
         .await

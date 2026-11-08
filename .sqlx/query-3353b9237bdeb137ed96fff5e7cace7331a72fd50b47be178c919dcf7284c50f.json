@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO auth_config (id, provider, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)\n             RETURNING id, provider, client_id, client_secret, scopes, created_at, updated_at",
+  "query": "UPDATE auth_config SET client_id = COALESCE($2, client_id), client_secret = COALESCE($3, client_secret),\n                 scopes = COALESCE($4, scopes), settings = COALESCE($5, settings),\n                 secret_settings = COALESCE($6, secret_settings), updated_at = now()\n             WHERE id = $1 RETURNING id, provider, client_id, client_secret, scopes, settings, secret_settings, created_at, updated_at",
   "describe": {
     "columns": [
       {
@@ -60,6 +60,28 @@
       },
       {
         "ordinal": 5,
+        "name": "settings",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "auth_config",
+            "name": "settings"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "secret_settings",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "auth_config",
+            "name": "secret_settings"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -70,7 +92,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 8,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -85,9 +107,10 @@
       "Left": [
         "Text",
         "Text",
-        "Text",
         "Bytea",
-        "TextArray"
+        "TextArray",
+        "Jsonb",
+        "Bytea"
       ]
     },
     "nullable": [
@@ -97,8 +120,10 @@
       false,
       false,
       false,
+      true,
+      false,
       false
     ]
   },
-  "hash": "d75fa588682389249a5e2bbc68ca18067552c41f264e6387d180d94d212634cb"
+  "hash": "3353b9237bdeb137ed96fff5e7cace7331a72fd50b47be178c919dcf7284c50f"
 }

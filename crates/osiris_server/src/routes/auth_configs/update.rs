@@ -37,6 +37,8 @@ pub async fn update_auth_config(
                     client_id: body.client_id,
                     client_secret: body.client_secret,
                     scopes: body.scopes,
+                    settings: body.settings.map(serde_json::Value::Object),
+                    secret_settings: body.secret_settings.map(|settings| settings.0),
                 })
                 .await
                 .map(AuthConfig::from)

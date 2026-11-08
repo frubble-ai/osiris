@@ -2,7 +2,8 @@
 //! refreshed here only if it is about to expire: a safety net, since its refresh task normally
 //! refreshes it in time. A connection disabled only because its refresh could not be scheduled is
 //! restored here, if the scheduler is reachable again. A connection granted scopes that don't cover
-//! the action's is refused here, before the provider is called.
+//! the action's is refused here, before the provider is called. An installation connection's token
+//! is minted from its app's credentials, or the one this process holds is reused.
 
 use crate::use_cases::{
     UseCaseResult, UseCases,
@@ -11,12 +12,13 @@ use crate::use_cases::{
         refresh_connected_account::RefreshConnectedAccountArgs,
     },
     lib::{
+        installation_tokens::installation_token::installation_token,
         refresh::{When, restore::restore},
         shared::missing_scopes::missing_scopes,
     },
 };
 use osiris_common::secret::Secret;
-use osiris_domain::{ConnectionStatus, DomainError};
+use osiris_domain::{ConnectionStatus, CredentialKind, DomainError};
 use time::OffsetDateTime;
 
 pub struct ConnectedAccountTokenArgs<'a> {
@@ -48,6 +50,30 @@ impl UseCases {
                     account.provider
                 ))
                 .into());
+            }
+            if account.credential_kind == CredentialKind::AppInstallation {
+                // An installation's token is minted from the app's credentials, never stored.
+                if account.status != ConnectionStatus::Active {
+                    return Err(DomainError::NotActive(account.status.as_str()).into());
+                }
+                let installation_id = account
+                    .installation_id
+                    .as_deref()
+                    .ok_or(DomainError::Internal)?;
+                let config = ctx.db.auth_config(&account.auth_config_id).await?;
+                let implementation = ctx
+                    .providers
+                    .get(provider)
+                    .ok_or(DomainError::Internal)?;
+                return installation_token(
+                    implementation,
+                    &ctx.http,
+                    &ctx.installation_tokens,
+                    ctx.config.settings.providers.installation_tokens.margin(),
+                    &config,
+                    installation_id,
+                )
+                .await;
             }
             // Only a token about to expire takes the refresh lock; a valid one is used as it is.
             let due = account.tokens.as_ref().is_some_and(|tokens| {

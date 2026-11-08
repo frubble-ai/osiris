@@ -10,6 +10,7 @@ mod github_actions;
 mod golden;
 mod health;
 mod idempotency;
+mod installations;
 mod keys_and_versions;
 mod listing;
 mod refreshing;

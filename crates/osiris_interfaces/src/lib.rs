@@ -4,6 +4,7 @@
 
 pub mod call;
 pub mod error;
+pub mod installation_token;
 pub mod oauth;
 pub mod oauth_client;
 pub mod provider;
@@ -12,6 +13,7 @@ pub mod tokens;
 
 pub use call::call;
 pub use error::ProviderError;
+pub use installation_token::InstallationToken;
 pub use oauth_client::OAuthClient;
 pub use provider::Provider;
 pub use provider_common::ProviderCommon;

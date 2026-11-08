@@ -10,7 +10,7 @@ use osiris_domain::DomainError;
 
 impl Db {
     pub async fn connected_account(&self, id: &str) -> UseCaseResult<ConnectedAccount> {
-        let row = sqlx::query_as!(AccountRow, "SELECT id, auth_config_id, provider, user_id, alias, status, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at FROM connected_account WHERE id = $1", id)
+        let row = sqlx::query_as!(AccountRow, "SELECT id, auth_config_id, provider, user_id, alias, status, credential_kind, installation_id, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at FROM connected_account WHERE id = $1", id)
             .fetch_optional(&self.pool)
             .await
             .map_err(db)?

@@ -60,6 +60,8 @@ pub async fn github_config_with(db: &Db, client_secret: &str) -> String {
         client_id: generate_secret("client"),
         client_secret: secret(client_secret),
         scopes: vec![],
+        settings: serde_json::json!({}),
+        secret_settings: None,
     })
     .await
     .unwrap()

@@ -82,9 +82,11 @@ export const zActionResultVecSlackChannel = z.object({
 export const zAuthConfig = z.object({
     client_id: z.string(),
     created_at: z.iso.datetime(),
+    has_secret_settings: z.boolean(),
     id: z.string(),
     provider: z.string(),
     scopes: z.array(z.string()),
+    settings: z.record(z.string(), z.unknown()),
     updated_at: z.iso.datetime()
 });
 
@@ -96,7 +98,9 @@ export const zConnectedAccount = z.object({
     alias: z.string().nullish(),
     auth_config_id: z.string(),
     created_at: z.iso.datetime(),
+    credential_kind: z.string(),
     id: z.string(),
+    installation_id: z.string().nullish(),
     last_error: z.string().nullish(),
     provider: z.string(),
     refresh_task: z.string().nullish(),
@@ -110,7 +114,7 @@ export const zConnectedAccount = z.object({
 
 export const zConnectedAccountCreated = z.object({
     id: z.string(),
-    redirect_url: z.string(),
+    redirect_url: z.string().nullish(),
     status: z.string()
 });
 
@@ -118,13 +122,16 @@ export const zCreateAuthConfig = z.object({
     client_id: z.string(),
     client_secret: z.string(),
     provider: z.string(),
-    scopes: z.array(z.string()).optional()
+    scopes: z.array(z.string()).optional(),
+    secret_settings: z.record(z.string(), z.unknown()).nullish(),
+    settings: z.record(z.string(), z.unknown()).optional()
 });
 
 export const zCreateConnectedAccount = z.object({
     alias: z.string().nullish(),
     auth_config_id: z.string(),
-    callback_url: z.string(),
+    callback_url: z.string().nullish(),
+    installation_id: z.string().nullish(),
     user_id: z.string()
 });
 
@@ -294,9 +301,11 @@ export const zListAuthConfig = z.object({
     data: z.array(z.object({
         client_id: z.string(),
         created_at: z.iso.datetime(),
+        has_secret_settings: z.boolean(),
         id: z.string(),
         provider: z.string(),
         scopes: z.array(z.string()),
+        settings: z.record(z.string(), z.unknown()),
         updated_at: z.iso.datetime()
     })),
     next_cursor: z.string().nullish(),
@@ -309,7 +318,9 @@ export const zListConnectedAccount = z.object({
         alias: z.string().nullish(),
         auth_config_id: z.string(),
         created_at: z.iso.datetime(),
+        credential_kind: z.string(),
         id: z.string(),
+        installation_id: z.string().nullish(),
         last_error: z.string().nullish(),
         provider: z.string(),
         refresh_task: z.string().nullish(),
@@ -351,7 +362,9 @@ export const zTriggeredEvent = z.object({
 export const zUpdateAuthConfig = z.object({
     client_id: z.string().nullish(),
     client_secret: z.string().nullish(),
-    scopes: z.array(z.string()).nullish()
+    scopes: z.array(z.string()).nullish(),
+    secret_settings: z.record(z.string(), z.unknown()).nullish(),
+    settings: z.record(z.string(), z.unknown()).nullish()
 });
 
 export const zListAuthConfigsQuery = z.object({

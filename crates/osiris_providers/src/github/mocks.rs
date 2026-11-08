@@ -7,6 +7,7 @@ pub mod generate_github_repository;
 pub mod generate_github_user;
 pub mod generate_sha;
 pub mod github_on;
+pub mod mock_github_app_key;
 pub mod mock_github_network;
 
 pub use mock_github_network::MockGithubNetwork;

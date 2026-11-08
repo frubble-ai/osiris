@@ -13,6 +13,8 @@ pub mod providers;
 pub mod slack;
 
 pub use list_limits::ListLimits;
-pub use osiris_interfaces::{OAuthClient, Provider, ProviderCommon, ProviderError, Tokens};
+pub use osiris_interfaces::{
+    InstallationToken, OAuthClient, Provider, ProviderCommon, ProviderError, Tokens,
+};
 pub use provider_urls::ProviderUrls;
 pub use providers::Providers;

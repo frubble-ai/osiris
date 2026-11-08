@@ -171,11 +171,21 @@ export type AuthConfig = {
     client_id: string;
     created_at: string;
     /**
+     * Whether the app has secret settings (which are never answered).
+     */
+    has_secret_settings: boolean;
+    /**
      * `ac_…`.
      */
     id: string;
     provider: string;
     scopes: Array<string>;
+    /**
+     * The provider's own settings for the app; an empty object when it has none.
+     */
+    settings: {
+        [key: string]: unknown;
+    };
     updated_at: string;
 };
 
@@ -187,7 +197,17 @@ export type ConnectedAccount = {
     alias?: string | null;
     auth_config_id: string;
     created_at: string;
+    /**
+     * What the connection acts as: `oauth` (the user who consented) or `app_installation` (an
+     * installation of the auth config's app, its tokens minted when an action runs). An open
+     * string.
+     */
+    credential_kind: string;
     id: string;
+    /**
+     * The installation an `app_installation` connection acts as.
+     */
+    installation_id?: string | null;
     /**
      * Why the last refresh or the consent failed.
      */
@@ -225,9 +245,10 @@ export type ConnectedAccountCreated = {
      */
     id: string;
     /**
-     * The provider's own consent page: send the browser here.
+     * The provider's own consent page: send the browser here. Absent for an installation
+     * connection, which needs no consent.
      */
-    redirect_url: string;
+    redirect_url?: string | null;
     status: string;
 };
 
@@ -239,6 +260,20 @@ export type CreateAuthConfig = {
      */
     provider: string;
     scopes?: Array<string>;
+    /**
+     * The provider's own secret settings for the app, never answered. A GitHub app that acts as
+     * its installations puts its App's private key here: `{"private_key": "-----BEGIN …"}`.
+     */
+    secret_settings?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * The provider's own settings for the app, which it validates; answered back. A GitHub app
+     * that acts as its installations names its App id here: `{"app_id": "12345"}`.
+     */
+    settings?: {
+        [key: string]: unknown;
+    };
 };
 
 export type CreateConnectedAccount = {
@@ -252,9 +287,15 @@ export type CreateConnectedAccount = {
     auth_config_id: string;
     /**
      * Where the browser goes after the provider's consent, with `connected_account_id` and
-     * `status` added to its query.
+     * `status` added to its query. Required for a consent; left out with `installation_id`.
      */
-    callback_url: string;
+    callback_url?: string | null;
+    /**
+     * Connect as this installation of the auth config's app instead of through a user's
+     * consent (a GitHub App's installation id): no browser, active at once. The auth config
+     * must hold the app's credentials in its settings.
+     */
+    installation_id?: string | null;
     /**
      * Yours: who the connection is for, such as an organization's id.
      */
@@ -455,11 +496,21 @@ export type ListAuthConfig = {
         client_id: string;
         created_at: string;
         /**
+         * Whether the app has secret settings (which are never answered).
+         */
+        has_secret_settings: boolean;
+        /**
          * `ac_…`.
          */
         id: string;
         provider: string;
         scopes: Array<string>;
+        /**
+         * The provider's own settings for the app; an empty object when it has none.
+         */
+        settings: {
+            [key: string]: unknown;
+        };
         updated_at: string;
     }>;
     /**
@@ -478,7 +529,17 @@ export type ListConnectedAccount = {
         alias?: string | null;
         auth_config_id: string;
         created_at: string;
+        /**
+         * What the connection acts as: `oauth` (the user who consented) or `app_installation` (an
+         * installation of the auth config's app, its tokens minted when an action runs). An open
+         * string.
+         */
+        credential_kind: string;
         id: string;
+        /**
+         * The installation an `app_installation` connection acts as.
+         */
+        installation_id?: string | null;
         /**
          * Why the last refresh or the consent failed.
          */
@@ -553,6 +614,18 @@ export type UpdateAuthConfig = {
     client_id?: string | null;
     client_secret?: string | null;
     scopes?: Array<string> | null;
+    /**
+     * Replaces the app's secret settings, when given.
+     */
+    secret_settings?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Replaces the app's settings, when given.
+     */
+    settings?: {
+        [key: string]: unknown;
+    } | null;
 };
 
 export type ListAuthConfigsData = {
@@ -881,10 +954,12 @@ export type CreateConnectedAccountErrors = {
      * This `Idempotency-Key` was used for another request
      */
     422: ErrorBody;
+    424: ErrorBody;
     /**
      * An internal error; the request may be retried
      */
     500: ErrorBody;
+    502: ErrorBody;
 };
 
 export type CreateConnectedAccountError = CreateConnectedAccountErrors[keyof CreateConnectedAccountErrors];

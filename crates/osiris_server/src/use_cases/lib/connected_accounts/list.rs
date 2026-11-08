@@ -40,7 +40,7 @@ impl Db {
         let found = match cursor.before.as_deref() {
             None => sqlx::query_as!(
                 AccountRow,
-                "SELECT id, auth_config_id, provider, user_id, alias, status, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at FROM connected_account
+                "SELECT id, auth_config_id, provider, user_id, alias, status, credential_kind, installation_id, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at FROM connected_account
              WHERE ($1::text IS NULL OR user_id = $1)
                AND ($2::text IS NULL OR provider = $2)
                AND ($3::text IS NULL OR auth_config_id = $3)
@@ -61,7 +61,7 @@ impl Db {
             .await,
             Some(before) => sqlx::query_as!(
                 AccountRow,
-                "SELECT id, auth_config_id, provider, user_id, alias, status, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at FROM connected_account
+                "SELECT id, auth_config_id, provider, user_id, alias, status, credential_kind, installation_id, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at FROM connected_account
              WHERE ($1::text IS NULL OR user_id = $1)
                AND ($2::text IS NULL OR provider = $2)
                AND ($3::text IS NULL OR auth_config_id = $3)

@@ -8,6 +8,7 @@ pub mod consent;
 pub mod database;
 pub mod events;
 pub mod idempotency;
+pub mod installation_tokens;
 pub mod oauth;
 pub mod refresh;
 pub mod shared;

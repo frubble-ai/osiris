@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, provider, client_id, client_secret, scopes, created_at, updated_at FROM auth_config\n             WHERE (created_at, id) < (SELECT created_at, id FROM auth_config WHERE id = $1)\n             ORDER BY created_at DESC, id DESC\n             LIMIT $2",
+  "query": "SELECT id, provider, client_id, client_secret, scopes, settings, secret_settings, created_at, updated_at FROM auth_config WHERE id = $1",
   "describe": {
     "columns": [
       {
@@ -60,6 +60,28 @@
       },
       {
         "ordinal": 5,
+        "name": "settings",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "auth_config",
+            "name": "settings"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "secret_settings",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "auth_config",
+            "name": "secret_settings"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -70,7 +92,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 8,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -83,8 +105,7 @@
     ],
     "parameters": {
       "Left": [
-        "Text",
-        "Int8"
+        "Text"
       ]
     },
     "nullable": [
@@ -94,8 +115,10 @@
       false,
       false,
       false,
+      true,
+      false,
       false
     ]
   },
-  "hash": "78ddee5bfa345f68070f815b40e44afc18632dd88e337876d5cee304ac78cf59"
+  "hash": "b836312cae1ddf6c72c9c2ead0bcad28b81ca44df8302c1861291c5a692cf900"
 }

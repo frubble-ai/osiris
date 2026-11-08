@@ -1,8 +1,10 @@
 //! The `connected_account` table: each connection, its consent while the consent is open, its
-//! tokens, and the refresh task scheduled for those tokens. One operation per module.
+//! tokens, and the refresh task scheduled for those tokens; or the installation an installation
+//! connection acts as. One operation per module.
 
 pub mod activate;
 pub mod claim_consent;
+pub mod create_installation;
 pub mod create_pending;
 pub mod delete;
 pub mod disable;

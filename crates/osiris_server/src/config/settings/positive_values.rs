@@ -32,6 +32,10 @@ impl Settings {
             ("consent.ttl_seconds", self.consent.ttl_seconds),
             ("refresh.keepalive_seconds", self.refresh.keepalive_seconds),
             (
+                "providers.installation_tokens.margin_seconds",
+                self.providers.installation_tokens.margin_seconds,
+            ),
+            (
                 "providers.listing.concurrency",
                 u64::try_from(self.providers.listing.concurrency).unwrap_or(u64::MAX),
             ),

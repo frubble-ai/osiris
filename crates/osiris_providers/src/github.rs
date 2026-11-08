@@ -3,6 +3,7 @@
 //! inputs and scopes as in `OpenConnector` v1.9.4 (Apache-2.0), `src/providers/github/`.
 
 pub mod activity;
+pub mod app;
 pub mod checks;
 pub mod get_page;
 pub mod installations;

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, auth_config_id, provider, user_id, alias, status, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at FROM connected_account WHERE id = $1",
+  "query": "INSERT INTO connected_account (id, auth_config_id, provider, user_id, alias, callback_url,\n                 status, credential_kind, installation_id)\n             SELECT $1, id, provider, $3, $4, '', 'active', 'app_installation', $5 FROM auth_config WHERE id = $2\n             RETURNING id, auth_config_id, provider, user_id, alias, status, credential_kind, installation_id, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at",
   "describe": {
     "columns": [
       {
@@ -71,6 +71,28 @@
       },
       {
         "ordinal": 6,
+        "name": "credential_kind",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "credential_kind"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "installation_id",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "installation_id"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
         "name": "callback_url",
         "type_info": "Text",
         "origin": {
@@ -81,7 +103,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 9,
         "name": "access_token",
         "type_info": "Bytea",
         "origin": {
@@ -92,7 +114,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 10,
         "name": "refresh_token",
         "type_info": "Bytea",
         "origin": {
@@ -103,7 +125,7 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 11,
         "name": "access_token_expires_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -114,7 +136,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 12,
         "name": "refresh_token_issued_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -125,7 +147,7 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 13,
         "name": "scope",
         "type_info": "Text",
         "origin": {
@@ -136,7 +158,7 @@
         }
       },
       {
-        "ordinal": 12,
+        "ordinal": 14,
         "name": "last_refresh_error",
         "type_info": "Text",
         "origin": {
@@ -147,7 +169,7 @@
         }
       },
       {
-        "ordinal": 13,
+        "ordinal": 15,
         "name": "refresh_failures",
         "type_info": "Int4",
         "origin": {
@@ -158,7 +180,7 @@
         }
       },
       {
-        "ordinal": 14,
+        "ordinal": 16,
         "name": "token_generation",
         "type_info": "Int8",
         "origin": {
@@ -169,7 +191,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 17,
         "name": "refresh_task",
         "type_info": "Text",
         "origin": {
@@ -180,7 +202,7 @@
         }
       },
       {
-        "ordinal": 16,
+        "ordinal": 18,
         "name": "refresh_task_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -191,7 +213,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 19,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -202,7 +224,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 20,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -215,6 +237,10 @@
     ],
     "parameters": {
       "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Text",
         "Text"
       ]
     },
@@ -225,6 +251,8 @@
       false,
       true,
       false,
+      false,
+      true,
       false,
       true,
       true,
@@ -240,5 +268,5 @@
       false
     ]
   },
-  "hash": "ddbe80a9005ef90f3340f5081c29bb1ab7c197d0e31996af679c2142bebf5585"
+  "hash": "f66858915f176f182c6120286d850f05c38a42bfa5fee618a403a113f3a6750a"
 }

@@ -51,6 +51,7 @@ pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCa
         tasks,
         providers: Arc::new(providers),
         http: settings.http.client()?,
+        installation_tokens: Arc::default(),
         config,
     })
 }

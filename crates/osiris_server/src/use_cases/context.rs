@@ -4,7 +4,7 @@
 
 use super::lib::tasks::Scheduling;
 use crate::config::Config;
-use crate::use_cases::lib::database::Db;
+use crate::use_cases::lib::{database::Db, installation_tokens::InstallationTokenCache};
 use osiris_events::MessageBus;
 use osiris_providers::Providers;
 use osiris_tasks::TaskScheduler;
@@ -20,6 +20,9 @@ pub struct UseCaseContext {
     pub providers: Arc<Providers>,
     /// The HTTP client for providers.
     pub http: reqwest::Client,
+    /// App installations' tokens this process minted, reused until shortly before they expire.
+    /// The one state the context holds: never a request's, and never stored.
+    pub installation_tokens: Arc<InstallationTokenCache>,
 }
 
 impl UseCaseContext {

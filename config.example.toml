@@ -98,6 +98,11 @@ purge_batch = 100
 concurrency = 4
 max_items = 5000
 
+[providers.installation_tokens]
+# An app installation's token (a GitHub App's, which lives an hour) is minted again this long
+# before the provider stops accepting it.
+margin_seconds = 300
+
 [providers.github]
 oauth_base_url = "https://github.com"
 api_base_url = "https://api.github.com"

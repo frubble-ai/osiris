@@ -118,6 +118,7 @@ pub async fn setup_test_context_with(
                 .expect("the fake's URLs"),
         ),
         http: reqwest::Client::new(),
+        installation_tokens: Arc::default(),
         config: config.clone(),
     });
     let draining = Arc::new(AtomicBool::new(false));

@@ -25,7 +25,7 @@ impl Db {
             "INSERT INTO connected_account (id, auth_config_id, provider, user_id, alias, callback_url,
                  oauth_state, oauth_state_expires_at, pkce_verifier)
              SELECT $1, id, provider, $3, $4, $5, $6, $7, $8 FROM auth_config WHERE id = $2
-             RETURNING id, auth_config_id, provider, user_id, alias, status, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at",
+             RETURNING id, auth_config_id, provider, user_id, alias, status, credential_kind, installation_id, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at",
             ids::id("ca"),
             new.auth_config_id,
             new.user_id,

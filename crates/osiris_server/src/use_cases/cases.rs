@@ -3,6 +3,7 @@
 pub mod abandon_idempotent_request;
 pub mod begin_idempotent_request;
 pub mod check_database;
+pub mod connect_installation;
 pub mod connected_account_token;
 pub mod create_auth_config;
 pub mod delete_auth_config;

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, auth_config_id, provider, user_id, alias, status, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at FROM connected_account\n             WHERE ($1::text IS NULL OR user_id = $1)\n               AND ($2::text IS NULL OR provider = $2)\n               AND ($3::text IS NULL OR auth_config_id = $3)\n               AND ($4::text IS NULL OR alias = $4)\n               AND ($5::text IS NULL OR status = $5)\n               AND ($6::text IS NULL OR (created_at, id) > (SELECT created_at, id FROM connected_account WHERE id = $6))\n             ORDER BY created_at ASC, id ASC\n             LIMIT $7",
+  "query": "SELECT id, auth_config_id, provider, user_id, alias, status, credential_kind, installation_id, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at FROM connected_account WHERE id = $1 FOR UPDATE",
   "describe": {
     "columns": [
       {
@@ -71,6 +71,28 @@
       },
       {
         "ordinal": 6,
+        "name": "credential_kind",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "credential_kind"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "installation_id",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "installation_id"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
         "name": "callback_url",
         "type_info": "Text",
         "origin": {
@@ -81,7 +103,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 9,
         "name": "access_token",
         "type_info": "Bytea",
         "origin": {
@@ -92,7 +114,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 10,
         "name": "refresh_token",
         "type_info": "Bytea",
         "origin": {
@@ -103,7 +125,7 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 11,
         "name": "access_token_expires_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -114,7 +136,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 12,
         "name": "refresh_token_issued_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -125,7 +147,7 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 13,
         "name": "scope",
         "type_info": "Text",
         "origin": {
@@ -136,7 +158,7 @@
         }
       },
       {
-        "ordinal": 12,
+        "ordinal": 14,
         "name": "last_refresh_error",
         "type_info": "Text",
         "origin": {
@@ -147,7 +169,7 @@
         }
       },
       {
-        "ordinal": 13,
+        "ordinal": 15,
         "name": "refresh_failures",
         "type_info": "Int4",
         "origin": {
@@ -158,7 +180,7 @@
         }
       },
       {
-        "ordinal": 14,
+        "ordinal": 16,
         "name": "token_generation",
         "type_info": "Int8",
         "origin": {
@@ -169,7 +191,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 17,
         "name": "refresh_task",
         "type_info": "Text",
         "origin": {
@@ -180,7 +202,7 @@
         }
       },
       {
-        "ordinal": 16,
+        "ordinal": 18,
         "name": "refresh_task_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -191,7 +213,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 19,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -202,7 +224,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 20,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -215,13 +237,7 @@
     ],
     "parameters": {
       "Left": [
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Int8"
+        "Text"
       ]
     },
     "nullable": [
@@ -231,6 +247,8 @@
       false,
       true,
       false,
+      false,
+      true,
       false,
       true,
       true,
@@ -246,5 +264,5 @@
       false
     ]
   },
-  "hash": "86bf14a7527ff0ba3c476163c29aea9d96590120ed827096cb4e68a582117187"
+  "hash": "6b9445629d43d745caa401865b2136a4d148e32ed3ca38b42505edf738742b46"
 }
