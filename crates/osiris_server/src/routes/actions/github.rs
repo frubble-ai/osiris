@@ -1,6 +1,7 @@
 //! GitHub's action routes, one per action, grouped as GitHub's API is.
 
 pub mod installations;
+pub mod pull_requests;
 pub mod repositories;
 pub mod router;
 pub mod users;
