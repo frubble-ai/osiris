@@ -4,6 +4,7 @@
 
 pub mod acknowledgement;
 pub mod artifact;
+pub mod artifact_download;
 pub mod branch;
 pub mod check_run;
 pub mod collaborator;
@@ -20,6 +21,7 @@ pub mod installation;
 pub mod issue;
 pub mod issue_comment;
 pub mod issue_event;
+pub mod job_logs;
 pub mod label;
 pub mod language;
 pub mod merge_result;
@@ -45,6 +47,7 @@ pub mod workflow_run;
 
 pub use acknowledgement::GithubAcknowledgement;
 pub use artifact::GithubArtifact;
+pub use artifact_download::GithubArtifactDownload;
 pub use branch::GithubBranch;
 pub use check_run::GithubCheckRun;
 pub use collaborator::{GithubCollaborator, GithubPermissions};
@@ -63,6 +66,7 @@ pub use installation::GithubInstallation;
 pub use issue::GithubIssue;
 pub use issue_comment::GithubIssueComment;
 pub use issue_event::GithubIssueEvent;
+pub use job_logs::GithubJobLogs;
 pub use label::GithubLabel;
 pub use language::GithubLanguage;
 pub use merge_result::GithubMergeResult;
