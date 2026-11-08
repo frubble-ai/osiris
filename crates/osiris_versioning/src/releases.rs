@@ -16,7 +16,8 @@ pub const ANUBIS: Release = Release {
 /// Every release osiris serves, oldest first.
 pub const RELEASES: &[Release] = &[ANUBIS];
 
-/// The release the code answers in, and a request naming no version is served at by default.
+/// The release the code answers in. A request naming no version is served at the pinned one,
+/// which defaults to the newest stable release (`pinned_by_default`), not to this.
 pub const CURRENT: &Release = &ANUBIS;
 
 /// The release named `name`, if osiris serves it.

@@ -122,7 +122,8 @@ existing transcripts stay as they are. CI's Contract job confirms nothing stable
      Point `CURRENT` (`osiris_versioning/src/releases.rs`) at it, and the client's
      `OSIRIS_VERSION` (`clients/typescript/src/index.ts`) to its name. Give it a `golden_at!` line
      in `services/api/tests/golden/releases.rs` and a changelog file, and move the client's major
-     version to its number (`npm run check` says which).
+     version to its number (`npm run check` says which). The default pin (`[api] pinned_version`)
+     stays on the newest stable release, so clients that name no version keep it.
   2. Change the code to the new shape.
   3. Write a version change under `osiris_versioning/src/changes/<release>/`, one file per
      change, and list it in the release's `changes`. It must give the older release its old
@@ -143,8 +144,12 @@ One pull request:
 1. Set its `stability` to `Stability::Stable`.
 2. Run `just openapi` and record its transcripts (`OSIRIS_GOLDEN=record just test
    golden::releases::<god>`).
-3. Finish its changelog.
-4. For the first release, move the client's major version from 0 to 1 (`npm run check` says
+3. The default pin moves to it, the newest stable release, so update `pinned_version` in
+   `config.example.toml` (a test holds it to the default). Clients that name no version move with
+   it. To keep them on the release before until they migrate, set `OSIRIS__API__PINNED_VERSION` to
+   it on both services before the rollout.
+4. Finish its changelog.
+5. For the first release, move the client's major version from 0 to 1 (`npm run check` says
    which). A later release's client already carries its number.
 
 From its date, the release before is deprecated, and its sunset is `support_days` later.

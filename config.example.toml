@@ -17,7 +17,9 @@ max_answer_bytes = 16777216
 shutdown_grace_seconds = 8
 
 [api]
-# The version a request naming no Osiris-Version is served at: the API key's pinned version.
+# The version a request naming no Osiris-Version is served at, and events are written in: the API
+# key's pinned version. It defaults to the newest stable release (the newest release while none is
+# stable), so a new preview is never what unversioned clients get.
 pinned_version = "2026-11-04.anubis"
 # How many days a release is still served once the next one is out. Its answers carry a Sunset
 # header with that date, and a Deprecation header with the next release's date.

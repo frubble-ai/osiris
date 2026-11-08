@@ -17,7 +17,8 @@ impl Default for ApiSettings {
     /// The current release, pinned, and two years of support.
     fn default() -> Self {
         Self {
-            pinned_version: osiris_versioning::CURRENT.name.to_owned(),
+            // The newest stable release, so a new preview never becomes what unversioned clients get.
+            pinned_version: osiris_versioning::pinned_by_default().name.to_owned(),
             // GitHub's window: two years from the next release.
             support_days: 730,
         }

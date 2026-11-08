@@ -11,6 +11,7 @@
 pub mod header;
 #[cfg(test)]
 pub mod mocks;
+pub mod pinned_by_default;
 pub mod release;
 pub mod releases;
 pub mod route;
@@ -20,6 +21,7 @@ pub mod translate;
 pub mod version_change;
 
 pub use header::{HEADER, STABILITY_HEADER};
+pub use pinned_by_default::{pinned_by_default, pinned_by_default_among};
 pub use release::Release;
 pub use releases::{ANUBIS, CURRENT, RELEASES, find, is_known};
 pub use route::Route;

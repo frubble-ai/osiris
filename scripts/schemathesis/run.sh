@@ -34,7 +34,17 @@ OSIRIS_PROCESS=migrate target/debug/osiris-server
 log="target/schemathesis-server.log"
 OSIRIS_PROCESS=serve PORT="$port" target/debug/osiris-server > "$log" 2>&1 &
 server=$!
-trap 'kill $server 2>/dev/null || true; sqlx database drop -y --database-url "$url" >/dev/null || true' EXIT
+# Cleanup on the way out: stop the server and wait for it, so its connections are closed before
+# its database is dropped. A drop that fails is reported, and the next run starts by dropping it.
+# shellcheck disable=SC2329 # called by the EXIT trap below
+cleanup() {
+  kill "$server" 2>/dev/null || true # the server may have stopped already
+  wait "$server" 2>/dev/null || true # its exit status is not this script's
+  if ! sqlx database drop -y --database-url "$url" >/dev/null; then
+    echo "could not drop ${DB_NAME}; the next run drops it first" >&2
+  fi
+}
+trap cleanup EXIT
 
 healthy=false
 for _ in $(seq 1 50); do
