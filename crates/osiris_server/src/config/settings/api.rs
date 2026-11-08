@@ -1,5 +1,6 @@
-//! `[api]`: the API version the API key is pinned to, for requests and events that name none, and
-//! how long a release stays supported once a newer one is out.
+//! `[api]`: the instance's pinned release, for requests and events that name none (one setting for
+//! the whole instance, whichever key a request carries), and how long a release stays supported
+//! once a newer one is out.
 
 use serde::{Deserialize, Serialize};
 use time::Duration;
@@ -14,7 +15,8 @@ pub struct ApiSettings {
 }
 
 impl Default for ApiSettings {
-    /// The current release, pinned, and two years of support.
+    /// The newest stable release pinned (the newest while none is stable), and two years of
+    /// support.
     fn default() -> Self {
         Self {
             // The newest stable release, so a new preview never becomes what unversioned clients get.

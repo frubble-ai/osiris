@@ -74,6 +74,26 @@ async fn serves_an_older_release_its_own_shape_beside_the_current_one(pool: PgPo
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn serves_a_request_naming_no_version_at_the_pinned_release_even_an_older_one(pool: PgPool) {
+    let app = setup_test_context(pool)
+        .await
+        .serving_pinned(MOCK_RELEASES, AMUN);
+    app.github_config().await;
+
+    // No Osiris-Version: served at amun, the pin, in amun's shape and marked as superseded.
+    let pinned = app
+        .send("GET", "/v1/auth-configs", Some(ADMIN_KEY), None, &[])
+        .await;
+
+    assert_eq!(pinned.status, StatusCode::OK, "{}", pinned.body);
+    assert_eq!(pinned.headers["osiris-version"], AMUN);
+    assert!(pinned.body["data"][0].get("app_id").is_some());
+    assert!(pinned.body["data"][0].get("client_id").is_none());
+    assert!(pinned.headers.get("deprecation").is_some());
+    assert!(pinned.headers.get("sunset").is_some());
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn marks_a_superseded_release_s_answers_with_its_deprecation_and_sunset(pool: PgPool) {
     let app = setup_test_context(pool).await.serving(MOCK_RELEASES);
 

@@ -2587,7 +2587,7 @@
   "webhooks": {
     "events": {
       "post": {
-        "description": "Published on the events topic, with the `type` and `osiris_version` attributes, written in the release the API key is pinned to.",
+        "description": "Published on the events topic, with the `type` and `osiris_version` attributes, written in the release the instance is pinned to (`[api] pinned_version`).",
         "operationId": "receive_event",
         "requestBody": {
           "content": {

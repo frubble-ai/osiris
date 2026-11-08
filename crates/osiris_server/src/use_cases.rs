@@ -5,6 +5,7 @@
 //! and holds setup only. `lib/` holds the helpers use cases share; a helper takes the parts of the
 //! context it needs, never the context, and never calls a use case.
 
+pub mod build_message_bus;
 pub mod build_use_case_context;
 pub mod cases;
 pub mod context;
