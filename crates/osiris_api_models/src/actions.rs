@@ -6,8 +6,6 @@ pub mod linear;
 pub mod slack;
 
 pub use action_result::ActionResult;
-pub use github::{
-    GithubAccountType, GithubInstallation, GithubRepository, GithubRepositorySelection,
-};
+pub use github::{GithubInstallation, GithubRepository};
 pub use linear::LinearTeam;
 pub use slack::SlackChannel;

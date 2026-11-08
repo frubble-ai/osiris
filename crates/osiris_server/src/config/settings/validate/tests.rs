@@ -38,6 +38,11 @@ fn accepts_more_concurrent_tasks_than_connections() {
     "pagination.default_limit",
     |settings: &mut Settings| settings.pagination.default_limit = settings.pagination.max_limit + 1
 )]
+#[case::no_support_window("api.support_days", |settings: &mut Settings| settings.api.support_days = 0)]
+#[case::a_support_window_too_long_to_compute(
+    "api.support_days",
+    |settings: &mut Settings| settings.api.support_days = 999_999_999_999_999
+)]
 #[case::an_unknown_api_version("api.pinned_version", |settings: &mut Settings| settings.api.pinned_version = "1999-01-01.nope".into())]
 #[case::a_provider_url_that_is_not_a_url(
     "providers.github",
@@ -50,4 +55,12 @@ fn refuses_a_setting_that_cannot_work_naming_it(
     let error = broken(change);
 
     assert!(error.contains(name), "{error}");
+}
+
+#[test]
+fn saturates_a_support_window_too_long_to_compute_instead_of_overflowing() {
+    let mut settings = Settings::default();
+    settings.api.support_days = u64::MAX;
+
+    assert_eq!(settings.api.support(), time::Duration::MAX);
 }

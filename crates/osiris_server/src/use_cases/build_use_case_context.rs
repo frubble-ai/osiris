@@ -2,7 +2,7 @@
 //! behind the use cases' traits: Pub/Sub for events, and Cloud Tasks or local timers for scheduled
 //! tasks.
 
-use super::UseCaseContext;
+use super::{UseCaseContext, build_message_bus::build_message_bus};
 use crate::use_cases::lib::database::Db;
 use crate::{
     config::{Config, TasksConfig},
@@ -11,13 +11,13 @@ use crate::{
 use anyhow::Context;
 use osiris_cloud_tasks::CloudTasksScheduler;
 use osiris_common::{crypto::MasterKey, secret::ExposeSecret};
-use osiris_events::MessageBus;
 use osiris_providers::Providers;
 use osiris_pubsub::PubSubTransport;
 use osiris_tasks::{
     TaskScheduler,
     adapters::local::{LocalConfig, LocalScheduler},
 };
+use osiris_versioning::RELEASES;
 use std::{sync::Arc, time::Duration};
 
 pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCaseContext> {
@@ -47,7 +47,7 @@ pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCa
     settings.refresh.check_against(tasks.max_lead_time())?;
     Ok(UseCaseContext {
         db: Db::new(pool, master, settings.database.lock_timeout()),
-        messages: MessageBus::new(Arc::new(transport)),
+        messages: build_message_bus(Arc::new(transport), RELEASES, &settings.api.pinned_version)?,
         tasks,
         providers: Arc::new(providers),
         http: settings.http.client()?,

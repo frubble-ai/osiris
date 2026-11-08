@@ -9,13 +9,22 @@
 request_timeout_seconds = 30
 # The largest request body the API reads.
 max_body_bytes = 1048576
+# The largest answer the API reads whole to take it back to an older release (16 MiB); a larger one
+# answers 500. Today's answers are bounded by pagination, far below it.
+max_answer_bytes = 16777216
 # After SIGTERM, how long a process lets requests already started finish before it exits. Keep it
 # under Cloud Run's grace period (10 seconds by default).
 shutdown_grace_seconds = 8
 
 [api]
-# The version a request naming no Osiris-Version is served at: the API key's pinned version.
+# The version a request naming no Osiris-Version is served at, and events are written in. One
+# setting for the whole instance, whichever key a request carries. It defaults to the newest
+# stable release (the newest release while none is stable), so a new preview is never what
+# unversioned clients get.
 pinned_version = "2026-11-04.anubis"
+# How many days a release is still served once the next one is out. Its answers carry a Sunset
+# header with that date, and a Deprecation header with the next release's date.
+support_days = 730
 
 [database]
 # The most connections one process opens. The Cloud SQL instance is shared with other services,

@@ -1,7 +1,7 @@
 //! `PATCH /v1/auth-configs/{id}`.
 
 use crate::{
-    http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
+    http::{auth::Auth, error::ApiResult, json_body::JsonBody, server_wrap, state::ApiState},
     use_cases::cases::update_auth_config::UpdateAuthConfigArgs,
 };
 use axum::{
@@ -22,7 +22,7 @@ pub async fn update_auth_config(
     State(state): State<ApiState>,
     headers: HeaderMap,
     Path(id): Path<String>,
-    Json(body): Json<UpdateAuthConfig>,
+    JsonBody(body): JsonBody<UpdateAuthConfig>,
 ) -> ApiResult<(StatusCode, Json<AuthConfig>)> {
     server_wrap(
         Flow::AuthConfigsUpdate,

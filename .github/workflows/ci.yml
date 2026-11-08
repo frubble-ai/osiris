@@ -1,7 +1,10 @@
 name: CI
 
 on:
+  # labeled and unlabeled too: the api-sunset label decides whether a release may be removed, and
+  # a re-run reuses the event it started with.
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches: [dev]
 
@@ -9,12 +12,17 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  # A label change runs only the contract job, in a group of its own, so it never cancels a run of
+  # the code's checks that it would then skip.
+  group: ci-${{ github.ref }}-${{ (github.event.action == 'labeled' || github.event.action == 'unlabeled') && 'labels' || 'code' }}
   cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always
   GITLEAKS_VERSION: 8.30.1
+  OASDIFF_VERSION: 1.35.0
+  # The linux_amd64 tarball's SHA-256, pinned here rather than read from the release it comes with.
+  OASDIFF_SHA256: a8023002fcb2eaa7f5758148a9303cb63d33b939886df312268bc0fc7b939140
   # Queries are checked against the committed .sqlx/: no database needed to build.
   SQLX_OFFLINE: "true"
 
@@ -55,6 +63,8 @@ jobs:
 
   quality:
     needs: secret-scan
+    # A label change only re-runs the contract job, which reads the labels.
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
     name: Format, lint, dependencies, spelling, commits
     runs-on: ubuntu-latest
     steps:
@@ -81,6 +91,8 @@ jobs:
 
   test:
     needs: secret-scan
+    # A label change only re-runs the contract job, which reads the labels.
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
     name: Tests
     runs-on: ubuntu-latest
     # The same Postgres as locally (docker-compose): TLS only, with a generated CA, and the same
@@ -120,20 +132,72 @@ jobs:
         env:
           SQLX_OFFLINE: "false"
       - run: cargo nextest run --workspace --locked
+      # Every release's spec held against a live osiris: generated requests at each release and
+      # each key, every answer checked against that release's spec, and no server error.
+      - name: Schemathesis against every release
+        run: |
+          set -a; source .env.example; set +a
+          cargo build --locked -q -p osiris_server
+          # Installs Schemathesis from scripts/schemathesis/requirements.txt, every package pinned
+          # by its hash.
+          scripts/schemathesis/run.sh
 
   openapi:
     needs: secret-scan
-    name: OpenAPI matches the routes
+    # A label change only re-runs the contract job, which reads the labels.
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
+    name: OpenAPI matches the routes, for every release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: rustup show
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
-      - run: cargo run --locked -q -p osiris_openapi target/openapi.json
-      - run: diff -u api-reference/openapi.json target/openapi.json
+      # A cached target/ may still hold the spec of a release removed since.
+      - run: rm -rf target/api-reference && cargo run --locked -q -p osiris_openapi target/api-reference
+      - run: diff -u api-reference/openapi.json target/api-reference/openapi.json
+      - run: diff -ru api-reference/versions target/api-reference/versions
+
+  contract:
+    needs: secret-scan
+    name: Stable releases break nothing
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Install oasdiff
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://github.com/oasdiff/oasdiff/releases/download/v${OASDIFF_VERSION}"
+          tarball="oasdiff_${OASDIFF_VERSION}_linux_amd64.tar.gz"
+          curl -sSfLO "$base/$tarball"
+          echo "$OASDIFF_SHA256  $tarball" | sha256sum -c -
+          tar -xzf "$tarball" oasdiff
+          sudo mv oasdiff /usr/local/bin/
+      - name: The guard decides each case right
+        run: python3 -m unittest scripts/test_api_contract_guard.py
+      # A stable release's spec may only grow, and its golden transcripts never change. A release
+      # is only removed past its sunset, in a pull request labelled api-sunset.
+      - name: Every stable release's spec and transcripts, against the base branch
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          OSIRIS_SUNSET: ${{ contains(github.event.pull_request.labels.*.name, 'api-sunset') }}
+        # The base branch's guard judges the pull request, so a pull request can't weaken the check
+        # it is held to; the first pull request to add the guard has no base copy and runs its own.
+        run: |
+          git fetch -q origin "$BASE_REF"
+          guard="$RUNNER_TEMP/api-contract-guard.py"
+          if ! git show "origin/$BASE_REF:scripts/api-contract-guard.py" > "$guard" 2>/dev/null; then
+            cp scripts/api-contract-guard.py "$guard"
+          fi
+          python3 "$guard" "origin/$BASE_REF" oasdiff
 
   image:
     needs: secret-scan
+    # A label change only re-runs the contract job, which reads the labels.
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
     name: Image
     runs-on: ubuntu-latest
     steps:
@@ -160,8 +224,10 @@ jobs:
 
   summary:
     name: Osiris - Code Quality Summary
-    if: always()
-    needs: [secret-scan, quality, test, openapi, image]
+    # Not on a label change: the code's jobs are skipped there, and a skip would read as a pass
+    # over a code run that failed. The contract job reports on its own.
+    if: always() && github.event.action != 'labeled' && github.event.action != 'unlabeled'
+    needs: [secret-scan, quality, test, openapi, contract, image]
     runs-on: ubuntu-latest
     steps:
       - name: Require every check to have passed

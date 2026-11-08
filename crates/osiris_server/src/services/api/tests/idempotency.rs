@@ -151,7 +151,7 @@ async fn runs_a_retry_again_after_the_first_answer_was_a_server_error(pool: PgPo
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
-async fn never_replays_an_answer_that_is_not_json(pool: PgPool) {
+async fn refuses_an_unreadable_body_as_os_02_and_answers_a_retry_the_same(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let send = || async {
         let request = axum::http::Request::builder()
@@ -162,17 +162,51 @@ async fn never_replays_an_answer_that_is_not_json(pool: PgPool) {
             .header("idempotency-key", "k1")
             .body(axum::body::Body::from("not json"))
             .unwrap();
+        let answer = tower::ServiceExt::oneshot(app.api.clone(), request)
+            .await
+            .unwrap();
+        let status = answer.status();
+        let bytes = http_body_util::BodyExt::collect(answer.into_body())
+            .await
+            .unwrap()
+            .to_bytes();
+        (
+            status,
+            serde_json::from_slice::<serde_json::Value>(&bytes).unwrap(),
+        )
+    };
+    let (first_status, first) = send().await;
+    assert_eq!(first_status, StatusCode::BAD_REQUEST);
+    assert_eq!(first["error"]["code"], "OS_02");
+    let (retry_status, retry) = send().await;
+    assert_eq!(retry_status, StatusCode::BAD_REQUEST);
+    assert_eq!(retry, first);
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn never_replays_an_answer_that_is_not_json(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    // `/v1/auth-configs` has no DELETE: axum's method router answers 405 with no body, inside
+    // the idempotency middleware, so the key is begun and the answer can't be stored.
+    let send = || async {
+        let request = axum::http::Request::builder()
+            .method("DELETE")
+            .uri("/v1/auth-configs")
+            .header("authorization", format!("Bearer {ADMIN_KEY}"))
+            .header("idempotency-key", "k1")
+            .body(axum::body::Body::empty())
+            .unwrap();
         tower::ServiceExt::oneshot(app.api.clone(), request)
             .await
             .unwrap()
     };
     let first = send().await;
-    assert!(first.status().is_client_error());
+    assert_eq!(first.status(), StatusCode::METHOD_NOT_ALLOWED);
     let retry = send().await;
-    assert!(retry.status().is_client_error());
+    assert_eq!(retry.status(), StatusCode::METHOD_NOT_ALLOWED);
     assert!(
         retry.headers().get("idempotent-replayed").is_none(),
-        "the plain-text answer was not stored"
+        "the answer that is not JSON was not stored"
     );
 }
 
@@ -221,6 +255,16 @@ async fn finishes_a_keyed_request_its_caller_gave_up_on(pool: PgPool) {
 }
 
 async fn refuses_a_keyed_request(pool: PgPool, key: &str, body: serde_json::Value) {
+    refuses_a_keyed_request_with(pool, key, body, StatusCode::BAD_REQUEST, "OS_02").await;
+}
+
+async fn refuses_a_keyed_request_with(
+    pool: PgPool,
+    key: &str,
+    body: serde_json::Value,
+    status: StatusCode,
+    code: &str,
+) {
     let app = setup_test_context(pool).await;
 
     let answer = app
@@ -233,8 +277,8 @@ async fn refuses_a_keyed_request(pool: PgPool, key: &str, body: serde_json::Valu
         )
         .await;
 
-    assert_eq!(answer.status, StatusCode::BAD_REQUEST, "{}", answer.body);
-    assert_eq!(answer.body["error"]["code"], "OS_02");
+    assert_eq!(answer.status, status, "{}", answer.body);
+    assert_eq!(answer.body["error"]["code"], code);
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
@@ -249,8 +293,16 @@ async fn refuses_an_idempotency_key_of_256_characters(pool: PgPool) {
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_a_keyed_body_over_the_limit(pool: PgPool) {
+    // The same 413 as an unkeyed body over the limit.
     let oversized = serde_json::json!({ "alias": "x".repeat(1_100_000) });
-    refuses_a_keyed_request(pool, "k1", oversized).await;
+    refuses_a_keyed_request_with(
+        pool,
+        "k1",
+        oversized,
+        StatusCode::PAYLOAD_TOO_LARGE,
+        "OS_10",
+    )
+    .await;
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]

@@ -1,7 +1,7 @@
 //! `POST /v1/connected-accounts`: start connecting a user.
 
 use crate::{
-    http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
+    http::{auth::Auth, error::ApiResult, json_body::JsonBody, server_wrap, state::ApiState},
     use_cases::cases::start_connect::StartConnectArgs,
 };
 use axum::{
@@ -24,7 +24,7 @@ use osiris_env::Flow;
 pub async fn create_connected_account(
     State(state): State<ApiState>,
     headers: HeaderMap,
-    Json(body): Json<CreateConnectedAccount>,
+    JsonBody(body): JsonBody<CreateConnectedAccount>,
 ) -> ApiResult<(StatusCode, Json<ConnectedAccountCreated>)> {
     let start = StartConnectArgs {
         auth_config_id: body.auth_config_id,

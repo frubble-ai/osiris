@@ -9,5 +9,7 @@ license.workspace = true
 workspace = true
 
 [dependencies]
+osiris_versioning.workspace = true
 osiris_server.workspace = true
+serde_json.workspace = true
 anyhow.workspace = true

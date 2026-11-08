@@ -1,7 +1,7 @@
 //! `POST /v1/auth-configs`: register a provider's app.
 
 use crate::{
-    http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
+    http::{auth::Auth, error::ApiResult, json_body::JsonBody, server_wrap, state::ApiState},
     use_cases::cases::create_auth_config::CreateAuthConfigArgs as New,
 };
 use axum::{
@@ -22,7 +22,7 @@ use osiris_env::Flow;
 pub async fn create_auth_config(
     State(state): State<ApiState>,
     headers: HeaderMap,
-    Json(body): Json<CreateAuthConfig>,
+    JsonBody(body): JsonBody<CreateAuthConfig>,
 ) -> ApiResult<(StatusCode, Json<AuthConfig>)> {
     let new = New {
         provider: body.provider,

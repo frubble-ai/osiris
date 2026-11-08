@@ -2,12 +2,12 @@
 
 use crate::use_cases::cases::list_auth_configs::ListAuthConfigsArgs;
 use crate::{
-    http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
+    http::{auth::Auth, error::ApiResult, query_params::QueryParams, server_wrap, state::ApiState},
     routes::{cursor::cursor, list::list},
 };
 use axum::{
     Json,
-    extract::{Query, State},
+    extract::State,
     http::{HeaderMap, StatusCode},
 };
 use osiris_api_models::{
@@ -22,9 +22,9 @@ use osiris_env::Flow;
 pub async fn list_auth_configs(
     State(state): State<ApiState>,
     headers: HeaderMap,
-    Query(params): Query<ListParams>,
+    QueryParams(params): QueryParams<ListParams>,
 ) -> ApiResult<(StatusCode, Json<List<AuthConfig>>)> {
-    let cursor = cursor(&state, params.after, params.before, params.limit);
+    let cursor = cursor(&state, params.after, params.before, params.limit)?;
     server_wrap(
         Flow::AuthConfigsList,
         &state,

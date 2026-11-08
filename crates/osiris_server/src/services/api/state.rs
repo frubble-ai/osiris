@@ -13,5 +13,6 @@ pub fn state(use_cases: UseCases, config: Arc<Config>, keys: &ApiConfig) -> ApiS
         config,
         api_key: Arc::new(keys.api_key.clone()),
         admin_key: Arc::new(keys.admin_key.clone()),
+        releases: osiris_versioning::RELEASES,
     }
 }

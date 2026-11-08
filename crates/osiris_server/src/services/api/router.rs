@@ -3,7 +3,7 @@
 
 use super::v1::v1;
 use crate::{
-    http::{idempotency::idempotency, state::ApiState, version::version},
+    http::{idempotency::idempotency, state::ApiState, version::serve_version},
     routes,
 };
 use axum::{Router, extract::DefaultBodyLimit, middleware, routing::get};
@@ -14,7 +14,7 @@ pub fn router(state: ApiState) -> Router {
     let max_body = state.config.settings.server.max_body();
     let (v1, _) = v1()
         .layer(middleware::from_fn_with_state(state.clone(), idempotency))
-        .layer(middleware::from_fn_with_state(state.clone(), version))
+        .layer(middleware::from_fn_with_state(state.clone(), serve_version))
         .layer(DefaultBodyLimit::max(max_body))
         .split_for_parts();
     Router::new()

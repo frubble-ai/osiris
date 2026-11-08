@@ -15,7 +15,7 @@
 	"scripts": {
 		"generate": "openapi-ts",
 		"build": "npm run generate && tsc -p tsconfig.json",
-		"check": "node --test publish-release.test.mjs && npm run generate && git diff --exit-code src/generated && tsc -p tsconfig.json --noEmit"
+		"check": "node --test publish-release.test.mjs release-line.test.mjs && npm run generate && git diff --exit-code src/generated && tsc -p tsconfig.json --noEmit"
 	},
 	"peerDependencies": {
 		"zod": "^4.0.0"

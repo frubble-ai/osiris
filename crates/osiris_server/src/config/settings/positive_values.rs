@@ -10,6 +10,8 @@ impl Settings {
                 self.server.request_timeout_seconds,
             ),
             ("server.max_body_bytes", self.server.max_body_bytes),
+            ("server.max_answer_bytes", self.server.max_answer_bytes),
+            ("api.support_days", self.api.support_days),
             (
                 "server.shutdown_grace_seconds",
                 self.server.shutdown_grace_seconds,

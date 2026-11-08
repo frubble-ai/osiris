@@ -1,6 +1,6 @@
 //! Requests to the routers, as clients, Cloud Run's probes and the task scheduler send them.
 
-use super::{TestContext, WORKER_TOKEN};
+use super::{TestContext, WORKER_TOKEN, conformance::assert_answer_conforms};
 use axum::{
     body::Body,
     http::{HeaderMap, Request, StatusCode},
@@ -10,7 +10,8 @@ use osiris_tasks::Task;
 use serde_json::Value;
 use tower::ServiceExt;
 
-/// A request's answer: its status, headers and JSON body (`null` when there is none).
+/// A request's answer: its status, headers and JSON body (`null` when there is none), already
+/// checked against its release's spec.
 pub struct Answer {
     pub status: StatusCode,
     pub headers: HeaderMap,
@@ -27,6 +28,19 @@ impl TestContext {
         body: Option<Value>,
         extra: &[(&str, &str)],
     ) -> Answer {
+        let body = body.map(|body| body.to_string()).unwrap_or_default();
+        self.send_raw(method, path, key, body, extra).await
+    }
+
+    /// Sends `body` as it is, JSON or not, as a request with a JSON content type.
+    pub async fn send_raw(
+        &self,
+        method: &str,
+        path: &str,
+        key: Option<&str>,
+        body: String,
+        extra: &[(&str, &str)],
+    ) -> Answer {
         let mut request = Request::builder()
             .method(method)
             .uri(path)
@@ -37,7 +51,11 @@ impl TestContext {
         for (name, value) in extra {
             request = request.header(*name, *value);
         }
-        let body = body.map_or_else(Body::empty, |body| Body::from(body.to_string()));
+        let body = if body.is_empty() {
+            Body::empty()
+        } else {
+            Body::from(body)
+        };
         let response = self
             .api
             .clone()
@@ -52,10 +70,12 @@ impl TestContext {
             .await
             .expect("a body")
             .to_bytes();
+        let body = serde_json::from_slice(&bytes).unwrap_or(Value::Null);
+        assert_answer_conforms(self.releases, method, path, status, &headers, &body);
         Answer {
             status,
             headers,
-            body: serde_json::from_slice(&bytes).unwrap_or(Value::Null),
+            body,
         }
     }
 

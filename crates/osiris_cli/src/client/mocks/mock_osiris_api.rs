@@ -1,7 +1,7 @@
 //! Osiris's API as the client sees it: an endpoint answers only a call that carries the expected
 //! key and the version header, so an unmatched call fails the test.
 
-use osiris_api_models::version::{CURRENT, HEADER};
+use osiris_versioning::{CURRENT, HEADER};
 use wiremock::{
     Mock, MockServer, ResponseTemplate,
     matchers::{header, method, path},
@@ -21,7 +21,7 @@ impl<'a> MockOsirisApi<'a> {
         Mock::given(method(verb))
             .and(path(route))
             .and(header("authorization", format!("Bearer {key}").as_str()))
-            .and(header(HEADER, CURRENT))
+            .and(header(HEADER, CURRENT.name))
             .respond_with(ResponseTemplate::new(status).set_body_string(body))
             .mount(self.server)
             .await;

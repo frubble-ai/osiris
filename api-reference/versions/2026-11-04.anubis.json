@@ -1,0 +1,2611 @@
+{
+  "components": {
+    "schemas": {
+      "ActionResult_Vec_GithubInstallation": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "Where our GitHub App is installed: an account or organization.",
+              "properties": {
+                "account": {
+                  "description": "The account or organization's login.",
+                  "type": "string"
+                },
+                "account_type": {
+                  "description": "`user` or `organization` today. An open string: more values may come without a new\nrelease, and a client keeps working on one it doesn't know.",
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "repository_selection": {
+                  "description": "`all` (every repository of the account) or `selected` (only the ones chosen at install)\ntoday. An open string: more values may come without a new release.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "account",
+                "account_type",
+                "repository_selection"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_Vec_GithubRepository": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A repository our GitHub App reads, through one of its installations.",
+              "properties": {
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "full_name": {
+                  "description": "`owner/name`.",
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "private": {
+                  "type": "boolean"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "full_name",
+                "private",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_Vec_LinearTeam": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A Linear team the connected user can see.",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_Vec_SlackChannel": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A channel the connected user can see.",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "is_private": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "num_members": {
+                  "description": "Absent when Slack leaves it out.",
+                  "format": "int64",
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "is_private"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "AuthConfig": {
+        "description": "An auth config, without its secret.",
+        "properties": {
+          "client_id": {
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "description": "`ac_…`.",
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "client_id",
+          "scopes",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "ConnectedAccount": {
+        "description": "A connection, without its tokens.",
+        "properties": {
+          "access_token_expires_at": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "auth_config_id": {
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_error": {
+            "description": "Why the last refresh or the consent failed.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "provider": {
+            "type": "string"
+          },
+          "refresh_task": {
+            "description": "The pending refresh task's name, and when it runs.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "refresh_task_at": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scope": {
+            "description": "The scopes the provider granted.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "setup_complete": {
+            "description": "Whether setup is complete: osiris holds the tokens and, when they can be refreshed, their\nrefresh is scheduled. When false, the connection can't be used.",
+            "type": "boolean"
+          },
+          "status": {
+            "description": "`pending` (the consent is open), `active`, `disabled` (no refresh is scheduled, so the\nconnection can't be used: after a failed connect the user must connect again; after a\nrefresh, osiris schedules it again by itself), `expired` (the provider refused a refresh\nor the grant is gone: reconnect) or `failed` (the consent failed or was never finished). A\nconnection is only reported `active` when its setup is complete.",
+            "example": "active",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "auth_config_id",
+          "provider",
+          "user_id",
+          "status",
+          "setup_complete",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "ConnectedAccountCreated": {
+        "properties": {
+          "id": {
+            "description": "`ca_…`.",
+            "type": "string"
+          },
+          "redirect_url": {
+            "description": "The provider's own consent page: send the browser here.",
+            "type": "string"
+          },
+          "status": {
+            "example": "pending",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "redirect_url"
+        ],
+        "type": "object"
+      },
+      "CreateAuthConfig": {
+        "properties": {
+          "client_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "provider": {
+            "description": "A provider osiris implements: `github`, `linear` or `slack`.",
+            "type": "string"
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "provider",
+          "client_id",
+          "client_secret"
+        ],
+        "type": "object"
+      },
+      "CreateConnectedAccount": {
+        "properties": {
+          "alias": {
+            "description": "Yours: a mark for this attempt, to find what it made if its answer is lost.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "auth_config_id": {
+            "description": "`ac_…`: the provider's app to connect through.",
+            "type": "string"
+          },
+          "callback_url": {
+            "description": "Where the browser goes after the provider's consent, with `connected_account_id` and\n`status` added to its query.",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "Yours: who the connection is for, such as an organization's id.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "auth_config_id",
+          "user_id",
+          "callback_url"
+        ],
+        "type": "object"
+      },
+      "Deleted": {
+        "properties": {
+          "deleted": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "deleted"
+        ],
+        "type": "object"
+      },
+      "ErrorBody": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "properties": {
+          "code": {
+            "description": "`OS_00` unauthorized, `OS_01` not found, `OS_02` invalid request, `OS_03` conflict,\n`OS_04` provider refused, `OS_05` provider unavailable, `OS_06` connection not active,\n`OS_07` unknown version, `OS_08` idempotency key reused, `OS_09` request in flight,\n`OS_10` body too large, `OS_99` internal. An open string: codes may be added.",
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "type": {
+            "description": "`unauthorized`, `not_found`, `invalid_request`, `conflict`, `provider_refused`,\n`provider_unavailable`, `connection_not_active`, `unknown_version`, `idempotency_mismatch`,\n`in_flight`, `too_large`, `internal`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "type",
+          "message"
+        ],
+        "type": "object"
+      },
+      "EventDelivery": {
+        "description": "An event as a subscriber receives it on the events topic, written in the instance's pinned\nrelease. The type and the connection's id, never its data: fetch the connection for its state.\n\nFields may be added without a new release, so a subscriber ignores one it doesn't know.",
+        "properties": {
+          "connected_account_id": {
+            "type": "string"
+          },
+          "event_id": {
+            "description": "`ev_…`, the same each time the event is delivered, so a client can drop repeats.",
+            "type": "string"
+          },
+          "id": {
+            "description": "`msg_…`, this delivery's own id.",
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "osiris_version": {
+            "description": "The API release the event is written in, also the message's `osiris_version` attribute.",
+            "type": "string"
+          },
+          "type": {
+            "description": "What happened, also the message's `type` attribute: `connection.active`,\n`connection.expired` or `connection.revoked` today. An open string: new types may come\nwithout a new release, and a client ignores a type it doesn't know.",
+            "type": "string"
+          },
+          "version": {
+            "description": "The envelope's format.",
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "id",
+          "occurred_at",
+          "osiris_version",
+          "event_id",
+          "type",
+          "connected_account_id"
+        ],
+        "type": "object"
+      },
+      "GithubInstallation": {
+        "description": "Where our GitHub App is installed: an account or organization.",
+        "properties": {
+          "account": {
+            "description": "The account or organization's login.",
+            "type": "string"
+          },
+          "account_type": {
+            "description": "`user` or `organization` today. An open string: more values may come without a new\nrelease, and a client keeps working on one it doesn't know.",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "repository_selection": {
+            "description": "`all` (every repository of the account) or `selected` (only the ones chosen at install)\ntoday. An open string: more values may come without a new release.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "account",
+          "account_type",
+          "repository_selection"
+        ],
+        "type": "object"
+      },
+      "GithubRepository": {
+        "description": "A repository our GitHub App reads, through one of its installations.",
+        "properties": {
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "full_name": {
+            "description": "`owner/name`.",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "full_name",
+          "private",
+          "url"
+        ],
+        "type": "object"
+      },
+      "LinearTeam": {
+        "description": "A Linear team the connected user can see.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "List_AuthConfig": {
+        "properties": {
+          "data": {
+            "items": {
+              "description": "An auth config, without its secret.",
+              "properties": {
+                "client_id": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "`ac_…`.",
+                  "type": "string"
+                },
+                "provider": {
+                  "type": "string"
+                },
+                "scopes": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "provider",
+                "client_id",
+                "scopes",
+                "created_at",
+                "updated_at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "description": "Pass as `after` for the next batch; null on the last.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "previous_cursor": {
+            "description": "Pass as `before` for the previous batch; null on the first.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "List_ConnectedAccount": {
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A connection, without its tokens.",
+              "properties": {
+                "access_token_expires_at": {
+                  "format": "date-time",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "alias": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "auth_config_id": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "last_error": {
+                  "description": "Why the last refresh or the consent failed.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "provider": {
+                  "type": "string"
+                },
+                "refresh_task": {
+                  "description": "The pending refresh task's name, and when it runs.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "refresh_task_at": {
+                  "format": "date-time",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "scope": {
+                  "description": "The scopes the provider granted.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "setup_complete": {
+                  "description": "Whether setup is complete: osiris holds the tokens and, when they can be refreshed, their\nrefresh is scheduled. When false, the connection can't be used.",
+                  "type": "boolean"
+                },
+                "status": {
+                  "description": "`pending` (the consent is open), `active`, `disabled` (no refresh is scheduled, so the\nconnection can't be used: after a failed connect the user must connect again; after a\nrefresh, osiris schedules it again by itself), `expired` (the provider refused a refresh\nor the grant is gone: reconnect) or `failed` (the consent failed or was never finished). A\nconnection is only reported `active` when its setup is complete.",
+                  "example": "active",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "user_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "auth_config_id",
+                "provider",
+                "user_id",
+                "status",
+                "setup_complete",
+                "created_at",
+                "updated_at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "description": "Pass as `after` for the next batch; null on the last.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "previous_cursor": {
+            "description": "Pass as `before` for the previous batch; null on the first.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "SlackChannel": {
+        "description": "A channel the connected user can see.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "is_private": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "num_members": {
+            "description": "Absent when Slack leaves it out.",
+            "format": "int64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "is_private"
+        ],
+        "type": "object"
+      },
+      "TriggerEvent": {
+        "properties": {
+          "connected_account_id": {
+            "type": "string"
+          },
+          "type": {
+            "description": "`connection.active`, `connection.expired` or `connection.revoked`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "connected_account_id"
+        ],
+        "type": "object"
+      },
+      "TriggeredEvent": {
+        "description": "The event as it was sent.",
+        "properties": {
+          "connected_account_id": {
+            "type": "string"
+          },
+          "event_id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "event_id",
+          "type",
+          "connected_account_id"
+        ],
+        "type": "object"
+      },
+      "UpdateAuthConfig": {
+        "properties": {
+          "client_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "client_secret": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "admin_key": {
+        "scheme": "bearer",
+        "type": "http"
+      },
+      "api_key": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Frubble's integrations service: OAuth connections to providers, their tokens kept fresh, and typed actions with them.",
+    "license": {
+      "identifier": "UNLICENSED",
+      "name": "UNLICENSED"
+    },
+    "title": "Osiris",
+    "version": "2026-11-04.anubis",
+    "x-osiris-release-number": 1,
+    "x-osiris-stability": "preview"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/auth-configs": {
+      "get": {
+        "operationId": "list_auth_configs",
+        "parameters": [
+          {
+            "description": "A batch's `next_cursor`: the batch after it.",
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "A batch's `previous_cursor`: the batch before it.",
+            "in": "query",
+            "name": "before",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "How many items a batch holds, within the server's bounds.",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/List_AuthConfig"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ],
+        "summary": "The providers' apps, in batches.",
+        "tags": [
+          "auth-configs"
+        ]
+      },
+      "post": {
+        "operationId": "create_auth_config",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAuthConfig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthConfig"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The first request with this `Idempotency-Key` is still running"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ],
+        "summary": "Register a provider's app.",
+        "tags": [
+          "auth-configs"
+        ]
+      }
+    },
+    "/v1/auth-configs/{id}": {
+      "delete": {
+        "operationId": "delete_auth_config",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deleted"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ],
+        "summary": "Delete an app no connection uses.",
+        "tags": [
+          "auth-configs"
+        ]
+      },
+      "get": {
+        "operationId": "retrieve_auth_config",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthConfig"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ],
+        "summary": "One provider's app, without its secret.",
+        "tags": [
+          "auth-configs"
+        ]
+      },
+      "patch": {
+        "operationId": "update_auth_config",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAuthConfig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthConfig"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ],
+        "summary": "Change an app's client, secret or scopes. Connections made before keep the scopes they got.",
+        "tags": [
+          "auth-configs"
+        ]
+      }
+    },
+    "/v1/connected-accounts": {
+      "get": {
+        "operationId": "list_connected_accounts",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "provider",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "auth_config_id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "alias",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "`pending`, `active`, `disabled`, `expired` or `failed`.",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "A batch's `next_cursor`: the batch after it.",
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "A batch's `previous_cursor`: the batch before it.",
+            "in": "query",
+            "name": "before",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/List_ConnectedAccount"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Connections, filtered, in batches; `alias` finds what an attempt made.",
+        "tags": [
+          "connected-accounts"
+        ]
+      },
+      "post": {
+        "operationId": "create_connected_account",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConnectedAccount"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectedAccountCreated"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The first request with this `Idempotency-Key` is still running"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Start connecting a user: a pending connection and the provider's consent URL. After the\nconsent, osiris sends the browser to `callback_url`.",
+        "tags": [
+          "connected-accounts"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}": {
+      "delete": {
+        "operationId": "delete_connected_account",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deleted"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The first request with this `Idempotency-Key` is still running"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "End the grant at the provider and forget the connection. A grant already gone there counts.",
+        "tags": [
+          "connected-accounts"
+        ]
+      },
+      "get": {
+        "operationId": "retrieve_connected_account",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectedAccount"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "One connection, without its tokens.",
+        "tags": [
+          "connected-accounts"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.list_installations": {
+      "post": {
+        "operationId": "github_list_installations",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubInstallation"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Where the GitHub App is installed, of what the connected user can see.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.list_repositories": {
+      "post": {
+        "operationId": "github_list_repositories",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Every repository the GitHub App's installations give the connected user, each once.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/linear.list_teams": {
+      "post": {
+        "operationId": "linear_list_teams",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_LinearTeam"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "The Linear teams the connected user can see.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/slack.list_channels": {
+      "post": {
+        "operationId": "slack_list_channels",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_SlackChannel"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "The Slack channels the connected user can see, archived ones left out.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/refresh": {
+      "post": {
+        "operationId": "refresh_connected_account",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectedAccount"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ],
+        "summary": "Refresh a connection's tokens now. The immediate refresh task replaces the connection's\nscheduled one; the answer shows it as `refresh_task`. For operators.",
+        "tags": [
+          "connected-accounts"
+        ]
+      }
+    },
+    "/v1/events/trigger": {
+      "post": {
+        "operationId": "trigger_event",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriggerEvent"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriggeredEvent"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The first request with this `Idempotency-Key` is still running"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "admin_key": []
+          }
+        ],
+        "summary": "Send a test event for a connection, its state left as it is.",
+        "tags": [
+          "events"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "The providers' apps (admin key)",
+      "name": "auth-configs"
+    },
+    {
+      "description": "Connections and their consent (API key; refreshing one now takes the admin key)",
+      "name": "connected-accounts"
+    },
+    {
+      "description": "Reads with a connection (API key)",
+      "name": "actions"
+    },
+    {
+      "description": "Test events (admin key)",
+      "name": "events"
+    }
+  ],
+  "webhooks": {
+    "events": {
+      "post": {
+        "description": "Published on the events topic, with the `type` and `osiris_version` attributes, written in the release the instance is pinned to (`[api] pinned_version`).",
+        "operationId": "receive_event",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventDelivery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Received"
+          }
+        },
+        "summary": "An event on the events topic"
+      }
+    }
+  }
+}

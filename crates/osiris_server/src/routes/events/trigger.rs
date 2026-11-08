@@ -3,6 +3,7 @@
 use crate::http::{
     auth::Auth,
     error::{ApiError, ApiResult},
+    json_body::JsonBody,
     server_wrap,
     state::ApiState,
 };
@@ -26,7 +27,7 @@ use osiris_env::Flow;
 pub async fn trigger_event(
     State(state): State<ApiState>,
     headers: HeaderMap,
-    Json(body): Json<TriggerEvent>,
+    JsonBody(body): JsonBody<TriggerEvent>,
 ) -> ApiResult<(StatusCode, Json<TriggeredEvent>)> {
     let event_type = EventType::parse(&body.event_type)
         .ok_or_else(|| ApiError::Invalid(format!("unknown event type {:?}", body.event_type)))?;

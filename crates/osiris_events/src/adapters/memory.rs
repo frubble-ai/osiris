@@ -1,18 +1,40 @@
-//! Keeps what was published, for tests to read.
+//! Keeps what was published, for tests to read: each message's bytes and attributes as they were
+//! sent, and its envelope when it reads as one.
 
 use crate::{Channel, Envelope, Transport, TransportError};
 use async_trait::async_trait;
 use std::sync::{Mutex, PoisonError};
 
+/// A message as it was handed to the transport.
+#[derive(Debug, Clone)]
+pub struct Published {
+    pub channel: Channel,
+    pub data: Vec<u8>,
+    pub attributes: Vec<(String, String)>,
+}
+
 #[derive(Default)]
 pub struct MemoryTransport {
-    published: Mutex<Vec<(Channel, Envelope)>>,
+    published: Mutex<Vec<Published>>,
     failing: Mutex<bool>,
 }
 
 impl MemoryTransport {
-    /// Every envelope published so far, in order.
+    /// Every envelope published so far, in order. A message written in an older release's shape
+    /// may not read as the current envelope; `sent` has those.
     pub fn published(&self) -> Vec<(Channel, Envelope)> {
+        self.sent()
+            .into_iter()
+            .filter_map(|sent| {
+                serde_json::from_slice(&sent.data)
+                    .ok()
+                    .map(|envelope| (sent.channel, envelope))
+            })
+            .collect()
+    }
+
+    /// Every message published so far, in order, as it was sent.
+    pub fn sent(&self) -> Vec<Published> {
         self.published
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
@@ -27,11 +49,12 @@ impl MemoryTransport {
 
 #[async_trait]
 impl Transport for MemoryTransport {
+    /// Keeps the message as it was sent, or fails while `fail(true)` is set.
     async fn publish(
         &self,
         channel: Channel,
         data: Vec<u8>,
-        _: &[(&str, &str)],
+        attributes: &[(&str, &str)],
     ) -> Result<(), TransportError> {
         if *self.failing.lock().unwrap_or_else(PoisonError::into_inner) {
             return Err(TransportError {
@@ -39,14 +62,17 @@ impl Transport for MemoryTransport {
                 message: "unavailable".into(),
             });
         }
-        let envelope = serde_json::from_slice(&data).map_err(|error| TransportError {
-            channel: channel.as_str(),
-            message: error.to_string(),
-        })?;
         self.published
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
-            .push((channel, envelope));
+            .push(Published {
+                channel,
+                data,
+                attributes: attributes
+                    .iter()
+                    .map(|(name, value)| ((*name).to_owned(), (*value).to_owned()))
+                    .collect(),
+            });
         Ok(())
     }
 }

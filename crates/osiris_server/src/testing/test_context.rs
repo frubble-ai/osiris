@@ -2,7 +2,7 @@
 //! adapters, and the API and worker routers over those use cases.
 
 use super::test_config::build_test_config;
-use crate::use_cases::lib::database::Db;
+use crate::use_cases::{build_message_bus::build_message_bus, lib::database::Db};
 use crate::{
     config::Config,
     http::state::ApiState,
@@ -14,9 +14,10 @@ use osiris_common::{
     crypto::MasterKey,
     secret::{ExposeSecret, secret},
 };
-use osiris_events::{MessageBus, adapters::memory::MemoryTransport};
+use osiris_events::adapters::memory::MemoryTransport;
 use osiris_providers::{ProviderUrls, Providers};
 use osiris_tasks::adapters::{bearer::BearerAuthenticator, memory::MemoryScheduler};
+use osiris_versioning::Release;
 use sqlx::PgPool;
 use std::sync::{Arc, atomic::AtomicBool};
 use url::Url;
@@ -39,6 +40,38 @@ pub struct TestContext {
     pub provider: MockServer,
     /// The worker's draining flag, as SIGTERM sets it.
     pub draining: Arc<AtomicBool>,
+    /// The releases the API serves, which its answers are checked against.
+    pub releases: &'static [Release],
+}
+
+impl TestContext {
+    /// The same context, its API serving `releases` instead of osiris's own.
+    #[must_use]
+    pub fn serving(mut self, releases: &'static [Release]) -> Self {
+        self.api = api_router(&self.use_cases, &self.config, releases);
+        self.releases = releases;
+        self
+    }
+
+    /// The same context, its API serving `releases` with requests naming no version pinned to
+    /// `pinned`, one of them.
+    #[must_use]
+    pub fn serving_pinned(mut self, releases: &'static [Release], pinned: &str) -> Self {
+        let mut config = (*self.config).clone();
+        pinned.clone_into(&mut config.settings.api.pinned_version);
+        self.config = Arc::new(config);
+        self.serving(releases)
+    }
+}
+
+fn api_router(use_cases: &UseCases, config: &Arc<Config>, releases: &'static [Release]) -> Router {
+    api::router(ApiState {
+        use_cases: use_cases.clone(),
+        config: config.clone(),
+        api_key: Arc::new(secret(API_KEY)),
+        admin_key: Arc::new(secret(ADMIN_KEY)),
+        releases,
+    })
 }
 
 /// A test context with the configuration fixture.
@@ -73,7 +106,12 @@ pub async fn setup_test_context_with(
             MasterKey::from_secret(config.encryption_key.expose_secret()).expect("the test key"),
             settings.database.lock_timeout(),
         ),
-        messages: MessageBus::new(bus.clone()),
+        messages: build_message_bus(
+            bus.clone(),
+            osiris_versioning::RELEASES,
+            &settings.api.pinned_version,
+        )
+        .expect("the fixture's pin is a release osiris serves"),
         tasks: tasks.clone(),
         providers: Arc::new(
             Providers::new(&urls, &urls, &slack, settings.providers.listing.limits())
@@ -83,12 +121,7 @@ pub async fn setup_test_context_with(
         config: config.clone(),
     });
     let draining = Arc::new(AtomicBool::new(false));
-    let api = api::router(ApiState {
-        use_cases: use_cases.clone(),
-        config: config.clone(),
-        api_key: Arc::new(secret(API_KEY)),
-        admin_key: Arc::new(secret(ADMIN_KEY)),
-    });
+    let api = api_router(&use_cases, &config, osiris_versioning::RELEASES);
     let worker = worker::router(worker::state::WorkerState {
         use_cases: use_cases.clone(),
         config: config.clone(),
@@ -106,5 +139,6 @@ pub async fn setup_test_context_with(
         tasks,
         provider,
         draining,
+        releases: osiris_versioning::RELEASES,
     }
 }

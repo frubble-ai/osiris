@@ -1,17 +1,41 @@
-//! Writes osiris's `OpenAPI` document, generated from its routes, to `api-reference/openapi.json`
-//! (or the path given). CI regenerates it and fails if the committed one differs.
+//! Writes osiris's `OpenAPI` documents, generated from its routes, under `api-reference/` (or the
+//! directory given): `openapi.json` at the current release, and `versions/<release>.json` for every
+//! release osiris serves, each taken back through the changes made since, after clearing the specs
+//! of releases no longer served. CI regenerates them and fails if the committed ones differ.
 
 use anyhow::Context;
+use osiris_server::services::api::{spec, versioned_spec};
+use osiris_versioning::RELEASES;
+use std::path::Path;
 
+/// Writes every spec under the directory given, `api-reference` by default.
 fn main() -> anyhow::Result<()> {
-    let path = std::env::args()
+    let root = std::env::args()
         .nth(1)
-        .unwrap_or_else(|| "api-reference/openapi.json".to_owned());
-    let spec = osiris_server::services::api::spec().to_pretty_json()?;
-    if let Some(directory) = std::path::Path::new(&path).parent() {
+        .unwrap_or_else(|| "api-reference".to_owned());
+    let root = Path::new(&root);
+    write(&root.join("openapi.json"), &spec()?)?;
+    // A release no longer served leaves no spec behind.
+    let versions = root.join("versions");
+    if versions.exists() {
+        std::fs::remove_dir_all(&versions)
+            .with_context(|| format!("clearing {}", versions.display()))?;
+    }
+    for release in RELEASES {
+        write(
+            &versions.join(format!("{}.json", release.name)),
+            &versioned_spec(RELEASES, release)?,
+        )?;
+    }
+    Ok(())
+}
+
+/// Writes `spec` to `path` as pretty JSON, creating its directory.
+fn write(path: &Path, spec: &serde_json::Value) -> anyhow::Result<()> {
+    if let Some(directory) = path.parent() {
         std::fs::create_dir_all(directory)
             .with_context(|| format!("creating {}", directory.display()))?;
     }
-    std::fs::write(&path, format!("{spec}\n")).with_context(|| format!("writing {path}"))?;
-    Ok(())
+    let text = serde_json::to_string_pretty(spec)?;
+    std::fs::write(path, format!("{text}\n")).with_context(|| format!("writing {}", path.display()))
 }
