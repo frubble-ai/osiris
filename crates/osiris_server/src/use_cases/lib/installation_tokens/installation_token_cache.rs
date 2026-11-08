@@ -33,6 +33,32 @@ impl InstallationTokenCache {
             .clone()
     }
 
+    /// Lets go of `lock`, the one [`Self::minting`] answered, once its mint is done: the entry is
+    /// dropped when nothing else holds it, so ids that are never minted again leave nothing
+    /// behind.
+    pub fn done_minting(
+        &self,
+        auth_config_id: &str,
+        installation_id: &str,
+        lock: &Arc<tokio::sync::Mutex<()>>,
+    ) {
+        let mut minting = self.minting.lock().unwrap_or_else(PoisonError::into_inner);
+        // Callers clone the lock under this same mutex, so two holders (the map and `lock`)
+        // means no one else is waiting on it.
+        if Arc::strong_count(lock) == 2 {
+            minting.remove(&(auth_config_id.to_owned(), installation_id.to_owned()));
+        }
+    }
+
+    /// How many installations' mint locks are held, for tests.
+    #[cfg(test)]
+    pub fn minting_locks(&self) -> usize {
+        self.minting
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .len()
+    }
+
     /// The token for `installation_id` of `auth_config_id`, if one is held that stays good past
     /// `now` plus `margin`.
     pub fn get(

@@ -30,9 +30,25 @@ pub async fn installation_token(
         return Ok(token);
     }
     // One mint at a time per installation: a call that waited finds the token the one before it
-    // minted.
+    // minted. The lock is let go of whether the mint worked or not.
     let lock = cache.minting(&config.id, installation_id);
-    let _minting = lock.lock().await;
+    let minted = {
+        let _minting = lock.lock().await;
+        mint_once(implementation, http, cache, margin, config, installation_id).await
+    };
+    cache.done_minting(&config.id, installation_id, &lock);
+    minted
+}
+
+/// Under the installation's mint lock: the token a call before this one minted, or a new one.
+async fn mint_once(
+    implementation: &dyn Provider,
+    http: &reqwest::Client,
+    cache: &InstallationTokenCache,
+    margin: Duration,
+    config: &AuthConfig,
+    installation_id: &str,
+) -> UseCaseResult<Secret> {
     if let Some(token) = cache.get(
         &config.id,
         installation_id,

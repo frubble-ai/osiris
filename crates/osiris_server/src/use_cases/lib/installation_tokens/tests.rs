@@ -49,3 +49,18 @@ fn reads_a_margin_too_long_to_compute_as_no_token_instead_of_overflowing() {
 
     assert!(cache.get("ac_1", "7", now, Duration::MAX).is_none());
 }
+
+#[tokio::test]
+async fn lets_go_of_an_installation_s_mint_lock_once_no_one_holds_it() {
+    let cache = InstallationTokenCache::default();
+    let first = cache.minting("ac_1", "7");
+    let waiting = cache.minting("ac_1", "7");
+
+    // Another call still holds the lock: it stays.
+    cache.done_minting("ac_1", "7", &first);
+    assert_eq!(cache.minting_locks(), 1);
+    drop(first);
+
+    cache.done_minting("ac_1", "7", &waiting);
+    assert_eq!(cache.minting_locks(), 0);
+}

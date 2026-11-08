@@ -20,7 +20,7 @@ fn refuses_a_dot_segment(#[case] path: &str) {
 
 #[rstest]
 #[case::plain("/repos/o/r")]
-#[case::dotted_names("/repos/o.o/r..r/contents/.github/a.b")]
+#[case::dotted_names("/repos/o.o/r..r/contents/.config/a.b")]
 #[case::relative_method("conversations.list")]
 #[case::three_dots("/repos/o/r/contents/...")]
 fn keeps_any_other_path(#[case] path: &str) {

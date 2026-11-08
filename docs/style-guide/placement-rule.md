@@ -37,4 +37,12 @@ Each provider is a domain in every layer, under its own id: `osiris_providers/sr
 path, its code, its comments or its tests; the only line that may is a module declaration
 (`pub mod <id>;`). Lists of providers are written by `build.rs` from the folders, shared code finds
 a provider through `Providers`, and shared tests use the fake provider. `just placement-check`
-fails a build that breaks this ([add a provider](../add_provider.md)).
+fails a build that breaks this ([add a provider](../add_provider.md)). It leaves out, each with
+its reason in `scripts/placement-check.py`:
+
+- generated artifacts: `api-reference/`, `.sqlx/`, the lockfiles and the client's generated code;
+- the init migration, already applied, which seeded the first providers' rows;
+- the hosting platform's own files and names, which a provider may share: `.github/`,
+  `.gitleaksignore`, `deny.toml`, and on any line `.github/` paths, `github.com` and
+  `github.io` links and CI variables such as `GITHUB_STEP_SUMMARY`. Shared code and tests use none
+  of them as fixtures.
