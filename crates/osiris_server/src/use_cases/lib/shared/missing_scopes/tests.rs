@@ -16,6 +16,7 @@ fn github() -> Github {
         ListLimits {
             concurrency: 1,
             max_items: 10,
+            max_log_bytes: 262_144,
         },
     )
     .unwrap()

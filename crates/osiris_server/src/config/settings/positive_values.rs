@@ -40,6 +40,10 @@ impl Settings {
                 u64::try_from(self.providers.listing.concurrency).unwrap_or(u64::MAX),
             ),
             (
+                "providers.listing.max_log_bytes",
+                u64::try_from(self.providers.listing.max_log_bytes).unwrap_or(u64::MAX),
+            ),
+            (
                 "providers.listing.max_items",
                 u64::try_from(self.providers.listing.max_items).unwrap_or(u64::MAX),
             ),

@@ -10,4 +10,7 @@ pub mod get_release_asset;
 pub mod get_release_by_tag;
 pub mod list_release_assets;
 pub mod list_releases;
+pub mod router;
 pub mod update_release;
+
+pub use router::router;

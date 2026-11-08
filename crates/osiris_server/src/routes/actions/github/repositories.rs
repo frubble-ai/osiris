@@ -35,6 +35,9 @@ pub mod merge_branch;
 pub mod remove_repository_collaborator;
 pub mod rename_branch;
 pub mod replace_repository_topics;
+pub mod router;
 pub mod sync_fork_branch_with_upstream;
 pub mod update_ref;
 pub mod update_repository;
+
+pub use router::router;

@@ -33,6 +33,7 @@ fn token(name: &str) -> Option<String> {
 const LIMITS: ListLimits = ListLimits {
     concurrency: 4,
     max_items: 5000,
+    max_log_bytes: 262_144,
 };
 
 fn urls(oauth: &str, api: &str) -> ProviderUrls {

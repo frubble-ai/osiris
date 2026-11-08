@@ -14,3 +14,6 @@ pub mod list_workflow_run_jobs;
 pub mod list_workflow_runs;
 pub mod rerun_failed_jobs;
 pub mod rerun_workflow;
+pub mod router;
+
+pub use router::router;

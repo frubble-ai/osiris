@@ -97,6 +97,8 @@ purge_batch = 100
 # once, and how many items it answers at most.
 concurrency = 4
 max_items = 5000
+# How much of a downloaded text (a GitHub workflow job's logs) is answered: its last bytes.
+max_log_bytes = 262144
 
 [providers.installation_tokens]
 # An app installation's token (a GitHub App's, which lives an hour) is minted again this long

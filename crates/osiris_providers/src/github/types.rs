@@ -23,12 +23,9 @@ pub mod installation;
 pub mod issue;
 pub mod issue_comment;
 pub mod issue_event;
-<<<<<<< HEAD
 pub mod issue_lock;
 pub mod issue_page;
-=======
 pub mod job_logs;
->>>>>>> port/github-checks_workflows
 pub mod label;
 pub mod language;
 pub mod merge_result;
@@ -48,19 +45,13 @@ pub mod review;
 pub mod review_comment;
 pub mod review_request;
 pub mod search;
-<<<<<<< HEAD
 pub mod search_issue_results;
-=======
 pub mod search_results;
 pub mod starred_check;
->>>>>>> port/github-releases_activity_search
 pub mod tag;
 pub mod team;
-<<<<<<< HEAD
-pub mod topics;
-=======
 pub mod timeline_event;
->>>>>>> port/github-issues
+pub mod topics;
 pub mod user;
 pub mod workflow;
 pub mod workflow_job;
@@ -89,12 +80,9 @@ pub use installation::GithubInstallation;
 pub use issue::GithubIssue;
 pub use issue_comment::GithubIssueComment;
 pub use issue_event::GithubIssueEvent;
-<<<<<<< HEAD
 pub use issue_lock::GithubIssueLock;
 pub use issue_page::GithubIssuePage;
-=======
 pub use job_logs::GithubJobLogs;
->>>>>>> port/github-checks_workflows
 pub use label::GithubLabel;
 pub use language::GithubLanguage;
 pub use merge_result::GithubMergeResult;
@@ -118,22 +106,16 @@ pub use search::{
     GithubSearchIssue, GithubSearchLabel, GithubSearchRepository, GithubSearchTopic,
     GithubSearchUser,
 };
-<<<<<<< HEAD
 pub use search_issue_results::GithubSearchIssueResults;
-=======
 pub use search_results::{
     GithubCodeSearchResults, GithubCommitSearchResults, GithubLabelSearchResults,
     GithubRepositorySearchResults, GithubTopicSearchResults, GithubUserSearchResults,
 };
 pub use starred_check::GithubStarredCheck;
->>>>>>> port/github-releases_activity_search
 pub use tag::GithubTag;
 pub use team::GithubTeam;
-<<<<<<< HEAD
-pub use topics::GithubTopics;
-=======
 pub use timeline_event::GithubTimelineEvent;
->>>>>>> port/github-issues
+pub use topics::GithubTopics;
 pub use user::{GithubCurrentUser, GithubUser};
 pub use workflow::GithubWorkflow;
 pub use workflow_job::{GithubWorkflowJob, GithubWorkflowStep};

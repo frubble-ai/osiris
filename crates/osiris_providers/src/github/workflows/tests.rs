@@ -20,8 +20,11 @@ use super::{
     },
 };
 use crate::{
-    ProviderError,
-    github::mocks::{MockGithubNetwork, github_on::github_on},
+    ListLimits, ProviderError, ProviderUrls,
+    github::{
+        Github,
+        mocks::{MockGithubNetwork, github_on::github_on},
+    },
 };
 use fake::{Fake, faker::lorem::en::Paragraph};
 use rstest::rstest;
@@ -323,6 +326,47 @@ async fn reads_the_logs_of_a_job_from_where_github_redirects() {
         .unwrap();
 
     assert_eq!(read.logs, logs);
+    assert!(!read.truncated);
+}
+
+#[tokio::test]
+async fn keeps_only_the_end_of_a_log_longer_than_osiris_answers() {
+    let server = MockServer::start().await;
+    let logs = format!("{}THE-END", "x".repeat(100));
+    MockGithubWorkflowsNetwork::on(&server)
+        .answer_redirect(
+            "/repos/octo/hello/actions/jobs/400/logs",
+            "/storage/logs/400.txt",
+            200,
+            &logs,
+        )
+        .await;
+    let base = url::Url::parse(&server.uri()).unwrap();
+    let github = Github::new(
+        &ProviderUrls {
+            oauth_base: base.clone(),
+            api_base: base,
+        },
+        ListLimits {
+            concurrency: 1,
+            max_items: 10,
+            max_log_bytes: 10,
+        },
+    )
+    .unwrap();
+    let input = GetWorkflowJobLogs {
+        owner: "octo".into(),
+        repo: "hello".into(),
+        job_id: 400,
+    };
+
+    let read = github
+        .get_workflow_job_logs(&reqwest::Client::new(), "token", &input)
+        .await
+        .unwrap();
+
+    assert_eq!(read.logs, "xxxTHE-END");
+    assert!(read.truncated);
 }
 
 #[tokio::test]

@@ -40,18 +40,12 @@ pub mod review;
 pub mod review_comment;
 pub mod review_request;
 pub mod search;
-<<<<<<< HEAD
 pub mod search_issue_results;
-=======
 pub mod search_results;
->>>>>>> port/github-releases_activity_search
 pub mod tag;
 pub mod team;
-<<<<<<< HEAD
-pub mod topics;
-=======
 pub mod timeline_event;
->>>>>>> port/github-issues
+pub mod topics;
 pub mod user;
 pub mod workflow;
 pub mod workflow_job;

@@ -1,6 +1,6 @@
 """Writes the GitHub actions' use cases and routes, which all share one shape, from actions/*.json (one
 file per group), and
-the group modules and the router that list them. The provider call, its input and its answer's
+the group modules, the parent modules and the router that list them. The provider call, its input and its answer's
 type are written by hand in osiris_providers/src/github/<group>/<action>.rs.
 
 Each entry: group, name, input (the input type), output (the answer's type), summary (what it
@@ -120,20 +120,39 @@ pub async fn github_{n}(
 
 # group module files, rebuilt from every action listed
 groups = {}
-for a in actions: groups.setdefault(a["group"], []).append(a["name"])
-for base, doc in [(cases, "GitHub's actions' use cases"), (routes, "GitHub's action routes")]:
-    for g, names in groups.items():
-        open(f"{base}/{g}.rs", "w").write(f"//! {doc}: {g.replace('_', ' ')}.\n\n" + "".join(f"pub mod {n};\n" for n in sorted(names)))
-# the routes' router, every action registered
-lines = "".join(f"        .routes(routes!({g}::{n}::github_{n}))\n" for g, names in sorted(groups.items()) for n in sorted(names))
-open(f"{routes}/router.rs", "w").write(f'''//! GitHub's action routes, every one registered.
+for a in actions: groups.setdefault(a["group"], set()).add(a["name"])
+for g, names in groups.items():
+    open(f"{cases}/{g}.rs", "w").write(f"//! GitHub's actions' use cases: {g.replace('_', ' ')}.\n\n" + "".join(f"pub mod {n};\n" for n in sorted(names)))
+    open(f"{routes}/{g}.rs", "w").write(f"//! GitHub's action routes: {g.replace('_', ' ')}.\n\n" + "".join(f"pub mod {n};\n" for n in sorted(names | {"router"})) + "\npub use router::router;\n")
+    lines = "".join(f"        .routes(routes!({n}::github_{n}))\n" for n in sorted(names))
+    open(f"{routes}/{g}/router.rs", "w").write(f"""//! The {g.replace('_', ' ')} action routes, every one registered.
 
-use super::{{{", ".join(sorted(groups))}}};
+use super::{{{", ".join(sorted(names))}}};
 use crate::http::state::ApiState;
 use utoipa_axum::{{router::OpenApiRouter, routes}};
 
 pub fn router() -> OpenApiRouter<ApiState> {{
     OpenApiRouter::new()
 {lines}}}
-''')
+""")
+# the parent modules: every group, plus the args type and the router
+open(f"{cases}.rs", "w").write("""//! GitHub's actions, one use case each, grouped as GitHub's API is: each runs its provider call
+//! through the connection, refused first when the connection lacks the action's scopes.
+
+""" + "".join(f"pub mod {g};\n" for g in sorted(set(groups) | {"github_action_args"})))
+open(f"{routes}.rs", "w").write("""//! GitHub's action routes, one per action, grouped as GitHub's API is.
+
+""" + "".join(f"pub mod {g};\n" for g in sorted(set(groups) | {"router"})) + "\npub use router::router;\n")
+# the routes' router: every group's
+merges = "".join(f"        .merge({g}::router())\n" for g in sorted(groups))
+open(f"{routes}/router.rs", "w").write(f"""//! GitHub's action routes: every group's router, merged.
+
+use super::{{{", ".join(sorted(groups))}}};
+use crate::http::state::ApiState;
+use utoipa_axum::router::OpenApiRouter;
+
+pub fn router() -> OpenApiRouter<ApiState> {{
+    OpenApiRouter::new()
+{merges}}}
+""")
 print(len(actions), "actions,", len(groups), "groups")

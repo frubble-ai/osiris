@@ -22,6 +22,7 @@ use wiremock::MockServer;
 const LIMITS: ListLimits = ListLimits {
     concurrency: 2,
     max_items: 5000,
+    max_log_bytes: 262_144,
 };
 
 fn github(server: &MockServer, limits: ListLimits) -> Github {
@@ -152,6 +153,7 @@ async fn stops_reading_repositories_at_the_cap() {
         ListLimits {
             concurrency: 1,
             max_items: 50,
+            max_log_bytes: 262_144,
         },
     )
     .list_repositories(&reqwest::Client::new(), "token", &ListRepositories {})

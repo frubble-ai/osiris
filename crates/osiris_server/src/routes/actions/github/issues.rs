@@ -28,6 +28,7 @@ pub mod list_repository_labels;
 pub mod lock_issue;
 pub mod remove_issue_assignees;
 pub mod remove_issue_label;
+pub mod router;
 pub mod search_issues_and_pull_requests;
 pub mod set_issue_labels;
 pub mod unlock_issue;
@@ -35,3 +36,5 @@ pub mod update_issue;
 pub mod update_issue_comment;
 pub mod update_label;
 pub mod update_milestone;
+
+pub use router::router;

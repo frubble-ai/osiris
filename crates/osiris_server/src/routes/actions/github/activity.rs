@@ -10,5 +10,8 @@ pub mod list_repository_stargazers;
 pub mod list_repository_watchers;
 pub mod list_user_public_events;
 pub mod list_user_received_public_events;
+pub mod router;
 pub mod star_repository;
 pub mod unstar_repository;
+
+pub use router::router;

@@ -43,6 +43,8 @@ pub struct ListingSettings {
     pub concurrency: usize,
     /// Items one list answers at most.
     pub max_items: usize,
+    /// The most of a downloaded text (a workflow job's logs) answered, in bytes: its end.
+    pub max_log_bytes: usize,
 }
 
 impl ListingSettings {
@@ -50,6 +52,7 @@ impl ListingSettings {
         osiris_providers::ListLimits {
             concurrency: self.concurrency,
             max_items: self.max_items,
+            max_log_bytes: self.max_log_bytes,
         }
     }
 }
@@ -59,6 +62,8 @@ impl Default for ListingSettings {
         Self {
             concurrency: 4,
             max_items: 5000,
+            // OpenConnector's cap on a job log: its last 256 KiB.
+            max_log_bytes: 262_144,
         }
     }
 }

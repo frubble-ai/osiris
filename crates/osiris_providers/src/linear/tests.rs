@@ -29,6 +29,7 @@ fn linear_capped_at(server: &MockServer, max_items: usize) -> Linear {
         ListLimits {
             concurrency: 2,
             max_items,
+            max_log_bytes: 262_144,
         },
     )
     .unwrap()

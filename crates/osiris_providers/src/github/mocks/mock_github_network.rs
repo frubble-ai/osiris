@@ -37,24 +37,6 @@ impl<'a> MockGithubNetwork<'a> {
             .await;
     }
 
-    /// Minting a token for installation `installation` answers `token`, good for an hour; the
-    /// test fails unless it is minted exactly `expected_calls` times.
-    pub async fn answer_installation_token(
-        &self,
-        installation: &str,
-        token: &str,
-        expected_calls: u64,
-    ) {
-        Mock::given(method("POST"))
-            .and(path(format!(
-                "/app/installations/{installation}/access_tokens"
-            )))
-            .respond_with(ResponseTemplate::new(201).set_body_json(json!({
-                "token": token,
-                "expires_at": "2999-01-01T00:00:00Z",
-                "permissions": { "contents": "read", "metadata": "read" },
-            })))
-            .expect(expected_calls)
     /// As [`Self::answer`], and only for a request whose JSON body is `request`: the test fails
     /// unless GitHub is sent exactly that body, once.
     pub async fn answer_with_body(
@@ -75,15 +57,6 @@ impl<'a> MockGithubNetwork<'a> {
             .await;
     }
 
-    /// Minting a token for installation `installation` is refused with `status`.
-    pub async fn refuse_installation_token(&self, installation: &str, status: u16) {
-        Mock::given(method("POST"))
-            .and(path(format!(
-                "/app/installations/{installation}/access_tokens"
-            )))
-            .respond_with(
-                ResponseTemplate::new(status).set_body_json(json!({ "message": "Not Found" })),
-            )
     /// `verb route` answers `status` with no body at all, as GitHub's 204 does; the test fails
     /// unless it is asked exactly once.
     pub async fn answer_empty(&self, verb: &str, route: &str, status: u16) {
@@ -101,6 +74,41 @@ impl<'a> MockGithubNetwork<'a> {
         Mock::given(path(route))
             .respond_with(ResponseTemplate::new(500))
             .expect(0)
+            .mount(self.server)
+            .await;
+    }
+
+    /// Minting a token for installation `installation` answers `token`, good for an hour; the
+    /// test fails unless it is minted exactly `expected_calls` times.
+    pub async fn answer_installation_token(
+        &self,
+        installation: &str,
+        token: &str,
+        expected_calls: u64,
+    ) {
+        Mock::given(method("POST"))
+            .and(path(format!(
+                "/app/installations/{installation}/access_tokens"
+            )))
+            .respond_with(ResponseTemplate::new(201).set_body_json(json!({
+                "token": token,
+                "expires_at": "2999-01-01T00:00:00Z",
+                "permissions": { "contents": "read", "metadata": "read" },
+            })))
+            .expect(expected_calls)
+            .mount(self.server)
+            .await;
+    }
+
+    /// Minting a token for installation `installation` is refused with `status`.
+    pub async fn refuse_installation_token(&self, installation: &str, status: u16) {
+        Mock::given(method("POST"))
+            .and(path(format!(
+                "/app/installations/{installation}/access_tokens"
+            )))
+            .respond_with(
+                ResponseTemplate::new(status).set_body_json(json!({ "message": "Not Found" })),
+            )
             .mount(self.server)
             .await;
     }
