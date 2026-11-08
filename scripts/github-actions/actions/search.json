@@ -1,0 +1,44 @@
+[
+ {
+  "group": "search",
+  "name": "search_repositories",
+  "input": "SearchRepositories",
+  "output": "GithubRepositorySearchResults",
+  "summary": "repositories that match a search, a page at a time."
+ },
+ {
+  "group": "search",
+  "name": "search_users",
+  "input": "SearchUsers",
+  "output": "GithubUserSearchResults",
+  "summary": "users that match a search, a page at a time."
+ },
+ {
+  "group": "search",
+  "name": "search_commits",
+  "input": "SearchCommits",
+  "output": "GithubCommitSearchResults",
+  "summary": "commits whose message and details match a search, a page at a time."
+ },
+ {
+  "group": "search",
+  "name": "search_code",
+  "input": "SearchCode",
+  "output": "GithubCodeSearchResults",
+  "summary": "files whose code matches a search, a page at a time."
+ },
+ {
+  "group": "search",
+  "name": "search_labels",
+  "input": "SearchLabels",
+  "output": "GithubLabelSearchResults",
+  "summary": "a repository's labels whose name or description match a search, a page at a time."
+ },
+ {
+  "group": "search",
+  "name": "search_topics",
+  "input": "SearchTopics",
+  "output": "GithubTopicSearchResults",
+  "summary": "topics that match a search, a page at a time."
+ }
+]

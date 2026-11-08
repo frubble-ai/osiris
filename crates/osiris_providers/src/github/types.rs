@@ -36,6 +36,8 @@ pub mod requested_reviewers;
 pub mod review;
 pub mod review_comment;
 pub mod search;
+pub mod search_results;
+pub mod starred_check;
 pub mod tag;
 pub mod team;
 pub mod user;
@@ -83,6 +85,11 @@ pub use search::{
     GithubSearchIssue, GithubSearchLabel, GithubSearchRepository, GithubSearchTopic,
     GithubSearchUser,
 };
+pub use search_results::{
+    GithubCodeSearchResults, GithubCommitSearchResults, GithubLabelSearchResults,
+    GithubRepositorySearchResults, GithubTopicSearchResults, GithubUserSearchResults,
+};
+pub use starred_check::GithubStarredCheck;
 pub use tag::GithubTag;
 pub use team::GithubTeam;
 pub use user::{GithubCurrentUser, GithubUser};

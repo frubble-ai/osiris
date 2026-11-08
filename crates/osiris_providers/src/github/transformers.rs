@@ -34,6 +34,7 @@ pub mod requested_reviewers;
 pub mod review;
 pub mod review_comment;
 pub mod search;
+pub mod search_results;
 pub mod tag;
 pub mod team;
 pub mod user;
