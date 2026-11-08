@@ -1,0 +1,39 @@
+//! `DELETE /v1/triggers/{id}`: stop watching; the subscription is removed at the provider.
+
+use crate::{
+    http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
+    use_cases::cases::triggers::delete_trigger::DeleteTriggerArgs,
+};
+use axum::{
+    Json,
+    extract::{Path, State},
+    http::{HeaderMap, StatusCode},
+};
+use osiris_api_models::{auth_configs::Deleted, errors::ErrorBody};
+use osiris_env::Flow;
+
+/// Delete a trigger: its subscription is removed at the provider (a GitHub repository webhook)
+/// when its connection still reaches it, and it is deleted either way.
+#[utoipa::path(delete, path = "/v1/triggers/{id}", tag = "triggers", params(("id" = String, Path)),
+    params(("Idempotency-Key" = Option<String>, Header, description = "Runs the request once; a retry gets the first answer")),
+    responses((status = 200, body = Deleted), (status = 404, body = ErrorBody)), security(("api_key" = [])))]
+pub async fn delete_trigger(
+    State(state): State<ApiState>,
+    headers: HeaderMap,
+    Path(id): Path<String>,
+) -> ApiResult<(StatusCode, Json<Deleted>)> {
+    server_wrap(
+        Flow::TriggersDelete,
+        &state,
+        &headers,
+        Auth::Api,
+        StatusCode::OK,
+        |use_cases| async move {
+            use_cases
+                .delete_trigger(DeleteTriggerArgs { id: &id })
+                .await?;
+            Ok(Deleted { id, deleted: true })
+        },
+    )
+    .await
+}

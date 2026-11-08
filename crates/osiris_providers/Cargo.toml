@@ -11,21 +11,24 @@ workspace = true
 [dependencies]
 osiris_interfaces.workspace = true
 async-trait.workspace = true
+# The webhook signatures of a provider's deliveries (HMAC-SHA256), and test App keys.
+aws-lc-rs = "1"
 base64.workspace = true
 futures.workspace = true
 jsonwebtoken = { workspace = true, features = ["use_pem"] }
 reqwest.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+sha2.workspace = true
+hex.workspace = true
 url.workspace = true
 utoipa.workspace = true
 fake = { workspace = true, optional = true }
-aws-lc-rs = { version = "1", optional = true }
 wiremock = { workspace = true, optional = true }
 
 [features]
 # Each provider's network faked for tests (its `mocks`), for other crates' tests to use.
-testing = ["dep:fake", "dep:wiremock", "dep:aws-lc-rs"]
+testing = ["dep:fake", "dep:wiremock"]
 
 [dev-dependencies]
 osiris_providers = { workspace = true, features = ["testing"] }

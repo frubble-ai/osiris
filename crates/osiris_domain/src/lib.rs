@@ -12,6 +12,9 @@ pub mod idempotency;
 pub mod page;
 pub mod task_outcome;
 pub mod token_set;
+pub mod trigger;
+pub mod trigger_fired;
+pub mod trigger_status;
 
 pub use account_filter::AccountFilter;
 pub use auth_config::AuthConfig;
@@ -24,3 +27,6 @@ pub use idempotency::Begun;
 pub use page::{Cursor, Page};
 pub use task_outcome::TaskOutcome;
 pub use token_set::TokenSet;
+pub use trigger::Trigger;
+pub use trigger_fired::TriggerFired;
+pub use trigger_status::TriggerStatus;

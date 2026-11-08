@@ -20,6 +20,11 @@ pub enum Flow {
     ActionsRun,
     EventsTrigger,
     TasksRun,
+    TriggersCreate,
+    TriggersList,
+    TriggersRetrieve,
+    TriggersDelete,
+    TriggerDelivery,
 }
 
 impl std::fmt::Display for Flow {

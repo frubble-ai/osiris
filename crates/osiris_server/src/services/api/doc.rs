@@ -13,7 +13,8 @@ use utoipa::{
     tags((name = "auth-configs", description = "The providers' apps (admin key)"),
          (name = "connected-accounts", description = "Connections and their consent (API key; refreshing one now takes the admin key)"),
          (name = "actions", description = "Reads with a connection (API key)"),
-         (name = "events", description = "Test events (admin key)")),
+         (name = "events", description = "Test events (admin key)"),
+         (name = "triggers", description = "Subscriptions to what happens at a connection's provider, each delivery published as a `trigger.fired` event (API key)")),
 )]
 pub struct ApiDoc;
 

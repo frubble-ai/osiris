@@ -27,6 +27,7 @@ pub mod run_refresh_task;
 pub mod run_task;
 pub mod start_connect;
 pub mod trigger_event;
+pub mod triggers;
 pub mod update_auth_config;
 
 #[cfg(test)]

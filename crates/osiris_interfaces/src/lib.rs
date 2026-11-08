@@ -10,6 +10,8 @@ pub mod oauth_client;
 pub mod provider;
 pub mod provider_common;
 pub mod tokens;
+pub mod trigger_check;
+pub mod trigger_receipt;
 
 pub use call::call;
 pub use error::ProviderError;
@@ -18,3 +20,5 @@ pub use oauth_client::OAuthClient;
 pub use provider::Provider;
 pub use provider_common::ProviderCommon;
 pub use tokens::Tokens;
+pub use trigger_check::TriggerCheck;
+pub use trigger_receipt::TriggerReceipt;

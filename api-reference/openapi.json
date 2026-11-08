@@ -5088,6 +5088,29 @@
         ],
         "type": "object"
       },
+      "CreateTrigger": {
+        "additionalProperties": false,
+        "properties": {
+          "config": {
+            "description": "The kind's own configuration, which its provider validates. `github.on_repo_event`:\n`{\"owner\", \"repo\", \"events\": [\"push\", …] or [\"*\"], \"insecure_ssl\"?}`.\n`github.watch_pull_request`: `{\"owner\", \"repo\", \"number\"}`.",
+            "type": "object"
+          },
+          "connected_account_id": {
+            "description": "`ca_…`: the connection the trigger watches through.",
+            "type": "string"
+          },
+          "trigger": {
+            "description": "What it watches: `github.on_repo_event` (a repository's webhook events) or\n`github.watch_pull_request` (one pull request's changes). An open string: more kinds may\ncome.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "connected_account_id",
+          "trigger",
+          "config"
+        ],
+        "type": "object"
+      },
       "DeleteFile": {
         "additionalProperties": false,
         "properties": {
@@ -11139,6 +11162,99 @@
         ],
         "type": "object"
       },
+      "List_Trigger": {
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A trigger, without its secret.",
+              "properties": {
+                "config": {
+                  "type": "object"
+                },
+                "connected_account_id": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "`tr_…`.",
+                  "type": "string"
+                },
+                "last_error": {
+                  "description": "Why it failed.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "next_check_at": {
+                  "description": "When it next checks the provider, for a kind that checks on a schedule.",
+                  "format": "date-time",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "provider": {
+                  "type": "string"
+                },
+                "status": {
+                  "description": "`active` (its deliveries are published) or `failed` (the provider refused it; create it\nagain). An open string.",
+                  "example": "active",
+                  "type": "string"
+                },
+                "subscription_id": {
+                  "description": "The provider's id of what osiris created there: a GitHub repository webhook's id.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "trigger": {
+                  "description": "Its kind, such as `github.on_repo_event`.",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "connected_account_id",
+                "provider",
+                "trigger",
+                "config",
+                "status",
+                "created_at",
+                "updated_at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "description": "Pass as `after` for the next batch; null on the last.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "previous_cursor": {
+            "description": "Pass as `before` for the previous batch; null on the first.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
       "LockIssue": {
         "additionalProperties": false,
         "properties": {
@@ -12258,10 +12374,99 @@
         ],
         "type": "object"
       },
+      "Trigger": {
+        "description": "A trigger, without its secret.",
+        "properties": {
+          "config": {
+            "type": "object"
+          },
+          "connected_account_id": {
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "description": "`tr_…`.",
+            "type": "string"
+          },
+          "last_error": {
+            "description": "Why it failed.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "next_check_at": {
+            "description": "When it next checks the provider, for a kind that checks on a schedule.",
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "provider": {
+            "type": "string"
+          },
+          "status": {
+            "description": "`active` (its deliveries are published) or `failed` (the provider refused it; create it\nagain). An open string.",
+            "example": "active",
+            "type": "string"
+          },
+          "subscription_id": {
+            "description": "The provider's id of what osiris created there: a GitHub repository webhook's id.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trigger": {
+            "description": "Its kind, such as `github.on_repo_event`.",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "connected_account_id",
+          "provider",
+          "trigger",
+          "config",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
       "TriggerEvent": {
         "properties": {
           "connected_account_id": {
             "type": "string"
+          },
+          "data": {
+            "description": "What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape:\n`github.on_repo_event` carries `event` (GitHub's event name), `delivery_id` and `payload`\n(GitHub's own); `github.watch_pull_request` carries `pull_request` and `version`.",
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "trigger": {
+            "description": "The trigger's kind, such as `github.on_repo_event`, on a `trigger.fired` event.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trigger_id": {
+            "description": "`tr_…`: the trigger that fired, on a `trigger.fired` event.",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "type": {
             "description": "`connection.active`, `connection.expired` or `connection.revoked`.",
@@ -37490,6 +37695,461 @@
           "events"
         ]
       }
+    },
+    "/v1/triggers": {
+      "get": {
+        "operationId": "list_triggers",
+        "parameters": [
+          {
+            "description": "Only this connection's triggers.",
+            "in": "query",
+            "name": "connected_account_id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "A batch's `next_cursor`: the batch after it.",
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "A batch's `previous_cursor`: the batch before it.",
+            "in": "query",
+            "name": "before",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/List_Trigger"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Triggers, of one connection or of all, in batches.",
+        "tags": [
+          "triggers"
+        ]
+      },
+      "post": {
+        "operationId": "create_trigger",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTrigger"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trigger"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Create a trigger: osiris subscribes at the connection's provider (a GitHub repository webhook)\nand publishes each delivery as a `trigger.fired` event.",
+        "tags": [
+          "triggers"
+        ]
+      }
+    },
+    "/v1/triggers/{id}": {
+      "delete": {
+        "operationId": "delete_trigger",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deleted"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The first request with this `Idempotency-Key` is still running"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Delete a trigger: its subscription is removed at the provider (a GitHub repository webhook)\nwhen its connection still reaches it, and it is deleted either way.",
+        "tags": [
+          "triggers"
+        ]
+      },
+      "get": {
+        "operationId": "retrieve_trigger",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trigger"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "One trigger.",
+        "tags": [
+          "triggers"
+        ]
+      }
     }
   },
   "tags": [
@@ -37508,6 +38168,10 @@
     {
       "description": "Test events (admin key)",
       "name": "events"
+    },
+    {
+      "description": "Subscriptions to what happens at a connection's provider, each delivery published as a `trigger.fired` event (API key)",
+      "name": "triggers"
     }
   ],
   "webhooks": {

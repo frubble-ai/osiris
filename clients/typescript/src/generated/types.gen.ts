@@ -1891,6 +1891,27 @@ export type CreateRepository = {
     private?: boolean | null;
 };
 
+export type CreateTrigger = {
+    /**
+     * The kind's own configuration, which its provider validates. `github.on_repo_event`:
+     * `{"owner", "repo", "events": ["push", …] or ["*"], "insecure_ssl"?}`.
+     * `github.watch_pull_request`: `{"owner", "repo", "number"}`.
+     */
+    config: {
+        [key: string]: unknown;
+    };
+    /**
+     * `ca_…`: the connection the trigger watches through.
+     */
+    connected_account_id: string;
+    /**
+     * What it watches: `github.on_repo_event` (a repository's webhook events) or
+     * `github.watch_pull_request` (one pull request's changes). An open string: more kinds may
+     * come.
+     */
+    trigger: string;
+};
+
 export type DeleteFile = {
     /**
      * The branch to commit to; the default branch when left out.
@@ -4274,6 +4295,51 @@ export type ListConnectedAccount = {
     previous_cursor?: string | null;
 };
 
+export type ListTrigger = {
+    data: Array<{
+        config: {
+            [key: string]: unknown;
+        };
+        connected_account_id: string;
+        created_at: string;
+        /**
+         * `tr_…`.
+         */
+        id: string;
+        /**
+         * Why it failed.
+         */
+        last_error?: string | null;
+        /**
+         * When it next checks the provider, for a kind that checks on a schedule.
+         */
+        next_check_at?: string | null;
+        provider: string;
+        /**
+         * `active` (its deliveries are published) or `failed` (the provider refused it; create it
+         * again). An open string.
+         */
+        status: string;
+        /**
+         * The provider's id of what osiris created there: a GitHub repository webhook's id.
+         */
+        subscription_id?: string | null;
+        /**
+         * Its kind, such as `github.on_repo_event`.
+         */
+        trigger: string;
+        updated_at: string;
+    }>;
+    /**
+     * Pass as `after` for the next batch; null on the last.
+     */
+    next_cursor?: string | null;
+    /**
+     * Pass as `before` for the previous batch; null on the first.
+     */
+    previous_cursor?: string | null;
+};
+
 export type LockIssue = {
     issue_number: number;
     /**
@@ -4769,8 +4835,62 @@ export type SyncForkBranchWithUpstream = {
     repo: string;
 };
 
+/**
+ * A trigger, without its secret.
+ */
+export type Trigger = {
+    config: {
+        [key: string]: unknown;
+    };
+    connected_account_id: string;
+    created_at: string;
+    /**
+     * `tr_…`.
+     */
+    id: string;
+    /**
+     * Why it failed.
+     */
+    last_error?: string | null;
+    /**
+     * When it next checks the provider, for a kind that checks on a schedule.
+     */
+    next_check_at?: string | null;
+    provider: string;
+    /**
+     * `active` (its deliveries are published) or `failed` (the provider refused it; create it
+     * again). An open string.
+     */
+    status: string;
+    /**
+     * The provider's id of what osiris created there: a GitHub repository webhook's id.
+     */
+    subscription_id?: string | null;
+    /**
+     * Its kind, such as `github.on_repo_event`.
+     */
+    trigger: string;
+    updated_at: string;
+};
+
 export type TriggerEvent = {
     connected_account_id: string;
+    /**
+     * What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape:
+     * `github.on_repo_event` carries `event` (GitHub's event name), `delivery_id` and `payload`
+     * (GitHub's own); `github.watch_pull_request` carries `pull_request` and `version`.
+     */
+    data?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * The trigger's kind, such as `github.on_repo_event`, on a `trigger.fired` event.
+     */
+    trigger?: string | null;
+    /**
+     * `tr_…`: the trigger that fired, on a `trigger.fired` event.
+     */
+    trigger_id?: string | null;
     /**
      * `connection.active`, `connection.expired` or `connection.revoked`.
      */
@@ -13871,6 +13991,207 @@ export type TriggerEventResponses = {
 };
 
 export type TriggerEventResponse = TriggerEventResponses[keyof TriggerEventResponses];
+
+export type ListTriggersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this connection's triggers.
+         */
+        connected_account_id?: string;
+        /**
+         * A batch's `next_cursor`: the batch after it.
+         */
+        after?: string;
+        /**
+         * A batch's `previous_cursor`: the batch before it.
+         */
+        before?: string;
+        limit?: number;
+    };
+    url: '/v1/triggers';
+};
+
+export type ListTriggersErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+};
+
+export type ListTriggersError = ListTriggersErrors[keyof ListTriggersErrors];
+
+export type ListTriggersResponses = {
+    200: ListTrigger;
+};
+
+export type ListTriggersResponse = ListTriggersResponses[keyof ListTriggersResponses];
+
+export type CreateTriggerData = {
+    body: CreateTrigger;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/triggers';
+};
+
+export type CreateTriggerErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type CreateTriggerError = CreateTriggerErrors[keyof CreateTriggerErrors];
+
+export type CreateTriggerResponses = {
+    201: Trigger;
+};
+
+export type CreateTriggerResponse = CreateTriggerResponses[keyof CreateTriggerResponses];
+
+export type DeleteTriggerData = {
+    body?: never;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/triggers/{id}';
+};
+
+export type DeleteTriggerErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The first request with this `Idempotency-Key` is still running
+     */
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+};
+
+export type DeleteTriggerError = DeleteTriggerErrors[keyof DeleteTriggerErrors];
+
+export type DeleteTriggerResponses = {
+    200: Deleted;
+};
+
+export type DeleteTriggerResponse = DeleteTriggerResponses[keyof DeleteTriggerResponses];
+
+export type RetrieveTriggerData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/triggers/{id}';
+};
+
+export type RetrieveTriggerErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+};
+
+export type RetrieveTriggerError = RetrieveTriggerErrors[keyof RetrieveTriggerErrors];
+
+export type RetrieveTriggerResponses = {
+    200: Trigger;
+};
+
+export type RetrieveTriggerResponse = RetrieveTriggerResponses[keyof RetrieveTriggerResponses];
 
 export type ReceiveEventWebhookPayload = EventDelivery;
 

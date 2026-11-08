@@ -4,7 +4,9 @@
 pub mod account_row;
 pub mod auth_config_row;
 pub mod crypt;
+pub mod trigger_row;
 
 pub use account_row::AccountRow;
 pub use auth_config_row::AuthConfigRow;
 pub use crypt::{decrypt, encrypt};
+pub use trigger_row::TriggerRow;

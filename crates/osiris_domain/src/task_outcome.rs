@@ -17,6 +17,8 @@ pub enum TaskOutcome {
     ConsentExpired,
     /// The event was published.
     Published,
+    /// A trigger was checked at the provider, and its next check scheduled.
+    TriggerChecked,
 }
 
 impl TaskOutcome {
@@ -28,6 +30,7 @@ impl TaskOutcome {
             Self::Failed => "failed",
             Self::ConsentExpired => "consent_expired",
             Self::Published => "published",
+            Self::TriggerChecked => "trigger_checked",
         }
     }
 }

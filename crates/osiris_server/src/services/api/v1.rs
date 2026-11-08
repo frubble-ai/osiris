@@ -11,4 +11,5 @@ pub fn v1() -> OpenApiRouter<ApiState> {
         .merge(routes::connected_accounts::router())
         .merge(routes::actions::router())
         .merge(routes::events::router())
+        .merge(routes::triggers::router())
 }

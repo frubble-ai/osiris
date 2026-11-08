@@ -117,3 +117,8 @@ api_base_url = "https://api.linear.app"
 oauth_base_url = "https://slack.com"
 # Ends with `/`: Slack's methods join onto it.
 api_base_url = "https://slack.com/api/"
+
+[triggers]
+# Between two scheduled checks of a trigger that checks on a schedule (a watched GitHub pull
+# request); its webhook deliveries also check it as they come.
+check_seconds = 300

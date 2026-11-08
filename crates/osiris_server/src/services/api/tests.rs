@@ -15,4 +15,5 @@ mod keys_and_versions;
 mod listing;
 mod refreshing;
 mod releases;
+mod triggers;
 mod unreadable_requests;

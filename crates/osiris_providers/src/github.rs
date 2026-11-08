@@ -20,6 +20,7 @@ pub mod request;
 pub mod revoke;
 pub mod search;
 pub mod transformers;
+pub mod triggers;
 pub mod types;
 pub mod users;
 pub mod workflows;

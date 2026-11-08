@@ -43,9 +43,7 @@ impl Github {
     }
 }
 
-/// Whether GitHub refused with a 404. A refusal's message starts with the status it answered, as
-/// the provider's error reading writes it, since the error carries no status of its own.
+/// Whether GitHub refused with a 404.
 fn is_not_found(error: &ProviderError) -> bool {
-    let status = format!("{}: ", StatusCode::NOT_FOUND);
-    matches!(error, ProviderError::Refused { message, .. } if message.starts_with(&status))
+    error.status() == Some(StatusCode::NOT_FOUND.as_u16())
 }

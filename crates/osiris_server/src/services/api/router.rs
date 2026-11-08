@@ -1,12 +1,17 @@
 //! The API's router: `/v1` behind the body limit, the version header and idempotency keys; the
-//! OAuth callback and `/health` in the open.
+//! OAuth callback, the triggers' deliveries and `/health` in the open.
 
 use super::v1::v1;
 use crate::{
     http::{idempotency::idempotency, state::ApiState, version::serve_version},
     routes,
 };
-use axum::{Router, extract::DefaultBodyLimit, middleware, routing::get};
+use axum::{
+    Router,
+    extract::DefaultBodyLimit,
+    middleware,
+    routing::{get, post},
+};
 use tower_http::{timeout::TimeoutLayer, trace::TraceLayer};
 
 pub fn router(state: ApiState) -> Router {
@@ -20,6 +25,10 @@ pub fn router(state: ApiState) -> Router {
     Router::new()
         .route("/health", get(routes::health::health))
         .route("/oauth/callback", get(routes::oauth_callback::oauth_callback))
+        .route(
+            "/webhooks/triggers/{id}",
+            post(routes::trigger_delivery::trigger_delivery),
+        )
         .merge(v1)
         .layer(TraceLayer::new_for_http().make_span_with(|request: &axum::http::Request<_>| {
             tracing::info_span!("request", method = %request.method(), path = %request.uri().path(), request_id = %osiris_env::request_id::of(request))

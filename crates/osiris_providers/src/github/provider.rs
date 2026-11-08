@@ -1,12 +1,19 @@
 //! GitHub's provider: its OAuth definition, its URLs, and how it ends a grant.
 
-use super::app::AppCredentials;
+use super::{
+    app::AppCredentials,
+    triggers::{
+        ON_REPO_EVENT, RepoEventConfig, WATCH_PULL_REQUEST, WatchPullRequestConfig,
+        receive_delivery::receive_delivery,
+    },
+};
 use crate::{
     InstallationToken, ListLimits, OAuthClient, Provider, ProviderCommon, ProviderError,
-    ProviderUrls,
+    ProviderUrls, TriggerCheck, TriggerReceipt,
 };
 use async_trait::async_trait;
 use osiris_interfaces::oauth::{ClientAuth, OAuth2Definition};
+use reqwest::header::HeaderMap;
 use serde_json::Value;
 use url::Url;
 
@@ -106,6 +113,110 @@ impl Provider for Github {
         let credentials = AppCredentials::read(settings, Some(secret_settings))
             .map_err(|reason| ProviderError::refused("github", reason))?;
         self.mint_installation_token(http, &credentials, installation_id)
+            .await
+    }
+
+    fn validate_trigger(&self, kind: &str, config: &Value) -> Result<(), String> {
+        match kind {
+            ON_REPO_EVENT => RepoEventConfig::read(config).map(|_| ()),
+            WATCH_PULL_REQUEST => WatchPullRequestConfig::read(config).map(|_| ()),
+            _ => Err(format!(
+                "github has no trigger {kind:?}; it has {ON_REPO_EVENT} and {WATCH_PULL_REQUEST}"
+            )),
+        }
+    }
+
+    fn trigger_checks_on_schedule(&self, kind: &str) -> bool {
+        kind == WATCH_PULL_REQUEST
+    }
+
+    async fn subscribe_trigger(
+        &self,
+        http: &reqwest::Client,
+        token: &str,
+        kind: &str,
+        config: &Value,
+        callback_url: &str,
+        secret: &str,
+    ) -> Result<Option<String>, ProviderError> {
+        let refused = |reason: String| ProviderError::refused("github", reason);
+        let (owner, repo, events, insecure_ssl) = match kind {
+            ON_REPO_EVENT => {
+                let config = RepoEventConfig::read(config).map_err(refused)?;
+                (
+                    config.owner,
+                    config.repo,
+                    config.events,
+                    config.insecure_ssl,
+                )
+            }
+            WATCH_PULL_REQUEST => {
+                let config = WatchPullRequestConfig::read(config).map_err(refused)?;
+                (
+                    config.owner,
+                    config.repo,
+                    vec!["pull_request".to_owned()],
+                    false,
+                )
+            }
+            _ => return Err(refused(format!("github has no trigger {kind:?}"))),
+        };
+        self.create_hook(
+            http,
+            token,
+            &owner,
+            &repo,
+            callback_url,
+            secret,
+            &events,
+            insecure_ssl,
+        )
+        .await
+        .map(Some)
+    }
+
+    async fn unsubscribe_trigger(
+        &self,
+        http: &reqwest::Client,
+        token: &str,
+        _kind: &str,
+        config: &Value,
+        subscription_id: &str,
+    ) -> Result<(), ProviderError> {
+        let field = |name: &str| config.get(name).and_then(Value::as_str).unwrap_or_default();
+        let (owner, repo) = (field("owner"), field("repo"));
+        self.delete_hook(http, token, owner, repo, subscription_id)
+            .await
+    }
+
+    fn receive_trigger(
+        &self,
+        kind: &str,
+        config: &Value,
+        headers: &HeaderMap,
+        body: &[u8],
+        secret: &str,
+    ) -> TriggerReceipt {
+        receive_delivery(kind, config, headers, body, secret)
+    }
+
+    async fn check_trigger(
+        &self,
+        http: &reqwest::Client,
+        token: &str,
+        kind: &str,
+        config: &Value,
+        checkpoint: Option<&Value>,
+    ) -> Result<TriggerCheck, ProviderError> {
+        if kind != WATCH_PULL_REQUEST {
+            return Err(ProviderError::refused(
+                "github",
+                format!("{kind} isn't checked on a schedule"),
+            ));
+        }
+        let config = WatchPullRequestConfig::read(config)
+            .map_err(|reason| ProviderError::refused("github", reason))?;
+        self.check_pull_request(http, token, &config, checkpoint)
             .await
     }
 }

@@ -32,7 +32,9 @@ pub trait ProviderCommon: Send + Sync {
         let message = format!("{status}: {body}");
         match status {
             StatusCode::UNAUTHORIZED => ProviderError::unauthorized(self.id(), message),
-            status if status.is_client_error() => ProviderError::refused(self.id(), message),
+            status if status.is_client_error() => {
+                ProviderError::refused_with_status(self.id(), status.as_u16(), message)
+            }
             _ => ProviderError::unavailable(self.id(), message),
         }
     }

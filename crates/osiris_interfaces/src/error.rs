@@ -13,6 +13,8 @@ pub enum ProviderError {
     Refused {
         provider: &'static str,
         message: String,
+        /// The HTTP status it answered, when the refusal came as one.
+        status: Option<u16>,
     },
     /// The provider could not be reached, or answered something we could not read.
     #[error("{provider} failed: {message}")]
@@ -34,6 +36,28 @@ impl ProviderError {
         Self::Refused {
             provider,
             message: message.into(),
+            status: None,
+        }
+    }
+
+    /// A refusal the provider answered with the HTTP status `status`.
+    pub fn refused_with_status(
+        provider: &'static str,
+        status: u16,
+        message: impl Into<String>,
+    ) -> Self {
+        Self::Refused {
+            provider,
+            message: message.into(),
+            status: Some(status),
+        }
+    }
+
+    /// The HTTP status a refusal came with, if it came as one.
+    pub fn status(&self) -> Option<u16> {
+        match self {
+            Self::Refused { status, .. } => *status,
+            _ => None,
         }
     }
 

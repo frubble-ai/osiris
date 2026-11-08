@@ -744,6 +744,12 @@ export const zCreateRepository = z.object({
     private: z.boolean().nullish()
 });
 
+export const zCreateTrigger = z.object({
+    config: z.record(z.string(), z.unknown()),
+    connected_account_id: z.string(),
+    trigger: z.string()
+});
+
 export const zDeleteFile = z.object({
     branch: z.string().nullish(),
     message: z.string(),
@@ -2948,6 +2954,24 @@ export const zListConnectedAccount = z.object({
     previous_cursor: z.string().nullish()
 });
 
+export const zListTrigger = z.object({
+    data: z.array(z.object({
+        config: z.record(z.string(), z.unknown()),
+        connected_account_id: z.string(),
+        created_at: z.iso.datetime(),
+        id: z.string(),
+        last_error: z.string().nullish(),
+        next_check_at: z.iso.datetime().nullish(),
+        provider: z.string(),
+        status: z.string(),
+        subscription_id: z.string().nullish(),
+        trigger: z.string(),
+        updated_at: z.iso.datetime()
+    })),
+    next_cursor: z.string().nullish(),
+    previous_cursor: z.string().nullish()
+});
+
 export const zLockIssue = z.object({
     issue_number: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     lock_reason: z.string().nullish(),
@@ -3263,8 +3287,28 @@ export const zSyncForkBranchWithUpstream = z.object({
     repo: z.string()
 });
 
+/**
+ * A trigger, without its secret.
+ */
+export const zTrigger = z.object({
+    config: z.record(z.string(), z.unknown()),
+    connected_account_id: z.string(),
+    created_at: z.iso.datetime(),
+    id: z.string(),
+    last_error: z.string().nullish(),
+    next_check_at: z.iso.datetime().nullish(),
+    provider: z.string(),
+    status: z.string(),
+    subscription_id: z.string().nullish(),
+    trigger: z.string(),
+    updated_at: z.iso.datetime()
+});
+
 export const zTriggerEvent = z.object({
     connected_account_id: z.string(),
+    data: z.record(z.string(), z.unknown()).nullish(),
+    trigger: z.string().nullish(),
+    trigger_id: z.string().nullish(),
     type: z.string()
 });
 
@@ -5309,6 +5353,39 @@ export const zTriggerEventHeaders = z.object({
 });
 
 export const zTriggerEventResponse = zTriggeredEvent;
+
+export const zListTriggersQuery = z.object({
+    connected_account_id: z.string().optional(),
+    after: z.string().optional(),
+    before: z.string().optional(),
+    limit: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional()
+});
+
+export const zListTriggersResponse = zListTrigger;
+
+export const zCreateTriggerBody = zCreateTrigger;
+
+export const zCreateTriggerHeaders = z.object({
+    'Idempotency-Key': z.string().nullish()
+});
+
+export const zCreateTriggerResponse = zTrigger;
+
+export const zDeleteTriggerHeaders = z.object({
+    'Idempotency-Key': z.string().nullish()
+});
+
+export const zDeleteTriggerPath = z.object({
+    id: z.string()
+});
+
+export const zDeleteTriggerResponse = zDeleted;
+
+export const zRetrieveTriggerPath = z.object({
+    id: z.string()
+});
+
+export const zRetrieveTriggerResponse = zTrigger;
 
 export const zReceiveEventWebhookRequest = z.object({
     body: zEventDelivery,

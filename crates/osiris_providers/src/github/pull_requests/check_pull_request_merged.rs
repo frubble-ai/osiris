@@ -44,13 +44,7 @@ impl Github {
     }
 }
 
-/// Whether GitHub refused with a 404. A refusal's message starts with the status GitHub answered,
-/// as `ProviderCommon::parse_error` writes it.
+/// Whether GitHub refused with a 404.
 fn is_not_found(error: &ProviderError) -> bool {
-    match error {
-        ProviderError::Refused { message, .. } => {
-            message.starts_with(&format!("{}:", StatusCode::NOT_FOUND))
-        }
-        _ => false,
-    }
+    error.status() == Some(StatusCode::NOT_FOUND.as_u16())
 }
