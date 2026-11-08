@@ -401,7 +401,7 @@
         "type": "object"
       },
       "EventDelivery": {
-        "description": "An event as a subscriber receives it on the events topic, written in the API key's pinned\nrelease. The type and the connection's id, never its data: fetch the connection for its state.\n\nFields may be added without a new release, so a subscriber ignores one it doesn't know.",
+        "description": "An event as a subscriber receives it on the events topic, written in the instance's pinned\nrelease. The type and the connection's id, never its data: fetch the connection for its state.\n\nFields may be added without a new release, so a subscriber ignores one it doesn't know.",
         "properties": {
           "connected_account_id": {
             "type": "string"

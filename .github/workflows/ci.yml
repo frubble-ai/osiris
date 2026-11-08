@@ -184,9 +184,15 @@ jobs:
         env:
           BASE_REF: ${{ github.base_ref }}
           OSIRIS_SUNSET: ${{ contains(github.event.pull_request.labels.*.name, 'api-sunset') }}
+        # The base branch's guard judges the pull request, so a pull request can't weaken the check
+        # it is held to; the first pull request to add the guard has no base copy and runs its own.
         run: |
           git fetch -q origin "$BASE_REF"
-          scripts/api-contract-guard.py "origin/$BASE_REF" oasdiff
+          guard="$RUNNER_TEMP/api-contract-guard.py"
+          if ! git show "origin/$BASE_REF:scripts/api-contract-guard.py" > "$guard" 2>/dev/null; then
+            cp scripts/api-contract-guard.py "$guard"
+          fi
+          python3 "$guard" "origin/$BASE_REF" oasdiff
 
   image:
     needs: secret-scan

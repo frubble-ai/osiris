@@ -16,7 +16,7 @@ The first release, a **preview**: its contract may still change until it is cut 
 - Versions: every answer names its release in `Osiris-Version` and its stability in
   `Osiris-Stability`. An answer at a superseded release carries `Deprecation` and `Sunset`.
 - Events carry `osiris_version`, also sent as the message's `osiris_version` attribute, and are
-  written in the API key's pinned release. The events topic is in the spec as its `events` webhook,
+  written in the instance's pinned release. The events topic is in the spec as its `events` webhook,
   with the `EventDelivery` schema.
 - Open strings: an event's `type`, an error's `code`, and GitHub's `account_type` and
   `repository_selection` may gain values without a new release; a client ignores one it doesn't

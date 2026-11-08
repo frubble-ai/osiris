@@ -32,6 +32,12 @@ sqlx database drop -y --database-url "$url" >/dev/null
 sqlx database create --database-url "$url"
 OSIRIS_PROCESS=migrate target/debug/osiris-server
 log="target/schemathesis-server.log"
+# Generated requests carry both keys, so they must only reach the server started here: refuse a
+# port that already answers.
+if curl -s -o /dev/null "http://localhost:$port/health"; then
+  echo "something already answers on port $port; set SCHEMATHESIS_PORT to a free one" >&2
+  exit 1
+fi
 OSIRIS_PROCESS=serve PORT="$port" target/debug/osiris-server > "$log" 2>&1 &
 server=$!
 # Cleanup on the way out: stop the server and wait for it, so its connections are closed before
@@ -54,8 +60,9 @@ for _ in $(seq 1 50); do
   fi
   sleep 0.2
 done
-if [ "$healthy" != true ]; then
-  echo "osiris did not answer /health on port $port within 10 seconds; its log:" >&2
+# The server started here must still be running: one that failed to bind has exited.
+if [ "$healthy" != true ] || ! kill -0 "$server" 2>/dev/null; then
+  echo "the osiris started here did not answer /health on port $port within 10 seconds; its log:" >&2
   cat "$log" >&2
   exit 1
 fi

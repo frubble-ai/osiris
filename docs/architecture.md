@@ -175,7 +175,7 @@ An event says what happened and to which connection, never the connection's data
 right after the change that caused it; if publishing fails, an `event.publish` task named after the
 event publishes it again. If that task cannot be scheduled either, the event is lost and this is
 logged. Clients ignore an event they have already received, by its `event_id`. An event is written
-in the API key's pinned release (`osiris_version`), taken back through the same version changes as
+in the instance's pinned release (`osiris_version`), taken back through the same version changes as
 answers ([API versioning](api-versioning.md)).
 
 ## Idempotency keys

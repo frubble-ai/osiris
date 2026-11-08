@@ -39,8 +39,9 @@ For coding agents working in this repository. Start with README.md.
 - A change to what the API answers or the events say keeps every stable release working, or
   waits for the next release as a version change ([api-versioning](docs/api-versioning.md) says
   what breaks). Values that grow are open strings, never closed answer enums. Run `just openapi`
-  and commit the specs; record golden transcripts with `OSIRIS_GOLDEN=record just test golden`
-  only for a preview.
+  and commit the specs. Record only the preview's golden transcripts, with
+  `OSIRIS_GOLDEN=record just test golden::releases::<god>`, then replay every release with
+  `just test golden`.
 - Docs change in the same pull request as the architecture they describe.
 - `just check` passes before a commit. Branch from `dev`; pull requests target `dev` with the
   template filled. Commit messages and PR titles are Conventional Commits.

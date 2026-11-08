@@ -5,7 +5,8 @@ and stateless events. It changes only if those rules change, and that is not exp
 
 The version is a **release**: a date and a god of the Egyptian pantheon, in alphabetical order
 (`2026-11-04.anubis`, then bastet, …). A request names it in `Osiris-Version`. One naming none is
-served at the API key's pinned release (`[api] pinned_version`), and one naming a release osiris
+served at the instance's pinned release (`[api] pinned_version`, one setting for the whole
+instance, whichever key a request carries), and one naming a release osiris
 doesn't serve is refused (`OS_07`). Every answer names the release it was served at
 (`Osiris-Version`) and whether it is a preview (`Osiris-Stability`). Events are written in the
 pinned release and say so in `osiris_version`.
@@ -95,7 +96,7 @@ is still served until a pull request removes it.
 | Golden transcripts | `services/api/tests/golden` | a release no longer doing what was recorded for it: a field gone or changed, a status, a header, an event |
 | Release rules | `osiris_versioning`'s tests, and `services/api/tests/releases.rs` for each spec and changelog | releases out of date, name or number order, a preview that isn't the newest, a later release without its changes, a current spec that doesn't name the current release |
 | Specs match the routes | `just openapi-check`, CI | a committed spec that isn't what the code generates |
-| Stable releases break nothing | `just contract-check`, CI's Contract job | an oasdiff error or warning in a stable release's spec, a stable release made a preview, removed without the label or before its sunset, a stable release's golden transcript changed |
+| Stable releases break nothing | `just contract-check`, CI's Contract job (the base branch's copy of the guard, so a pull request can't weaken it; it feeds the required `Osiris - Code Quality Summary`) | an oasdiff error or warning in a stable release's spec, a stable release made a preview, removed without the label or before its sunset, a stable release's golden transcript changed |
 | Schemathesis | `just schemathesis` (`scripts/schemathesis/`), CI's Tests job | a live osiris answering a generated request at any release and key with an undocumented status, content type or body, or a server error |
 | Client release line | `npm run check`, the publish step | a client sending another release than its spec's, a major version that isn't its release's number (`info.x-osiris-release-number`), a preview published on latest |
 
@@ -158,7 +159,9 @@ From its date, the release before is deprecated, and its sunset is `support_days
 
 Only the oldest release, only past its sunset, in a pull request labelled `api-sunset`. Releases
 are removed oldest first, so the ones left keep consecutive numbers, which the release rules check.
-The Contract job checks the label and that the day is past the next release's date plus the
+Add the label before the last push: the required `Osiris - Code Quality Summary` check comes from
+the run for the code, and a label added later re-runs only the Contract job. The Contract job
+checks the label and that the day is past the next release's date plus the
 longest support window clients were promised: the base branch's documented `support_days`
 (`config.example.toml`), the pull request's, or `OSIRIS__API__SUPPORT_DAYS` when a deployment
 sets its own (set it for the job too). With none of them known, the removal is refused. The
@@ -167,6 +170,6 @@ newest release has no sunset, so it is never removed.
 2. The next release becomes the first: delete the version changes that only served the removed
    one, and empty that release's `changes`.
 
-Clients still pinned to it get `OS_07`, so move the API key's `pinned_version` first.
+Clients still pinned to it get `OS_07`, so move the instance's `pinned_version` first.
 
 Each release's changes for clients go in [`changelog/`](changelog/).
