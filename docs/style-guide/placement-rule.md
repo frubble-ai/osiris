@@ -43,6 +43,8 @@ its reason in `scripts/placement-check.py`:
 - generated artifacts: `api-reference/`, `.sqlx/`, the lockfiles and the client's generated code;
 - the init migration, already applied, which seeded the first providers' rows;
 - the hosting platform's own files and names, which a provider may share: `.github/`,
-  `.gitleaksignore`, `deny.toml`, and on any line `.github/` paths, `github.com` and
+  `.gitleaksignore`, `deny.toml`, the client's release script and its tests
+  (`clients/typescript/publish-release.mjs` and `publish-release.test.mjs`, which call the
+  platform's API and package registry), and on any line `.github/` paths, `github.com` and
   `github.io` links and CI variables such as `GITHUB_STEP_SUMMARY`. Shared code and tests use none
   of them as fixtures.

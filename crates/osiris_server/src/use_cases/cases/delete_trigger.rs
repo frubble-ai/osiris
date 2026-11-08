@@ -1,6 +1,7 @@
-//! Deletes a trigger: its subscription ended at the provider when its connection still reaches it
-//! (a failure there is logged, and the trigger deleted all the same), its scheduled check
-//! cancelled, and the trigger removed.
+//! Deletes a trigger: its subscription ended at the provider, its scheduled check cancelled, and
+//! the trigger removed. A provider that can't be reached keeps the trigger, so the delete can be
+//! tried again; a refusal, or a connection that no longer reaches the provider, is logged and the
+//! trigger removed all the same.
 
 use crate::use_cases::{
     UseCaseResult, UseCases, cases::end_trigger_subscription::EndTriggerSubscriptionArgs,

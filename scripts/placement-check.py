@@ -29,6 +29,8 @@ EXEMPT = [
     ".github/",
     ".gitleaksignore",
     "deny.toml",
+    # The client's release script and its tests call the platform's API and package registry to
+    # publish.
     "clients/typescript/publish-release.mjs",
     "clients/typescript/publish-release.test.mjs",
     # This check, which names the hosting platform's references it leaves out, and its tests.
