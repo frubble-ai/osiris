@@ -5,25 +5,52 @@ import * as z from 'zod';
 /**
  * An action's answer: what it read, as `data`.
  */
-export const zActionResultVecGithubInstallation = z.object({
-    data: z.array(z.object({
-        account: z.string(),
+export const zActionResultGithubBranch = z.object({
+    data: z.object({
+        commit_sha: z.string(),
+        name: z.string(),
+        protected: z.boolean()
+    })
+});
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export const zActionResultGithubCurrentUser = z.object({
+    data: z.object({
         account_type: z.string(),
+        avatar_url: z.string(),
+        bio: z.string().nullish(),
+        company: z.string().nullish(),
+        email: z.string().nullish(),
         id: z.string(),
-        repository_selection: z.string()
+        location: z.string().nullish(),
+        login: z.string(),
+        name: z.string().nullish(),
+        url: z.string()
+    })
+});
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export const zActionResultVecGithubBranch = z.object({
+    data: z.array(z.object({
+        commit_sha: z.string(),
+        name: z.string(),
+        protected: z.boolean()
     }))
 });
 
 /**
  * An action's answer: what it read, as `data`.
  */
-export const zActionResultVecGithubRepository = z.object({
+export const zActionResultVecGithubInstallation = z.object({
     data: z.array(z.object({
-        description: z.string().nullish(),
-        full_name: z.string(),
+        account: z.string(),
+        account_type: z.string(),
         id: z.string(),
-        private: z.boolean(),
-        url: z.string()
+        repository_selection: z.string()
     }))
 });
 
@@ -132,6 +159,42 @@ export const zEventDelivery = z.object({
     version: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' })
 });
 
+export const zGetBranch = z.object({
+    branch: z.string(),
+    owner: z.string(),
+    repo: z.string()
+});
+
+export const zGetRepository = z.object({
+    owner: z.string(),
+    repo: z.string()
+});
+
+/**
+ * A branch: its name, the commit it points at, and whether it is protected.
+ */
+export const zGithubBranch = z.object({
+    commit_sha: z.string(),
+    name: z.string(),
+    protected: z.boolean()
+});
+
+/**
+ * The authenticated user, with their profile.
+ */
+export const zGithubCurrentUser = z.object({
+    account_type: z.string(),
+    avatar_url: z.string(),
+    bio: z.string().nullish(),
+    company: z.string().nullish(),
+    email: z.string().nullish(),
+    id: z.string(),
+    location: z.string().nullish(),
+    login: z.string(),
+    name: z.string().nullish(),
+    url: z.string()
+});
+
 /**
  * Where our GitHub App is installed: an account or organization.
  */
@@ -143,14 +206,72 @@ export const zGithubInstallation = z.object({
 });
 
 /**
- * A repository our GitHub App reads, through one of its installations.
+ * A GitHub account, as another resource names it (an owner, an author, an assignee).
+ */
+export const zGithubUser = z.object({
+    account_type: z.string(),
+    avatar_url: z.string(),
+    id: z.string(),
+    login: z.string(),
+    url: z.string()
+});
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export const zActionResultGithubRepository = z.object({
+    data: z.object({
+        clone_url: z.string(),
+        default_branch: z.string(),
+        description: z.string().nullish(),
+        fork: z.boolean(),
+        full_name: z.string(),
+        id: z.string(),
+        name: z.string(),
+        owner: zGithubUser,
+        private: z.boolean(),
+        ssh_url: z.string(),
+        url: z.string(),
+        visibility: z.string()
+    })
+});
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export const zActionResultVecGithubRepository = z.object({
+    data: z.array(z.object({
+        clone_url: z.string(),
+        default_branch: z.string(),
+        description: z.string().nullish(),
+        fork: z.boolean(),
+        full_name: z.string(),
+        id: z.string(),
+        name: z.string(),
+        owner: zGithubUser,
+        private: z.boolean(),
+        ssh_url: z.string(),
+        url: z.string(),
+        visibility: z.string()
+    }))
+});
+
+/**
+ * A repository.
  */
 export const zGithubRepository = z.object({
+    clone_url: z.string(),
+    default_branch: z.string(),
     description: z.string().nullish(),
+    fork: z.boolean(),
     full_name: z.string(),
     id: z.string(),
+    name: z.string(),
+    owner: zGithubUser,
     private: z.boolean(),
-    url: z.string()
+    ssh_url: z.string(),
+    url: z.string(),
+    visibility: z.string()
 });
 
 /**
@@ -159,6 +280,14 @@ export const zGithubRepository = z.object({
 export const zLinearTeam = z.object({
     id: z.string(),
     name: z.string()
+});
+
+export const zListBranches = z.object({
+    owner: z.string(),
+    page: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).nullish(),
+    per_page: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).nullish(),
+    protected: z.boolean().nullish(),
+    repo: z.string()
 });
 
 export const zListAuthConfig = z.object({
@@ -301,6 +430,52 @@ export const zRetrieveConnectedAccountPath = z.object({
 });
 
 export const zRetrieveConnectedAccountResponse = zConnectedAccount;
+
+export const zGithubGetBranchBody = zGetBranch;
+
+export const zGithubGetBranchHeaders = z.object({
+    'Idempotency-Key': z.string().nullish()
+});
+
+export const zGithubGetBranchPath = z.object({
+    id: z.string()
+});
+
+export const zGithubGetBranchResponse = zActionResultGithubBranch;
+
+export const zGithubGetCurrentUserHeaders = z.object({
+    'Idempotency-Key': z.string().nullish()
+});
+
+export const zGithubGetCurrentUserPath = z.object({
+    id: z.string()
+});
+
+export const zGithubGetCurrentUserResponse = zActionResultGithubCurrentUser;
+
+export const zGithubGetRepositoryBody = zGetRepository;
+
+export const zGithubGetRepositoryHeaders = z.object({
+    'Idempotency-Key': z.string().nullish()
+});
+
+export const zGithubGetRepositoryPath = z.object({
+    id: z.string()
+});
+
+export const zGithubGetRepositoryResponse = zActionResultGithubRepository;
+
+export const zGithubListBranchesBody = zListBranches;
+
+export const zGithubListBranchesHeaders = z.object({
+    'Idempotency-Key': z.string().nullish()
+});
+
+export const zGithubListBranchesPath = z.object({
+    id: z.string()
+});
+
+export const zGithubListBranchesResponse = zActionResultVecGithubBranch;
 
 export const zGithubListInstallationsHeaders = z.object({
     'Idempotency-Key': z.string().nullish()

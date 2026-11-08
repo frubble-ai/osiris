@@ -17,6 +17,9 @@ pub enum DomainError {
     ProviderUnavailable(String),
     #[error("the connection is {0}: reconnect it")]
     NotActive(&'static str),
+    /// The connection wasn't granted a scope the action needs; reconnecting with it fixes that.
+    #[error("the connection lacks the scopes this action needs: {0}")]
+    MissingScopes(String),
     #[error("an internal error")]
     Internal,
 }

@@ -46,5 +46,11 @@ pub async fn call<T: DeserializeOwned, B: Serialize>(
     if !status.is_success() {
         return Err(provider.parse_error(status, &body));
     }
-    serde_json::from_str(&body).map_err(|error| ProviderError::unavailable(provider.id(), error))
+    // An empty answer (a 204) reads as JSON null, so `()` or an `Option` stands for it.
+    let body = if body.trim().is_empty() {
+        "null"
+    } else {
+        body.as_str()
+    };
+    serde_json::from_str(body).map_err(|error| ProviderError::unavailable(provider.id(), error))
 }

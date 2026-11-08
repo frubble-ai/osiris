@@ -4,8 +4,8 @@ import * as z from 'zod';
 
 import { client } from './client.gen.js';
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client/index.js';
-import type { CreateAuthConfigData, CreateAuthConfigErrors, CreateAuthConfigResponses, CreateConnectedAccountData, CreateConnectedAccountErrors, CreateConnectedAccountResponses, DeleteAuthConfigData, DeleteAuthConfigErrors, DeleteAuthConfigResponses, DeleteConnectedAccountData, DeleteConnectedAccountErrors, DeleteConnectedAccountResponses, GithubListInstallationsData, GithubListInstallationsErrors, GithubListInstallationsResponses, GithubListRepositoriesData, GithubListRepositoriesErrors, GithubListRepositoriesResponses, LinearListTeamsData, LinearListTeamsErrors, LinearListTeamsResponses, ListAuthConfigsData, ListAuthConfigsErrors, ListAuthConfigsResponses, ListConnectedAccountsData, ListConnectedAccountsErrors, ListConnectedAccountsResponses, RefreshConnectedAccountData, RefreshConnectedAccountErrors, RefreshConnectedAccountResponses, RetrieveAuthConfigData, RetrieveAuthConfigErrors, RetrieveAuthConfigResponses, RetrieveConnectedAccountData, RetrieveConnectedAccountErrors, RetrieveConnectedAccountResponses, SlackListChannelsData, SlackListChannelsErrors, SlackListChannelsResponses, TriggerEventData, TriggerEventErrors, TriggerEventResponses, UpdateAuthConfigData, UpdateAuthConfigErrors, UpdateAuthConfigResponses } from './types.gen.js';
-import { zCreateAuthConfigBody, zCreateAuthConfigHeaders, zCreateAuthConfigResponse, zCreateConnectedAccountBody, zCreateConnectedAccountHeaders, zCreateConnectedAccountResponse, zDeleteAuthConfigHeaders, zDeleteAuthConfigPath, zDeleteAuthConfigResponse, zDeleteConnectedAccountHeaders, zDeleteConnectedAccountPath, zDeleteConnectedAccountResponse, zGithubListInstallationsHeaders, zGithubListInstallationsPath, zGithubListInstallationsResponse, zGithubListRepositoriesHeaders, zGithubListRepositoriesPath, zGithubListRepositoriesResponse, zLinearListTeamsHeaders, zLinearListTeamsPath, zLinearListTeamsResponse, zListAuthConfigsQuery, zListAuthConfigsResponse, zListConnectedAccountsQuery, zListConnectedAccountsResponse, zRefreshConnectedAccountHeaders, zRefreshConnectedAccountPath, zRefreshConnectedAccountResponse, zRetrieveAuthConfigPath, zRetrieveAuthConfigResponse, zRetrieveConnectedAccountPath, zRetrieveConnectedAccountResponse, zSlackListChannelsHeaders, zSlackListChannelsPath, zSlackListChannelsResponse, zTriggerEventBody, zTriggerEventHeaders, zTriggerEventResponse, zUpdateAuthConfigBody, zUpdateAuthConfigPath, zUpdateAuthConfigResponse } from './zod.gen.js';
+import type { CreateAuthConfigData, CreateAuthConfigErrors, CreateAuthConfigResponses, CreateConnectedAccountData, CreateConnectedAccountErrors, CreateConnectedAccountResponses, DeleteAuthConfigData, DeleteAuthConfigErrors, DeleteAuthConfigResponses, DeleteConnectedAccountData, DeleteConnectedAccountErrors, DeleteConnectedAccountResponses, GithubGetBranchData, GithubGetBranchErrors, GithubGetBranchResponses, GithubGetCurrentUserData, GithubGetCurrentUserErrors, GithubGetCurrentUserResponses, GithubGetRepositoryData, GithubGetRepositoryErrors, GithubGetRepositoryResponses, GithubListBranchesData, GithubListBranchesErrors, GithubListBranchesResponses, GithubListInstallationsData, GithubListInstallationsErrors, GithubListInstallationsResponses, GithubListRepositoriesData, GithubListRepositoriesErrors, GithubListRepositoriesResponses, LinearListTeamsData, LinearListTeamsErrors, LinearListTeamsResponses, ListAuthConfigsData, ListAuthConfigsErrors, ListAuthConfigsResponses, ListConnectedAccountsData, ListConnectedAccountsErrors, ListConnectedAccountsResponses, RefreshConnectedAccountData, RefreshConnectedAccountErrors, RefreshConnectedAccountResponses, RetrieveAuthConfigData, RetrieveAuthConfigErrors, RetrieveAuthConfigResponses, RetrieveConnectedAccountData, RetrieveConnectedAccountErrors, RetrieveConnectedAccountResponses, SlackListChannelsData, SlackListChannelsErrors, SlackListChannelsResponses, TriggerEventData, TriggerEventErrors, TriggerEventResponses, UpdateAuthConfigData, UpdateAuthConfigErrors, UpdateAuthConfigResponses } from './types.gen.js';
+import { zCreateAuthConfigBody, zCreateAuthConfigHeaders, zCreateAuthConfigResponse, zCreateConnectedAccountBody, zCreateConnectedAccountHeaders, zCreateConnectedAccountResponse, zDeleteAuthConfigHeaders, zDeleteAuthConfigPath, zDeleteAuthConfigResponse, zDeleteConnectedAccountHeaders, zDeleteConnectedAccountPath, zDeleteConnectedAccountResponse, zGithubGetBranchBody, zGithubGetBranchHeaders, zGithubGetBranchPath, zGithubGetBranchResponse, zGithubGetCurrentUserHeaders, zGithubGetCurrentUserPath, zGithubGetCurrentUserResponse, zGithubGetRepositoryBody, zGithubGetRepositoryHeaders, zGithubGetRepositoryPath, zGithubGetRepositoryResponse, zGithubListBranchesBody, zGithubListBranchesHeaders, zGithubListBranchesPath, zGithubListBranchesResponse, zGithubListInstallationsHeaders, zGithubListInstallationsPath, zGithubListInstallationsResponse, zGithubListRepositoriesHeaders, zGithubListRepositoriesPath, zGithubListRepositoriesResponse, zLinearListTeamsHeaders, zLinearListTeamsPath, zLinearListTeamsResponse, zListAuthConfigsQuery, zListAuthConfigsResponse, zListConnectedAccountsQuery, zListConnectedAccountsResponse, zRefreshConnectedAccountHeaders, zRefreshConnectedAccountPath, zRefreshConnectedAccountResponse, zRetrieveAuthConfigPath, zRetrieveAuthConfigResponse, zRetrieveConnectedAccountPath, zRetrieveConnectedAccountResponse, zSlackListChannelsHeaders, zSlackListChannelsPath, zSlackListChannelsResponse, zTriggerEventBody, zTriggerEventHeaders, zTriggerEventResponse, zUpdateAuthConfigBody, zUpdateAuthConfigPath, zUpdateAuthConfigResponse } from './zod.gen.js';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -207,6 +207,98 @@ export const retrieveConnectedAccount = <ThrowOnError extends boolean = false>(o
         }],
     url: '/v1/connected-accounts/{id}',
     ...options
+});
+
+/**
+ * A branch, by name.
+ */
+export const githubGetBranch = <ThrowOnError extends boolean = false>(options: Options<GithubGetBranchData, ThrowOnError>): RequestResult<GithubGetBranchResponses, GithubGetBranchErrors, ThrowOnError> => (options.client ?? client).post<GithubGetBranchResponses, GithubGetBranchErrors, ThrowOnError>({
+    requestValidator: async (data) => await z.object({
+        body: zGithubGetBranchBody,
+        headers: zGithubGetBranchHeaders.optional(),
+        path: zGithubGetBranchPath,
+        query: z.never().optional()
+    }).parseAsync(data),
+    responseValidator: async (data) => await zGithubGetBranchResponse.parseAsync(data),
+    security: [{
+            key: 'api_key',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/v1/connected-accounts/{id}/actions/github.get_branch',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * The authenticated user and their profile.
+ */
+export const githubGetCurrentUser = <ThrowOnError extends boolean = false>(options: Options<GithubGetCurrentUserData, ThrowOnError>): RequestResult<GithubGetCurrentUserResponses, GithubGetCurrentUserErrors, ThrowOnError> => (options.client ?? client).post<GithubGetCurrentUserResponses, GithubGetCurrentUserErrors, ThrowOnError>({
+    requestValidator: async (data) => await z.object({
+        body: z.never().optional(),
+        headers: zGithubGetCurrentUserHeaders.optional(),
+        path: zGithubGetCurrentUserPath,
+        query: z.never().optional()
+    }).parseAsync(data),
+    responseValidator: async (data) => await zGithubGetCurrentUserResponse.parseAsync(data),
+    security: [{
+            key: 'api_key',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/v1/connected-accounts/{id}/actions/github.get_current_user',
+    ...options
+});
+
+/**
+ * A repository, by owner and name.
+ */
+export const githubGetRepository = <ThrowOnError extends boolean = false>(options: Options<GithubGetRepositoryData, ThrowOnError>): RequestResult<GithubGetRepositoryResponses, GithubGetRepositoryErrors, ThrowOnError> => (options.client ?? client).post<GithubGetRepositoryResponses, GithubGetRepositoryErrors, ThrowOnError>({
+    requestValidator: async (data) => await z.object({
+        body: zGithubGetRepositoryBody,
+        headers: zGithubGetRepositoryHeaders.optional(),
+        path: zGithubGetRepositoryPath,
+        query: z.never().optional()
+    }).parseAsync(data),
+    responseValidator: async (data) => await zGithubGetRepositoryResponse.parseAsync(data),
+    security: [{
+            key: 'api_key',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/v1/connected-accounts/{id}/actions/github.get_repository',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * A repository's branches, a page at a time.
+ */
+export const githubListBranches = <ThrowOnError extends boolean = false>(options: Options<GithubListBranchesData, ThrowOnError>): RequestResult<GithubListBranchesResponses, GithubListBranchesErrors, ThrowOnError> => (options.client ?? client).post<GithubListBranchesResponses, GithubListBranchesErrors, ThrowOnError>({
+    requestValidator: async (data) => await z.object({
+        body: zGithubListBranchesBody,
+        headers: zGithubListBranchesHeaders.optional(),
+        path: zGithubListBranchesPath,
+        query: z.never().optional()
+    }).parseAsync(data),
+    responseValidator: async (data) => await zGithubListBranchesResponse.parseAsync(data),
+    security: [{
+            key: 'api_key',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/v1/connected-accounts/{id}/actions/github.list_branches',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**

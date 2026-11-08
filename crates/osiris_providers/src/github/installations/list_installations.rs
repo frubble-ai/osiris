@@ -1,12 +1,24 @@
 //! `github.list_installations`: where our GitHub App is installed, of what the user can see.
 
-use super::{
+use crate::ProviderError;
+use crate::github::{
     Github,
     get_page::{PER_PAGE, get_page},
-    transformers::InstallationsPage,
+    transformers::installation::InstallationsPage,
     types::GithubInstallation,
 };
-use crate::ProviderError;
+use serde::Deserialize;
+use utoipa::ToSchema;
+
+/// No input: the installations are those the connection's user can see.
+#[derive(Debug, Default, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ListInstallations {}
+
+impl ListInstallations {
+    /// None: a GitHub App's user token reaches what the app is installed on.
+    pub const SCOPES: &[&str] = &[];
+}
 
 impl Github {
     /// Every installation, across pages, up to `max_items`.
@@ -14,6 +26,7 @@ impl Github {
         &self,
         http: &reqwest::Client,
         token: &str,
+        _input: &ListInstallations,
     ) -> Result<Vec<GithubInstallation>, ProviderError> {
         let mut all: Vec<GithubInstallation> = Vec::new();
         let mut page = 1;

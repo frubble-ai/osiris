@@ -23,6 +23,7 @@ impl UseCases {
                 id: args.id,
                 provider: "slack",
                 action: "slack.list_channels",
+                required_scopes: &[],
                 call: move |token: Secret| async move {
                     provider.list_channels(http, token.expose_secret()).await
                 },

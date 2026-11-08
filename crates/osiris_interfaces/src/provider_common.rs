@@ -15,6 +15,12 @@ pub trait ProviderCommon: Send + Sync {
     /// Its API's base URL, from `[providers]` in the settings.
     fn base_url(&self) -> &Url;
 
+    /// Whether a granted scope covers a `required` one: the same scope by default. A provider whose
+    /// scopes nest (GitHub's `repo` covers `repo:status`) overrides it.
+    fn scope_covers(&self, granted: &str, required: &str) -> bool {
+        granted == required
+    }
+
     /// The header a request carries the token in. A bearer token by default.
     fn auth_header(&self, token: &str) -> (HeaderName, String) {
         (AUTHORIZATION, format!("Bearer {token}"))

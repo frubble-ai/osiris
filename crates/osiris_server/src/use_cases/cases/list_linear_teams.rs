@@ -23,6 +23,7 @@ impl UseCases {
                 id: args.id,
                 provider: "linear",
                 action: "linear.list_teams",
+                required_scopes: &[],
                 call: move |token: Secret| async move {
                     provider.list_teams(http, token.expose_secret()).await
                 },

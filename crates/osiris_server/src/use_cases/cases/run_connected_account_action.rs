@@ -19,6 +19,8 @@ pub struct RunConnectedAccountActionArgs<'a, F> {
     pub id: &'a str,
     pub provider: &'a str,
     pub action: &'a str,
+    /// The scopes the action needs, checked before the call.
+    pub required_scopes: &'a [&'a str],
     /// The provider call, given the token.
     pub call: F,
 }
@@ -37,6 +39,7 @@ impl UseCases {
                 id,
                 provider: provider_id,
                 action,
+                required_scopes,
                 call,
             } = args;
             let token = self
@@ -44,6 +47,7 @@ impl UseCases {
                     id,
                     provider: provider_id,
                     action,
+                    required_scopes,
                 })
                 .await?;
             let first = match call(token).await {

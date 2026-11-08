@@ -8,6 +8,7 @@
 
 use super::{
     Github,
+    installations::{ListInstallations, ListRepositories},
     mocks::{
         MockGithubNetwork, generate_github_installation::generate_github_installation,
         generate_github_repository::generate_github_repository,
@@ -47,7 +48,7 @@ async fn lists_the_installations_the_user_can_see_with_their_token() {
         .await;
 
     let listed = github(&server, LIMITS)
-        .list_installations(&reqwest::Client::new(), "the-token")
+        .list_installations(&reqwest::Client::new(), "the-token", &ListInstallations {})
         .await
         .unwrap();
 
@@ -79,7 +80,7 @@ async fn passes_values_github_adds_on_instead_of_refusing_the_page(
         .await;
 
     let listed = github(&server, LIMITS)
-        .list_installations(&reqwest::Client::new(), "the-token")
+        .list_installations(&reqwest::Client::new(), "the-token", &ListInstallations {})
         .await
         .unwrap();
 
@@ -119,7 +120,7 @@ async fn lists_every_repository_once_across_installations_and_pages() {
         .await;
 
     let repositories = github(&server, LIMITS)
-        .list_repositories(&reqwest::Client::new(), "token")
+        .list_repositories(&reqwest::Client::new(), "token", &ListRepositories {})
         .await
         .unwrap();
 
@@ -153,7 +154,7 @@ async fn stops_reading_repositories_at_the_cap() {
             max_items: 50,
         },
     )
-    .list_repositories(&reqwest::Client::new(), "token")
+    .list_repositories(&reqwest::Client::new(), "token", &ListRepositories {})
     .await
     .unwrap();
 
@@ -171,7 +172,7 @@ async fn tells_a_rejected_token_from_a_refusal(#[case] status: u16, #[case] reje
         .await;
 
     let error = github(&server, LIMITS)
-        .list_installations(&reqwest::Client::new(), "token")
+        .list_installations(&reqwest::Client::new(), "token", &ListInstallations {})
         .await
         .unwrap_err();
 

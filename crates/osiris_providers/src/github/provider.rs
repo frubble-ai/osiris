@@ -39,6 +39,27 @@ impl ProviderCommon for Github {
     fn base_url(&self) -> &Url {
         &self.api_base
     }
+
+    /// GitHub's scopes nest: `repo` covers `repo:status` and the other `repo:` scopes, `user`
+    /// covers `read:user` and `user:email`, and `write:` and `admin:` cover the `read:` of the
+    /// same thing (GitHub's scope docs).
+    fn scope_covers(&self, granted: &str, required: &str) -> bool {
+        if granted == required {
+            return true;
+        }
+        match (granted, required) {
+            ("repo", needed) => needed.starts_with("repo:") || needed == "public_repo",
+            ("user", "read:user" | "user:email" | "user:follow") => true,
+            (wider, needed) => {
+                let Some(thing) = needed.strip_prefix("read:") else {
+                    return needed
+                        .strip_prefix("write:")
+                        .is_some_and(|thing| wider == format!("admin:{thing}"));
+                };
+                wider == format!("write:{thing}") || wider == format!("admin:{thing}")
+            }
+        }
+    }
 }
 
 #[async_trait]

@@ -1,6 +1,205 @@
 {
   "components": {
     "schemas": {
+      "ActionResult_GithubBranch": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A branch: its name, the commit it points at, and whether it is protected.",
+            "properties": {
+              "commit_sha": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "protected": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name",
+              "commit_sha",
+              "protected"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubCurrentUser": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "The authenticated user, with their profile.",
+            "properties": {
+              "account_type": {
+                "description": "`User` or `Bot` today. An open string.",
+                "type": "string"
+              },
+              "avatar_url": {
+                "type": "string"
+              },
+              "bio": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "company": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "location": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "login": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "login",
+              "avatar_url",
+              "url",
+              "account_type"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubRepository": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A repository.",
+            "properties": {
+              "clone_url": {
+                "type": "string"
+              },
+              "default_branch": {
+                "type": "string"
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "fork": {
+                "type": "boolean"
+              },
+              "full_name": {
+                "description": "`owner/name`.",
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "owner": {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              "private": {
+                "type": "boolean"
+              },
+              "ssh_url": {
+                "type": "string"
+              },
+              "url": {
+                "description": "Its page on GitHub.",
+                "type": "string"
+              },
+              "visibility": {
+                "description": "`public`, `private` or `internal` today. An open string.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "full_name",
+              "private",
+              "url",
+              "clone_url",
+              "ssh_url",
+              "default_branch",
+              "visibility",
+              "fork",
+              "owner"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_Vec_GithubBranch": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A branch: its name, the commit it points at, and whether it is protected.",
+              "properties": {
+                "commit_sha": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "protected": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "name",
+                "commit_sha",
+                "protected"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
       "ActionResult_Vec_GithubInstallation": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -45,13 +244,22 @@
         "properties": {
           "data": {
             "items": {
-              "description": "A repository our GitHub App reads, through one of its installations.",
+              "description": "A repository.",
               "properties": {
+                "clone_url": {
+                  "type": "string"
+                },
+                "default_branch": {
+                  "type": "string"
+                },
                 "description": {
                   "type": [
                     "string",
                     "null"
                   ]
+                },
+                "fork": {
+                  "type": "boolean"
                 },
                 "full_name": {
                   "description": "`owner/name`.",
@@ -60,18 +268,39 @@
                 "id": {
                   "type": "string"
                 },
+                "name": {
+                  "type": "string"
+                },
+                "owner": {
+                  "$ref": "#/components/schemas/GithubUser"
+                },
                 "private": {
                   "type": "boolean"
                 },
+                "ssh_url": {
+                  "type": "string"
+                },
                 "url": {
+                  "description": "Its page on GitHub.",
+                  "type": "string"
+                },
+                "visibility": {
+                  "description": "`public`, `private` or `internal` today. An open string.",
                   "type": "string"
                 }
               },
               "required": [
                 "id",
+                "name",
                 "full_name",
                 "private",
-                "url"
+                "url",
+                "clone_url",
+                "ssh_url",
+                "default_branch",
+                "visibility",
+                "fork",
+                "owner"
               ],
               "type": "object"
             },
@@ -382,14 +611,14 @@
       "ErrorDetail": {
         "properties": {
           "code": {
-            "description": "`OS_00` unauthorized, `OS_01` not found, `OS_02` invalid request, `OS_03` conflict,\n`OS_04` provider refused, `OS_05` provider unavailable, `OS_06` connection not active,\n`OS_07` unknown version, `OS_08` idempotency key reused, `OS_09` request in flight,\n`OS_10` body too large, `OS_99` internal. An open string: codes may be added.",
+            "description": "`OS_00` unauthorized, `OS_01` not found, `OS_02` invalid request, `OS_03` conflict,\n`OS_04` provider refused, `OS_05` provider unavailable, `OS_06` connection not active,\n`OS_07` unknown version, `OS_08` idempotency key reused, `OS_09` request in flight,\n`OS_10` body too large, `OS_11` missing scopes, `OS_99` internal. An open string: codes may\nbe added.",
             "type": "string"
           },
           "message": {
             "type": "string"
           },
           "type": {
-            "description": "`unauthorized`, `not_found`, `invalid_request`, `conflict`, `provider_refused`,\n`provider_unavailable`, `connection_not_active`, `unknown_version`, `idempotency_mismatch`,\n`in_flight`, `too_large`, `internal`.",
+            "description": "`unauthorized`, `not_found`, `invalid_request`, `conflict`, `provider_refused`,\n`provider_unavailable`, `connection_not_active`, `unknown_version`, `idempotency_mismatch`,\n`in_flight`, `too_large`, `missing_scopes`, `internal`.",
             "type": "string"
           }
         },
@@ -444,6 +673,122 @@
         ],
         "type": "object"
       },
+      "GetBranch": {
+        "additionalProperties": false,
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "branch"
+        ],
+        "type": "object"
+      },
+      "GetRepository": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns it.",
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo"
+        ],
+        "type": "object"
+      },
+      "GithubBranch": {
+        "description": "A branch: its name, the commit it points at, and whether it is protected.",
+        "properties": {
+          "commit_sha": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "protected": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "commit_sha",
+          "protected"
+        ],
+        "type": "object"
+      },
+      "GithubCurrentUser": {
+        "description": "The authenticated user, with their profile.",
+        "properties": {
+          "account_type": {
+            "description": "`User` or `Bot` today. An open string.",
+            "type": "string"
+          },
+          "avatar_url": {
+            "type": "string"
+          },
+          "bio": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "company": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "login": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "login",
+          "avatar_url",
+          "url",
+          "account_type"
+        ],
+        "type": "object"
+      },
       "GithubInstallation": {
         "description": "Where our GitHub App is installed: an account or organization.",
         "properties": {
@@ -472,13 +817,22 @@
         "type": "object"
       },
       "GithubRepository": {
-        "description": "A repository our GitHub App reads, through one of its installations.",
+        "description": "A repository.",
         "properties": {
+          "clone_url": {
+            "type": "string"
+          },
+          "default_branch": {
+            "type": "string"
+          },
           "description": {
             "type": [
               "string",
               "null"
             ]
+          },
+          "fork": {
+            "type": "boolean"
           },
           "full_name": {
             "description": "`owner/name`.",
@@ -487,8 +841,57 @@
           "id": {
             "type": "string"
           },
+          "name": {
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/GithubUser"
+          },
           "private": {
             "type": "boolean"
+          },
+          "ssh_url": {
+            "type": "string"
+          },
+          "url": {
+            "description": "Its page on GitHub.",
+            "type": "string"
+          },
+          "visibility": {
+            "description": "`public`, `private` or `internal` today. An open string.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "full_name",
+          "private",
+          "url",
+          "clone_url",
+          "ssh_url",
+          "default_branch",
+          "visibility",
+          "fork",
+          "owner"
+        ],
+        "type": "object"
+      },
+      "GithubUser": {
+        "description": "A GitHub account, as another resource names it (an owner, an author, an assignee).",
+        "properties": {
+          "account_type": {
+            "description": "`User`, `Organization` or `Bot` today, as GitHub names it. An open string.",
+            "type": "string"
+          },
+          "avatar_url": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
           },
           "url": {
             "type": "string"
@@ -496,9 +899,10 @@
         },
         "required": [
           "id",
-          "full_name",
-          "private",
-          "url"
+          "login",
+          "avatar_url",
+          "url",
+          "account_type"
         ],
         "type": "object"
       },
@@ -515,6 +919,47 @@
         "required": [
           "id",
           "name"
+        ],
+        "type": "object"
+      },
+      "ListBranches": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "protected": {
+            "description": "Only protected branches (`true`) or only unprotected ones (`false`); both when left out.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo"
         ],
         "type": "object"
       },
@@ -1782,6 +2227,616 @@
         ]
       }
     },
+    "/v1/connected-accounts/{id}/actions/github.get_branch": {
+      "post": {
+        "operationId": "github_get_branch",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetBranch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubBranch"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A branch, by name.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.get_current_user": {
+      "post": {
+        "operationId": "github_get_current_user",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubCurrentUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "The authenticated user and their profile.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.get_repository": {
+      "post": {
+        "operationId": "github_get_repository",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetRepository"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubRepository"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A repository, by owner and name.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.list_branches": {
+      "post": {
+        "operationId": "github_list_branches",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListBranches"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubBranch"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A repository's branches, a page at a time.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
     "/v1/connected-accounts/{id}/actions/github.list_installations": {
       "post": {
         "operationId": "github_list_installations",
@@ -1836,6 +2891,15 @@
               }
             },
             "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
           },
           "404": {
             "content": {
@@ -1972,6 +3036,15 @@
               }
             },
             "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
           },
           "404": {
             "content": {

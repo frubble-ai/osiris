@@ -9,6 +9,87 @@ export type Webhooks = ReceiveEventWebhookRequest;
 /**
  * An action's answer: what it read, as `data`.
  */
+export type ActionResultGithubBranch = {
+    /**
+     * A branch: its name, the commit it points at, and whether it is protected.
+     */
+    data: {
+        commit_sha: string;
+        name: string;
+        protected: boolean;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubCurrentUser = {
+    /**
+     * The authenticated user, with their profile.
+     */
+    data: {
+        /**
+         * `User` or `Bot` today. An open string.
+         */
+        account_type: string;
+        avatar_url: string;
+        bio?: string | null;
+        company?: string | null;
+        email?: string | null;
+        id: string;
+        location?: string | null;
+        login: string;
+        name?: string | null;
+        url: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubRepository = {
+    /**
+     * A repository.
+     */
+    data: {
+        clone_url: string;
+        default_branch: string;
+        description?: string | null;
+        fork: boolean;
+        /**
+         * `owner/name`.
+         */
+        full_name: string;
+        id: string;
+        name: string;
+        owner: GithubUser;
+        private: boolean;
+        ssh_url: string;
+        /**
+         * Its page on GitHub.
+         */
+        url: string;
+        /**
+         * `public`, `private` or `internal` today. An open string.
+         */
+        visibility: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubBranch = {
+    data: Array<{
+        commit_sha: string;
+        name: string;
+        protected: boolean;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
 export type ActionResultVecGithubInstallation = {
     data: Array<{
         /**
@@ -34,14 +115,27 @@ export type ActionResultVecGithubInstallation = {
  */
 export type ActionResultVecGithubRepository = {
     data: Array<{
+        clone_url: string;
+        default_branch: string;
         description?: string | null;
+        fork: boolean;
         /**
          * `owner/name`.
          */
         full_name: string;
         id: string;
+        name: string;
+        owner: GithubUser;
         private: boolean;
+        ssh_url: string;
+        /**
+         * Its page on GitHub.
+         */
         url: string;
+        /**
+         * `public`, `private` or `internal` today. An open string.
+         */
+        visibility: string;
     }>;
 };
 
@@ -181,14 +275,15 @@ export type ErrorDetail = {
      * `OS_00` unauthorized, `OS_01` not found, `OS_02` invalid request, `OS_03` conflict,
      * `OS_04` provider refused, `OS_05` provider unavailable, `OS_06` connection not active,
      * `OS_07` unknown version, `OS_08` idempotency key reused, `OS_09` request in flight,
-     * `OS_10` body too large, `OS_99` internal. An open string: codes may be added.
+     * `OS_10` body too large, `OS_11` missing scopes, `OS_99` internal. An open string: codes may
+     * be added.
      */
     code: string;
     message: string;
     /**
      * `unauthorized`, `not_found`, `invalid_request`, `conflict`, `provider_refused`,
      * `provider_unavailable`, `connection_not_active`, `unknown_version`, `idempotency_mismatch`,
-     * `in_flight`, `too_large`, `internal`.
+     * `in_flight`, `too_large`, `missing_scopes`, `internal`.
      */
     type: string;
 };
@@ -226,6 +321,48 @@ export type EventDelivery = {
     version: number;
 };
 
+export type GetBranch = {
+    branch: string;
+    owner: string;
+    repo: string;
+};
+
+export type GetRepository = {
+    /**
+     * The account or organization that owns it.
+     */
+    owner: string;
+    repo: string;
+};
+
+/**
+ * A branch: its name, the commit it points at, and whether it is protected.
+ */
+export type GithubBranch = {
+    commit_sha: string;
+    name: string;
+    protected: boolean;
+};
+
+/**
+ * The authenticated user, with their profile.
+ */
+export type GithubCurrentUser = {
+    /**
+     * `User` or `Bot` today. An open string.
+     */
+    account_type: string;
+    avatar_url: string;
+    bio?: string | null;
+    company?: string | null;
+    email?: string | null;
+    id: string;
+    location?: string | null;
+    login: string;
+    name?: string | null;
+    url: string;
+};
+
 /**
  * Where our GitHub App is installed: an account or organization.
  */
@@ -248,16 +385,43 @@ export type GithubInstallation = {
 };
 
 /**
- * A repository our GitHub App reads, through one of its installations.
+ * A repository.
  */
 export type GithubRepository = {
+    clone_url: string;
+    default_branch: string;
     description?: string | null;
+    fork: boolean;
     /**
      * `owner/name`.
      */
     full_name: string;
     id: string;
+    name: string;
+    owner: GithubUser;
     private: boolean;
+    ssh_url: string;
+    /**
+     * Its page on GitHub.
+     */
+    url: string;
+    /**
+     * `public`, `private` or `internal` today. An open string.
+     */
+    visibility: string;
+};
+
+/**
+ * A GitHub account, as another resource names it (an owner, an author, an assignee).
+ */
+export type GithubUser = {
+    /**
+     * `User`, `Organization` or `Bot` today, as GitHub names it. An open string.
+     */
+    account_type: string;
+    avatar_url: string;
+    id: string;
+    login: string;
     url: string;
 };
 
@@ -267,6 +431,23 @@ export type GithubRepository = {
 export type LinearTeam = {
     id: string;
     name: string;
+};
+
+export type ListBranches = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * Only protected branches (`true`) or only unprotected ones (`false`); both when left out.
+     */
+    protected?: boolean | null;
+    repo: string;
 };
 
 export type ListAuthConfig = {
@@ -811,6 +992,226 @@ export type RetrieveConnectedAccountResponses = {
 
 export type RetrieveConnectedAccountResponse = RetrieveConnectedAccountResponses[keyof RetrieveConnectedAccountResponses];
 
+export type GithubGetBranchData = {
+    body: GetBranch;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_branch';
+};
+
+export type GithubGetBranchErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetBranchError = GithubGetBranchErrors[keyof GithubGetBranchErrors];
+
+export type GithubGetBranchResponses = {
+    200: ActionResultGithubBranch;
+};
+
+export type GithubGetBranchResponse = GithubGetBranchResponses[keyof GithubGetBranchResponses];
+
+export type GithubGetCurrentUserData = {
+    body?: never;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_current_user';
+};
+
+export type GithubGetCurrentUserErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetCurrentUserError = GithubGetCurrentUserErrors[keyof GithubGetCurrentUserErrors];
+
+export type GithubGetCurrentUserResponses = {
+    200: ActionResultGithubCurrentUser;
+};
+
+export type GithubGetCurrentUserResponse = GithubGetCurrentUserResponses[keyof GithubGetCurrentUserResponses];
+
+export type GithubGetRepositoryData = {
+    body: GetRepository;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_repository';
+};
+
+export type GithubGetRepositoryErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetRepositoryError = GithubGetRepositoryErrors[keyof GithubGetRepositoryErrors];
+
+export type GithubGetRepositoryResponses = {
+    200: ActionResultGithubRepository;
+};
+
+export type GithubGetRepositoryResponse = GithubGetRepositoryResponses[keyof GithubGetRepositoryResponses];
+
+export type GithubListBranchesData = {
+    body: ListBranches;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_branches';
+};
+
+export type GithubListBranchesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListBranchesError = GithubListBranchesErrors[keyof GithubListBranchesErrors];
+
+export type GithubListBranchesResponses = {
+    200: ActionResultVecGithubBranch;
+};
+
+export type GithubListBranchesResponse = GithubListBranchesResponses[keyof GithubListBranchesResponses];
+
 export type GithubListInstallationsData = {
     body?: never;
     headers?: {
@@ -835,6 +1236,7 @@ export type GithubListInstallationsErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    403: ErrorBody;
     404: ErrorBody;
     /**
      * The request took longer than the server waits
@@ -889,6 +1291,7 @@ export type GithubListRepositoriesErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    403: ErrorBody;
     404: ErrorBody;
     /**
      * The request took longer than the server waits

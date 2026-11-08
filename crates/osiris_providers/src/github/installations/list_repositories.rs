@@ -1,14 +1,27 @@
 //! `github.list_repositories`: every repository our GitHub App's installations give the user.
 
-use super::{
+use super::list_installations::ListInstallations;
+use crate::ProviderError;
+use crate::github::{
     Github,
     get_page::{PER_PAGE, get_page},
-    transformers::RepositoriesPage,
+    transformers::repository::RepositoriesPage,
     types::GithubRepository,
 };
-use crate::ProviderError;
 use futures::{StreamExt, TryStreamExt, stream};
+use serde::Deserialize;
 use std::collections::BTreeMap;
+use utoipa::ToSchema;
+
+/// No input: the repositories are those the app's installations give the connection's user.
+#[derive(Debug, Default, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ListRepositories {}
+
+impl ListRepositories {
+    /// None: a GitHub App's user token reaches what the app is installed on.
+    pub const SCOPES: &[&str] = &[];
+}
 
 impl Github {
     /// Every repository of every installation, each once, ordered by id: installations read a few
@@ -17,8 +30,11 @@ impl Github {
         &self,
         http: &reqwest::Client,
         token: &str,
+        _input: &ListRepositories,
     ) -> Result<Vec<GithubRepository>, ProviderError> {
-        let installations = self.list_installations(http, token).await?;
+        let installations = self
+            .list_installations(http, token, &ListInstallations {})
+            .await?;
         let mut pages = stream::iter(installations)
             .map(|installation| self.installation_repositories(http, token, installation.id))
             .buffer_unordered(self.limits.concurrency.max(1));

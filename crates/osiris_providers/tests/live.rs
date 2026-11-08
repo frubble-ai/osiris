@@ -10,7 +10,15 @@
     reason = "test fixtures: a failure here is the test failing; a skip is reported on stderr"
 )]
 
-use osiris_providers::{ListLimits, ProviderUrls, github::Github, linear::Linear, slack::Slack};
+use osiris_providers::{
+    ListLimits, ProviderUrls,
+    github::{
+        Github,
+        installations::{ListInstallations, ListRepositories},
+    },
+    linear::Linear,
+    slack::Slack,
+};
 use url::Url;
 
 fn token(name: &str) -> Option<String> {
@@ -49,12 +57,18 @@ async fn github_lists_installations_and_their_repositories() {
         .user_agent("osiris-live-tests")
         .build()
         .unwrap();
-    let installations = github.list_installations(&http, &token).await.unwrap();
+    let installations = github
+        .list_installations(&http, &token, &ListInstallations {})
+        .await
+        .unwrap();
     assert!(
         !installations.is_empty(),
         "the test account has the app installed somewhere"
     );
-    github.list_repositories(&http, &token).await.unwrap();
+    github
+        .list_repositories(&http, &token, &ListRepositories {})
+        .await
+        .unwrap();
 }
 
 #[tokio::test]

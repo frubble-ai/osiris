@@ -6,6 +6,7 @@ mod auth_configs;
 mod connecting;
 mod disconnecting;
 mod events;
+mod github_actions;
 mod golden;
 mod health;
 mod idempotency;

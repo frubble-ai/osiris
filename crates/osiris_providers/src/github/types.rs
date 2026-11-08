@@ -1,29 +1,13 @@
-//! GitHub's reads, in our terms.
+//! GitHub's resources in our terms, one file each: the shapes osiris's GitHub actions answer with,
+//! the fields `OpenConnector`'s GitHub output schemas name (v1.9.4, Apache-2.0), typed, with
+//! GitHub's numeric ids as strings.
 
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+pub mod branch;
+pub mod installation;
+pub mod repository;
+pub mod user;
 
-/// Where our GitHub App is installed: an account or organization.
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, PartialEq, Eq)]
-pub struct GithubInstallation {
-    pub id: String,
-    /// The account or organization's login.
-    pub account: String,
-    /// `user` or `organization` today. An open string: more values may come without a new
-    /// release, and a client keeps working on one it doesn't know.
-    pub account_type: String,
-    /// `all` (every repository of the account) or `selected` (only the ones chosen at install)
-    /// today. An open string: more values may come without a new release.
-    pub repository_selection: String,
-}
-
-/// A repository our GitHub App reads, through one of its installations.
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, PartialEq, Eq)]
-pub struct GithubRepository {
-    pub id: String,
-    /// `owner/name`.
-    pub full_name: String,
-    pub private: bool,
-    pub url: String,
-    pub description: Option<String>,
-}
+pub use branch::GithubBranch;
+pub use installation::GithubInstallation;
+pub use repository::GithubRepository;
+pub use user::{GithubCurrentUser, GithubUser};

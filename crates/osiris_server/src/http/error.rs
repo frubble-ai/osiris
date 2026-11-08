@@ -99,6 +99,9 @@ impl ApiError {
                         "connection_not_active",
                         message,
                     ),
+                    DomainError::MissingScopes(_) => {
+                        (StatusCode::FORBIDDEN, "OS_11", "missing_scopes", message)
+                    }
                     DomainError::Internal => (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         "OS_99",

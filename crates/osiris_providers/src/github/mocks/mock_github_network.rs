@@ -15,6 +15,28 @@ impl<'a> MockGithubNetwork<'a> {
         Self { server }
     }
 
+    /// `verb route` with every `(name, value)` of `query`, carrying GitHub's API version, answers
+    /// `status` with `body`; the test fails unless it is asked exactly once.
+    pub async fn answer(
+        &self,
+        verb: &str,
+        route: &str,
+        query: &[(&str, &str)],
+        status: u16,
+        body: Value,
+    ) {
+        let mut mock = Mock::given(method(verb))
+            .and(path(route))
+            .and(header("x-github-api-version", "2022-11-28"));
+        for (name, value) in query {
+            mock = mock.and(query_param(*name, *value));
+        }
+        mock.respond_with(ResponseTemplate::new(status).set_body_json(body))
+            .expect(1)
+            .mount(self.server)
+            .await;
+    }
+
     /// The consent's code is exchanged for `answer`.
     pub async fn answer_code_exchange(&self, answer: Value) {
         Mock::given(method("POST"))
