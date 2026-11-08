@@ -205,7 +205,6 @@ impl UseCases {
             .await;
         match checked {
             Ok(answer) => Ok(Checked::Answered(answer)),
-            // The provider answered for good: the item is gone or the config can't work.
             // The provider answering for good about what the trigger watches, or a config it
             // can't take, fails it; an installation token that couldn't be minted is the app's
             // credentials, which leave it waiting below.

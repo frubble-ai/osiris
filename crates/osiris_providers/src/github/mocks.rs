@@ -3,6 +3,7 @@
 
 pub mod generate_github;
 pub mod generate_github_branch;
+pub mod generate_github_commit;
 pub mod generate_github_delivery_signature;
 pub mod generate_github_installation;
 pub mod generate_github_names;

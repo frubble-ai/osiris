@@ -1,7 +1,6 @@
 //! Pull requests and their parts as GitHub answers them, and the requests that change them
 //! checked down to their body, for tests.
 
-pub mod generate_github_commit;
 pub mod generate_github_pull_request;
 pub mod generate_github_pull_request_file;
 pub mod generate_github_review;

@@ -1,6 +1,6 @@
 //! Two commits compared, as GitHub answers it.
 
-use super::generate_github_commit::generate_github_commit;
+use crate::github::mocks::generate_github_commit::generate_github_commit;
 use fake::Fake;
 use serde_json::{Value, json};
 

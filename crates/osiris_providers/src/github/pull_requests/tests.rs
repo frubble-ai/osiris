@@ -19,14 +19,14 @@ use super::{
     ReviewCommentSort, ReviewEvent, SortDirection, SubmitPullRequestReview, UpdatePullRequest,
     UpdatePullRequestBranch, UpdatePullRequestReviewComment,
     mocks::{
-        MockPullRequestNetwork, generate_github_commit::generate_github_commit,
-        generate_github_pull_request::generate_github_pull_request,
+        MockPullRequestNetwork, generate_github_pull_request::generate_github_pull_request,
         generate_github_pull_request_file::generate_github_pull_request_file,
         generate_github_review::generate_github_review,
         generate_github_review_comment::generate_github_review_comment,
         generate_github_team::generate_github_team,
     },
 };
+use crate::github::mocks::generate_github_commit::generate_github_commit;
 use crate::{
     ProviderError,
     github::mocks::{

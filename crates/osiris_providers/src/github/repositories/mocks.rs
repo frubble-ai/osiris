@@ -1,7 +1,6 @@
 //! A repository's resources, as GitHub answers them, for tests.
 
 pub mod generate_github_collaborator;
-pub mod generate_github_commit;
 pub mod generate_github_commit_comment;
 pub mod generate_github_commit_comparison;
 pub mod generate_github_content;

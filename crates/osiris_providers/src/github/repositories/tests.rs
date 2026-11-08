@@ -19,7 +19,6 @@ use super::{
     SyncForkBranchWithUpstream, UpdateRef, UpdateRepository,
     mocks::{
         generate_github_collaborator::generate_github_collaborator,
-        generate_github_commit::generate_github_commit,
         generate_github_commit_comment::generate_github_commit_comment,
         generate_github_commit_comparison::generate_github_commit_comparison,
         generate_github_content::{
@@ -34,6 +33,7 @@ use super::{
         generate_github_tag::generate_github_tag,
     },
 };
+use crate::github::mocks::generate_github_commit::generate_github_commit;
 use crate::{
     ActingAs, ProviderError,
     github::{
