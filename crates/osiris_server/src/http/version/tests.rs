@@ -175,6 +175,36 @@ async fn brings_an_older_release_s_query_up_to_the_current_one(pool: PgPool) {
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn applies_an_older_release_s_default_to_a_request_without_a_query(pool: PgPool) {
+    let app = setup_test_context(pool).await.serving(MOCK_RELEASES);
+    app.github_config().await;
+    app.auth_config("linear").await;
+
+    let old = app
+        .send(
+            "GET",
+            "/v1/auth-configs",
+            Some(ADMIN_KEY),
+            None,
+            &[("osiris-version", AMUN)],
+        )
+        .await;
+    let current = app
+        .send(
+            "GET",
+            "/v1/auth-configs",
+            Some(ADMIN_KEY),
+            None,
+            &[("osiris-version", ANUBIS)],
+        )
+        .await;
+
+    // amun listed one auth config a page when asked for no limit.
+    assert_eq!(old.body["data"].as_array().map(Vec::len), Some(1));
+    assert_eq!(current.body["data"].as_array().map(Vec::len), Some(2));
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn passes_an_older_release_s_unreadable_body_on_for_the_route_to_refuse(pool: PgPool) {
     let app = setup_test_context(pool).await.serving(MOCK_RELEASES);
 

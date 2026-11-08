@@ -1,6 +1,7 @@
 //! A version change as a real release writes one: anubis renamed an auth config's `app_id` to
-//! `client_id` and the connections filter `label` to `alias`, so amun's requests are brought up and
-//! anubis's answers, events and spec taken back.
+//! `client_id` and the connections filter `label` to `alias`, and dropped two of amun's defaults (a
+//! page of one auth config, a refresh's reason), so amun's requests are brought up and anubis's
+//! answers, events and spec taken back.
 
 use osiris_versioning::{ANUBIS, Release, Route, Stability, VersionChange};
 use serde_json::Value;
@@ -59,15 +60,27 @@ impl VersionChange for MockRenamedClientId {
         }
     }
 
-    /// An amun auth config body, with `app_id` as `client_id`.
+    /// An amun auth config body, with `app_id` as `client_id`; amun's refresh took no body and
+    /// meant `{"reason": "amun"}`.
     fn request(&self, route: &Route<'_>, body: &mut Value) {
         if route.is("POST", "/v1/auth-configs") || route.is("PATCH", "/v1/auth-configs/{id}") {
             rename(body, "app_id", "client_id");
         }
+        if route.is("POST", "/v1/connected-accounts/{id}/refresh")
+            && let Some(object) = body.as_object_mut()
+        {
+            object
+                .entry("reason")
+                .or_insert_with(|| Value::String("amun".into()));
+        }
     }
 
-    /// An amun connections filter, with `label` as `alias`.
+    /// An amun connections filter, with `label` as `alias`; amun listed one auth config a page
+    /// when asked for no limit.
     fn query(&self, route: &Route<'_>, query: &mut Vec<(String, String)>) {
+        if route.is("GET", "/v1/auth-configs") && !query.iter().any(|(name, _)| name == "limit") {
+            query.push(("limit".to_owned(), "1".to_owned()));
+        }
         if route.is("GET", "/v1/connected-accounts") {
             for (name, _) in query.iter_mut() {
                 if name == "label" {
