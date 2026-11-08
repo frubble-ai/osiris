@@ -382,14 +382,14 @@
       "ErrorDetail": {
         "properties": {
           "code": {
-            "description": "`OS_00` unauthorized, `OS_01` not found, `OS_02` invalid request, `OS_03` conflict,\n`OS_04` provider refused, `OS_05` provider unavailable, `OS_06` connection not active,\n`OS_07` unknown version, `OS_08` idempotency key reused, `OS_09` request in flight,\n`OS_99` internal.",
+            "description": "`OS_00` unauthorized, `OS_01` not found, `OS_02` invalid request, `OS_03` conflict,\n`OS_04` provider refused, `OS_05` provider unavailable, `OS_06` connection not active,\n`OS_07` unknown version, `OS_08` idempotency key reused, `OS_09` request in flight,\n`OS_10` body too large, `OS_99` internal. An open string: codes may be added.",
             "type": "string"
           },
           "message": {
             "type": "string"
           },
           "type": {
-            "description": "`unauthorized`, `not_found`, `invalid_request`, `conflict`, `provider_refused`,\n`provider_unavailable`, `connection_not_active`, `unknown_version`, `idempotency_mismatch`,\n`in_flight`, `internal`.",
+            "description": "`unauthorized`, `not_found`, `invalid_request`, `conflict`, `provider_refused`,\n`provider_unavailable`, `connection_not_active`, `unknown_version`, `idempotency_mismatch`,\n`in_flight`, `too_large`, `internal`.",
             "type": "string"
           }
         },
@@ -875,7 +875,14 @@
             "description": "The request took longer than the server waits"
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "500": {
             "content": {
@@ -967,7 +974,14 @@
             "description": "The first request with this `Idempotency-Key` is still running"
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "422": {
             "content": {
@@ -1078,7 +1092,14 @@
             }
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "422": {
             "content": {
@@ -1166,7 +1187,14 @@
             "description": "The request took longer than the server waits"
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "500": {
             "content": {
@@ -1254,7 +1282,14 @@
             "description": "The request took longer than the server waits"
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "500": {
             "content": {
@@ -1385,7 +1420,14 @@
             "description": "The request took longer than the server waits"
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "500": {
             "content": {
@@ -1486,7 +1528,14 @@
             "description": "The first request with this `Idempotency-Key` is still running"
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "422": {
             "content": {
@@ -1598,7 +1647,14 @@
             "description": "The first request with this `Idempotency-Key` is still running"
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "422": {
             "content": {
@@ -1695,7 +1751,14 @@
             "description": "The request took longer than the server waits"
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "500": {
             "content": {
@@ -1796,7 +1859,14 @@
             }
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "422": {
             "content": {
@@ -1925,7 +1995,14 @@
             }
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "422": {
             "content": {
@@ -2054,7 +2131,14 @@
             }
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "422": {
             "content": {
@@ -2183,7 +2267,14 @@
             }
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "422": {
             "content": {
@@ -2312,7 +2403,14 @@
             }
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "422": {
             "content": {
@@ -2426,7 +2524,14 @@
             "description": "The first request with this `Idempotency-Key` is still running"
           },
           "413": {
-            "description": "The body is larger than the server reads"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
           },
           "422": {
             "content": {

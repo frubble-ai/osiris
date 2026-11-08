@@ -9,7 +9,12 @@ use crate::{
         setup_test_context_with,
     },
 };
-use axum::http::{HeaderMap, StatusCode};
+use axum::{
+    body::Body,
+    extract::Request,
+    http::{HeaderMap, StatusCode},
+};
+use http_body_util::BodyExt;
 use osiris_events::{
     Message, MessageBus, adapters::memory::MemoryTransport,
     testing::generate_event_message::generate_event_message,
@@ -19,6 +24,7 @@ use serde_json::json;
 use sqlx::PgPool;
 use std::sync::Arc;
 use time::Duration;
+use tower::ServiceExt;
 
 const AMUN: &str = "2026-01-01.amun";
 const ANUBIS: &str = "2026-11-04.anubis";
@@ -227,6 +233,26 @@ async fn passes_an_older_release_s_unreadable_body_on_for_the_route_to_refuse(po
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn passes_an_older_release_s_answer_that_is_not_json_on_untouched(pool: PgPool) {
+    let app = setup_test_context(pool).await.serving(MOCK_RELEASES);
+    // `/v1/auth-configs` has no DELETE: axum answers 405 with no body, which nothing translates.
+    let request = Request::builder()
+        .method("DELETE")
+        .uri("/v1/auth-configs")
+        .header("authorization", format!("Bearer {ADMIN_KEY}"))
+        .header("osiris-version", AMUN)
+        .body(Body::empty())
+        .unwrap();
+
+    let answer = app.api.clone().oneshot(request).await.unwrap();
+
+    assert_eq!(answer.status(), StatusCode::METHOD_NOT_ALLOWED);
+    assert_eq!(answer.headers()["osiris-version"], AMUN);
+    let bytes = answer.into_body().collect().await.unwrap().to_bytes();
+    assert!(bytes.is_empty());
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_a_body_too_large_the_same_at_every_release(pool: PgPool) {
     let app = setup_test_context(pool).await.serving(MOCK_RELEASES);
     let too_large = "x".repeat(app.config.settings.server.max_body() + 1);
@@ -241,8 +267,12 @@ async fn refuses_a_body_too_large_the_same_at_every_release(pool: PgPool) {
                 &[("osiris-version", release)],
             )
             .await;
-        assert_eq!(refused.status, StatusCode::BAD_REQUEST, "at {release}");
-        assert_eq!(refused.body["error"]["code"], "OS_02", "at {release}");
+        assert_eq!(
+            refused.status,
+            StatusCode::PAYLOAD_TOO_LARGE,
+            "at {release}"
+        );
+        assert_eq!(refused.body["error"]["code"], "OS_10", "at {release}");
         assert_eq!(refused.headers["osiris-version"], release);
     }
 }

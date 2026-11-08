@@ -76,3 +76,17 @@ async fn names_why_a_body_or_a_query_cannot_be_read(pool: PgPool) {
         assert_eq!(refused.body["error"]["message"], message, "{path}");
     }
 }
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_a_json_body_too_large_as_os_10_with_its_413(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    let padding = "x".repeat(app.config.settings.server.max_body());
+    let body = format!(r#"{{"provider":"github","client_id":"{padding}","client_secret":"s"}}"#);
+
+    let refused = app
+        .send_raw("POST", "/v1/auth-configs", Some(ADMIN_KEY), body, &[])
+        .await;
+
+    assert_eq!(refused.status, StatusCode::PAYLOAD_TOO_LARGE);
+    assert_eq!(refused.body["error"]["code"], "OS_10");
+}

@@ -37,7 +37,7 @@ pub fn ground_rule_answers(spec: &mut Value) {
                 ),
                 (
                     "413",
-                    json!({ "description": "The body is larger than the server reads" }),
+                    error("The body is larger than the server reads (`OS_10`)"),
                 ),
                 (
                     "500",

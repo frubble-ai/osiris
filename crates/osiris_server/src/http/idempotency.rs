@@ -53,7 +53,7 @@ pub async fn idempotency(
     let (parts, body) = request.into_parts();
     let bytes = to_bytes(body, state.config.settings.server.max_body())
         .await
-        .map_err(|_| ApiError::Invalid("the body is too large".into()))?;
+        .map_err(|_| ApiError::TooLarge)?;
     let mut hash = Sha256::new();
     hash.update(parts.method.as_str());
     hash.update(parts.uri.path());

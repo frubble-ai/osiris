@@ -1,12 +1,13 @@
 //! A route's JSON body. A body that can't be read as the route's type (not JSON, a missing field,
 //! a wrong type, no JSON content type) is refused as `OS_02` in the error shape every answer uses,
-//! never as axum's plain-text rejection. The message is osiris's own, so an axum or serde upgrade
+//! never as axum's plain-text rejection; a body too large is `OS_10` (413). The message is osiris's own, so an axum or serde upgrade
 //! that rewords its errors changes no answer.
 
 use super::error::ApiError;
 use axum::{
     Json,
     extract::{FromRequest, Request, rejection::JsonRejection},
+    http::StatusCode,
 };
 use serde::de::DeserializeOwned;
 
@@ -24,7 +25,14 @@ where
         Json::<T>::from_request(request, state)
             .await
             .map(|Json(body)| Self(body))
-            .map_err(|rejection| ApiError::Invalid(message(&rejection).into()))
+            .map_err(|rejection| {
+                // A body past `[server] max_body_bytes` keeps its 413.
+                if rejection.status() == StatusCode::PAYLOAD_TOO_LARGE {
+                    ApiError::TooLarge
+                } else {
+                    ApiError::Invalid(message(&rejection).into())
+                }
+            })
     }
 }
 

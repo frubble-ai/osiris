@@ -55,7 +55,7 @@ pub async fn translate_request(
     }
     let bytes = to_bytes(body, max_body)
         .await
-        .map_err(|_| ApiError::Invalid("the body is too large".into()))?;
+        .map_err(|_| ApiError::TooLarge)?;
     let empty = bytes.is_empty();
     let mut json = if empty {
         Value::Object(Map::new())

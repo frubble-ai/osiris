@@ -181,14 +181,14 @@ export type ErrorDetail = {
      * `OS_00` unauthorized, `OS_01` not found, `OS_02` invalid request, `OS_03` conflict,
      * `OS_04` provider refused, `OS_05` provider unavailable, `OS_06` connection not active,
      * `OS_07` unknown version, `OS_08` idempotency key reused, `OS_09` request in flight,
-     * `OS_99` internal.
+     * `OS_10` body too large, `OS_99` internal. An open string: codes may be added.
      */
     code: string;
     message: string;
     /**
      * `unauthorized`, `not_found`, `invalid_request`, `conflict`, `provider_refused`,
      * `provider_unavailable`, `connection_not_active`, `unknown_version`, `idempotency_mismatch`,
-     * `in_flight`, `internal`.
+     * `in_flight`, `too_large`, `internal`.
      */
     type: string;
 };
@@ -408,9 +408,9 @@ export type ListAuthConfigsErrors = {
      */
     408: unknown;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * An internal error; the request may be retried
      */
@@ -453,9 +453,9 @@ export type CreateAuthConfigErrors = {
      */
     409: ErrorBody;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * This `Idempotency-Key` was used for another request
      */
@@ -505,9 +505,9 @@ export type DeleteAuthConfigErrors = {
     408: unknown;
     409: ErrorBody;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * This `Idempotency-Key` was used for another request
      */
@@ -550,9 +550,9 @@ export type RetrieveAuthConfigErrors = {
      */
     408: unknown;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * An internal error; the request may be retried
      */
@@ -591,9 +591,9 @@ export type UpdateAuthConfigErrors = {
      */
     408: unknown;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * An internal error; the request may be retried
      */
@@ -647,9 +647,9 @@ export type ListConnectedAccountsErrors = {
      */
     408: unknown;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * An internal error; the request may be retried
      */
@@ -693,9 +693,9 @@ export type CreateConnectedAccountErrors = {
      */
     409: ErrorBody;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * This `Idempotency-Key` was used for another request
      */
@@ -748,9 +748,9 @@ export type DeleteConnectedAccountErrors = {
      */
     409: ErrorBody;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * This `Idempotency-Key` was used for another request
      */
@@ -794,9 +794,9 @@ export type RetrieveConnectedAccountErrors = {
      */
     408: unknown;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * An internal error; the request may be retried
      */
@@ -842,9 +842,9 @@ export type GithubListInstallationsErrors = {
     408: unknown;
     409: ErrorBody;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * This `Idempotency-Key` was used for another request
      */
@@ -896,9 +896,9 @@ export type GithubListRepositoriesErrors = {
     408: unknown;
     409: ErrorBody;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * This `Idempotency-Key` was used for another request
      */
@@ -950,9 +950,9 @@ export type LinearListTeamsErrors = {
     408: unknown;
     409: ErrorBody;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * This `Idempotency-Key` was used for another request
      */
@@ -1004,9 +1004,9 @@ export type SlackListChannelsErrors = {
     408: unknown;
     409: ErrorBody;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * This `Idempotency-Key` was used for another request
      */
@@ -1058,9 +1058,9 @@ export type RefreshConnectedAccountErrors = {
     408: unknown;
     409: ErrorBody;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * This `Idempotency-Key` was used for another request
      */
@@ -1111,9 +1111,9 @@ export type TriggerEventErrors = {
      */
     409: ErrorBody;
     /**
-     * The body is larger than the server reads
+     * The body is larger than the server reads (`OS_10`)
      */
-    413: unknown;
+    413: ErrorBody;
     /**
      * This `Idempotency-Key` was used for another request
      */

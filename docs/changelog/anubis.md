@@ -22,5 +22,5 @@ The first release, a **preview**: its contract may still change until it is cut 
   `repository_selection` may gain values without a new release; a client ignores one it doesn't
   know.
 - Errors: a body or a query a route can't read is refused as `OS_02` (400) in the usual error
-  shape. Every `/v1` operation documents 400, 401, 408, 413 and 500, and on a POST or DELETE 409
+  shape, and a body larger than the server reads as `OS_10` (413). Every `/v1` operation documents 400, 401, 408, 413 and 500, and on a POST or DELETE 409
   and 422 for `Idempotency-Key`; actions and deleting an auth config document 404.

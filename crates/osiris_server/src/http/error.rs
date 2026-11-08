@@ -15,6 +15,7 @@ pub enum ApiError {
     Unauthorized,
     Invalid(String),
     UnknownVersion(String),
+    TooLarge,
     IdempotencyMismatch,
     InFlight,
     Domain(Report<DomainError>),
@@ -46,6 +47,12 @@ impl ApiError {
                 "OS_07",
                 "unknown_version",
                 format!("Osiris-Version {version:?} is not one osiris serves"),
+            ),
+            Self::TooLarge => (
+                StatusCode::PAYLOAD_TOO_LARGE,
+                "OS_10",
+                "too_large",
+                "the body is larger than the server reads".into(),
             ),
             Self::IdempotencyMismatch => (
                 StatusCode::UNPROCESSABLE_ENTITY,
