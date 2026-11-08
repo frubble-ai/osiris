@@ -15,7 +15,11 @@ use super::{
 use crate::{
     TriggerReceipt,
     github::{
-        mocks::{MockGithubNetwork, generate_github::generate_github, generate_sha::generate_sha},
+        mocks::{
+            MockGithubNetwork,
+            generate_github::{generate_github, generate_github_with},
+            generate_sha::generate_sha,
+        },
         pull_requests::mocks::generate_github_pull_request::generate_github_pull_request,
     },
 };
@@ -196,7 +200,6 @@ async fn creates_the_webhook_delivering_to_the_trigger() {
             "https://osiris.test/webhooks/triggers/tr_1",
             SECRET,
             &["push".to_owned()],
-            false,
         )
         .await
         .unwrap();
@@ -245,12 +248,152 @@ async fn aligns_the_webhook_github_says_already_exists() {
             url,
             SECRET,
             &["push".to_owned()],
-            false,
         )
         .await
         .unwrap();
 
     assert_eq!(id, "6");
+}
+
+/// `count` webhooks that deliver elsewhere, as one page of GitHub's list answers them.
+fn hooks_elsewhere(first_id: u64, count: u64) -> Value {
+    Value::Array(
+        (first_id..first_id + count)
+            .map(|id| json!({ "id": id, "config": { "url": format!("https://elsewhere.test/{id}") } }))
+            .collect(),
+    )
+}
+
+async fn create_on(github: &crate::github::Github) -> Result<String, crate::ProviderError> {
+    github
+        .create_hook(
+            &reqwest::Client::new(),
+            "token",
+            "octo",
+            "hello",
+            "https://osiris.test/webhooks/triggers/tr_1",
+            SECRET,
+            &["push".to_owned()],
+        )
+        .await
+}
+
+#[tokio::test]
+async fn keeps_github_s_refusal_when_no_webhook_delivers_to_the_trigger() {
+    let server = MockServer::start().await;
+    let network = MockGithubNetwork::on(&server);
+    network
+        .answer_times(
+            "POST",
+            "/repos/octo/hello/hooks",
+            422,
+            json!({ "message": "Validation Failed", "errors": [{ "field": "events" }] }),
+            1,
+        )
+        .await;
+    network
+        .answer(
+            "GET",
+            "/repos/octo/hello/hooks",
+            &[("page", "1"), ("per_page", "100")],
+            200,
+            hooks_elsewhere(1, 2),
+        )
+        .await;
+
+    let refused = create_on(&generate_github(&server)).await.unwrap_err();
+
+    assert_eq!(refused.status(), Some(422), "{refused}");
+    assert!(
+        refused.to_string().contains("Validation Failed"),
+        "{refused}"
+    );
+}
+
+#[tokio::test]
+async fn finds_the_existing_webhook_past_a_full_first_page() {
+    let server = MockServer::start().await;
+    let network = MockGithubNetwork::on(&server);
+    network
+        .answer_times(
+            "POST",
+            "/repos/octo/hello/hooks",
+            422,
+            json!({ "message": "Hook already exists on this repository" }),
+            1,
+        )
+        .await;
+    network
+        .answer(
+            "GET",
+            "/repos/octo/hello/hooks",
+            &[("page", "1"), ("per_page", "100")],
+            200,
+            hooks_elsewhere(1, 100),
+        )
+        .await;
+    network
+        .answer(
+            "GET",
+            "/repos/octo/hello/hooks",
+            &[("page", "2"), ("per_page", "100")],
+            200,
+            json!([{ "id": 777, "config": { "url": "https://osiris.test/webhooks/triggers/tr_1" } }]),
+        )
+        .await;
+    network
+        .answer_times(
+            "PATCH",
+            "/repos/octo/hello/hooks/777",
+            200,
+            json!({ "id": 777 }),
+            1,
+        )
+        .await;
+
+    let id = create_on(&generate_github(&server)).await.unwrap();
+
+    assert_eq!(id, "777");
+}
+
+#[tokio::test]
+async fn stops_looking_for_the_existing_webhook_at_the_page_cap() {
+    let server = MockServer::start().await;
+    let network = MockGithubNetwork::on(&server);
+    network
+        .answer_times(
+            "POST",
+            "/repos/octo/hello/hooks",
+            422,
+            json!({ "message": "Hook already exists on this repository" }),
+            1,
+        )
+        .await;
+    // Two full pages are read and no third: `answer` fails the test unless each is asked once.
+    for page in ["1", "2"] {
+        network
+            .answer(
+                "GET",
+                "/repos/octo/hello/hooks",
+                &[("page", page), ("per_page", "100")],
+                200,
+                hooks_elsewhere(page.parse::<u64>().unwrap() * 1000, 100),
+            )
+            .await;
+    }
+    let github = generate_github_with(
+        &server,
+        crate::ListLimits {
+            concurrency: 1,
+            max_items: 5000,
+            max_log_bytes: 262_144,
+            max_scan_pages: 2,
+        },
+    );
+
+    let refused = create_on(&github).await.unwrap_err();
+
+    assert_eq!(refused.status(), Some(422), "{refused}");
 }
 
 #[tokio::test]

@@ -42,8 +42,9 @@ osiris_server/src/
 └── testing/                           # the test context, with its arrangers and observers
 ```
 
-- `UseCaseContext` holds `config`, `db`, `messages`, `tasks`, `providers` and `http`. It is built
-  before the process takes traffic and holds nothing about a request.
+- `UseCaseContext` holds `config`, `db`, `messages`, `tasks`, `providers`, `http` and
+  `installation_tokens` (the process's cache of app installations' tokens). It is built before the
+  process takes traffic and holds nothing about a request.
 - `ctx.db` is the pool, the master key and the data keys. Every query is a `query!` in
   `lib/<domain>/`, an operation of `Db`. Secrets go in encrypted and come out decrypted there.
   The migrate reset's `DO` block, and the test DDL that checks which objects it drops, are

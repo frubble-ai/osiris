@@ -52,7 +52,7 @@ An installation has no user, so on an installation connection:
 
 | Kind | Config | Delivers |
 | --- | --- | --- |
-| `github.on_repo_event` | `{"owner", "repo", "events": ["push", …] or ["*"], "insecure_ssl"?}` | `event` (GitHub's event name), `delivery_id`, `payload` (GitHub's own) |
+| `github.on_repo_event` | `{"owner", "repo", "events": ["push", …] or ["*"]}` | `event` (GitHub's event name), `delivery_id`, `payload` (GitHub's own) |
 | `github.watch_pull_request` | `{"owner", "repo", "number"}` | `pull_request` and `version`, once per change |
 
 `github.on_repo_event` creates a repository webhook that delivers to

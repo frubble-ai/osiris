@@ -22,10 +22,12 @@ use_cases/
 ├── use_case.rs                      # UseCases and run
 ├── cases.rs                         # declares each case
 ├── cases/                           # one use case per file
+│   ├── <provider>/                  # a provider's actions, generated, grouped as its API is
 │   └── tests/                       # their behaviour, by domain
 └── lib/                             # helpers by domain
-    ├── auth_configs/  connected_accounts/  idempotency/  task_outcomes/   # the database's operations
+    ├── auth_configs/  connected_accounts/  idempotency/  task_outcomes/  triggers/   # the database's operations
     ├── database/                    # Db, tenants, rows, data keys
+    ├── installation_tokens/         # app installations' tokens, minted and cached in memory
     └── consent/  events/  oauth/  refresh/  shared/  tasks/
 ```
 

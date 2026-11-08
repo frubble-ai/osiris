@@ -146,39 +146,20 @@ impl Provider for Github {
         secret: &str,
     ) -> Result<Option<String>, ProviderError> {
         let refused = |reason: String| ProviderError::invalid("github", reason);
-        let (owner, repo, events, insecure_ssl) = match kind {
+        let (owner, repo, events) = match kind {
             ON_REPO_EVENT => {
                 let config = RepoEventConfig::read(config).map_err(refused)?;
-                (
-                    config.owner,
-                    config.repo,
-                    config.events,
-                    config.insecure_ssl,
-                )
+                (config.owner, config.repo, config.events)
             }
             WATCH_PULL_REQUEST => {
                 let config = WatchPullRequestConfig::read(config).map_err(refused)?;
-                (
-                    config.owner,
-                    config.repo,
-                    vec!["pull_request".to_owned()],
-                    false,
-                )
+                (config.owner, config.repo, vec!["pull_request".to_owned()])
             }
             _ => return Err(refused(format!("github has no trigger {kind:?}"))),
         };
-        self.create_hook(
-            http,
-            token,
-            &owner,
-            &repo,
-            callback_url,
-            secret,
-            &events,
-            insecure_ssl,
-        )
-        .await
-        .map(Some)
+        self.create_hook(http, token, &owner, &repo, callback_url, secret, &events)
+            .await
+            .map(Some)
     }
 
     async fn unsubscribe_trigger(

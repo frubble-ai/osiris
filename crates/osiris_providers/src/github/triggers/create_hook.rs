@@ -31,28 +31,25 @@ impl Github {
         callback_url: &str,
         secret: &str,
         events: &[String],
-        insecure_ssl: bool,
     ) -> Result<String, ProviderError> {
         let path = format!(
             "/repos/{}/{}/hooks",
             path_segment(owner),
             path_segment(repo)
         );
-        let body = hook_body(callback_url, secret, events, insecure_ssl);
+        let body = hook_body(callback_url, secret, events);
         match send::<CreatedHook, Value>(self, http, token, Method::POST, &path, &[], Some(&body))
             .await
         {
             Ok(created) => Ok(created.id.to_string()),
             Err(error) if error.status() == Some(422) => {
+                // A 422 is GitHub's answer both to a webhook that already delivers to the URL and
+                // to a configuration it won't take; with no such webhook, its own answer stands.
                 let Some(id) = self
                     .find_hook(http, token, owner, repo, callback_url)
                     .await?
                 else {
-                    return Err(ProviderError::refused_with_status(
-                        "github",
-                        422,
-                        "GitHub refused the webhook's configuration",
-                    ));
+                    return Err(error);
                 };
                 let existing = format!("{path}/{}", path_segment(&id));
                 send::<Value, Value>(

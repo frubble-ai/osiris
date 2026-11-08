@@ -4,7 +4,7 @@
 use serde_json::{Value, json};
 
 /// The body GitHub's hooks API takes to create or align the webhook.
-pub fn hook_body(callback_url: &str, secret: &str, events: &[String], insecure_ssl: bool) -> Value {
+pub fn hook_body(callback_url: &str, secret: &str, events: &[String]) -> Value {
     json!({
         "name": "web",
         "active": true,
@@ -13,7 +13,8 @@ pub fn hook_body(callback_url: &str, secret: &str, events: &[String], insecure_s
             "url": callback_url,
             "content_type": "json",
             "secret": secret,
-            "insecure_ssl": if insecure_ssl { "1" } else { "0" },
+            // GitHub always checks osiris's TLS certificate before delivering.
+            "insecure_ssl": "0",
         },
     })
 }

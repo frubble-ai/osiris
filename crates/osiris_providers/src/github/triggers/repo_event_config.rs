@@ -69,9 +69,6 @@ pub struct RepoEventConfig {
     pub repo: String,
     /// The webhook events it fires on, at least one, or `["*"]` for every one.
     pub events: Vec<String>,
-    /// Whether GitHub may deliver without checking osiris's TLS certificate; never by default.
-    #[serde(default)]
-    pub insecure_ssl: bool,
 }
 
 impl RepoEventConfig {
