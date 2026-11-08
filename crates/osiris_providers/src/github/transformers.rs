@@ -2,8 +2,10 @@
 
 pub mod acknowledgement;
 pub mod artifact;
+pub mod artifacts_page;
 pub mod branch;
 pub mod check_run;
+pub mod check_runs_page;
 pub mod collaborator;
 pub mod collaborator_addition;
 pub mod combined_status;
@@ -49,4 +51,7 @@ pub mod timeline_event;
 pub mod user;
 pub mod workflow;
 pub mod workflow_job;
+pub mod workflow_jobs_page;
 pub mod workflow_run;
+pub mod workflow_runs_page;
+pub mod workflows_page;

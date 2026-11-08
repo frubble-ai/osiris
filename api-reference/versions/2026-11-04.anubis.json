@@ -22,6 +22,31 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
+=======
+      "ActionResult_GithubArtifactDownload": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "Where a workflow artifact's ZIP archive can be downloaded.",
+            "properties": {
+              "url": {
+                "description": "A signed URL that downloads the archive without a token, for one minute.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "url"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+>>>>>>> port/github-checks_workflows
       "ActionResult_GithubBranch": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -51,6 +76,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubCollaboratorAddition": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -192,29 +218,55 @@
             "description": "A comment on a commit.",
             "properties": {
               "body": {
+=======
+      "ActionResult_GithubCommitStatus": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A status a service set on a commit.",
+            "properties": {
+              "context": {
+>>>>>>> port/github-checks_workflows
                 "type": "string"
               },
               "created_at": {
                 "type": "string"
               },
+<<<<<<< HEAD
               "id": {
                 "type": "string"
               },
               "path": {
+=======
+              "description": {
+>>>>>>> port/github-checks_workflows
                 "type": [
                   "string",
                   "null"
                 ]
               },
+<<<<<<< HEAD
               "position": {
                 "format": "int64",
                 "type": [
                   "integer",
+=======
+              "id": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "target_url": {
+                "type": [
+                  "string",
+>>>>>>> port/github-checks_workflows
                   "null"
                 ]
               },
               "updated_at": {
                 "type": "string"
+<<<<<<< HEAD
               },
               "url": {
                 "type": "string"
@@ -228,12 +280,19 @@
                     "type": "null"
                   }
                 ]
+=======
+>>>>>>> port/github-checks_workflows
               }
             },
             "required": [
               "id",
+<<<<<<< HEAD
               "body",
               "url",
+=======
+              "state",
+              "context",
+>>>>>>> port/github-checks_workflows
               "created_at",
               "updated_at"
             ],
@@ -245,6 +304,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubCommitComparison": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -330,6 +390,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-checks_workflows
       "ActionResult_GithubCurrentUser": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -398,6 +460,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
       "ActionResult_GithubFileContent": {
@@ -473,6 +536,21 @@
               "size",
               "encoding",
               "content_base64"
+=======
+      "ActionResult_GithubJobLogs": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A workflow job's logs, as plain text.",
+            "properties": {
+              "logs": {
+                "description": "The whole log, as GitHub keeps it once the job has finished.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "logs"
+>>>>>>> port/github-checks_workflows
             ],
             "type": "object"
           }
@@ -482,6 +560,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubForkSync": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1060,6 +1139,8 @@
       },
 =======
 >>>>>>> port/github-pull_requests
+=======
+>>>>>>> port/github-checks_workflows
       "ActionResult_GithubRepository": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1130,6 +1211,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
       "ActionResult_GithubRepositoryPermission": {
@@ -1316,11 +1398,24 @@
                 ]
               },
               "original_commit_id": {
+=======
+      "ActionResult_GithubWorkflow": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A GitHub Actions workflow.",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+>>>>>>> port/github-checks_workflows
                 "type": "string"
               },
               "path": {
                 "type": "string"
               },
+<<<<<<< HEAD
               "side": {
                 "type": [
                   "string",
@@ -1352,15 +1447,28 @@
                     "type": "null"
                   }
                 ]
+=======
+              "state": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+>>>>>>> port/github-checks_workflows
               }
             },
             "required": [
               "id",
+<<<<<<< HEAD
               "path",
               "body",
               "commit_id",
               "original_commit_id",
               "diff_hunk",
+=======
+              "name",
+              "path",
+              "state",
+>>>>>>> port/github-checks_workflows
               "url"
             ],
             "type": "object"
@@ -1371,6 +1479,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubReviewRequest": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1398,6 +1507,77 @@
               "requested_reviewers",
               "requested_teams"
 >>>>>>> port/github-pull_requests
+=======
+      "ActionResult_GithubWorkflowRun": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A run of a workflow.",
+            "properties": {
+              "conclusion": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "display_title": {
+                "type": "string"
+              },
+              "event": {
+                "type": "string"
+              },
+              "head_branch": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "head_sha": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "run_number": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "workflow_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "display_title",
+              "workflow_id",
+              "event",
+              "head_sha",
+              "url",
+              "run_number",
+              "created_at",
+              "updated_at"
+>>>>>>> port/github-checks_workflows
             ],
             "type": "object"
           }
@@ -1407,6 +1587,62 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
+=======
+      "ActionResult_Vec_GithubArtifact": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A file a workflow run kept.",
+              "properties": {
+                "archive_download_url": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "expired": {
+                  "type": "boolean"
+                },
+                "expires_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "size_in_bytes": {
+                  "format": "int64",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "size_in_bytes",
+                "archive_download_url",
+                "expired"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+>>>>>>> port/github-checks_workflows
       "ActionResult_Vec_GithubBranch": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1440,22 +1676,51 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ActionResult_Vec_GithubCollaborator": {
+=======
+      "ActionResult_Vec_GithubCheckRun": {
+>>>>>>> port/github-checks_workflows
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
             "items": {
+<<<<<<< HEAD
               "description": "A repository's collaborator.",
               "properties": {
                 "account_type": {
                   "type": "string"
                 },
                 "avatar_url": {
+=======
+              "description": "A check run on a commit.",
+              "properties": {
+                "completed_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "conclusion": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "details_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "head_sha": {
+>>>>>>> port/github-checks_workflows
                   "type": "string"
                 },
                 "id": {
                   "type": "string"
                 },
+<<<<<<< HEAD
                 "login": {
                   "type": "string"
                 },
@@ -1470,21 +1735,44 @@
                   ]
                 },
                 "role_name": {
+=======
+                "name": {
+                  "type": "string"
+                },
+                "started_at": {
+>>>>>>> port/github-checks_workflows
                   "type": [
                     "string",
                     "null"
                   ]
                 },
+<<<<<<< HEAD
                 "url": {
                   "type": "string"
+=======
+                "status": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+>>>>>>> port/github-checks_workflows
                 }
               },
               "required": [
                 "id",
+<<<<<<< HEAD
                 "login",
                 "avatar_url",
                 "url",
                 "account_type"
+=======
+                "name",
+                "status",
+                "head_sha"
+>>>>>>> port/github-checks_workflows
               ],
               "type": "object"
             },
@@ -1496,13 +1784,18 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 =======
 >>>>>>> port/github-pull_requests
       "ActionResult_Vec_GithubCommit": {
+=======
+      "ActionResult_Vec_GithubCommitStatus": {
+>>>>>>> port/github-checks_workflows
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
             "items": {
+<<<<<<< HEAD
               "description": "A commit.",
               "properties": {
                 "author": {
@@ -1613,29 +1906,51 @@
               "description": "A comment on a commit.",
               "properties": {
                 "body": {
+=======
+              "description": "A status a service set on a commit.",
+              "properties": {
+                "context": {
+>>>>>>> port/github-checks_workflows
                   "type": "string"
                 },
                 "created_at": {
                   "type": "string"
                 },
+<<<<<<< HEAD
                 "id": {
                   "type": "string"
                 },
                 "path": {
+=======
+                "description": {
+>>>>>>> port/github-checks_workflows
                   "type": [
                     "string",
                     "null"
                   ]
                 },
+<<<<<<< HEAD
                 "position": {
                   "format": "int64",
                   "type": [
                     "integer",
+=======
+                "id": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string"
+                },
+                "target_url": {
+                  "type": [
+                    "string",
+>>>>>>> port/github-checks_workflows
                     "null"
                   ]
                 },
                 "updated_at": {
                   "type": "string"
+<<<<<<< HEAD
                 },
                 "url": {
                   "type": "string"
@@ -1649,12 +1964,19 @@
                       "type": "null"
                     }
                   ]
+=======
+>>>>>>> port/github-checks_workflows
                 }
               },
               "required": [
                 "id",
+<<<<<<< HEAD
                 "body",
                 "url",
+=======
+                "state",
+                "context",
+>>>>>>> port/github-checks_workflows
                 "created_at",
                 "updated_at"
               ],
@@ -1668,6 +1990,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_Vec_GithubContentEntry": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1800,6 +2123,8 @@
       },
 =======
 >>>>>>> port/github-pull_requests
+=======
+>>>>>>> port/github-checks_workflows
       "ActionResult_Vec_GithubInstallation": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -2245,6 +2570,7 @@
       },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ActionResult_Vec_GithubTag": {
 =======
       "ActionResult_Vec_GithubTimelineEvent": {
@@ -2252,20 +2578,30 @@
 =======
       "ActionResult_Vec_GithubReview": {
 >>>>>>> port/github-pull_requests
+=======
+      "ActionResult_Vec_GithubWorkflow": {
+>>>>>>> port/github-checks_workflows
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
             "items": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
               "description": "A tag.",
               "properties": {
                 "commit_sha": {
+=======
+              "description": "A GitHub Actions workflow.",
+              "properties": {
+                "id": {
+>>>>>>> port/github-checks_workflows
                   "type": "string"
                 },
                 "name": {
                   "type": "string"
                 },
+<<<<<<< HEAD
                 "tarball_url": {
                   "type": "string"
                 },
@@ -2309,11 +2645,15 @@
                 "created_at": {
 =======
                 "id": {
+=======
+                "path": {
+>>>>>>> port/github-checks_workflows
                   "type": "string"
                 },
                 "state": {
                   "type": "string"
                 },
+<<<<<<< HEAD
                 "submitted_at": {
 >>>>>>> port/github-pull_requests
                   "type": [
@@ -2382,10 +2722,15 @@
                     }
                   ]
 >>>>>>> port/github-pull_requests
+=======
+                "url": {
+                  "type": "string"
+>>>>>>> port/github-checks_workflows
                 }
               },
               "required": [
                 "id",
+<<<<<<< HEAD
 <<<<<<< HEAD
                 "login",
                 "avatar_url",
@@ -2393,6 +2738,10 @@
                 "account_type"
 >>>>>>> port/github-issues
 =======
+=======
+                "name",
+                "path",
+>>>>>>> port/github-checks_workflows
                 "state",
                 "url"
               ],
@@ -2406,11 +2755,16 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_Vec_GithubReviewComment": {
+=======
+      "ActionResult_Vec_GithubWorkflowJob": {
+>>>>>>> port/github-checks_workflows
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
             "items": {
+<<<<<<< HEAD
               "description": "A comment on a line of a pull request's diff.",
               "properties": {
                 "body": {
@@ -2421,10 +2775,26 @@
                 },
                 "diff_hunk": {
                   "type": "string"
+=======
+              "description": "A job of a workflow run.",
+              "properties": {
+                "completed_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "conclusion": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+>>>>>>> port/github-checks_workflows
                 },
                 "id": {
                   "type": "string"
                 },
+<<<<<<< HEAD
                 "in_reply_to_id": {
                   "type": [
                     "string",
@@ -2445,11 +2815,21 @@
                   "type": "string"
                 },
                 "side": {
+=======
+                "name": {
+                  "type": "string"
+                },
+                "run_id": {
+                  "type": "string"
+                },
+                "started_at": {
+>>>>>>> port/github-checks_workflows
                   "type": [
                     "string",
                     "null"
                   ]
                 },
+<<<<<<< HEAD
                 "start_line": {
                   "format": "int64",
                   "type": [
@@ -2474,11 +2854,27 @@
                     {
                       "type": "null"
                     }
+=======
+                "status": {
+                  "type": "string"
+                },
+                "steps": {
+                  "items": {
+                    "$ref": "#/components/schemas/GithubWorkflowStep"
+                  },
+                  "type": "array"
+                },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+>>>>>>> port/github-checks_workflows
                   ]
                 }
               },
               "required": [
                 "id",
+<<<<<<< HEAD
                 "path",
                 "body",
                 "commit_id",
@@ -2486,6 +2882,93 @@
                 "diff_hunk",
                 "url"
 >>>>>>> port/github-pull_requests
+=======
+                "run_id",
+                "name",
+                "status",
+                "steps"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_Vec_GithubWorkflowRun": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A run of a workflow.",
+              "properties": {
+                "conclusion": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "created_at": {
+                  "type": "string"
+                },
+                "display_title": {
+                  "type": "string"
+                },
+                "event": {
+                  "type": "string"
+                },
+                "head_branch": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "head_sha": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "run_number": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "status": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "updated_at": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "workflow_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "display_title",
+                "workflow_id",
+                "event",
+                "head_sha",
+                "url",
+                "run_number",
+                "created_at",
+                "updated_at"
+>>>>>>> port/github-checks_workflows
               ],
               "type": "object"
             },
@@ -2702,6 +3185,7 @@
       },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "CompareCommits": {
         "additionalProperties": false,
         "properties": {
@@ -2744,11 +3228,15 @@
 >>>>>>> port/github-issues
 =======
       "CheckPullRequestMerged": {
+=======
+      "CancelWorkflowRun": {
+>>>>>>> port/github-checks_workflows
         "additionalProperties": false,
         "properties": {
           "owner": {
             "type": "string"
           },
+<<<<<<< HEAD
           "pull_number": {
             "format": "int64",
             "minimum": 0,
@@ -2757,11 +3245,21 @@
 >>>>>>> port/github-pull_requests
           "repo": {
             "type": "string"
+=======
+          "repo": {
+            "type": "string"
+          },
+          "run_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+>>>>>>> port/github-checks_workflows
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
           "basehead"
@@ -2771,6 +3269,9 @@
 =======
           "pull_number"
 >>>>>>> port/github-pull_requests
+=======
+          "run_id"
+>>>>>>> port/github-checks_workflows
         ],
         "type": "object"
       },
@@ -2934,6 +3435,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "CreateCommitComment": {
         "additionalProperties": false,
         "properties": {
@@ -2948,11 +3450,19 @@
           },
           "path": {
             "description": "The file to comment on, relative to the repository's root.",
+=======
+      "CreateCommitStatus": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "description": "The name that tells this status apart from other services' statuses on the commit.\nGitHub uses `default` when it is left out.",
+>>>>>>> port/github-checks_workflows
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "position": {
             "description": "The line of the file's diff to comment on, from 1.",
             "format": "int32",
@@ -2964,13 +3474,47 @@
           },
           "repo": {
             "type": "string"
+=======
+          "description": {
+            "description": "A short description of the status.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "sha": {
+            "description": "The commit's full SHA.",
+            "type": "string"
+          },
+          "state": {
+            "description": "`error`, `failure`, `pending` or `success`.",
+            "type": "string"
+          },
+          "target_url": {
+            "description": "The page the status links to, such as a build's output.",
+            "type": [
+              "string",
+              "null"
+            ]
+>>>>>>> port/github-checks_workflows
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "commit_sha",
           "body"
+=======
+          "sha",
+          "state"
+>>>>>>> port/github-checks_workflows
         ],
         "type": "object"
       },
@@ -3763,6 +4307,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "DiffSide": {
         "description": "The side of a diff a review comment is placed on: `LEFT` is the old version of the file, with\nthe lines removed, and `RIGHT` is the new version, with the lines added.",
         "enum": [
@@ -3793,14 +4338,114 @@
             "format": "int64",
             "minimum": 0,
             "type": "integer"
+=======
+      "DisableWorkflow": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "workflow_id": {
+            "description": "The workflow's id, or its file name such as `ci.yml`.",
+            "type": "string"
+>>>>>>> port/github-checks_workflows
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "pull_number",
           "review_id",
           "message"
+=======
+          "workflow_id"
+        ],
+        "type": "object"
+      },
+      "DispatchWorkflow": {
+        "additionalProperties": false,
+        "properties": {
+          "inputs": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The workflow's inputs, by name. Every value is a string.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "ref": {
+            "description": "The branch or tag the workflow runs on.",
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "workflow_id": {
+            "description": "The workflow's id, or its file name such as `ci.yml`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "workflow_id",
+          "ref"
+        ],
+        "type": "object"
+      },
+      "DownloadWorkflowArtifact": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "artifact_id"
+        ],
+        "type": "object"
+      },
+      "EnableWorkflow": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "workflow_id": {
+            "description": "The workflow's id, or its file name such as `ci.yml`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "workflow_id"
+>>>>>>> port/github-checks_workflows
         ],
         "type": "object"
       },
@@ -3939,15 +4584,20 @@
       },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "GetCommit": {
 =======
       "GetPullRequest": {
 >>>>>>> port/github-pull_requests
+=======
+      "GetCommitStatuses": {
+>>>>>>> port/github-checks_workflows
         "additionalProperties": false,
         "properties": {
           "owner": {
             "type": "string"
           },
+<<<<<<< HEAD
 <<<<<<< HEAD
           "ref": {
             "description": "A commit SHA, a branch name or a tag name.",
@@ -4050,6 +4700,30 @@
             "type": "string"
           },
 >>>>>>> port/github-issues
+=======
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "ref": {
+            "description": "A commit SHA, a branch name or a tag name.",
+            "type": "string"
+          },
+>>>>>>> port/github-checks_workflows
           "repo": {
             "type": "string"
           }
@@ -4057,6 +4731,7 @@
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
 <<<<<<< HEAD
           "ref"
 =======
@@ -4118,6 +4793,9 @@
           "pull_number",
           "review_id"
 >>>>>>> port/github-pull_requests
+=======
+          "ref"
+>>>>>>> port/github-checks_workflows
         ],
         "type": "object"
       },
@@ -4140,7 +4818,11 @@
       },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "GetRepositoryPermissionForUser": {
+=======
+      "GetWorkflow": {
+>>>>>>> port/github-checks_workflows
         "additionalProperties": false,
         "properties": {
           "owner": {
@@ -4149,14 +4831,20 @@
           "repo": {
             "type": "string"
           },
+<<<<<<< HEAD
           "username": {
             "description": "The account's login.",
+=======
+          "workflow_id": {
+            "description": "The workflow's id, or its file name such as `ci.yml`.",
+>>>>>>> port/github-checks_workflows
             "type": "string"
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "username"
         ],
         "type": "object"
@@ -4174,12 +4862,30 @@
               "null"
             ]
           },
+=======
+          "workflow_id"
+        ],
+        "type": "object"
+      },
+      "GetWorkflowJobLogs": {
+        "additionalProperties": false,
+        "properties": {
+          "job_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+>>>>>>> port/github-checks_workflows
           "repo": {
             "type": "string"
           }
         },
         "required": [
           "owner",
+<<<<<<< HEAD
           "repo"
         ],
         "type": "object"
@@ -4201,6 +4907,35 @@
 >>>>>>> port/github-issues
 =======
 >>>>>>> port/github-pull_requests
+=======
+          "repo",
+          "job_id"
+        ],
+        "type": "object"
+      },
+      "GetWorkflowRun": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "run_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "run_id"
+        ],
+        "type": "object"
+      },
+>>>>>>> port/github-checks_workflows
       "GithubAcknowledgement": {
         "description": "An action that answers nothing of its own: `ok` once GitHub has done it.",
         "properties": {
@@ -4213,6 +4948,63 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
+=======
+      "GithubArtifact": {
+        "description": "A file a workflow run kept.",
+        "properties": {
+          "archive_download_url": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expired": {
+            "type": "boolean"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "size_in_bytes": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "size_in_bytes",
+          "archive_download_url",
+          "expired"
+        ],
+        "type": "object"
+      },
+      "GithubArtifactDownload": {
+        "description": "Where a workflow artifact's ZIP archive can be downloaded.",
+        "properties": {
+          "url": {
+            "description": "A signed URL that downloads the archive without a token, for one minute.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+>>>>>>> port/github-checks_workflows
       "GithubBranch": {
         "description": "A branch: its name, the commit it points at, and whether it is protected.",
         "properties": {
@@ -4234,6 +5026,7 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "GithubCollaborator": {
         "description": "A repository's collaborator.",
         "properties": {
@@ -4241,11 +5034,36 @@
             "type": "string"
           },
           "avatar_url": {
+=======
+      "GithubCheckRun": {
+        "description": "A check run on a commit.",
+        "properties": {
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "conclusion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "details_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "head_sha": {
+>>>>>>> port/github-checks_workflows
             "type": "string"
           },
           "id": {
             "type": "string"
           },
+<<<<<<< HEAD
           "login": {
             "type": "string"
           },
@@ -4623,6 +5441,20 @@
             "format": "int64",
             "type": "integer"
           },
+=======
+          "name": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+>>>>>>> port/github-checks_workflows
           "url": {
             "type": [
               "string",
@@ -4631,6 +5463,7 @@
           }
         },
         "required": [
+<<<<<<< HEAD
           "entry_type",
           "name",
           "path",
@@ -4651,19 +5484,56 @@
           "contributions": {
             "format": "int64",
             "type": "integer"
+=======
+          "id",
+          "name",
+          "status",
+          "head_sha"
+        ],
+        "type": "object"
+      },
+      "GithubCommitStatus": {
+        "description": "A status a service set on a commit.",
+        "properties": {
+          "context": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+>>>>>>> port/github-checks_workflows
           },
           "id": {
             "type": "string"
           },
+<<<<<<< HEAD
           "login": {
             "type": "string"
           },
           "url": {
+=======
+          "state": {
+            "type": "string"
+          },
+          "target_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+>>>>>>> port/github-checks_workflows
             "type": "string"
           }
         },
         "required": [
           "id",
+<<<<<<< HEAD
           "login",
           "avatar_url",
           "url",
@@ -4674,6 +5544,15 @@
       },
 =======
 >>>>>>> port/github-pull_requests
+=======
+          "state",
+          "context",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+>>>>>>> port/github-checks_workflows
       "GithubCurrentUser": {
         "description": "The authenticated user, with their profile.",
         "properties": {
@@ -4862,6 +5741,7 @@
       },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "GithubLanguage": {
         "description": "A language a repository is written in, by bytes of code.",
         "properties": {
@@ -4870,10 +5750,18 @@
             "type": "integer"
           },
           "name": {
+=======
+      "GithubJobLogs": {
+        "description": "A workflow job's logs, as plain text.",
+        "properties": {
+          "logs": {
+            "description": "The whole log, as GitHub keeps it once the job has finished.",
+>>>>>>> port/github-checks_workflows
             "type": "string"
           }
         },
         "required": [
+<<<<<<< HEAD
           "name",
           "bytes"
         ],
@@ -5439,6 +6327,9 @@
           "deletions",
           "changes"
 >>>>>>> port/github-pull_requests
+=======
+          "logs"
+>>>>>>> port/github-checks_workflows
         ],
         "type": "object"
       },
@@ -5940,6 +6831,197 @@
         ],
         "type": "object"
       },
+      "GithubWorkflow": {
+        "description": "A GitHub Actions workflow.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "path",
+          "state",
+          "url"
+        ],
+        "type": "object"
+      },
+      "GithubWorkflowJob": {
+        "description": "A job of a workflow run.",
+        "properties": {
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "conclusion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "run_id": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/GithubWorkflowStep"
+            },
+            "type": "array"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "run_id",
+          "name",
+          "status",
+          "steps"
+        ],
+        "type": "object"
+      },
+      "GithubWorkflowRun": {
+        "description": "A run of a workflow.",
+        "properties": {
+          "conclusion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "display_title": {
+            "type": "string"
+          },
+          "event": {
+            "type": "string"
+          },
+          "head_branch": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "head_sha": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "run_number": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "workflow_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "display_title",
+          "workflow_id",
+          "event",
+          "head_sha",
+          "url",
+          "run_number",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "GithubWorkflowStep": {
+        "description": "A step of a job.",
+        "properties": {
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "conclusion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "started_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "name",
+          "status"
+        ],
+        "type": "object"
+      },
       "LinearTeam": {
         "description": "A Linear team the connected user can see.",
         "properties": {
@@ -6033,6 +7115,7 @@
       },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ListCommitComments": {
 =======
       "ListPullRequestCommits": {
@@ -6085,11 +7168,21 @@
             "description": "From 1.",
             "format": "int32",
             "minimum": 0,
+=======
+      "ListCheckRunsForRef": {
+        "additionalProperties": false,
+        "properties": {
+          "app_id": {
+            "description": "Only the check runs of the GitHub App with this id.",
+            "format": "int64",
+            "minimum": 0,
+>>>>>>> port/github-checks_workflows
             "type": [
               "integer",
               "null"
             ]
           },
+<<<<<<< HEAD
           "per_page": {
             "description": "At most 100.",
             "format": "int32",
@@ -6181,11 +7274,16 @@
           },
           "since": {
             "description": "Only comments updated at or after this time, in ISO 8601 (`2024-01-31T12:00:00Z`).",
+=======
+          "check_name": {
+            "description": "Only the check runs with this name.",
+>>>>>>> port/github-checks_workflows
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "sort": {
             "oneOf": [
               {
@@ -6266,6 +7364,10 @@
           },
           "head": {
             "description": "Only pull requests from this branch, as `user:ref-name` or `organization:ref-name`.",
+=======
+          "filter": {
+            "description": "`latest` (each check's most recent run, GitHub's default) or `all`.",
+>>>>>>> port/github-checks_workflows
             "type": [
               "string",
               "null"
@@ -6292,6 +7394,7 @@
               "null"
             ]
           },
+<<<<<<< HEAD
           "repo": {
             "type": "string"
           },
@@ -6706,10 +7809,22 @@
           },
           "ref": {
             "description": "A branch, a tag or a commit SHA; the default branch when left out.",
+=======
+          "ref": {
+            "description": "A commit SHA, a branch name or a tag name.",
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "status": {
+            "description": "Only the check runs in this status, such as `queued`, `in_progress` or `completed`.",
+>>>>>>> port/github-checks_workflows
             "type": [
               "string",
               "null"
             ]
+<<<<<<< HEAD
           },
           "repo": {
             "type": "string"
@@ -6733,6 +7848,8 @@
           },
           "repo": {
             "type": "string"
+=======
+>>>>>>> port/github-checks_workflows
           }
         },
         "required": [
@@ -6742,6 +7859,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ListMyRepositories": {
         "additionalProperties": false,
         "properties": {
@@ -6804,6 +7922,12 @@
           },
           "org": {
             "description": "The organization's login.",
+=======
+      "ListRepositoryWorkflows": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+>>>>>>> port/github-checks_workflows
             "type": "string"
           },
           "page": {
@@ -6824,6 +7948,7 @@
               "null"
             ]
           },
+<<<<<<< HEAD
           "sort": {
             "description": "`created`, `updated`, `pushed` or `full_name`.",
             "type": [
@@ -6849,6 +7974,23 @@
         "properties": {
           "affiliation": {
             "description": "`outside`, `direct` or `all`.",
+=======
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo"
+        ],
+        "type": "object"
+      },
+      "ListWorkflowRunArtifacts": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Only the artifacts with exactly this name.",
+>>>>>>> port/github-checks_workflows
             "type": [
               "string",
               "null"
@@ -6875,19 +8017,75 @@
               "null"
             ]
           },
+<<<<<<< HEAD
           "permission": {
             "description": "Only those with this permission: `pull`, `triage`, `push`, `maintain` or `admin`.",
+=======
+          "repo": {
+            "type": "string"
+          },
+          "run_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "run_id"
+        ],
+        "type": "object"
+      },
+      "ListWorkflowRunJobs": {
+        "additionalProperties": false,
+        "properties": {
+          "filter": {
+            "description": "`latest` (the jobs of the run's latest attempt, GitHub's default) or `all`.",
+>>>>>>> port/github-checks_workflows
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "repo": {
             "type": "string"
+=======
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "repo": {
+            "type": "string"
+          },
+          "run_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+>>>>>>> port/github-checks_workflows
           }
         },
         "required": [
           "owner",
+<<<<<<< HEAD
           "repo"
         ],
         "type": "object"
@@ -6897,11 +8095,61 @@
         "properties": {
           "anon": {
             "description": "Whether to include contributors whose commits match no GitHub account.",
+=======
+          "repo",
+          "run_id"
+        ],
+        "type": "object"
+      },
+      "ListWorkflowRuns": {
+        "additionalProperties": false,
+        "properties": {
+          "actor": {
+            "description": "Only the runs started by this user's login.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "branch": {
+            "description": "Only the runs on this branch.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "check_suite_id": {
+            "description": "Only the runs of this check suite.",
+            "format": "int64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "created": {
+            "description": "Only the runs created in this date range, in GitHub's search syntax, such as\n`>=2024-01-01` or `2024-01-01..2024-01-31`.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event": {
+            "description": "Only the runs started by this event, such as `push` or `pull_request`.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "exclude_pull_requests": {
+            "description": "Whether to leave out the pull requests GitHub would otherwise list with each run.",
+>>>>>>> port/github-checks_workflows
             "type": [
               "boolean",
               "null"
             ]
           },
+<<<<<<< HEAD
           "owner": {
             "type": "string"
           },
@@ -6936,6 +8184,15 @@
       "ListRepositoryForks": {
         "additionalProperties": false,
         "properties": {
+=======
+          "head_sha": {
+            "description": "Only the runs of this commit.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+>>>>>>> port/github-checks_workflows
           "owner": {
             "type": "string"
           },
@@ -6960,12 +8217,17 @@
           "repo": {
             "type": "string"
           },
+<<<<<<< HEAD
           "sort": {
             "description": "`newest`, `oldest`, `stargazers` or `watchers`.",
 =======
           "state": {
             "description": "`open` (GitHub's default), `closed` or `all`.",
 >>>>>>> port/github-issues
+=======
+          "status": {
+            "description": "Only the runs in this status or with this conclusion, such as `in_progress` or `failure`.",
+>>>>>>> port/github-checks_workflows
             "type": [
               "string",
               "null"
@@ -6978,6 +8240,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
       "ListRepositoryLanguages": {
         "additionalProperties": false,
@@ -7123,6 +8386,8 @@
 >>>>>>> port/github-issues
 =======
 >>>>>>> port/github-pull_requests
+=======
+>>>>>>> port/github-checks_workflows
       "List_AuthConfig": {
         "properties": {
           "data": {
@@ -7322,6 +8587,7 @@
       },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "MergeBranch": {
         "additionalProperties": false,
         "properties": {
@@ -7336,10 +8602,17 @@
         "additionalProperties": false,
         "properties": {
           "issue_number": {
+=======
+      "RerequestCheckRun": {
+        "additionalProperties": false,
+        "properties": {
+          "check_run_id": {
+>>>>>>> port/github-checks_workflows
             "format": "int64",
             "minimum": 0,
             "type": "integer"
           },
+<<<<<<< HEAD
           "lock_reason": {
             "description": "Why: `off-topic`, `too heated`, `resolved` or `spam`.",
 >>>>>>> port/github-issues
@@ -7642,6 +8915,8 @@
           "new_name": {
             "type": "string"
           },
+=======
+>>>>>>> port/github-checks_workflows
           "owner": {
             "type": "string"
           },
@@ -7652,6 +8927,7 @@
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "branch",
           "new_name"
         ],
@@ -7702,11 +8978,45 @@
           },
           "is_merged": {
             "description": "Only merged pull requests (`true`) or only unmerged ones (`false`).",
+=======
+          "check_run_id"
+        ],
+        "type": "object"
+      },
+      "RerequestCheckSuite": {
+        "additionalProperties": false,
+        "properties": {
+          "check_suite_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "check_suite_id"
+        ],
+        "type": "object"
+      },
+      "RerunFailedJobs": {
+        "additionalProperties": false,
+        "properties": {
+          "enable_debug_logging": {
+            "description": "Whether the jobs run again with debug logging turned on.",
+>>>>>>> port/github-checks_workflows
             "type": [
               "boolean",
               "null"
             ]
           },
+<<<<<<< HEAD
           "label": {
             "description": "Only items carrying this label.",
             "type": [
@@ -7864,11 +9174,24 @@
           },
           "repo": {
             "type": "string"
+=======
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "run_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+>>>>>>> port/github-checks_workflows
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
 <<<<<<< HEAD
           "names"
 =======
@@ -7915,6 +9238,41 @@
         "type": "string"
       },
 >>>>>>> port/github-pull_requests
+=======
+          "run_id"
+        ],
+        "type": "object"
+      },
+      "RerunWorkflow": {
+        "additionalProperties": false,
+        "properties": {
+          "enable_debug_logging": {
+            "description": "Whether the jobs run again with debug logging turned on.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "run_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "run_id"
+        ],
+        "type": "object"
+      },
+>>>>>>> port/github-checks_workflows
       "SlackChannel": {
         "description": "A channel the connected user can see.",
         "properties": {
@@ -9536,6 +10894,7 @@
     },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.add_repository_collaborator": {
       "post": {
         "operationId": "github_add_repository_collaborator",
@@ -9549,6 +10908,11 @@
       "post": {
         "operationId": "github_check_pull_request_merged",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.cancel_workflow_run": {
+      "post": {
+        "operationId": "github_cancel_workflow_run",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -9575,6 +10939,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 "$ref": "#/components/schemas/AddRepositoryCollaborator"
@@ -10795,6 +12160,9 @@
 =======
                 "$ref": "#/components/schemas/DeletePullRequestReviewComment"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/CancelWorkflowRun"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -10916,6 +12284,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A branch's or a tag's git reference deleted.",
 =======
         "summary": "Every label taken off an issue.",
@@ -10923,11 +12292,15 @@
 =======
         "summary": "A comment on a pull request's diff, deleted.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "Stops a workflow run that is queued or in progress.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.delete_repository": {
@@ -10943,6 +12316,11 @@
       "post": {
         "operationId": "github_dismiss_pull_request_review",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.create_commit_status": {
+      "post": {
+        "operationId": "github_create_commit_status",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -10971,12 +12349,16 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/DeleteRepository"
 =======
                 "$ref": "#/components/schemas/CreateIssue"
 =======
                 "$ref": "#/components/schemas/DismissPullRequestReview"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/CreateCommitStatus"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -10988,10 +12370,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubIssue"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubReview"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubCommitStatus"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -11101,15 +12487,25 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A new issue in a repository.",
+=======
+        "summary": "Sets a status on a commit.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.create_issue_comment": {
       "post": {
         "operationId": "github_create_issue_comment",
+=======
+    "/v1/connected-accounts/{id}/actions/github.disable_workflow": {
+      "post": {
+        "operationId": "github_disable_workflow",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -11136,6 +12532,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/CreateIssueComment"
               }
             }
@@ -11913,6 +13310,9 @@
               "schema": {
                 "$ref": "#/components/schemas/DeleteIssueComment"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/DisableWorkflow"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -12033,15 +13433,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A repository deleted, by owner and name.",
 =======
         "summary": "A comment on an issue deleted.",
 >>>>>>> port/github-issues
+=======
+        "summary": "Turns a workflow off, so nothing starts it until it is enabled again.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.fork_repository": {
       "post": {
@@ -12051,6 +13456,11 @@
       "post": {
         "operationId": "github_delete_label",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.dispatch_workflow": {
+      "post": {
+        "operationId": "github_dispatch_workflow",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -12077,6 +13487,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
                 "$ref": "#/components/schemas/ForkRepository"
 =======
@@ -12244,6 +13655,9 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/DeleteMilestone"
+=======
+                "$ref": "#/components/schemas/DispatchWorkflow"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -12363,11 +13777,325 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A milestone deleted from a repository.",
 >>>>>>> port/github-issues
 =======
         "summary": "A submitted review of a pull request, dismissed.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "Starts a workflow that runs on `workflow_dispatch`.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.download_workflow_artifact": {
+      "post": {
+        "operationId": "github_download_workflow_artifact",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DownloadWorkflowArtifact"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubArtifactDownload"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Where an artifact's ZIP archive can be downloaded: a signed URL GitHub keeps valid for one minute.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.enable_workflow": {
+      "post": {
+        "operationId": "github_enable_workflow",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnableWorkflow"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Turns a disabled workflow back on.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
@@ -12528,9 +14256,15 @@
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_commit": {
       "post": {
         "operationId": "github_get_commit",
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_commit_statuses": {
+      "post": {
+        "operationId": "github_get_commit_statuses",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -12557,7 +14291,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetCommit"
+=======
+                "$ref": "#/components/schemas/GetCommitStatuses"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -12568,7 +14306,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubCommit"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubCommitStatus"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -12677,7 +14419,11 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A commit, with its stats and the files it changed.",
+=======
+        "summary": "The statuses set on a commit, newest first, a page at a time.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
@@ -13676,6 +15422,7 @@
       }
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_repository_permission_for_user": {
       "post": {
         "operationId": "github_get_repository_permission_for_user",
@@ -13684,6 +15431,11 @@
       "post": {
         "operationId": "github_list_assignees",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_workflow": {
+      "post": {
+        "operationId": "github_get_workflow",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -13710,11 +15462,15 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
                 "$ref": "#/components/schemas/GetRepositoryPermissionForUser"
 =======
                 "$ref": "#/components/schemas/ListAssignees"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/GetWorkflow"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -13725,11 +15481,15 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubRepositoryPermission"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubUser"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubWorkflow"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -13839,15 +15599,25 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "What an account may do in a repository.",
+=======
+        "summary": "A workflow, by id or file name.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_repository_readme": {
       "post": {
         "operationId": "github_get_repository_readme",
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_workflow_job_logs": {
+      "post": {
+        "operationId": "github_get_workflow_job_logs",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -13874,7 +15644,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetRepositoryReadme"
+=======
+                "$ref": "#/components/schemas/GetWorkflowJobLogs"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -13885,7 +15659,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubFileContent"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubJobLogs"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -13994,15 +15772,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A repository's README, in base64 and decoded when it is text.",
+=======
+        "summary": "The plain-text logs of a finished workflow job.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_user": {
       "post": {
         "operationId": "github_get_user",
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_workflow_run": {
+      "post": {
+        "operationId": "github_get_workflow_run",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -14029,7 +15817,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetUser"
+=======
+                "$ref": "#/components/schemas/GetWorkflowRun"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -14040,7 +15832,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubPublicUser"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubWorkflowRun"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -14149,10 +15945,14 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A user's public profile, by login.",
 =======
         "summary": "The people issues in a repository can be assigned to, a page at a time.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A workflow run, by id.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
@@ -14313,9 +16113,15 @@
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_commit_comments": {
       "post": {
         "operationId": "github_list_commit_comments",
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_check_runs_for_ref": {
+      "post": {
+        "operationId": "github_list_check_runs_for_ref",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -14342,7 +16148,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListCommitComments"
+=======
+                "$ref": "#/components/schemas/ListCheckRunsForRef"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -14353,7 +16163,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubCommitComment"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubCheckRun"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -14462,6 +16276,7 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "The comments on a commit, a page at a time.",
         "tags": [
           "actions"
@@ -14773,6 +16588,9 @@
           }
         ],
         "summary": "The entries of a directory of a repository.",
+=======
+        "summary": "The check runs on a commit, a branch or a tag, a page at a time.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
@@ -16299,6 +18117,7 @@
     },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_collaborators": {
       "post": {
         "operationId": "github_list_repository_collaborators",
@@ -16312,6 +18131,11 @@
       "post": {
         "operationId": "github_merge_pull_request",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_repository_workflows": {
+      "post": {
+        "operationId": "github_list_repository_workflows",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -16338,6 +18162,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryCollaborators"
@@ -16347,6 +18172,9 @@
 =======
                 "$ref": "#/components/schemas/MergePullRequest"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/ListRepositoryWorkflows"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -16359,10 +18187,14 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubCollaborator"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubIssueEvent"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubWorkflow"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -16472,15 +18304,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A repository's collaborators, a page at a time.",
 =======
         "summary": "What happened to every issue in a repository, a page at a time.",
 >>>>>>> port/github-issues
+=======
+        "summary": "The workflows a repository has, a page at a time.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_contributors": {
       "post": {
@@ -16490,6 +18327,11 @@
       "post": {
         "operationId": "github_list_repository_issues",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_workflow_run_artifacts": {
+      "post": {
+        "operationId": "github_list_workflow_run_artifacts",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -16517,10 +18359,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryContributors"
 =======
                 "$ref": "#/components/schemas/ListRepositoryIssues"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/ListWorkflowRunArtifacts"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -16532,10 +18378,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubContributor"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssuePage"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubArtifact"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -16645,15 +18495,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "Who contributed to a repository, a page at a time.",
 =======
         "summary": "A repository's issues, a page at a time, without the pull requests GitHub lists among them.",
 >>>>>>> port/github-issues
+=======
+        "summary": "The artifacts a workflow run kept, a page at a time.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_forks": {
       "post": {
@@ -16663,6 +18518,11 @@
       "post": {
         "operationId": "github_list_repository_labels",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_workflow_run_jobs": {
+      "post": {
+        "operationId": "github_list_workflow_run_jobs",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -16690,10 +18550,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryForks"
 =======
                 "$ref": "#/components/schemas/ListRepositoryLabels"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/ListWorkflowRunJobs"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -16705,10 +18569,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubWorkflowJob"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -16818,15 +18686,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A repository's forks, a page at a time.",
 =======
         "summary": "The labels a repository has, a page at a time.",
 >>>>>>> port/github-issues
+=======
+        "summary": "The jobs of a workflow run, a page at a time.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_languages": {
       "post": {
@@ -16836,6 +18709,11 @@
       "post": {
         "operationId": "github_lock_issue",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_workflow_runs": {
+      "post": {
+        "operationId": "github_list_workflow_runs",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -16863,10 +18741,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryLanguages"
 =======
                 "$ref": "#/components/schemas/LockIssue"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/ListWorkflowRuns"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -16878,10 +18760,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubLanguage"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssueLock"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubWorkflowRun"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -16991,15 +18877,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "The languages a repository is written in, by bytes of code.",
 =======
         "summary": "An issue's conversation locked, so only collaborators can comment.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A repository's workflow runs, newest first, a page at a time.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_tags": {
       "post": {
@@ -17009,6 +18900,11 @@
       "post": {
         "operationId": "github_remove_issue_assignees",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.rerequest_check_run": {
+      "post": {
+        "operationId": "github_rerequest_check_run",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -17036,10 +18932,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryTags"
 =======
                 "$ref": "#/components/schemas/RemoveIssueAssignees"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/RerequestCheckRun"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -17050,6 +18950,7 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubTag"
 =======
@@ -17768,6 +19669,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubReviewRequest"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -17878,6 +19782,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A collaborator removed from a repository.",
 =======
         "summary": "An issue's conversation unlocked.",
@@ -17885,11 +19790,15 @@
 =======
         "summary": "Users and teams removed from those a pull request's review is requested from.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "Asks the app that made a check run to run it again.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.rename_branch": {
@@ -17905,6 +19814,11 @@
       "post": {
         "operationId": "github_reply_pull_request_review_comment",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.rerequest_check_suite": {
+      "post": {
+        "operationId": "github_rerequest_check_suite",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -17933,6 +19847,7 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/RenameBranch"
 =======
                 "$ref": "#/components/schemas/UpdateIssue"
@@ -17940,6 +19855,9 @@
 =======
                 "$ref": "#/components/schemas/ReplyPullRequestReviewComment"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/RerequestCheckSuite"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -17952,6 +19870,7 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubBranch"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssue"
@@ -17959,6 +19878,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubReviewComment"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -18069,6 +19991,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A branch given a new name.",
 =======
         "summary": "An issue's title, text, state, assignees, labels or milestone changed.",
@@ -18076,11 +19999,15 @@
 =======
         "summary": "A reply to a comment on a pull request's diff.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "Asks the app that made a check suite to run it again.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.replace_repository_topics": {
@@ -18096,6 +20023,11 @@
       "post": {
         "operationId": "github_request_pull_request_reviewers",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.rerun_failed_jobs": {
+      "post": {
+        "operationId": "github_rerun_failed_jobs",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -18124,6 +20056,7 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ReplaceRepositoryTopics"
 =======
                 "$ref": "#/components/schemas/UpdateIssueComment"
@@ -18131,6 +20064,9 @@
 =======
                 "$ref": "#/components/schemas/RequestPullRequestReviewers"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/RerunFailedJobs"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -18143,6 +20079,7 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubTopics"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssueComment"
@@ -18150,6 +20087,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubReviewRequest"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -18260,6 +20200,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A repository's topics replaced by a new set.",
 =======
         "summary": "A comment on an issue, its text replaced.",
@@ -18267,11 +20208,15 @@
 =======
         "summary": "A pull request's review requested from users and teams.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "Runs again the jobs of a workflow run that failed, and the jobs that depend on them.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.sync_fork_branch_with_upstream": {
@@ -18287,6 +20232,11 @@
       "post": {
         "operationId": "github_submit_pull_request_review",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.rerun_workflow": {
+      "post": {
+        "operationId": "github_rerun_workflow",
+>>>>>>> port/github-checks_workflows
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -18315,6 +20265,7 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/SyncForkBranchWithUpstream"
 =======
                 "$ref": "#/components/schemas/UpdateLabel"
@@ -18322,6 +20273,9 @@
 =======
                 "$ref": "#/components/schemas/SubmitPullRequestReview"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/RerunWorkflow"
+>>>>>>> port/github-checks_workflows
               }
             }
           },
@@ -18334,6 +20288,7 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubForkSync"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubLabel"
@@ -18341,6 +20296,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubReview"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
+>>>>>>> port/github-checks_workflows
                 }
               }
             }
@@ -18449,6 +20407,7 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         "summary": "A fork's branch brought up to date with its upstream.",
@@ -18977,6 +20936,9 @@
         ],
         "summary": "A comment on a pull request's diff, its text replaced.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "Runs every job of a workflow run again.",
+>>>>>>> port/github-checks_workflows
         "tags": [
           "actions"
         ]

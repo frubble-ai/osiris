@@ -1,0 +1,104 @@
+[
+ {
+  "group": "workflows",
+  "name": "list_repository_workflows",
+  "input": "ListRepositoryWorkflows",
+  "output": "GithubWorkflow",
+  "list": true,
+  "summary": "the workflows a repository has, a page at a time."
+ },
+ {
+  "group": "workflows",
+  "name": "get_workflow",
+  "input": "GetWorkflow",
+  "output": "GithubWorkflow",
+  "summary": "a workflow, by id or file name."
+ },
+ {
+  "group": "workflows",
+  "name": "dispatch_workflow",
+  "input": "DispatchWorkflow",
+  "output": "GithubAcknowledgement",
+  "summary": "starts a workflow that runs on `workflow_dispatch`."
+ },
+ {
+  "group": "workflows",
+  "name": "enable_workflow",
+  "input": "EnableWorkflow",
+  "output": "GithubAcknowledgement",
+  "summary": "turns a disabled workflow back on."
+ },
+ {
+  "group": "workflows",
+  "name": "disable_workflow",
+  "input": "DisableWorkflow",
+  "output": "GithubAcknowledgement",
+  "summary": "turns a workflow off, so nothing starts it until it is enabled again."
+ },
+ {
+  "group": "workflows",
+  "name": "list_workflow_runs",
+  "input": "ListWorkflowRuns",
+  "output": "GithubWorkflowRun",
+  "list": true,
+  "summary": "a repository's workflow runs, newest first, a page at a time."
+ },
+ {
+  "group": "workflows",
+  "name": "get_workflow_run",
+  "input": "GetWorkflowRun",
+  "output": "GithubWorkflowRun",
+  "summary": "a workflow run, by id."
+ },
+ {
+  "group": "workflows",
+  "name": "list_workflow_run_jobs",
+  "input": "ListWorkflowRunJobs",
+  "output": "GithubWorkflowJob",
+  "list": true,
+  "summary": "the jobs of a workflow run, a page at a time."
+ },
+ {
+  "group": "workflows",
+  "name": "get_workflow_job_logs",
+  "input": "GetWorkflowJobLogs",
+  "output": "GithubJobLogs",
+  "summary": "the plain-text logs of a finished workflow job."
+ },
+ {
+  "group": "workflows",
+  "name": "rerun_workflow",
+  "input": "RerunWorkflow",
+  "output": "GithubAcknowledgement",
+  "summary": "runs every job of a workflow run again."
+ },
+ {
+  "group": "workflows",
+  "name": "rerun_failed_jobs",
+  "input": "RerunFailedJobs",
+  "output": "GithubAcknowledgement",
+  "summary": "runs again the jobs of a workflow run that failed, and the jobs that depend on them."
+ },
+ {
+  "group": "workflows",
+  "name": "cancel_workflow_run",
+  "input": "CancelWorkflowRun",
+  "output": "GithubAcknowledgement",
+  "summary": "stops a workflow run that is queued or in progress."
+ },
+ {
+  "group": "workflows",
+  "name": "list_workflow_run_artifacts",
+  "input": "ListWorkflowRunArtifacts",
+  "output": "GithubArtifact",
+  "list": true,
+  "summary": "the artifacts a workflow run kept, a page at a time."
+ },
+ {
+  "group": "workflows",
+  "name": "download_workflow_artifact",
+  "input": "DownloadWorkflowArtifact",
+  "output": "GithubArtifactDownload",
+  "summary": "where an artifact's ZIP archive can be downloaded: a signed URL GitHub keeps valid for one minute."
+ }
+]
