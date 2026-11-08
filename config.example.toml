@@ -116,3 +116,5 @@ margin_seconds = 300
 # Between two scheduled checks of a trigger that checks on a schedule; its deliveries also check
 # it as they come.
 check_seconds = 300
+# The largest delivery body a trigger reads; a larger one is answered 413.
+max_delivery_bytes = 26214400

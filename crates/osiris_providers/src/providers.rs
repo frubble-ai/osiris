@@ -46,9 +46,4 @@ impl Providers {
             .iter()
             .find_map(|registered| registered.typed.downcast_ref::<P>())
     }
-
-    /// Every provider's id.
-    pub fn ids(&self) -> impl Iterator<Item = &'static str> + '_ {
-        self.built.iter().map(|registered| registered.provider.id())
-    }
 }

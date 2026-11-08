@@ -145,8 +145,8 @@ schedule.
 
 One pull request:
 1. Set its `stability` to `Stability::Stable`.
-2. Run `just openapi` and record its transcripts (`OSIRIS_GOLDEN=record just test
-   golden::releases::<god>`).
+2. Run `just openapi` and record its transcripts (`OSIRIS_GOLDEN=record just test -E
+   "'test(/golden::.*::<god>$/)'"`).
 3. The default pin moves to it, the newest stable release, so update `pinned_version` in
    `config.example.toml` (a test holds it to the default). Clients that name no version move with
    it. To keep them on the release before until they migrate, set `OSIRIS__API__PINNED_VERSION` to

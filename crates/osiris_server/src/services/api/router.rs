@@ -1,5 +1,6 @@
 //! The API's router: `/v1` behind the body limit, the version header and idempotency keys; the
-//! OAuth callback, the triggers' deliveries and `/health` in the open.
+//! OAuth callback, the triggers' deliveries (behind their own body limit) and `/health` in the
+//! open.
 
 use super::v1::v1;
 use crate::{
@@ -17,6 +18,7 @@ use tower_http::{timeout::TimeoutLayer, trace::TraceLayer};
 pub fn router(state: ApiState) -> Router {
     let timeout = state.config.settings.server.request_timeout();
     let max_body = state.config.settings.server.max_body();
+    let max_delivery = state.config.settings.triggers.max_delivery();
     let (v1, _) = v1()
         .layer(middleware::from_fn_with_state(state.clone(), idempotency))
         .layer(middleware::from_fn_with_state(state.clone(), serve_version))
@@ -27,7 +29,8 @@ pub fn router(state: ApiState) -> Router {
         .route("/oauth/callback", get(routes::oauth_callback::oauth_callback))
         .route(
             "/webhooks/triggers/{id}",
-            post(routes::trigger_delivery::trigger_delivery),
+            post(routes::trigger_delivery::trigger_delivery)
+                .layer(DefaultBodyLimit::max(max_delivery)),
         )
         .merge(v1)
         .layer(TraceLayer::new_for_http().make_span_with(|request: &axum::http::Request<_>| {

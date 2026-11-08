@@ -15,4 +15,5 @@ mod listing;
 mod refreshing;
 mod releases;
 mod slack;
+mod trigger_deliveries;
 mod unreadable_requests;

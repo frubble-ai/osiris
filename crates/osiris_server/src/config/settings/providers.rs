@@ -1,6 +1,7 @@
 //! `[providers]`: how far provider calls go, and `[providers.<id>]`, where a provider is when
 //! not where it registers by default (tests and a local fake point it elsewhere).
 
+use super::seconds;
 use osiris_providers::{ProviderUrls, Registration};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -25,7 +26,7 @@ pub struct InstallationTokenSettings {
 
 impl InstallationTokenSettings {
     pub fn margin(&self) -> time::Duration {
-        time::Duration::seconds(i64::try_from(self.margin_seconds).unwrap_or(i64::MAX))
+        seconds(self.margin_seconds)
     }
 }
 

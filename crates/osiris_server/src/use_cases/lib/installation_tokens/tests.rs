@@ -40,3 +40,12 @@ fn drops_a_refused_token_and_every_token_of_a_changed_app() {
     assert!(cache.get("ac_1", "8", now, Duration::ZERO).is_none());
     assert!(cache.get("ac_2", "7", now, Duration::ZERO).is_some());
 }
+
+#[test]
+fn reads_a_margin_too_long_to_compute_as_no_token_instead_of_overflowing() {
+    let cache = InstallationTokenCache::default();
+    let now = OffsetDateTime::now_utc();
+    cache.put("ac_1", "7", secret("ghs_1"), now + Duration::minutes(60));
+
+    assert!(cache.get("ac_1", "7", now, Duration::MAX).is_none());
+}

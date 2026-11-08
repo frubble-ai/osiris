@@ -42,6 +42,7 @@ pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCa
     })
     .await?;
     settings.refresh.check_against(tasks.max_lead_time())?;
+    settings.triggers.check_against(tasks.max_lead_time())?;
     Ok(UseCaseContext {
         db: Db::new(pool, master, settings.database.lock_timeout()),
         messages: build_message_bus(Arc::new(transport), RELEASES, &settings.api.pinned_version)?,

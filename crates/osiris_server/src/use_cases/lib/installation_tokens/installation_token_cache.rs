@@ -28,7 +28,7 @@ impl InstallationTokenCache {
         let tokens = self.tokens.lock().unwrap_or_else(PoisonError::into_inner);
         tokens
             .get(&(auth_config_id.to_owned(), installation_id.to_owned()))
-            .filter(|(_, expires_at)| *expires_at - margin > now)
+            .filter(|(_, expires_at)| expires_at.saturating_sub(margin) > now)
             .map(|(token, _)| token.clone())
     }
 

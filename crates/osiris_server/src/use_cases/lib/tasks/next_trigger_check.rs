@@ -13,7 +13,7 @@ pub fn next_trigger_check(
 ) -> Task {
     Task {
         name: names::trigger_poll(trigger_id, check),
-        run_at: OffsetDateTime::now_utc() + interval,
+        run_at: OffsetDateTime::now_utc().saturating_add(interval),
         payload: TaskPayload::TriggerPoll(TriggerTask {
             trigger_id: trigger_id.to_owned(),
             connected_account_id: connected_account_id.to_owned(),

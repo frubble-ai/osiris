@@ -7,3 +7,6 @@ pub mod schedule;
 pub mod scheduling;
 
 pub use scheduling::Scheduling;
+
+#[cfg(test)]
+mod tests;

@@ -45,6 +45,10 @@ impl Settings {
                 u64::try_from(self.providers.listing.max_log_bytes).unwrap_or(u64::MAX),
             ),
             (
+                "triggers.max_delivery_bytes",
+                self.triggers.max_delivery_bytes,
+            ),
+            (
                 "providers.listing.max_scan_pages",
                 u64::from(self.providers.listing.max_scan_pages),
             ),
