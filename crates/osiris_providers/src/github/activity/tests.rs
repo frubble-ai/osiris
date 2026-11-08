@@ -16,8 +16,9 @@ use super::{
 use crate::{
     ProviderError,
     github::mocks::{
-        MockGithubNetwork, generate_github_repository::generate_github_repository,
-        generate_github_user::generate_github_user, github_on::github_on,
+        MockGithubNetwork, generate_github::generate_github,
+        generate_github_repository::generate_github_repository,
+        generate_github_user::generate_github_user,
     },
 };
 use rstest::rstest;
@@ -48,7 +49,7 @@ async fn lists_a_page_of_the_public_feed() {
         page: Some(4),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_public_events(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -83,7 +84,7 @@ async fn lists_a_page_of_a_users_feed(#[case] feed: &str, #[case] route: &str) {
             json!([generate_github_event(3, "IssuesEvent")]),
         )
         .await;
-    let github = github_on(&server);
+    let github = generate_github(&server);
     let http = reqwest::Client::new();
     let username = String::from("octo cat");
 
@@ -152,7 +153,7 @@ async fn lists_a_page_of_the_events_of_a_repository() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_repository_events(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -170,7 +171,7 @@ async fn stars_and_unstars_a_repository_and_acknowledges_it(#[case] verb: &str) 
     MockGithubNetwork::on(&server)
         .answer(verb, "/user/starred/octo/hello", &[], 204, Value::Null)
         .await;
-    let github = github_on(&server);
+    let github = generate_github(&server);
     let http = reqwest::Client::new();
 
     let acknowledged = if verb == "PUT" {
@@ -209,7 +210,7 @@ async fn checks_whether_a_repository_is_starred(#[case] status: u16, #[case] sta
         repo: "hello".into(),
     };
 
-    let check = github_on(&server)
+    let check = generate_github(&server)
         .check_repository_starred(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -238,7 +239,7 @@ async fn a_star_check_github_refuses_otherwise_is_an_error(#[case] status: u16) 
         repo: "hello".into(),
     };
 
-    let error = github_on(&server)
+    let error = generate_github(&server)
         .check_repository_starred(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap_err();
@@ -267,7 +268,7 @@ async fn lists_a_page_of_the_stargazers_or_watchers_of_a_repository(#[case] rout
             json!(users),
         )
         .await;
-    let github = github_on(&server);
+    let github = generate_github(&server);
     let http = reqwest::Client::new();
 
     let listed = if route.ends_with("stargazers") {
@@ -323,7 +324,7 @@ async fn lists_the_repositories_the_user_starred_sorted_as_asked() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_my_starred_repositories(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -354,7 +355,7 @@ async fn sends_the_starred_sort_trimmed_and_leaves_out_a_blank_direction() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_my_starred_repositories(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();

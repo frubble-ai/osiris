@@ -8,7 +8,7 @@ use crate::testing::db_fixtures::{
 use osiris_common::secret::ExposeSecret;
 use osiris_domain::{AccountFilter, Cursor};
 use osiris_domain::{ConnectionStatus, EventType};
-use osiris_providers::mocks::fake::FAKE_ID;
+use osiris_providers::mocks::FAKE_ID;
 use sqlx::PgPool;
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]

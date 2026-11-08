@@ -5,8 +5,7 @@ use super::db_fixtures::generate_secret;
 use super::{ADMIN_KEY, API_KEY, TestContext, generate_connect_attempt::generate_connect_attempt};
 use axum::http::StatusCode;
 use osiris_providers::mocks::{
-    fake::{FAKE_ID, MockFakeNetwork},
-    generate_token_answer::generate_token_answer,
+    FAKE_ID, MockFakeNetwork, generate_token_answer::generate_token_answer,
 };
 use serde_json::{Value, json};
 use url::Url;

@@ -12,14 +12,12 @@ use axum::http::StatusCode;
 use osiris_domain::EventType;
 use osiris_events::catalog::events::EventMessage;
 use osiris_providers::github::{
-    mocks::sign_github_delivery::sign_github_delivery,
+    mocks::{
+        MockGithubNetwork, generate_github_delivery_signature::generate_github_delivery_signature,
+    },
     pull_requests::mocks::generate_github_pull_request::generate_github_pull_request,
 };
 use serde_json::{Value, json};
-use wiremock::{
-    Mock, ResponseTemplate,
-    matchers::{method, path},
-};
 
 /// The repository every trigger test watches.
 pub const HOOKS: &str = "/repos/octo/hello/hooks";
@@ -30,11 +28,8 @@ pub const PULL_REQUEST: &str = "/repos/octo/hello/pulls/7";
 
 /// Answers GitHub's webhook creation with hook 99, once.
 pub async fn answer_hook_creation(app: &TestContext) {
-    Mock::given(method("POST"))
-        .and(path(HOOKS))
-        .respond_with(ResponseTemplate::new(201).set_body_json(json!({ "id": 99 })))
-        .expect(1)
-        .mount(&app.provider)
+    MockGithubNetwork::on(&app.provider)
+        .answer_hook_creation("octo", "hello", 99)
         .await;
 }
 
@@ -47,11 +42,8 @@ pub async fn answer(
     body: Value,
     times: u64,
 ) {
-    Mock::given(method(verb))
-        .and(path(route))
-        .respond_with(ResponseTemplate::new(status).set_body_json(body))
-        .expect(times)
-        .mount(&app.provider)
+    MockGithubNetwork::on(&app.provider)
+        .answer_times(verb, route, status, body, times)
         .await;
 }
 
@@ -88,10 +80,14 @@ pub async fn watching_repo_events(app: &TestContext) -> (String, String) {
 pub async fn watching_a_pull_request(app: &TestContext) -> (String, String, String) {
     let connection = app.connected_to_github(3600).await;
     answer_hook_creation(app).await;
-    let first_state = Mock::given(method("GET"))
-        .and(path(PULL_REQUEST))
-        .respond_with(ResponseTemplate::new(200).set_body_json(generate_github_pull_request(70, 7)))
-        .mount_as_scoped(&app.provider)
+    let first_state = MockGithubNetwork::on(&app.provider)
+        .answer_while(
+            "GET",
+            PULL_REQUEST,
+            200,
+            generate_github_pull_request(70, 7),
+            None,
+        )
         .await;
     let created = create(
         app,
@@ -152,7 +148,8 @@ pub async fn deliver_as(
     delivery_id: Option<&str>,
 ) -> StatusCode {
     let body = body.to_string();
-    let signature = secret.map(|secret| sign_github_delivery(body.as_bytes(), secret));
+    let signature =
+        secret.map(|secret| generate_github_delivery_signature(body.as_bytes(), secret));
     let mut headers = vec![("x-github-event", event)];
     if let Some(delivery_id) = delivery_id {
         headers.push(("x-github-delivery", delivery_id));

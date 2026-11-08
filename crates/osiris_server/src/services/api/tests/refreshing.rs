@@ -9,7 +9,7 @@
 use crate::testing::{ADMIN_KEY, setup_test_context};
 use axum::http::StatusCode;
 use osiris_providers::mocks::{
-    fake::MockFakeNetwork, generate_token_answer::generate_token_answer_without_refresh,
+    MockFakeNetwork, generate_token_answer::generate_token_answer_without_refresh,
 };
 use sqlx::PgPool;
 

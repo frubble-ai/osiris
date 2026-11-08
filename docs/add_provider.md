@@ -6,15 +6,17 @@ a build that does ([placement rule](style-guide/placement-rule.md)).
 
 ## A provider
 
-1. Copy [`provider-template/`](../provider-template/) into `crates/osiris_providers/src/` and
-   rename `acme`/`Acme`. Fill its OAuth2 definition from the provider's docs (OpenConnector's
+1. Copy [`provider-template/`](../provider-template/)'s `acme.rs` and `acme/` into
+   `crates/osiris_providers/src/`, and its `actions/acme/` into `scripts/actions/`, and rename
+   `acme`/`Acme`. It holds every piece below: the provider, its registration, one action group
+   with an input and its `SCOPES`, and the generator's specs. Fill its OAuth2 definition from the provider's docs (OpenConnector's
    definitions are a good reference), including `issues_refresh_tokens`: true when the provider
    issues refresh tokens (its connections get a scheduled refresh), false when its tokens never
    expire (nothing is scheduled). Override `parse_error` when the provider's error answers
    (non-2xx) carry their reason in its own shape. A provider that reports errors inside a 200 is
    handled in its own transformers, since `call` only hands non-2xx answers to `parse_error`.
-2. Its `registration.rs`: its id, its default `oauth_base_url` and `api_base_url`, and how it is
-   built. `build.rs` lists every folder that has one, so nothing else registers it: `Providers`
+2. Fill its `registration.rs`: its id, its default `oauth_base_url` and `api_base_url`, and how
+   it is built. `build.rs` lists every folder that has one, so nothing else registers it: `Providers`
    finds it, `[providers.<id>]` can move its URLs, the tests build it at the fake network, and the
    `migrate` process writes its `provider` row.
 3. Declare its module in `osiris_providers/src/lib.rs` and its API models in

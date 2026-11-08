@@ -1,5 +1,7 @@
 # Findings that are not secrets, one fingerprint per line.
 
-# The GitHub App settings test names two PEM headers, with no key between them; its key is
-# generated when the test runs (MockGithubAppKey).
+# A commit of this branch, whose GitHub App settings test named two PEM headers with no key
+# between them (its key is generated when the test runs, MockGithubAppKey). The test now splits
+# the headers, so no later commit, the squash merge included, matches; this covers only that
+# commit, scanned while the pull request is open.
 fef8261608e9ddd23dbc325d06abb30e85808041:crates/osiris_providers/src/github/app/tests.rs:private-key:40

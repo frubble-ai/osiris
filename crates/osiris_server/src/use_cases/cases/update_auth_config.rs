@@ -54,9 +54,8 @@ impl UseCases {
                     .or(current.secret_settings.as_ref());
                 validated_settings(provider, settings, secret_settings)?;
             }
-            // Tokens minted with the app's old credentials are dropped with them.
-            ctx.installation_tokens.forget_auth_config(args.id);
-            ctx.db
+            let updated = ctx
+                .db
                 .update_auth_config(
                     args.id,
                     AuthConfigChanges {
@@ -67,7 +66,11 @@ impl UseCases {
                         secret_settings: args.secret_settings,
                     },
                 )
-                .await
+                .await?;
+            // Tokens minted with the app's old credentials are dropped once the new ones are
+            // saved, so none minted in between with the old ones stays.
+            ctx.installation_tokens.forget_auth_config(args.id);
+            Ok(updated)
         })
         .await
     }

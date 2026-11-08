@@ -23,7 +23,7 @@ use crate::{
     ListLimits, ProviderError, ProviderUrls,
     github::{
         Github,
-        mocks::{MockGithubNetwork, github_on::github_on},
+        mocks::{MockGithubNetwork, generate_github::generate_github},
     },
 };
 use fake::{Fake, faker::lorem::en::Paragraph};
@@ -52,7 +52,7 @@ async fn lists_a_page_of_the_workflows_of_a_repository() {
         page: Some(1),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_repository_workflows(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -85,7 +85,7 @@ async fn reads_a_workflow_by_id_or_file_name(#[case] workflow_id: &str, #[case] 
         workflow_id: workflow_id.into(),
     };
 
-    let workflow = github_on(&server)
+    let workflow = generate_github(&server)
         .get_workflow(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -123,7 +123,7 @@ async fn dispatches_a_workflow_on_a_ref(
         inputs,
     };
 
-    let acknowledged = github_on(&server)
+    let acknowledged = generate_github(&server)
         .dispatch_workflow(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -149,7 +149,7 @@ async fn enables_a_workflow() {
         workflow_id: "ci.yml".into(),
     };
 
-    let acknowledged = github_on(&server)
+    let acknowledged = generate_github(&server)
         .enable_workflow(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -175,7 +175,7 @@ async fn disables_a_workflow() {
         workflow_id: "161335".into(),
     };
 
-    let acknowledged = github_on(&server)
+    let acknowledged = generate_github(&server)
         .disable_workflow(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -225,7 +225,7 @@ async fn lists_workflow_runs_filtered_as_asked() {
         page: Some(1),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_workflow_runs(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -263,7 +263,7 @@ async fn leaves_out_a_blank_actor_and_trims_a_padded_branch_of_a_run_list() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_workflow_runs(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -297,7 +297,7 @@ async fn reads_a_workflow_run_by_id() {
         run_id: 30,
     };
 
-    let run = github_on(&server)
+    let run = generate_github(&server)
         .get_workflow_run(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -329,7 +329,7 @@ async fn lists_the_jobs_of_a_run_with_their_steps() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_workflow_run_jobs(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -362,7 +362,7 @@ async fn reads_the_logs_of_a_job_from_where_github_redirects() {
         job_id: 400,
     };
 
-    let read = github_on(&server)
+    let read = generate_github(&server)
         .get_workflow_job_logs(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -430,7 +430,7 @@ async fn refuses_the_logs_of_a_job_github_no_longer_keeps() {
         job_id: 400,
     };
 
-    let refused = github_on(&server)
+    let refused = generate_github(&server)
         .get_workflow_job_logs(&reqwest::Client::new(), "token", &input)
         .await;
 
@@ -462,7 +462,7 @@ async fn reruns_a_whole_workflow_run(
         enable_debug_logging,
     };
 
-    let acknowledged = github_on(&server)
+    let acknowledged = generate_github(&server)
         .rerun_workflow(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -489,7 +489,7 @@ async fn reruns_only_the_failed_jobs_of_a_run() {
         enable_debug_logging: Some(false),
     };
 
-    let acknowledged = github_on(&server)
+    let acknowledged = generate_github(&server)
         .rerun_failed_jobs(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -515,7 +515,7 @@ async fn cancels_a_workflow_run() {
         run_id: 30,
     };
 
-    let acknowledged = github_on(&server)
+    let acknowledged = generate_github(&server)
         .cancel_workflow_run(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -545,7 +545,7 @@ async fn lists_the_artifacts_of_a_run_by_name() {
         page: Some(1),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_workflow_run_artifacts(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -576,7 +576,7 @@ async fn answers_the_signed_url_github_redirects_an_artifact_to() {
         artifact_id: 500,
     };
 
-    let download = github_on(&server)
+    let download = generate_github(&server)
         .download_workflow_artifact(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -605,7 +605,7 @@ async fn refuses_an_artifact_that_has_expired() {
         artifact_id: 500,
     };
 
-    let refused = github_on(&server)
+    let refused = generate_github(&server)
         .download_workflow_artifact(&reqwest::Client::new(), "token", &input)
         .await;
 

@@ -16,7 +16,7 @@ use super::{
 };
 use crate::{
     ProviderError,
-    github::mocks::{MockGithubNetwork, github_on::github_on},
+    github::mocks::{MockGithubNetwork, generate_github::generate_github},
 };
 use rstest::rstest;
 use serde_json::json;
@@ -45,7 +45,7 @@ async fn sets_a_status_on_a_commit_with_only_the_fields_given() {
         description: None,
     };
 
-    let status = github_on(&server)
+    let status = generate_github(&server)
         .create_commit_status(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -78,7 +78,7 @@ async fn leaves_out_a_blank_link_and_trims_a_padded_context_of_a_status() {
         description: Some(" Built ".into()),
     };
 
-    let status = github_on(&server)
+    let status = generate_github(&server)
         .create_commit_status(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -110,7 +110,7 @@ async fn lists_a_page_of_the_statuses_on_a_branch() {
         page: Some(1),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .get_commit_statuses(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -156,7 +156,7 @@ async fn lists_the_check_runs_of_a_ref_filtered_as_asked() {
         page: Some(2),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_check_runs_for_ref(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -192,7 +192,7 @@ async fn leaves_out_a_blank_check_name_and_trims_a_padded_status() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_check_runs_for_ref(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -228,7 +228,7 @@ async fn acknowledges_a_check_run_rerequested(#[case] answer: serde_json::Value)
         check_run_id: 42,
     };
 
-    let acknowledged = github_on(&server)
+    let acknowledged = generate_github(&server)
         .rerequest_check_run(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -254,7 +254,7 @@ async fn acknowledges_a_check_suite_rerequested() {
         check_suite_id: 9,
     };
 
-    let acknowledged = github_on(&server)
+    let acknowledged = generate_github(&server)
         .rerequest_check_suite(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -280,7 +280,7 @@ async fn refuses_a_check_run_github_will_not_rerequest() {
         check_run_id: 42,
     };
 
-    let refused = github_on(&server)
+    let refused = generate_github(&server)
         .rerequest_check_run(&reqwest::Client::new(), "token", &input)
         .await;
 

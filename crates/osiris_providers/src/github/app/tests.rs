@@ -8,7 +8,9 @@
 )]
 
 use super::{AppCredentials, app_jwt::app_jwt};
-use crate::github::mocks::{github_on::github_on, mock_github_app_key::MockGithubAppKey};
+use crate::github::mocks::{
+    generate_github::generate_github, mock_github_app_key::MockGithubAppKey,
+};
 use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode};
 use osiris_common::secret::ExposeSecret;
 use rstest::rstest;
@@ -38,13 +40,16 @@ fn reads_credentials_with_an_escaped_key() {
     assert!(
         credentials
             .private_key
-            .starts_with("-----BEGIN PRIVATE KEY-----\n")
+            .starts_with(concat!("-----BEGIN ", "PRIVATE KEY-----\n"))
     );
 }
 
+/// A PEM's first line with no key after it, split so the secret scan doesn't read it as a key.
+const PEM_HEADER_ONLY: &str = concat!("-----BEGIN RSA ", "PRIVATE KEY-----");
+
 #[rstest]
-#[case::no_app_id(json!({}), json!({ "private_key": "-----BEGIN RSA PRIVATE KEY-----" }), "app_id")]
-#[case::an_app_id_with_a_slash(json!({ "app_id": "1/2" }), json!({ "private_key": "-----BEGIN RSA PRIVATE KEY-----" }), "app_id")]
+#[case::no_app_id(json!({}), json!({ "private_key": PEM_HEADER_ONLY }), "app_id")]
+#[case::an_app_id_with_a_slash(json!({ "app_id": "1/2" }), json!({ "private_key": PEM_HEADER_ONLY }), "app_id")]
 #[case::no_key(json!({ "app_id": "1" }), json!({}), "private_key")]
 #[case::not_a_pem(json!({ "app_id": "1" }), json!({ "private_key": "hunter2" }), "private_key")]
 fn names_what_the_settings_lack(
@@ -106,7 +111,7 @@ async fn mints_an_installation_token_as_the_app() {
         private_key: MockGithubAppKey::default().pem(),
     };
 
-    let minted = github_on(&server)
+    let minted = generate_github(&server)
         .mint_installation_token(&reqwest::Client::new(), &credentials, "678")
         .await
         .unwrap();

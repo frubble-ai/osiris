@@ -3,7 +3,7 @@
 
 use crate::testing::TestContext;
 use crate::testing::golden::{GoldenSession, Key};
-use osiris_providers::mocks::fake::FAKE_ID;
+use osiris_providers::mocks::FAKE_ID;
 use serde_json::json;
 
 pub async fn run(_app: &TestContext, session: &mut GoldenSession<'_>) {

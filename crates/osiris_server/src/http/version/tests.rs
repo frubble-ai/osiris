@@ -19,7 +19,7 @@ use osiris_events::{
     Message, MessageBus, adapters::memory::MemoryTransport,
     testing::generate_event_message::generate_event_message,
 };
-use osiris_providers::mocks::fake::FAKE_ID;
+use osiris_providers::mocks::FAKE_ID;
 use osiris_versioning::translate::event_down;
 use serde_json::json;
 use sqlx::PgPool;

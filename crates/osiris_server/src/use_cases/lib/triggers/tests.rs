@@ -51,7 +51,7 @@ async fn stores_the_secret_encrypted_and_reads_it_back(pool: PgPool) {
         .unwrap();
 
     assert_eq!(created.secret.expose_secret(), trigger_secret);
-    assert_eq!(created.provider, osiris_providers::mocks::fake::FAKE_ID);
+    assert_eq!(created.provider, osiris_providers::mocks::FAKE_ID);
     let raw = sqlx::query_scalar!("SELECT secret FROM trigger WHERE id = $1", created.id)
         .fetch_one(&pool)
         .await

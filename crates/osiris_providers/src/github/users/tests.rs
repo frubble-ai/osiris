@@ -11,7 +11,7 @@ use super::{
     GetCurrentUser, GetUser, mocks::generate_github_public_user::generate_github_public_user,
 };
 use crate::github::{
-    mocks::github_on::github_on,
+    mocks::generate_github::generate_github,
     mocks::{MockGithubNetwork, generate_github_user::generate_github_current_user},
 };
 use wiremock::MockServer;
@@ -24,7 +24,7 @@ async fn reads_the_authenticated_user() {
         .answer("GET", "/user", &[], 200, answer.clone())
         .await;
 
-    let user = github_on(&server)
+    let user = generate_github(&server)
         .get_current_user(&reqwest::Client::new(), "token", &GetCurrentUser {})
         .await
         .unwrap();
@@ -46,7 +46,7 @@ async fn reads_a_users_public_profile_by_login() {
         username: "mona[bot]".into(),
     };
 
-    let user = github_on(&server)
+    let user = generate_github(&server)
         .get_user(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();

@@ -30,8 +30,8 @@ use super::{
 use crate::{
     ProviderError,
     github::mocks::{
-        MockGithubNetwork, generate_github_user::generate_github_user, generate_sha::generate_sha,
-        github_on::github_on,
+        MockGithubNetwork, generate_github::generate_github,
+        generate_github_user::generate_github_user, generate_sha::generate_sha,
     },
 };
 use fake::{Fake, faker::lorem::en::Sentence};
@@ -83,7 +83,7 @@ async fn lists_a_page_of_pull_requests_filtered_and_sorted() {
         page: Some(3),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_pull_requests(&http(), "token", &input)
         .await
         .unwrap();
@@ -131,7 +131,7 @@ async fn leaves_out_a_blank_branch_and_trims_a_padded_one_in_a_pull_request_list
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_pull_requests(&http(), "token", &input)
         .await
         .unwrap();
@@ -169,7 +169,7 @@ async fn lists_the_pull_requests_a_commit_belongs_to() {
         page: Some(1),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_pull_requests_associated_with_commit(&http(), "token", &input)
         .await
         .unwrap();
@@ -201,7 +201,7 @@ async fn lists_the_files_a_pull_request_changes() {
         page: None,
     };
 
-    let files = github_on(&server)
+    let files = generate_github(&server)
         .list_pull_request_files(&http(), "token", &input)
         .await
         .unwrap();
@@ -238,7 +238,7 @@ async fn lists_the_commits_on_a_pull_request() {
         page: Some(2),
     };
 
-    let commits = github_on(&server)
+    let commits = generate_github(&server)
         .list_pull_request_commits(&http(), "token", &input)
         .await
         .unwrap();
@@ -273,7 +273,7 @@ async fn lists_who_a_pull_requests_review_is_requested_from() {
         pull_number: 5,
     };
 
-    let requested = github_on(&server)
+    let requested = generate_github(&server)
         .list_pull_request_requested_reviewers(&http(), "token", &input)
         .await
         .unwrap();
@@ -309,7 +309,7 @@ async fn lists_the_reviews_of_a_pull_request() {
         page: Some(1),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_pull_request_reviews(&http(), "token", &input)
         .await
         .unwrap();
@@ -357,7 +357,7 @@ async fn lists_the_comments_on_a_pull_requests_diff_sorted_and_since_a_time() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_pull_request_review_comments(&http(), "token", &input)
         .await
         .unwrap();
@@ -429,7 +429,7 @@ async fn creates_a_review_with_comments_on_lines_of_the_diff() {
         ]),
     };
 
-    let created = github_on(&server)
+    let created = generate_github(&server)
         .create_pull_request_review(&http(), "token", &input)
         .await
         .unwrap();
@@ -461,7 +461,7 @@ async fn creates_a_pending_review_when_nothing_is_given() {
         comments: None,
     };
 
-    let created = github_on(&server)
+    let created = generate_github(&server)
         .create_pull_request_review(&http(), "token", &input)
         .await
         .unwrap();
@@ -499,7 +499,7 @@ async fn submits_a_pending_review_with_its_verdict(
         body: Some(body),
     };
 
-    let submitted = github_on(&server)
+    let submitted = generate_github(&server)
         .submit_pull_request_review(&http(), "token", &input)
         .await
         .unwrap();
@@ -528,7 +528,7 @@ async fn reads_a_review_by_id() {
         review_id: 91,
     };
 
-    let read = github_on(&server)
+    let read = generate_github(&server)
         .get_pull_request_review(&http(), "token", &input)
         .await
         .unwrap();
@@ -562,7 +562,7 @@ async fn dismisses_a_review_with_a_reason() {
         message: reason,
     };
 
-    let dismissed = github_on(&server)
+    let dismissed = generate_github(&server)
         .dismiss_pull_request_review(&http(), "token", &input)
         .await
         .unwrap();
@@ -589,7 +589,7 @@ async fn deletes_a_pending_review_and_answers_it() {
         review_id: 93,
     };
 
-    let deleted = github_on(&server)
+    let deleted = generate_github(&server)
         .delete_pending_pull_request_review(&http(), "token", &input)
         .await
         .unwrap();
@@ -634,7 +634,7 @@ async fn comments_on_a_range_of_lines_of_the_diff() {
         start_side: Some(DiffSide::Right),
     };
 
-    let created = github_on(&server)
+    let created = generate_github(&server)
         .create_pull_request_review_comment(&http(), "token", &input)
         .await
         .unwrap();
@@ -666,7 +666,7 @@ async fn replies_to_a_comment_on_the_diff() {
         body,
     };
 
-    let reply = github_on(&server)
+    let reply = generate_github(&server)
         .reply_pull_request_review_comment(&http(), "token", &input)
         .await
         .unwrap();
@@ -697,7 +697,7 @@ async fn replaces_the_text_of_a_comment_on_the_diff() {
         body: body.clone(),
     };
 
-    let updated = github_on(&server)
+    let updated = generate_github(&server)
         .update_pull_request_review_comment(&http(), "token", &input)
         .await
         .unwrap();
@@ -724,7 +724,7 @@ async fn deletes_a_comment_on_the_diff_and_acknowledges_it() {
         comment_id: 104,
     };
 
-    let deleted = github_on(&server)
+    let deleted = generate_github(&server)
         .delete_pull_request_review_comment(&http(), "token", &input)
         .await
         .unwrap();
@@ -747,7 +747,7 @@ async fn reads_a_pull_request_by_number() {
         pull_number: 9,
     };
 
-    let read = github_on(&server)
+    let read = generate_github(&server)
         .get_pull_request(&http(), "token", &input)
         .await
         .unwrap();
@@ -794,7 +794,7 @@ async fn opens_a_pull_request_from_one_branch_into_another() {
         maintainer_can_modify: Some(false),
     };
 
-    let created = github_on(&server)
+    let created = generate_github(&server)
         .create_pull_request(&http(), "token", &input)
         .await
         .unwrap();
@@ -830,7 +830,7 @@ async fn changes_only_what_is_given_of_a_pull_request() {
         maintainer_can_modify: None,
     };
 
-    let updated = github_on(&server)
+    let updated = generate_github(&server)
         .update_pull_request(&http(), "token", &input)
         .await
         .unwrap();
@@ -868,7 +868,7 @@ async fn sends_the_base_branch_of_a_pull_request_trimmed(
         maintainer_can_modify: None,
     };
 
-    let updated = github_on(&server)
+    let updated = generate_github(&server)
         .update_pull_request(&http(), "token", &input)
         .await
         .unwrap();
@@ -903,7 +903,7 @@ async fn brings_a_pull_requests_branch_up_to_date(#[case] expected_head_sha: Opt
         expected_head_sha,
     };
 
-    let update = github_on(&server)
+    let update = generate_github(&server)
         .update_pull_request_branch(&http(), "token", &input)
         .await
         .unwrap();
@@ -944,7 +944,7 @@ async fn requests_a_review_from_users_and_teams() {
         team_reviewers: Some(vec![text(&team["slug"]).into()]),
     };
 
-    let requested = github_on(&server)
+    let requested = generate_github(&server)
         .request_pull_request_reviewers(&http(), "token", &input)
         .await
         .unwrap();
@@ -978,7 +978,7 @@ async fn removes_users_from_those_a_review_is_requested_from() {
         team_reviewers: None,
     };
 
-    let remaining = github_on(&server)
+    let remaining = generate_github(&server)
         .remove_pull_request_reviewers(&http(), "token", &input)
         .await
         .unwrap();
@@ -1019,7 +1019,7 @@ async fn merges_a_pull_request_by_the_method_asked(
         merge_method: Some(method),
     };
 
-    let merged = github_on(&server)
+    let merged = generate_github(&server)
         .merge_pull_request(&http(), "token", &input)
         .await
         .unwrap();
@@ -1055,7 +1055,7 @@ async fn tells_whether_a_pull_request_has_been_merged(#[case] status: u16, #[cas
         pull_number: 15,
     };
 
-    let check = github_on(&server)
+    let check = generate_github(&server)
         .check_pull_request_merged(&http(), "token", &input)
         .await
         .unwrap();
@@ -1081,7 +1081,7 @@ async fn passes_on_any_other_refusal_of_the_merge_check() {
         pull_number: 15,
     };
 
-    let refused = github_on(&server)
+    let refused = generate_github(&server)
         .check_pull_request_merged(&http(), "token", &input)
         .await;
 
@@ -1108,7 +1108,7 @@ async fn encodes_an_owner_a_repository_and_a_commit_into_one_segment_each() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_pull_requests_associated_with_commit(&http(), "token", &input)
         .await
         .unwrap();
@@ -1134,7 +1134,7 @@ async fn encodes_an_owner_and_a_repository_in_a_comment_path() {
         comment_id: 7,
     };
 
-    let deleted = github_on(&server)
+    let deleted = generate_github(&server)
         .delete_pull_request_review_comment(&http(), "token", &input)
         .await
         .unwrap();

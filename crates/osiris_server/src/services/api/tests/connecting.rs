@@ -6,7 +6,7 @@ use crate::testing::{API_KEY, setup_test_context, setup_test_context_with};
 use axum::http::StatusCode;
 use osiris_domain::EventType;
 use osiris_providers::mocks::{
-    fake::MockFakeNetwork,
+    MockFakeNetwork,
     generate_token_answer::{generate_token_answer, generate_token_answer_without_refresh},
 };
 use osiris_tasks::{RefreshReason, TaskPayload, names};

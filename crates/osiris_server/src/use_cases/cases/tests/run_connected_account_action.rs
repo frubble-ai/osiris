@@ -13,9 +13,7 @@ use super::whoami::{PLAIN, Whoami, run_whoami};
 use crate::testing::{TestContext, setup_test_context};
 use crate::use_cases::lib::connected_accounts::create_installation::NewInstallation;
 use osiris_domain::{DomainError, EventType};
-use osiris_providers::mocks::{
-    fake::MockFakeNetwork, generate_token_answer::generate_token_answer,
-};
+use osiris_providers::mocks::{MockFakeNetwork, generate_token_answer::generate_token_answer};
 use serde_json::{Value, json};
 use sqlx::PgPool;
 

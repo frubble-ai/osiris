@@ -15,7 +15,7 @@ use super::{
 use crate::{
     TriggerReceipt,
     github::{
-        mocks::{MockGithubNetwork, generate_sha::generate_sha, github_on::github_on},
+        mocks::{MockGithubNetwork, generate_github::generate_github, generate_sha::generate_sha},
         pull_requests::mocks::generate_github_pull_request::generate_github_pull_request,
     },
 };
@@ -188,7 +188,7 @@ async fn creates_the_webhook_delivering_to_the_trigger() {
         .mount(&server)
         .await;
 
-    let id = github_on(&server)
+    let id = generate_github(&server)
         .create_hook(
             &reqwest::Client::new(),
             "token",
@@ -233,7 +233,7 @@ async fn aligns_the_webhook_github_says_already_exists() {
         .mount(&server)
         .await;
 
-    let id = github_on(&server)
+    let id = generate_github(&server)
         .create_hook(
             &reqwest::Client::new(),
             "token",
@@ -266,7 +266,7 @@ async fn deletes_a_webhook_or_counts_one_already_gone_as_deleted() {
             json!({ "message": "Not Found" }),
         )
         .await;
-    let github = github_on(&server);
+    let github = generate_github(&server);
     let http = reqwest::Client::new();
 
     github
@@ -288,7 +288,7 @@ async fn sees_each_change_to_a_watched_pull_request_once() {
         repo: "hello".into(),
         number: 7,
     };
-    let github = github_on(&server);
+    let github = generate_github(&server);
     let http = reqwest::Client::new();
     let answer = |body: Value| ResponseTemplate::new(200).set_body_json(body);
 

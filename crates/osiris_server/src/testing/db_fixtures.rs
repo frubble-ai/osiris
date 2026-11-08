@@ -17,7 +17,7 @@ use crate::use_cases::lib::{
 use fake::Fake;
 use osiris_common::{crypto::MasterKey, ids, secret::secret};
 use osiris_domain::TriggerStatus;
-use osiris_providers::mocks::fake::FAKE_ID;
+use osiris_providers::mocks::FAKE_ID;
 use sqlx::PgPool;
 use time::{Duration, OffsetDateTime};
 

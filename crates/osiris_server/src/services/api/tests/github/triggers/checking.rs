@@ -26,10 +26,6 @@ use osiris_providers::{
 use serde_json::json;
 use sqlx::PgPool;
 use time::Duration;
-use wiremock::{
-    Mock, ResponseTemplate,
-    matchers::{method, path},
-};
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn publishes_a_watched_pull_request_s_changes_once_each(pool: PgPool) {
@@ -37,10 +33,8 @@ async fn publishes_a_watched_pull_request_s_changes_once_each(pool: PgPool) {
     let connection = app.connected_to_github(3600).await;
     super::support::answer_hook_creation(&app).await;
     let mut pull_request = generate_github_pull_request(70, 7);
-    let first_state = Mock::given(method("GET"))
-        .and(path(PULL_REQUEST))
-        .respond_with(ResponseTemplate::new(200).set_body_json(pull_request.clone()))
-        .mount_as_scoped(&app.provider)
+    let first_state = MockGithubNetwork::on(&app.provider)
+        .answer_while("GET", PULL_REQUEST, 200, pull_request.clone(), None)
         .await;
 
     let created = super::support::create(
@@ -65,10 +59,8 @@ async fn publishes_a_watched_pull_request_s_changes_once_each(pool: PgPool) {
     drop(first_state);
 
     pull_request["head"]["sha"] = json!(generate_sha());
-    Mock::given(method("GET"))
-        .and(path(PULL_REQUEST))
-        .respond_with(ResponseTemplate::new(200).set_body_json(pull_request))
-        .mount(&app.provider)
+    let _changed = MockGithubNetwork::on(&app.provider)
+        .answer_while("GET", PULL_REQUEST, 200, pull_request, None)
         .await;
     // A delivery about the pull request asks for a check at once; the next scheduled check sees
     // nothing new.
@@ -122,11 +114,8 @@ async fn tries_a_check_again_while_github_limits_the_rate(pool: PgPool) {
             json!({ "message": "API rate limit exceeded for user ID 1." }),
         ),
     ] {
-        let limited = Mock::given(method("GET"))
-            .and(path(PULL_REQUEST))
-            .respond_with(ResponseTemplate::new(status).set_body_json(body))
-            .expect(1)
-            .mount_as_scoped(&app.provider)
+        let limited = MockGithubNetwork::on(&app.provider)
+            .answer_while("GET", PULL_REQUEST, status, body, Some(1))
             .await;
         assert!(
             app.run(&task).await.is_err(),

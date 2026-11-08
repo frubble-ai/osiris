@@ -3,7 +3,7 @@
 use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
-use osiris_providers::mocks::fake::MockFakeNetwork;
+use osiris_providers::mocks::MockFakeNetwork;
 use sqlx::PgPool;
 use std::time::Duration;
 

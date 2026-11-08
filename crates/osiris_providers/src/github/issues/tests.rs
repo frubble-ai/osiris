@@ -34,7 +34,8 @@ use super::{
 use crate::{
     ProviderError,
     github::mocks::{
-        MockGithubNetwork, generate_github_user::generate_github_user, github_on::github_on,
+        MockGithubNetwork, generate_github::generate_github,
+        generate_github_user::generate_github_user,
     },
 };
 use fake::{Fake, faker::lorem::en::Word};
@@ -96,7 +97,7 @@ async fn lists_a_page_of_issues_without_its_pull_requests_and_counts_the_whole_p
         page: Some(2),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_repository_issues(&http(), "token", &input)
         .await
         .unwrap();
@@ -132,7 +133,7 @@ async fn asks_for_github_s_default_page_size_when_none_is_given() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_repository_issues(&http(), "token", &input)
         .await
         .unwrap();
@@ -166,7 +167,7 @@ async fn sends_the_issue_filters_trimmed_and_leaves_out_the_blank_ones() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_repository_issues(&http(), "token", &input)
         .await
         .unwrap();
@@ -198,7 +199,7 @@ async fn creates_an_issue_with_only_the_fields_given() {
         milestone: Some(2),
     };
 
-    let issue = github_on(&server)
+    let issue = generate_github(&server)
         .create_issue(&http(), "token", &input)
         .await
         .unwrap();
@@ -232,7 +233,7 @@ async fn reads_an_issue_with_its_owner_and_repo_encoded(
         issue_number: 9,
     };
 
-    let issue = github_on(&server)
+    let issue = generate_github(&server)
         .get_issue(&http(), "token", &input)
         .await
         .unwrap();
@@ -260,7 +261,7 @@ async fn reads_a_pull_request_answered_as_an_issue_as_one() {
         issue_number: 5,
     };
 
-    let issue = github_on(&server)
+    let issue = generate_github(&server)
         .get_issue(&http(), "token", &input)
         .await
         .unwrap();
@@ -292,7 +293,7 @@ async fn updates_an_issue_with_only_the_fields_given() {
         milestone: None,
     };
 
-    let issue = github_on(&server)
+    let issue = generate_github(&server)
         .update_issue(&http(), "token", &input)
         .await
         .unwrap();
@@ -322,7 +323,7 @@ async fn lists_a_page_of_a_repository_s_labels() {
         page: Some(1),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_repository_labels(&http(), "token", &input)
         .await
         .unwrap();
@@ -354,7 +355,7 @@ async fn creates_a_label() {
         description: Some("Broken".into()),
     };
 
-    let label = github_on(&server)
+    let label = generate_github(&server)
         .create_label(&http(), "token", &input)
         .await
         .unwrap();
@@ -383,7 +384,7 @@ async fn lists_a_page_of_an_issue_s_labels() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_issue_labels(&http(), "token", &input)
         .await
         .unwrap();
@@ -414,7 +415,7 @@ async fn adds_labels_to_an_issue_and_answers_every_label_it_has() {
         labels: vec!["bug".into(), "urgent".into()],
     };
 
-    let labels = github_on(&server)
+    let labels = generate_github(&server)
         .add_issue_labels(&http(), "token", &input)
         .await
         .unwrap();
@@ -445,7 +446,7 @@ async fn replaces_an_issue_s_labels(#[case] labels: Vec<String>) {
         labels,
     };
 
-    let set = github_on(&server)
+    let set = generate_github(&server)
         .set_issue_labels(&http(), "token", &input)
         .await
         .unwrap();
@@ -472,7 +473,7 @@ async fn removes_one_label_named_with_a_space_from_an_issue() {
         label: "help wanted".into(),
     };
 
-    let kept = github_on(&server)
+    let kept = generate_github(&server)
         .remove_issue_label(&http(), "token", &input)
         .await
         .unwrap();
@@ -492,7 +493,7 @@ async fn clears_an_issue_s_labels() {
         issue_number: 4,
     };
 
-    let done = github_on(&server)
+    let done = generate_github(&server)
         .clear_issue_labels(&http(), "token", &input)
         .await
         .unwrap();
@@ -519,7 +520,7 @@ async fn reads_a_label_by_a_name_with_reserved_characters() {
         name: "type: bug/crash".into(),
     };
 
-    let label = github_on(&server)
+    let label = generate_github(&server)
         .get_label(&http(), "token", &input)
         .await
         .unwrap();
@@ -549,7 +550,7 @@ async fn updates_a_label_with_only_the_fields_given() {
         description: None,
     };
 
-    let label = github_on(&server)
+    let label = generate_github(&server)
         .update_label(&http(), "token", &input)
         .await
         .unwrap();
@@ -576,7 +577,7 @@ async fn refuses_a_label_color_that_is_not_six_hex_digits_without_asking_github(
         description: None,
     };
 
-    let error = github_on(&server)
+    let error = generate_github(&server)
         .update_label(&http(), "token", &input)
         .await
         .unwrap_err();
@@ -596,7 +597,7 @@ async fn deletes_a_label() {
         name: "won't fix".into(),
     };
 
-    let done = github_on(&server)
+    let done = generate_github(&server)
         .delete_label(&http(), "token", &input)
         .await
         .unwrap();
@@ -625,7 +626,7 @@ async fn assigns_people_to_an_issue() {
         assignees: vec!["alice".into()],
     };
 
-    let issue = github_on(&server)
+    let issue = generate_github(&server)
         .add_issue_assignees(&http(), "token", &input)
         .await
         .unwrap();
@@ -653,7 +654,7 @@ async fn unassigns_people_from_an_issue() {
         assignees: vec!["alice".into(), "bob".into()],
     };
 
-    let issue = github_on(&server)
+    let issue = generate_github(&server)
         .remove_issue_assignees(&http(), "token", &input)
         .await
         .unwrap();
@@ -681,7 +682,7 @@ async fn lists_a_page_of_the_people_issues_can_be_assigned_to() {
         page: Some(2),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_assignees(&http(), "token", &input)
         .await
         .unwrap();
@@ -710,7 +711,7 @@ async fn locks_an_issue_s_conversation(#[case] reason: Option<&str>, #[case] sen
         lock_reason: reason.map(str::to_owned),
     };
 
-    let lock = github_on(&server)
+    let lock = generate_github(&server)
         .lock_issue(&http(), "token", &input)
         .await
         .unwrap();
@@ -730,7 +731,7 @@ async fn unlocks_an_issue_s_conversation() {
         issue_number: 8,
     };
 
-    let lock = github_on(&server)
+    let lock = generate_github(&server)
         .unlock_issue(&http(), "token", &input)
         .await
         .unwrap();
@@ -761,7 +762,7 @@ async fn lists_a_page_of_an_issue_s_comments() {
         page: Some(3),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_issue_comments(&http(), "token", &input)
         .await
         .unwrap();
@@ -792,7 +793,7 @@ async fn comments_on_an_issue() {
         body,
     };
 
-    let comment = github_on(&server)
+    let comment = generate_github(&server)
         .create_issue_comment(&http(), "token", &input)
         .await
         .unwrap();
@@ -819,7 +820,7 @@ async fn reads_a_comment_on_an_issue_by_id() {
         comment_id: 191,
     };
 
-    let comment = github_on(&server)
+    let comment = generate_github(&server)
         .get_issue_comment(&http(), "token", &input)
         .await
         .unwrap();
@@ -848,7 +849,7 @@ async fn replaces_a_comment_s_text() {
         body,
     };
 
-    let comment = github_on(&server)
+    let comment = generate_github(&server)
         .update_issue_comment(&http(), "token", &input)
         .await
         .unwrap();
@@ -868,7 +869,7 @@ async fn deletes_a_comment_on_an_issue() {
         comment_id: 211,
     };
 
-    let done = github_on(&server)
+    let done = generate_github(&server)
         .delete_issue_comment(&http(), "token", &input)
         .await
         .unwrap();
@@ -899,7 +900,7 @@ async fn lists_an_issue_s_timeline_including_entries_with_no_id_of_their_own() {
         page: None,
     };
 
-    let timeline = github_on(&server)
+    let timeline = generate_github(&server)
         .list_issue_timeline_events(&http(), "token", &input)
         .await
         .unwrap();
@@ -934,7 +935,7 @@ async fn lists_a_page_of_what_happened_to_an_issue() {
         page: Some(4),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_issue_events(&http(), "token", &input)
         .await
         .unwrap();
@@ -970,7 +971,7 @@ async fn lists_a_page_of_what_happened_to_a_repository_s_issues() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_repository_issue_events(&http(), "token", &input)
         .await
         .unwrap();
@@ -1011,7 +1012,7 @@ async fn lists_a_page_of_milestones_filtered_and_sorted() {
         page: Some(1),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_milestones(&http(), "token", &input)
         .await
         .unwrap();
@@ -1043,7 +1044,7 @@ async fn reads_a_milestone_by_number() {
         milestone_number: 3,
     };
 
-    let milestone = github_on(&server)
+    let milestone = generate_github(&server)
         .get_milestone(&http(), "token", &input)
         .await
         .unwrap();
@@ -1075,7 +1076,7 @@ async fn creates_a_milestone_with_only_the_fields_given() {
         due_on: Some("2026-12-31T00:00:00Z".into()),
     };
 
-    let milestone = github_on(&server)
+    let milestone = generate_github(&server)
         .create_milestone(&http(), "token", &input)
         .await
         .unwrap();
@@ -1105,7 +1106,7 @@ async fn creates_a_milestone_with_its_state_trimmed_and_a_blank_due_date_left_ou
         due_on: Some("  ".into()),
     };
 
-    let milestone = github_on(&server)
+    let milestone = generate_github(&server)
         .create_milestone(&http(), "token", &input)
         .await
         .unwrap();
@@ -1135,7 +1136,7 @@ async fn updates_a_milestone_with_only_the_fields_given() {
         due_on: None,
     };
 
-    let milestone = github_on(&server)
+    let milestone = generate_github(&server)
         .update_milestone(&http(), "token", &input)
         .await
         .unwrap();
@@ -1155,7 +1156,7 @@ async fn deletes_a_milestone() {
         milestone_number: 4,
     };
 
-    let done = github_on(&server)
+    let done = generate_github(&server)
         .delete_milestone(&http(), "token", &input)
         .await
         .unwrap();
@@ -1184,7 +1185,7 @@ async fn reacts_to_an_issue() {
         content: "+1".into(),
     };
 
-    let reaction = github_on(&server)
+    let reaction = generate_github(&server)
         .create_issue_reaction(&http(), "token", &input)
         .await
         .unwrap();
@@ -1213,7 +1214,7 @@ async fn reacts_to_a_comment_on_an_issue() {
         content: "rocket".into(),
     };
 
-    let reaction = github_on(&server)
+    let reaction = generate_github(&server)
         .create_issue_comment_reaction(&http(), "token", &input)
         .await
         .unwrap();
@@ -1262,7 +1263,7 @@ async fn searches_issues_and_pull_requests_with_the_filters_as_qualifiers() {
         ..Default::default()
     };
 
-    let found = github_on(&server)
+    let found = generate_github(&server)
         .search_issues_and_pull_requests(&http(), "token", &input)
         .await
         .unwrap();
@@ -1287,7 +1288,7 @@ async fn reads_a_search_answer_without_items_as_nothing_found() {
         .answer("GET", "/search/issues", &[("q", "")], 200, json!({}))
         .await;
 
-    let found = github_on(&server)
+    let found = generate_github(&server)
         .search_issues_and_pull_requests(&http(), "token", &SearchIssuesAndPullRequests::default())
         .await
         .unwrap();

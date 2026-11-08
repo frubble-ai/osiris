@@ -17,7 +17,7 @@ use osiris_common::{
 };
 use osiris_events::adapters::memory::MemoryTransport;
 use osiris_providers::{
-    ProviderUrls, Providers, REGISTRATIONS, Registration, mocks::fake::FAKE_REGISTRATION,
+    ProviderUrls, Providers, REGISTRATIONS, Registration, mocks::FAKE_REGISTRATION,
 };
 use osiris_tasks::adapters::{bearer::BearerAuthenticator, memory::MemoryScheduler};
 use osiris_versioning::Release;

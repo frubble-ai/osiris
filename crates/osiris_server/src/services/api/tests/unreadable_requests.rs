@@ -12,7 +12,7 @@ use axum::{
     http::{Request, StatusCode},
 };
 use http_body_util::BodyExt;
-use osiris_providers::mocks::fake::FAKE_ID;
+use osiris_providers::mocks::FAKE_ID;
 use serde_json::{Value, json};
 use sqlx::PgPool;
 use tower::ServiceExt;

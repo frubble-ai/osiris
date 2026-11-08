@@ -47,10 +47,16 @@ impl Github {
             .map_err(|error| ProviderError::unavailable(self.id(), error.without_url()))?
         {
             tail.extend_from_slice(&chunk);
-            if tail.len() > limit {
+            // Dropping the start only once twice the limit is held moves each byte a few times
+            // at most, however long the logs are, while memory stays under twice the limit.
+            if tail.len() >= limit.saturating_mul(2) {
                 tail.drain(..tail.len() - limit);
                 truncated = true;
             }
+        }
+        if tail.len() > limit {
+            tail.drain(..tail.len() - limit);
+            truncated = true;
         }
         // The cut may fall inside a character; what can't be read as UTF-8 reads as U+FFFD.
         Ok(GithubJobLogs {

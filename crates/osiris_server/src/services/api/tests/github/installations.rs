@@ -15,10 +15,6 @@ use osiris_providers::github::mocks::{
 };
 use serde_json::{Value, json};
 use sqlx::PgPool;
-use wiremock::{
-    Mock, ResponseTemplate,
-    matchers::{header, method, path},
-};
 
 /// A GitHub app holding App credentials; answers its id.
 async fn app_with_credentials(app: &TestContext) -> String {
@@ -107,12 +103,13 @@ async fn connects_as_an_installation_and_acts_with_one_minted_token(pool: PgPool
     github
         .answer_installation_token("77", "ghs_installation", 1)
         .await;
-    Mock::given(method("GET"))
-        .and(path("/repos/octo/hello"))
-        .and(header("authorization", "Bearer ghs_installation"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(generate_github_repository(5)))
-        .expect(2)
-        .mount(&app.provider)
+    github
+        .answer_for_token(
+            "/repos/octo/hello",
+            "ghs_installation",
+            generate_github_repository(5),
+            2,
+        )
         .await;
 
     let created = connect(&app, &config, "77").await;
@@ -146,18 +143,22 @@ async fn mints_again_once_when_github_refuses_the_installation_s_token(pool: PgP
     let created = connect(&app, &config, "77").await;
     let id = created.body["id"].as_str().unwrap().to_owned();
     // The first call is refused, the call with the newly minted token answers.
-    Mock::given(method("GET"))
-        .and(path("/repos/octo/hello"))
-        .respond_with(
-            ResponseTemplate::new(401).set_body_json(json!({ "message": "Bad credentials" })),
+    github
+        .answer_once(
+            "GET",
+            "/repos/octo/hello",
+            401,
+            json!({ "message": "Bad credentials" }),
         )
-        .up_to_n_times(1)
-        .mount(&app.provider)
         .await;
-    Mock::given(method("GET"))
-        .and(path("/repos/octo/hello"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(generate_github_repository(6)))
-        .mount(&app.provider)
+    github
+        .answer_times(
+            "GET",
+            "/repos/octo/hello",
+            200,
+            generate_github_repository(6),
+            1,
+        )
         .await;
 
     let answer = get_repository(&app, &id).await;

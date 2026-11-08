@@ -2,7 +2,7 @@
 
 use serde_json::{Value, json};
 use wiremock::{
-    Mock, MockServer, ResponseTemplate,
+    Mock, MockGuard, MockServer, ResponseTemplate,
     matchers::{body_json, body_string_contains, header, method, path, path_regex, query_param},
 };
 
@@ -67,6 +67,78 @@ impl<'a> MockGithubNetwork<'a> {
             .expect(1)
             .mount(self.server)
             .await;
+    }
+
+    /// `verb route` answers `status` with `body`; the test fails unless it is asked exactly
+    /// `times` times.
+    pub async fn answer_times(
+        &self,
+        verb: &str,
+        route: &str,
+        status: u16,
+        body: Value,
+        times: u64,
+    ) {
+        Mock::given(method(verb))
+            .and(path(route))
+            .respond_with(ResponseTemplate::new(status).set_body_json(body))
+            .expect(times)
+            .mount(self.server)
+            .await;
+    }
+
+    /// `verb route` answers `status` with `body` to its first request only; later ones go to the
+    /// next arrangement.
+    pub async fn answer_once(&self, verb: &str, route: &str, status: u16, body: Value) {
+        Mock::given(method(verb))
+            .and(path(route))
+            .respond_with(ResponseTemplate::new(status).set_body_json(body))
+            .up_to_n_times(1)
+            .mount(self.server)
+            .await;
+    }
+
+    /// `verb route` answers `status` with `body` for as long as the guard it answers is kept; with
+    /// `times`, the test fails unless it is asked exactly that often meanwhile.
+    pub async fn answer_while(
+        &self,
+        verb: &str,
+        route: &str,
+        status: u16,
+        body: Value,
+        times: Option<u64>,
+    ) -> MockGuard {
+        let mut mock = Mock::given(method(verb))
+            .and(path(route))
+            .respond_with(ResponseTemplate::new(status).set_body_json(body));
+        if let Some(times) = times {
+            mock = mock.expect(times);
+        }
+        mock.mount_as_scoped(self.server).await
+    }
+
+    /// `GET route` answers `body` only to requests made with `token`; the test fails unless it
+    /// is asked exactly `times` times.
+    pub async fn answer_for_token(&self, route: &str, token: &str, body: Value, times: u64) {
+        Mock::given(method("GET"))
+            .and(path(route))
+            .and(header("authorization", format!("Bearer {token}")))
+            .respond_with(ResponseTemplate::new(200).set_body_json(body))
+            .expect(times)
+            .mount(self.server)
+            .await;
+    }
+
+    /// Creating a webhook on `owner/repo` answers hook `id`, once.
+    pub async fn answer_hook_creation(&self, owner: &str, repo: &str, id: u64) {
+        self.answer_times(
+            "POST",
+            &format!("/repos/{owner}/{repo}/hooks"),
+            201,
+            json!({ "id": id }),
+            1,
+        )
+        .await;
     }
 
     /// No request may reach `route`; the test fails if one does.

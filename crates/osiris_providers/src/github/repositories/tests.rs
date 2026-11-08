@@ -37,7 +37,7 @@ use super::{
 use crate::{
     ActingAs, ProviderError,
     github::{
-        mocks::github_on::github_on,
+        mocks::generate_github::generate_github,
         mocks::{
             MockGithubNetwork, generate_github_branch::generate_github_branch,
             generate_github_repository::generate_github_repository, generate_sha::generate_sha,
@@ -66,7 +66,7 @@ async fn reads_a_repository_by_owner_and_name() {
         repo: "hello".into(),
     };
 
-    let repository = github_on(&server)
+    let repository = generate_github(&server)
         .get_repository(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -101,7 +101,7 @@ async fn lists_a_page_of_branches_filtered_by_protection() {
         page: Some(3),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_branches(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -133,7 +133,7 @@ async fn encodes_a_branch_name_with_a_slash_into_one_segment() {
         branch: "feature/login".into(),
     };
 
-    let branch = github_on(&server)
+    let branch = generate_github(&server)
         .get_branch(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -168,7 +168,7 @@ async fn lists_the_users_repositories_sorted_and_filtered() {
         page: Some(1),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_my_repositories(&http(), "token", &input, ActingAs::User)
         .await
         .unwrap();
@@ -197,7 +197,7 @@ async fn lists_an_installation_s_repositories_on_an_installation_connection() {
         ..ListMyRepositories::default()
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_my_repositories(&http(), "token", &input, ActingAs::Installation)
         .await
         .unwrap();
@@ -218,7 +218,7 @@ async fn refuses_a_user_s_filter_on_an_installation_connection_without_asking_gi
     // No answer is arranged: a request to GitHub would fail the call another way.
     let server = MockServer::start().await;
 
-    let refused = github_on(&server)
+    let refused = generate_github(&server)
         .list_my_repositories(&http(), "token", &input, ActingAs::Installation)
         .await
         .unwrap_err();
@@ -262,7 +262,7 @@ async fn creates_a_repository_sending_only_the_settings_given() {
         license_template: Some("mit".into()),
     };
 
-    let repository = github_on(&server)
+    let repository = generate_github(&server)
         .create_repository(&http(), "token", &input)
         .await
         .unwrap();
@@ -282,7 +282,7 @@ async fn deletes_a_repository_and_acknowledges_it() {
         repo: "hello".into(),
     };
 
-    let done = github_on(&server)
+    let done = generate_github(&server)
         .delete_repository(&http(), "token", &input)
         .await
         .unwrap();
@@ -324,7 +324,7 @@ async fn updates_the_settings_of_a_repository() {
         archived: Some(true),
     };
 
-    let repository = github_on(&server)
+    let repository = generate_github(&server)
         .update_repository(&http(), "token", &input)
         .await
         .unwrap();
@@ -352,7 +352,7 @@ async fn forks_a_repository_into_an_organization() {
         default_branch_only: Some(true),
     };
 
-    let fork = github_on(&server)
+    let fork = generate_github(&server)
         .fork_repository(&http(), "token", &input)
         .await
         .unwrap();
@@ -380,7 +380,7 @@ async fn lists_the_forks_of_a_repository() {
         page: Some(2),
     };
 
-    let forks = github_on(&server)
+    let forks = generate_github(&server)
         .list_repository_forks(&http(), "token", &input)
         .await
         .unwrap();
@@ -409,7 +409,7 @@ async fn lists_an_organizations_repositories_by_type() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_organization_repositories(&http(), "token", &input)
         .await
         .unwrap();
@@ -438,7 +438,7 @@ async fn lists_a_users_repositories() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_user_repositories(&http(), "token", &input)
         .await
         .unwrap();
@@ -478,7 +478,7 @@ async fn lists_commits_filtered_by_path_and_author() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_commits(&http(), "token", &input)
         .await
         .unwrap();
@@ -511,7 +511,7 @@ async fn reads_a_commit_with_its_stats_and_files() {
         reference: "release/1.0".into(),
     };
 
-    let commit = github_on(&server)
+    let commit = generate_github(&server)
         .get_commit(&http(), "token", &input)
         .await
         .unwrap();
@@ -553,7 +553,7 @@ async fn compares_two_commits() {
         page: None,
     };
 
-    let comparison = github_on(&server)
+    let comparison = generate_github(&server)
         .compare_commits(&http(), "token", &input)
         .await
         .unwrap();
@@ -588,7 +588,7 @@ async fn merges_a_branch_and_answers_the_merge_commit() {
         commit_message: Some("Merge it".into()),
     };
 
-    let merge = github_on(&server)
+    let merge = generate_github(&server)
         .merge_branch(&http(), "token", &input)
         .await
         .unwrap();
@@ -612,7 +612,7 @@ async fn a_merge_with_nothing_to_merge_answers_not_merged() {
         commit_message: None,
     };
 
-    let merge = github_on(&server)
+    let merge = generate_github(&server)
         .merge_branch(&http(), "token", &input)
         .await
         .unwrap();
@@ -641,7 +641,7 @@ async fn renames_a_branch() {
         new_name: "feature/new".into(),
     };
 
-    let branch = github_on(&server)
+    let branch = generate_github(&server)
         .rename_branch(&http(), "token", &input)
         .await
         .unwrap();
@@ -668,7 +668,7 @@ async fn syncs_a_fork_branch_with_its_upstream() {
         branch: "main".into(),
     };
 
-    let sync = github_on(&server)
+    let sync = generate_github(&server)
         .sync_fork_branch_with_upstream(&http(), "token", &input)
         .await
         .unwrap();
@@ -699,7 +699,7 @@ async fn creates_a_reference() {
         sha,
     };
 
-    let reference = github_on(&server)
+    let reference = generate_github(&server)
         .create_ref(&http(), "token", &input)
         .await
         .unwrap();
@@ -727,7 +727,7 @@ async fn reads_a_reference_keeping_its_slashes_and_encoding_its_parts() {
         reference: "heads/feature/a b".into(),
     };
 
-    let reference = github_on(&server)
+    let reference = generate_github(&server)
         .get_ref(&http(), "token", &input)
         .await
         .unwrap();
@@ -756,7 +756,7 @@ async fn lists_the_references_matching_a_prefix() {
         reference: "heads/feat".into(),
     };
 
-    let references = github_on(&server)
+    let references = generate_github(&server)
         .list_matching_refs(&http(), "token", &input)
         .await
         .unwrap();
@@ -786,7 +786,7 @@ async fn moves_a_reference_by_force() {
         force: Some(true),
     };
 
-    let reference = github_on(&server)
+    let reference = generate_github(&server)
         .update_ref(&http(), "token", &input)
         .await
         .unwrap();
@@ -806,7 +806,7 @@ async fn deletes_a_reference_and_acknowledges_it() {
         reference: "heads/old".into(),
     };
 
-    let done = github_on(&server)
+    let done = generate_github(&server)
         .delete_ref(&http(), "token", &input)
         .await
         .unwrap();
@@ -826,7 +826,7 @@ async fn refuses_a_reference_that_is_not_a_branch_or_a_tag_without_asking_github
     MockGithubNetwork::on(&server)
         .expect_nothing_at("/repos/octo/hello/git/ref/pull/1/head")
         .await;
-    let github = github_on(&server);
+    let github = generate_github(&server);
     let (owner, repo, reference) = ("octo".to_owned(), "hello".to_owned(), "pull/1/head");
 
     let refused = match action {
@@ -896,7 +896,7 @@ async fn lists_the_entries_of_a_directory(#[case] path: Option<&str>, #[case] ro
         reference: Some("v1".into()),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_directory_contents(&http(), "token", &input)
         .await
         .unwrap();
@@ -927,7 +927,7 @@ async fn refuses_to_list_a_file_as_a_directory() {
         reference: None,
     };
 
-    let refused = github_on(&server)
+    let refused = generate_github(&server)
         .list_directory_contents(&http(), "token", &input)
         .await;
 
@@ -954,7 +954,7 @@ async fn reads_a_text_file_decoded() {
         reference: Some("main".into()),
     };
 
-    let file = github_on(&server)
+    let file = generate_github(&server)
         .get_file_contents(&http(), "token", &input)
         .await
         .unwrap();
@@ -984,7 +984,7 @@ async fn reads_a_binary_file_without_decoding_it() {
         reference: None,
     };
 
-    let file = github_on(&server)
+    let file = generate_github(&server)
         .get_file_contents(&http(), "token", &input)
         .await
         .unwrap();
@@ -1009,7 +1009,7 @@ async fn refuses_to_read_what_is_not_a_regular_file(#[case] answer: serde_json::
         reference: None,
     };
 
-    let refused = github_on(&server)
+    let refused = generate_github(&server)
         .get_file_contents(&http(), "token", &input)
         .await;
 
@@ -1035,7 +1035,7 @@ async fn reads_the_readme_decoded() {
         reference: Some("dev".into()),
     };
 
-    let readme = github_on(&server)
+    let readme = generate_github(&server)
         .get_repository_readme(&http(), "token", &input)
         .await
         .unwrap();
@@ -1077,7 +1077,7 @@ async fn writes_a_file_with_its_content_base64_encoded(
         branch: Some("dev".into()),
     };
 
-    let change = github_on(&server)
+    let change = generate_github(&server)
         .create_or_update_file(&http(), "token", &input)
         .await
         .unwrap();
@@ -1113,7 +1113,7 @@ async fn deletes_a_file_in_a_commit() {
         branch: None,
     };
 
-    let change = github_on(&server)
+    let change = generate_github(&server)
         .delete_file(&http(), "token", &input)
         .await
         .unwrap();
@@ -1132,7 +1132,7 @@ async fn refuses_a_file_path_that_climbs_out_of_the_repository_without_asking_gi
 ) {
     // No answer is arranged: a request reaching GitHub would fail the test another way.
     let server = MockServer::start().await;
-    let github = github_on(&server);
+    let github = generate_github(&server);
     let read = GetFileContents {
         owner: "octo".into(),
         repo: "hello".into(),
@@ -1182,7 +1182,7 @@ async fn lists_the_tags_of_a_repository() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_repository_tags(&http(), "token", &input)
         .await
         .unwrap();
@@ -1213,7 +1213,7 @@ async fn lists_the_languages_of_a_repository_most_used_first() {
         repo: "hello".into(),
     };
 
-    let languages = github_on(&server)
+    let languages = generate_github(&server)
         .list_repository_languages(&http(), "token", &input)
         .await
         .unwrap();
@@ -1250,7 +1250,7 @@ async fn lists_the_contributors_of_a_repository_with_anonymous_ones() {
         page: Some(1),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_repository_contributors(&http(), "token", &input)
         .await
         .unwrap();
@@ -1276,7 +1276,7 @@ async fn an_empty_repository_has_no_contributors() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_repository_contributors(&http(), "token", &input)
         .await
         .unwrap();
@@ -1303,7 +1303,7 @@ async fn lists_the_topics_of_a_repository() {
         page: None,
     };
 
-    let topics = github_on(&server)
+    let topics = generate_github(&server)
         .list_repository_topics(&http(), "token", &input)
         .await
         .unwrap();
@@ -1329,7 +1329,7 @@ async fn replaces_the_topics_of_a_repository() {
         names: vec!["cli".into()],
     };
 
-    let topics = github_on(&server)
+    let topics = generate_github(&server)
         .replace_repository_topics(&http(), "token", &input)
         .await
         .unwrap();
@@ -1358,7 +1358,7 @@ async fn lists_the_collaborators_of_a_repository() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_repository_collaborators(&http(), "token", &input)
         .await
         .unwrap();
@@ -1387,7 +1387,7 @@ async fn invites_a_collaborator_who_must_accept() {
         permission: Some("maintain".into()),
     };
 
-    let added = github_on(&server)
+    let added = generate_github(&server)
         .add_repository_collaborator(&http(), "token", &input)
         .await
         .unwrap();
@@ -1412,7 +1412,7 @@ async fn adds_a_collaborator_at_once_without_an_invitation() {
         permission: None,
     };
 
-    let added = github_on(&server)
+    let added = generate_github(&server)
         .add_repository_collaborator(&http(), "token", &input)
         .await
         .unwrap();
@@ -1433,7 +1433,7 @@ async fn removes_a_collaborator_and_acknowledges_it() {
         username: "mona".into(),
     };
 
-    let done = github_on(&server)
+    let done = generate_github(&server)
         .remove_repository_collaborator(&http(), "token", &input)
         .await
         .unwrap();
@@ -1459,7 +1459,7 @@ async fn reads_an_accounts_permission_in_a_repository() {
         username: "mona".into(),
     };
 
-    let permission = github_on(&server)
+    let permission = generate_github(&server)
         .get_repository_permission_for_user(&http(), "token", &input)
         .await
         .unwrap();
@@ -1491,7 +1491,7 @@ async fn comments_on_a_line_of_a_commit() {
         position: Some(4),
     };
 
-    let comment = github_on(&server)
+    let comment = generate_github(&server)
         .create_commit_comment(&http(), "token", &input)
         .await
         .unwrap();
@@ -1523,7 +1523,7 @@ async fn lists_the_comments_on_a_commit() {
         page: Some(2),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_commit_comments(&http(), "token", &input)
         .await
         .unwrap();

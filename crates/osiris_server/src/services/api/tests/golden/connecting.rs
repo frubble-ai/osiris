@@ -3,7 +3,7 @@
 
 use crate::testing::TestContext;
 use crate::testing::golden::{GoldenSession, Key};
-use osiris_providers::mocks::fake::{FAKE_ID, MockFakeNetwork};
+use osiris_providers::mocks::{FAKE_ID, MockFakeNetwork};
 use serde_json::{Value, json};
 use url::Url;
 

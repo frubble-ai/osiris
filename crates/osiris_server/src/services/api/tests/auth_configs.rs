@@ -10,7 +10,7 @@ use crate::testing::db_fixtures::generate_secret;
 use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
-use osiris_providers::mocks::fake::FAKE_ID;
+use osiris_providers::mocks::FAKE_ID;
 use serde_json::{Value, json};
 use sqlx::PgPool;
 

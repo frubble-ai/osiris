@@ -8,9 +8,7 @@
 
 use crate::testing::{API_KEY, setup_test_context};
 use axum::http::StatusCode;
-use osiris_providers::mocks::{
-    fake::MockFakeNetwork, generate_token_answer::generate_token_answer,
-};
+use osiris_providers::mocks::{MockFakeNetwork, generate_token_answer::generate_token_answer};
 use sqlx::PgPool;
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]

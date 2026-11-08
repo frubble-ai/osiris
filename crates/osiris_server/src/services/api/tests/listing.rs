@@ -11,7 +11,7 @@ use crate::testing::{ADMIN_KEY, API_KEY, TestContext, setup_test_context};
 use axum::http::StatusCode;
 use osiris_providers::{
     REGISTRATIONS,
-    mocks::fake::{FAKE_ID, MockFakeNetwork},
+    mocks::{FAKE_ID, MockFakeNetwork},
 };
 use sqlx::PgPool;
 

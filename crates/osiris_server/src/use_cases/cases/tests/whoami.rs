@@ -12,7 +12,7 @@ use crate::use_cases::{
 };
 use osiris_common::secret::{ExposeSecret, Secret};
 use osiris_interfaces::ActingAs;
-use osiris_providers::mocks::fake::{FAKE_ID, FakeProvider};
+use osiris_providers::mocks::{FAKE_ID, FakeProvider};
 use serde_json::Value;
 
 /// What the action asks for, besides the connection.

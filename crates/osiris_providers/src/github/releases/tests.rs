@@ -17,7 +17,7 @@ use super::{
 };
 use crate::{
     ProviderError,
-    github::mocks::{MockGithubNetwork, github_on::github_on},
+    github::mocks::{MockGithubNetwork, generate_github::generate_github},
 };
 use fake::{Fake, faker::lorem::en::Sentence};
 use rstest::rstest;
@@ -47,7 +47,7 @@ async fn lists_a_page_of_releases() {
         page: Some(1),
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_releases(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -93,7 +93,7 @@ async fn creates_a_release_sending_only_the_fields_given() {
         make_latest: Some("false".into()),
     };
 
-    let release = github_on(&server)
+    let release = generate_github(&server)
         .create_release(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -131,7 +131,7 @@ async fn creates_a_release_with_its_target_trimmed_a_blank_latest_left_out_and_i
         make_latest: Some("   ".into()),
     };
 
-    let release = github_on(&server)
+    let release = generate_github(&server)
         .create_release(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -158,7 +158,7 @@ async fn reads_a_release_by_its_id() {
         release_id: 13,
     };
 
-    let release = github_on(&server)
+    let release = generate_github(&server)
         .get_release(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -188,7 +188,7 @@ async fn reads_the_latest_release() {
         repo: "hello".into(),
     };
 
-    let release = github_on(&server)
+    let release = generate_github(&server)
         .get_latest_release(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -215,7 +215,7 @@ async fn reads_a_release_by_its_tag_encoded_into_one_segment(
         tag: tag.into(),
     };
 
-    let release = github_on(&server)
+    let release = generate_github(&server)
         .get_release_by_tag(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -244,7 +244,7 @@ async fn lists_a_page_of_a_releases_assets() {
         page: None,
     };
 
-    let listed = github_on(&server)
+    let listed = generate_github(&server)
         .list_release_assets(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -283,7 +283,7 @@ async fn updates_a_release_sending_only_the_fields_given() {
         make_latest: None,
     };
 
-    let release = github_on(&server)
+    let release = generate_github(&server)
         .update_release(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -313,7 +313,7 @@ async fn generates_release_notes_for_a_tag() {
         configuration_file_path: None,
     };
 
-    let notes = github_on(&server)
+    let notes = generate_github(&server)
         .generate_release_notes(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -341,7 +341,7 @@ async fn reads_a_release_asset_by_its_id() {
         asset_id: 22,
     };
 
-    let asset = github_on(&server)
+    let asset = generate_github(&server)
         .get_release_asset(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -364,7 +364,7 @@ async fn deletes_a_release_or_an_asset_and_acknowledges_it(
     MockGithubNetwork::on(&server)
         .answer("DELETE", route, &[], 204, Value::Null)
         .await;
-    let github = github_on(&server);
+    let github = generate_github(&server);
     let http = reqwest::Client::new();
 
     let acknowledged = if asset {
@@ -403,7 +403,7 @@ async fn a_missing_release_is_a_refusal() {
         repo: "hello".into(),
     };
 
-    let error = github_on(&server)
+    let error = generate_github(&server)
         .get_latest_release(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap_err();

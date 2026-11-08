@@ -1,6 +1,6 @@
 //! A missing scope is named; a granted, a covering, or an unscoped token passes.
 
-use super::{missing_scopes, mocks::nesting_provider::nesting};
+use super::{missing_scopes, mocks::mock_nesting_provider::nesting};
 use rstest::rstest;
 
 #[rstest]

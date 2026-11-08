@@ -19,7 +19,7 @@ use super::{
         generate_github_search_user::generate_github_search_user,
     },
 };
-use crate::github::mocks::{MockGithubNetwork, github_on::github_on};
+use crate::github::mocks::{MockGithubNetwork, generate_github::generate_github};
 use rstest::rstest;
 use serde_json::json;
 use wiremock::{
@@ -61,7 +61,7 @@ async fn searches_repositories_sorted_as_asked(#[case] incomplete: bool) {
         page: Some(1),
     };
 
-    let found = github_on(&server)
+    let found = generate_github(&server)
         .search_repositories(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -102,7 +102,7 @@ async fn searches_users() {
         page: None,
     };
 
-    let found = github_on(&server)
+    let found = generate_github(&server)
         .search_users(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -133,7 +133,7 @@ async fn searches_commits() {
         page: None,
     };
 
-    let found = github_on(&server)
+    let found = generate_github(&server)
         .search_commits(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -169,7 +169,7 @@ async fn searches_code() {
         page: None,
     };
 
-    let found = github_on(&server)
+    let found = generate_github(&server)
         .search_code(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -207,7 +207,7 @@ async fn searches_the_labels_of_a_repository_by_its_id() {
         page: None,
     };
 
-    let found = github_on(&server)
+    let found = generate_github(&server)
         .search_labels(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -236,7 +236,7 @@ async fn searches_topics() {
         page: Some(2),
     };
 
-    let found = github_on(&server)
+    let found = generate_github(&server)
         .search_topics(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -263,7 +263,7 @@ async fn a_search_answer_without_items_reads_as_none_found() {
         page: None,
     };
 
-    let found = github_on(&server)
+    let found = generate_github(&server)
         .search_topics(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();
@@ -294,7 +294,7 @@ async fn sends_the_sort_trimmed_and_leaves_out_a_blank_order() {
         page: None,
     };
 
-    let found = github_on(&server)
+    let found = generate_github(&server)
         .search_repositories(&reqwest::Client::new(), "token", &input)
         .await
         .unwrap();

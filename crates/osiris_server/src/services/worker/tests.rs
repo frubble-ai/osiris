@@ -8,9 +8,7 @@
 
 use crate::testing::{WORKER_TOKEN, setup_test_context};
 use axum::http::StatusCode;
-use osiris_providers::mocks::{
-    fake::MockFakeNetwork, generate_token_answer::generate_token_answer,
-};
+use osiris_providers::mocks::{MockFakeNetwork, generate_token_answer::generate_token_answer};
 use osiris_tasks::names;
 use sqlx::PgPool;
 
