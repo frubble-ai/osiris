@@ -148,6 +148,50 @@ async fn connects_as_an_installation_and_acts_with_one_minted_token(pool: PgPool
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn mints_one_token_for_actions_that_miss_the_cache_at_once(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    let config = app_with_credentials(&app).await;
+    let (owner, repo, token) = (
+        generate_github_login(),
+        generate_github_repo(),
+        generate_github_token(),
+    );
+    let github = MockGithubNetwork::on(&app.provider);
+    // Minted at connect and once more after the cache is cleared: never once per action.
+    github.answer_installation_token("77", &token, 2).await;
+    github
+        .answer_for_token(
+            &format!("/repos/{owner}/{repo}"),
+            &token,
+            generate_github_repository(5),
+            4,
+        )
+        .await;
+    let created = connect(&app, &config, "77").await;
+    let id = created.body["id"].as_str().unwrap().to_owned();
+    // Saving the app's credentials again drops the token, so every action below misses it.
+    let saved = app
+        .send(
+            "PATCH",
+            &format!("/v1/auth-configs/{config}"),
+            Some(ADMIN_KEY),
+            Some(
+                json!({ "secret_settings": { "private_key": MockGithubAppKey::default().pem() } }),
+            ),
+            &[],
+        )
+        .await;
+    assert_eq!(saved.status, StatusCode::OK, "{}", saved.body);
+
+    let answers =
+        futures::future::join_all((0..4).map(|_| get_repository(&app, &id, (&owner, &repo)))).await;
+
+    for answer in answers {
+        assert_eq!(answer.status, StatusCode::OK, "{}", answer.body);
+    }
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn mints_again_once_when_github_refuses_the_installation_s_token(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app_with_credentials(&app).await;

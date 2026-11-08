@@ -4,7 +4,7 @@
 use osiris_common::secret::Secret;
 use std::{
     collections::HashMap,
-    sync::{Mutex, PoisonError},
+    sync::{Arc, Mutex, PoisonError},
 };
 use time::{Duration, OffsetDateTime};
 
@@ -13,9 +13,26 @@ type Key = (String, String);
 #[derive(Default)]
 pub struct InstallationTokenCache {
     tokens: Mutex<HashMap<Key, (Secret, OffsetDateTime)>>,
+    /// One lock per installation, held while its token is minted, so calls that miss the cache at
+    /// once mint one token between them.
+    minting: Mutex<HashMap<Key, Arc<tokio::sync::Mutex<()>>>>,
 }
 
 impl InstallationTokenCache {
+    /// The lock to hold while minting a token for `installation_id` of `auth_config_id`.
+    pub fn minting(
+        &self,
+        auth_config_id: &str,
+        installation_id: &str,
+    ) -> Arc<tokio::sync::Mutex<()>> {
+        self.minting
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .entry((auth_config_id.to_owned(), installation_id.to_owned()))
+            .or_default()
+            .clone()
+    }
+
     /// The token for `installation_id` of `auth_config_id`, if one is held that stays good past
     /// `now` plus `margin`.
     pub fn get(

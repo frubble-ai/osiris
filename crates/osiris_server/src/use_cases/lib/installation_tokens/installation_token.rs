@@ -21,8 +21,24 @@ pub async fn installation_token(
     config: &AuthConfig,
     installation_id: &str,
 ) -> UseCaseResult<Secret> {
-    let now = OffsetDateTime::now_utc();
-    if let Some(token) = cache.get(&config.id, installation_id, now, margin) {
+    if let Some(token) = cache.get(
+        &config.id,
+        installation_id,
+        OffsetDateTime::now_utc(),
+        margin,
+    ) {
+        return Ok(token);
+    }
+    // One mint at a time per installation: a call that waited finds the token the one before it
+    // minted.
+    let lock = cache.minting(&config.id, installation_id);
+    let _minting = lock.lock().await;
+    if let Some(token) = cache.get(
+        &config.id,
+        installation_id,
+        OffsetDateTime::now_utc(),
+        margin,
+    ) {
         return Ok(token);
     }
     let secret_settings = config
