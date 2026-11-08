@@ -52,7 +52,7 @@ impl Github {
             .await
             {
                 Ok(hooks) => hooks,
-                Err(error) if error.status() == Some(404) => return Ok(None),
+                Err(error) if error.is_not_found() => return Ok(None),
                 Err(error) => return Err(error),
             };
             if let Some(hook) = hooks

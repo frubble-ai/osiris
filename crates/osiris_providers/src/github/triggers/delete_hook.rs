@@ -26,7 +26,7 @@ impl Github {
             .await
         {
             Ok(_) => Ok(()),
-            Err(error) if error.status() == Some(404) => Ok(()),
+            Err(error) if error.is_not_found() => Ok(()),
             Err(error) => Err(error),
         }
     }

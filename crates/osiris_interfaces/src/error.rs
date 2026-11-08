@@ -60,6 +60,12 @@ impl ProviderError {
         }
     }
 
+    /// Whether the provider answered 404: what it asked about isn't there (or isn't shown to the
+    /// token), which some actions read as an answer rather than a failure.
+    pub fn is_not_found(&self) -> bool {
+        self.status() == Some(404)
+    }
+
     /// The HTTP status a refusal came with, if it came as one.
     pub fn status(&self) -> Option<u16> {
         match self {

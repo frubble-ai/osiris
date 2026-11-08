@@ -4,7 +4,7 @@ use crate::{
     ProviderError,
     github::{Github, path_segment::path_segment, request::send, types::GithubMergedCheck},
 };
-use reqwest::{Method, StatusCode};
+use reqwest::Method;
 use serde::Deserialize;
 use utoipa::ToSchema;
 
@@ -38,13 +38,8 @@ impl Github {
         );
         match send::<(), ()>(self, http, token, Method::GET, &path, &[], None).await {
             Ok(()) => Ok(GithubMergedCheck { merged: true }),
-            Err(error) if is_not_found(&error) => Ok(GithubMergedCheck { merged: false }),
+            Err(error) if error.is_not_found() => Ok(GithubMergedCheck { merged: false }),
             Err(error) => Err(error),
         }
     }
-}
-
-/// Whether GitHub refused with a 404.
-fn is_not_found(error: &ProviderError) -> bool {
-    error.status() == Some(StatusCode::NOT_FOUND.as_u16())
 }
