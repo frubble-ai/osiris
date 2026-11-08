@@ -15,6 +15,7 @@ use crate::use_cases::{
     cases::run_connected_account_action::RunConnectedAccountActionArgs,
     lib::{
         events::{publish::publish, trigger_event_id::trigger_event_id},
+        installation_tokens::mint_refused::MintRefused,
         tasks::{next_trigger_check::next_trigger_check, schedule::schedule},
         triggers::TriggerState,
     },
@@ -193,20 +194,25 @@ impl UseCases {
         match checked {
             Ok(answer) => Ok(Checked::Answered(answer)),
             // The provider answered for good: the item is gone or the config can't work.
-            // Only the provider answering for good fails the trigger.
-            Err(report) if matches!(report.current_context(), DomainError::ProviderRefused(_)) => {
+            // Only the provider answering for good about what the trigger watches fails it; a
+            // refused installation token is the app's credentials, which leave it waiting below.
+            Err(report)
+                if matches!(report.current_context(), DomainError::ProviderRefused(_))
+                    && !report.contains::<MintRefused>() =>
+            {
                 tracing::warn!(error = ?report, trigger_id = %trigger.id, "the provider refuses the trigger's check; the trigger fails");
                 Ok(Checked::Refused)
             }
             // A connection that can't be used now, or credentials that can't mint its token yet
             // (an auth config the operator can fix), leave the trigger waiting.
             Err(report)
-                if matches!(
-                    report.current_context(),
-                    DomainError::NotActive(_)
-                        | DomainError::MissingScopes(_)
-                        | DomainError::Invalid(_)
-                ) =>
+                if report.contains::<MintRefused>()
+                    || matches!(
+                        report.current_context(),
+                        DomainError::NotActive(_)
+                            | DomainError::MissingScopes(_)
+                            | DomainError::Invalid(_)
+                    ) =>
             {
                 tracing::info!(error = ?report, trigger_id = %trigger.id, "the trigger's connection can't be used now");
                 Ok(Checked::Waiting)

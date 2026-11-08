@@ -3,8 +3,12 @@
 
 use serde_json::Value;
 
-/// Whether `settings` and `secret_settings` are both absent or empty objects.
+/// Whether `settings` and `secret_settings` are both absent or empty objects. A value that isn't
+/// an object (an array, a string, null) is not empty: the provider's own check refuses it.
 pub fn no_settings(settings: &Value, secret_settings: Option<&Value>) -> bool {
-    let empty = |value: &Value| value.as_object().is_none_or(serde_json::Map::is_empty);
+    let empty = |value: &Value| value.as_object().is_some_and(serde_json::Map::is_empty);
     empty(settings) && secret_settings.is_none_or(empty)
 }
+
+#[cfg(test)]
+mod tests;

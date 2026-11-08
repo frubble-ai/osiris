@@ -22,7 +22,7 @@ use osiris_providers::{
     github::{
         mocks::{
             MockGithubNetwork, generate_github_names::generate_github_token,
-            generate_sha::generate_sha,
+            generate_sha::generate_sha, mock_github_app_key::MockGithubAppKey,
         },
         pull_requests::mocks::generate_github_pull_request::generate_github_pull_request,
     },
@@ -237,6 +237,55 @@ async fn keeps_the_trigger_waiting_while_its_app_s_credentials_can_t_mint_a_toke
     let next = pending_checks(&app, &id);
     assert_eq!(next.len(), 1, "{next:?}");
     assert_ne!(next[0], task);
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn keeps_the_trigger_waiting_while_github_refuses_to_mint_its_app_s_token(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    let config = app_with_credentials(&app).await;
+    let github = MockGithubNetwork::on(&app.provider);
+    let mint = "/app/installations/77/access_tokens";
+    // GitHub mints once, for connecting and the watch's first check, then refuses: the app's key
+    // was rotated at GitHub.
+    let first_mint = github
+        .answer_while(
+            "POST",
+            mint,
+            201,
+            json!({ "token": generate_github_token(), "expires_at": "2999-01-01T00:00:00Z" }),
+            Some(1),
+        )
+        .await;
+    let created = connect(&app, &config, "77").await;
+    assert_eq!(created.status, StatusCode::CREATED, "{}", created.body);
+    let connection = created.body["id"].as_str().unwrap().to_owned();
+    let (id, task, watched) = watch_a_pull_request(&app, &connection).await;
+    drop(first_mint);
+    // A new key is saved, which drops the token minted with the old one; GitHub refuses it.
+    let changed = app
+        .send(
+            "PATCH",
+            &format!("/v1/auth-configs/{config}"),
+            Some(ADMIN_KEY),
+            Some(
+                json!({ "secret_settings": { "private_key": MockGithubAppKey::default().pem() } }),
+            ),
+            &[],
+        )
+        .await;
+    assert_eq!(changed.status, StatusCode::OK, "{}", changed.body);
+    github.refuse_installation_token("77", 401).await;
+    github.expect_nothing_at(&watched.pull_request()).await;
+
+    assert_eq!(
+        app.run_pending(&task).await.unwrap(),
+        TaskOutcome::TriggerChecked
+    );
+
+    let trigger = get_trigger(&app, &id).await.body;
+    assert_eq!(trigger["status"], "active", "{trigger}");
+    assert!(trigger["next_check_at"].is_string(), "{trigger}");
+    assert_eq!(pending_checks(&app, &id).len(), 1);
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]

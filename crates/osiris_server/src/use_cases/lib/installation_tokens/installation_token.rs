@@ -2,11 +2,12 @@
 //! the app's credentials and kept until shortly before it expires.
 
 use super::InstallationTokenCache;
+use super::mint_refused::MintRefused;
 use crate::use_cases::UseCaseResult;
 use crate::use_cases::lib::shared::domain_errors::provider;
 use osiris_common::secret::{ExposeSecret, Secret};
 use osiris_domain::{AuthConfig, DomainError};
-use osiris_interfaces::Provider;
+use osiris_interfaces::{Provider, ProviderError};
 use serde_json::Value;
 use time::{Duration, OffsetDateTime, format_description::well_known::Rfc3339};
 
@@ -38,7 +39,18 @@ pub async fn installation_token(
     let minted = implementation
         .installation_token(http, &config.settings, &secret_settings, installation_id)
         .await
-        .map_err(provider)?;
+        .map_err(|error| {
+            let refused = matches!(
+                error,
+                ProviderError::Refused { .. } | ProviderError::Unauthorized { .. }
+            );
+            let report = provider(error);
+            if refused {
+                report.attach(MintRefused)
+            } else {
+                report
+            }
+        })?;
     // A token whose expiry can't be read is used once and not kept.
     let token = minted.token;
     if let Ok(expires_at) = OffsetDateTime::parse(&minted.expires_at, &Rfc3339) {
