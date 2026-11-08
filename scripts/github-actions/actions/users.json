@@ -6,5 +6,12 @@
   "output": "GithubCurrentUser",
   "no_input": true,
   "summary": "the authenticated user and their profile."
+ },
+ {
+  "group": "users",
+  "name": "get_user",
+  "input": "GetUser",
+  "output": "GithubPublicUser",
+  "summary": "a user's public profile, by login."
  }
 ]

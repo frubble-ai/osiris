@@ -11,6 +11,7 @@ workspace = true
 [dependencies]
 osiris_interfaces.workspace = true
 async-trait.workspace = true
+base64.workspace = true
 futures.workspace = true
 reqwest.workspace = true
 serde.workspace = true
