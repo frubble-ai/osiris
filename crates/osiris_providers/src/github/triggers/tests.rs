@@ -54,7 +54,8 @@ fn repo_events(events: &[&str]) -> Value {
 #[rstest]
 #[case::no_events(json!({ "owner": "octo", "repo": "hello", "events": [] }), "at least one")]
 #[case::an_unknown_event(repo_events(&["pushes"]), "pushes")]
-#[case::a_bad_owner(json!({ "owner": "-octo", "repo": "hello", "events": ["push"] }), "owner")]
+#[case::a_bad_owner(json!({ "owner": "octo/cat", "repo": "hello", "events": ["push"] }), "owner")]
+#[case::a_dot_owner(json!({ "owner": "..", "repo": "hello", "events": ["push"] }), "owner")]
 #[case::a_dot_repo(json!({ "owner": "octo", "repo": "..", "events": ["push"] }), "repo")]
 #[case::an_unknown_field(json!({ "owner": "octo", "repo": "hello", "events": ["push"], "x": 1 }), "x")]
 fn refuses_a_repo_event_config_that_cannot_work(#[case] config: Value, #[case] named: &str) {
@@ -62,6 +63,16 @@ fn refuses_a_repo_event_config_that_cannot_work(#[case] config: Value, #[case] n
         panic!("the config was accepted");
     };
     assert!(reason.contains(named), "{reason}");
+}
+
+#[rstest]
+#[case::a_managed_user("mona_octocorp")]
+#[case::a_plain_login("octo-cat")]
+#[case::a_dotted_name("octo.cat")]
+fn takes_an_owner_github_may_have(#[case] owner: &str) {
+    let config = json!({ "owner": owner, "repo": "hello", "events": ["push"] });
+
+    assert!(RepoEventConfig::read(&config).is_ok(), "{owner}");
 }
 
 #[test]
