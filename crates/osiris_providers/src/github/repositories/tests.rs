@@ -870,7 +870,7 @@ async fn refuses_a_reference_that_is_not_a_branch_or_a_tag_without_asking_github
             .map(|_| ()),
     };
 
-    assert!(matches!(refused, Err(ProviderError::Refused { .. })));
+    assert!(matches!(refused, Err(ProviderError::Invalid { .. })));
     assert!(server.received_requests().await.unwrap().is_empty());
 }
 

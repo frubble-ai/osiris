@@ -45,3 +45,6 @@ impl Default for TriggersSettings {
         }
     }
 }
+
+#[cfg(test)]
+mod tests;

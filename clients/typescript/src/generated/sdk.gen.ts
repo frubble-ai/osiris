@@ -148,7 +148,8 @@ export const listConnectedAccounts = <ThrowOnError extends boolean = false>(opti
 /**
  * Start connecting a user: a pending connection and the provider's consent URL. After the
  * consent, osiris sends the browser to `callback_url`. With `installation_id`, connect as that
- * installation of the auth config's app instead: active at once, no consent.
+ * installation of the auth config's app instead: active at once, no consent. No user approves an
+ * installation connection, so it needs the admin key.
  */
 export const createConnectedAccount = <ThrowOnError extends boolean = false>(options: Options<CreateConnectedAccountData, ThrowOnError>): RequestResult<CreateConnectedAccountResponses, CreateConnectedAccountErrors, ThrowOnError> => (options.client ?? client).post<CreateConnectedAccountResponses, CreateConnectedAccountErrors, ThrowOnError>({
     requestValidator: async (data) => await z.object({
@@ -160,6 +161,10 @@ export const createConnectedAccount = <ThrowOnError extends boolean = false>(opt
     responseValidator: async (data) => await zCreateConnectedAccountResponse.parseAsync(data),
     security: [{
             key: 'api_key',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'admin_key',
             scheme: 'bearer',
             type: 'http'
         }],

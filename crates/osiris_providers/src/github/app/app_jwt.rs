@@ -28,7 +28,7 @@ pub fn app_jwt(credentials: &AppCredentials) -> Result<String, ProviderError> {
         .as_secs();
     let issued_at = now.saturating_sub(CLOCK_SKEW_SECONDS);
     let key = EncodingKey::from_rsa_pem(credentials.private_key.as_bytes()).map_err(|_| {
-        ProviderError::refused(
+        ProviderError::invalid(
             "github",
             "the GitHub App's private key is not an RSA key in PEM",
         )
@@ -42,5 +42,5 @@ pub fn app_jwt(credentials: &AppCredentials) -> Result<String, ProviderError> {
         },
         &key,
     )
-    .map_err(|error| ProviderError::refused("github", format!("signing the app's JWT: {error}")))
+    .map_err(|error| ProviderError::invalid("github", format!("signing the app's JWT: {error}")))
 }

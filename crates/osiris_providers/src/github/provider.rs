@@ -117,7 +117,7 @@ impl Provider for Github {
         installation_id: &str,
     ) -> Result<InstallationToken, ProviderError> {
         let credentials = AppCredentials::read(settings, Some(secret_settings))
-            .map_err(|reason| ProviderError::refused("github", reason))?;
+            .map_err(|reason| ProviderError::invalid("github", reason))?;
         self.mint_installation_token(http, &credentials, installation_id)
             .await
     }
@@ -145,7 +145,7 @@ impl Provider for Github {
         callback_url: &str,
         secret: &str,
     ) -> Result<Option<String>, ProviderError> {
-        let refused = |reason: String| ProviderError::refused("github", reason);
+        let refused = |reason: String| ProviderError::invalid("github", reason);
         let (owner, repo, events, insecure_ssl) = match kind {
             ON_REPO_EVENT => {
                 let config = RepoEventConfig::read(config).map_err(refused)?;
@@ -215,13 +215,13 @@ impl Provider for Github {
         checkpoint: Option<&Value>,
     ) -> Result<TriggerCheck, ProviderError> {
         if kind != WATCH_PULL_REQUEST {
-            return Err(ProviderError::refused(
+            return Err(ProviderError::invalid(
                 "github",
                 format!("{kind} isn't checked on a schedule"),
             ));
         }
         let config = WatchPullRequestConfig::read(config)
-            .map_err(|reason| ProviderError::refused("github", reason))?;
+            .map_err(|reason| ProviderError::invalid("github", reason))?;
         self.check_pull_request(http, token, &config, checkpoint)
             .await
     }

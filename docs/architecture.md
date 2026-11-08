@@ -199,7 +199,9 @@ names it except module declarations:
 
 An app's auth config can hold the app's own `settings` and `secret_settings` (encrypted like a
 client secret), which its provider validates when the auth config is saved. A connection made with
-an `installation_id` is `app_installation`: it holds no tokens. When an action runs, the provider
+an `installation_id` is `app_installation`: it holds no tokens. No user approves it, and nothing
+ties an installation to the `user_id` it is made for, so only the admin key may make one; the API
+key may only start a consent, which the user approves. When an action runs, the provider
 mints the installation's token from the app's credentials (`Provider::installation_token`). The
 token is kept in memory (`InstallationTokenCache`) until `[providers.installation_tokens]
 margin_seconds` before it expires. A token the provider refuses is minted again and the call runs

@@ -577,7 +577,7 @@ async fn refuses_a_label_color_that_is_not_six_hex_digits_without_asking_github(
         .await
         .unwrap_err();
 
-    assert!(matches!(error, ProviderError::Refused { .. }));
+    assert!(matches!(error, ProviderError::Invalid { .. }));
 }
 
 #[tokio::test]

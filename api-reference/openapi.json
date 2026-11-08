@@ -13899,9 +13899,12 @@
         "security": [
           {
             "api_key": []
+          },
+          {
+            "admin_key": []
           }
         ],
-        "summary": "Start connecting a user: a pending connection and the provider's consent URL. After the\nconsent, osiris sends the browser to `callback_url`. With `installation_id`, connect as that\ninstallation of the auth config's app instead: active at once, no consent.",
+        "summary": "Start connecting a user: a pending connection and the provider's consent URL. After the\nconsent, osiris sends the browser to `callback_url`. With `installation_id`, connect as that\ninstallation of the auth config's app instead: active at once, no consent. No user approves an\ninstallation connection, so it needs the admin key.",
         "tags": [
           "connected-accounts"
         ]

@@ -33,7 +33,8 @@ An auth config acts as the app's installations when it holds the app's credentia
 - `secret_settings`: `{"private_key": "-----BEGIN …"}`, the PEM the app's settings page downloads;
   encrypted and never answered (`has_secret_settings` says it is set).
 
-`POST /v1/connected-accounts` with `installation_id` connects as that installation, active at once.
+`POST /v1/connected-accounts` with `installation_id`, made with the admin key, connects as that
+installation, active at once.
 Its tokens are minted with an RS256 App JWT when an action runs, kept in memory until
 `[providers.installation_tokens] margin_seconds` before they expire (GitHub's last an hour), and
 minted again once when GitHub refuses one.

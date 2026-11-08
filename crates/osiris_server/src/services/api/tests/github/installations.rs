@@ -48,7 +48,7 @@ async fn connect(
     app.send(
         "POST",
         "/v1/connected-accounts",
-        Some(API_KEY),
+        Some(ADMIN_KEY),
         Some(json!({ "auth_config_id": config, "user_id": "org_1", "installation_id": installation })),
         &[],
     )
@@ -234,6 +234,28 @@ async fn refuses_settings_the_provider_does_not_read(pool: PgPool) {
         );
         assert_eq!(refused.body["error"]["code"], "OS_02");
     }
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_an_installation_connection_made_with_the_api_key(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    let config = app_with_credentials(&app).await;
+    // No token may be minted: the key is refused before GitHub is asked.
+    MockGithubNetwork::on(&app.provider)
+        .answer_installation_token("77", "ghs_installation", 0)
+        .await;
+
+    let refused = app
+        .send(
+            "POST",
+            "/v1/connected-accounts",
+            Some(API_KEY),
+            Some(json!({ "auth_config_id": config, "user_id": "org_1", "installation_id": "77" })),
+            &[],
+        )
+        .await;
+
+    assert_eq!(refused.status, StatusCode::UNAUTHORIZED, "{}", refused.body);
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]

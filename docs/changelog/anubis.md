@@ -19,7 +19,7 @@ The first release, a **preview**: its contract may still change until it is cut 
   checked.
 - App installations: an auth config can hold its app's `settings` and `secret_settings` (encrypted
   and never returned; `has_secret_settings` says whether they are set), which the provider
-  validates. `POST /v1/connected-accounts` with `installation_id` connects as that installation,
+  validates. `POST /v1/connected-accounts` with `installation_id` (admin key) connects as that installation,
   with no consent, and is `active` at once. Its tokens are minted when an action runs, reused
   until `[providers.installation_tokens] margin_seconds` before they expire, and minted once more
   when the provider refuses one. An action that only works as a user is refused on one as

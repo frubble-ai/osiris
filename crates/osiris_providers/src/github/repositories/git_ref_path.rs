@@ -18,7 +18,7 @@ pub fn branch_or_tag_ref_path(reference: &str) -> Result<String, ProviderError> 
     if reference.starts_with("heads/") || reference.starts_with("tags/") {
         Ok(git_ref_path(reference))
     } else {
-        Err(ProviderError::refused(
+        Err(ProviderError::invalid(
             "github",
             "ref must start with heads/ or tags/",
         ))

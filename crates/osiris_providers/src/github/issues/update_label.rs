@@ -54,7 +54,7 @@ impl Github {
         if let Some(color) = &input.color
             && !(color.len() == 6 && color.bytes().all(|byte| byte.is_ascii_hexdigit()))
         {
-            return Err(ProviderError::refused(
+            return Err(ProviderError::invalid(
                 "github",
                 "color must be a 6-character hex color without #",
             ));
