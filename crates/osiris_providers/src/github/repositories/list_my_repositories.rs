@@ -79,7 +79,8 @@ impl Github {
             ("sort", &input.sort),
             ("direction", &input.direction),
         ] {
-            if value.is_some() {
+            // A blank one is left out, as on a user's list.
+            if trimmed(value.as_deref()).is_some() {
                 return Err(ProviderError::invalid(
                     "github",
                     format!(

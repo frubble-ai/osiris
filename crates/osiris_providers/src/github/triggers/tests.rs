@@ -115,6 +115,7 @@ fn fires_on_a_watched_event_with_github_s_payload() {
         &signed(body, SECRET, "push"),
         body,
         SECRET,
+        usize::MAX,
     );
 
     let TriggerReceipt::Fired { delivery_id, data } = receipt else {
@@ -142,6 +143,7 @@ fn does_not_fire_on_what_the_trigger_does_not_take(
         &signed(body, signed_with, event),
         body,
         SECRET,
+        usize::MAX,
     );
     if signed_right {
         assert!(matches!(receipt, TriggerReceipt::Ignored(_)), "{receipt:?}");
@@ -159,6 +161,7 @@ fn fires_on_every_event_for_a_star() {
         &signed(body, SECRET, "issues"),
         body,
         SECRET,
+        usize::MAX,
     );
     assert!(matches!(receipt, TriggerReceipt::Fired { .. }));
 }
@@ -176,6 +179,7 @@ fn checks_a_watched_pull_request_only_on_its_own_deliveries() {
         &signed(ours, SECRET, "pull_request"),
         ours,
         SECRET,
+        usize::MAX,
     );
     let ignored = receive_delivery(
         WATCH_PULL_REQUEST,
@@ -183,10 +187,48 @@ fn checks_a_watched_pull_request_only_on_its_own_deliveries() {
         &signed(another, SECRET, "pull_request"),
         another,
         SECRET,
+        usize::MAX,
     );
 
     assert_eq!(checked, TriggerReceipt::Check);
     assert!(matches!(ignored, TriggerReceipt::Ignored(_)));
+}
+
+#[test]
+fn notes_a_delivery_too_large_to_carry_by_its_size_without_reading_it() {
+    // Not JSON at all: a body over the limit is never parsed.
+    let body = vec![b'x'; 64];
+
+    let receipt = receive_delivery(
+        ON_REPO_EVENT,
+        &repo_events(&["push"]),
+        &signed(&body, SECRET, "push"),
+        &body,
+        SECRET,
+        32,
+    );
+
+    let TriggerReceipt::Fired { data, .. } = receipt else {
+        panic!("it did not fire: {receipt:?}");
+    };
+    assert_eq!(data["event"], "push");
+    assert_eq!(data["payload"], json!({ "omitted": true, "bytes": 64 }));
+}
+
+#[test]
+fn checks_a_watched_pull_request_on_a_delivery_too_large_to_read() {
+    let body = vec![b'x'; 64];
+
+    let receipt = receive_delivery(
+        WATCH_PULL_REQUEST,
+        &json!({ "owner": generate_github_login(), "repo": generate_github_repo(), "number": 7 }),
+        &signed(&body, SECRET, "pull_request"),
+        &body,
+        SECRET,
+        32,
+    );
+
+    assert_eq!(receipt, TriggerReceipt::Check);
 }
 
 #[tokio::test]

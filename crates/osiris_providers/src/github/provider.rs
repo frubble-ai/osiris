@@ -183,8 +183,9 @@ impl Provider for Github {
         headers: &HeaderMap,
         body: &[u8],
         secret: &str,
+        max_data_bytes: usize,
     ) -> TriggerReceipt {
-        receive_delivery(kind, config, headers, body, secret)
+        receive_delivery(kind, config, headers, body, secret, max_data_bytes)
     }
 
     async fn check_trigger(

@@ -228,6 +228,33 @@ async fn lists_an_installation_s_repositories_on_an_installation_connection() {
     assert_eq!(listed[0].id, "3");
 }
 
+#[tokio::test]
+async fn leaves_out_a_blank_filter_on_an_installation_connection() {
+    let server = MockServer::start().await;
+    let (token, repository) = (generate_github_token(), generate_github_repository(3));
+    MockGithubNetwork::on(&server)
+        .answer(
+            "GET",
+            "/installation/repositories",
+            &[],
+            200,
+            json!({ "total_count": 1, "repositories": [repository] }),
+        )
+        .await;
+    let input = ListMyRepositories {
+        visibility: Some("  ".into()),
+        sort: Some(String::new()),
+        ..ListMyRepositories::default()
+    };
+
+    let listed = generate_github(&server)
+        .list_my_repositories(&http(), &token, &input, ActingAs::Installation)
+        .await
+        .unwrap();
+
+    assert_eq!(listed.len(), 1);
+}
+
 #[rstest]
 #[case::visibility(ListMyRepositories { visibility: Some("private".into()), ..ListMyRepositories::default() }, "visibility")]
 #[case::sort(ListMyRepositories { sort: Some("pushed".into()), ..ListMyRepositories::default() }, "sort")]

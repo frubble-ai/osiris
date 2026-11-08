@@ -95,7 +95,8 @@ pub trait Provider: ProviderCommon {
     }
 
     /// What a delivery (its `headers` and raw `body`) means for a trigger of kind `kind`, signed
-    /// with `secret`.
+    /// with `secret`. A body longer than `max_data_bytes` can't be carried in an event, so a
+    /// provider doesn't read it into the event's data; it notes its size instead.
     fn receive_trigger(
         &self,
         _kind: &str,
@@ -103,6 +104,7 @@ pub trait Provider: ProviderCommon {
         _headers: &HeaderMap,
         _body: &[u8],
         _secret: &str,
+        _max_data_bytes: usize,
     ) -> TriggerReceipt {
         TriggerReceipt::Unsigned
     }

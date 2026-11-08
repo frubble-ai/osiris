@@ -55,6 +55,8 @@ An installation has no user, so on an installation connection:
 | `github.on_repo_event` | `{"owner", "repo", "events": ["push", …] or ["*"]}` | `event` (GitHub's event name), `delivery_id`, `payload` (GitHub's own) |
 | `github.watch_pull_request` | `{"owner", "repo", "number"}` | `pull_request` and `version`, once per change |
 
+A delivery larger than `[triggers] max_event_data_bytes` is not parsed: `github.on_repo_event` fires with `payload` set to `{"omitted": true, "bytes": <length>}` (read the event from GitHub), and `github.watch_pull_request` checks its pull request.
+
 `github.on_repo_event` creates a repository webhook that delivers to
 `{public_url}/webhooks/triggers/{id}`, signed with the trigger's own secret (HMAC-SHA256,
 `X-Hub-Signature-256`). If GitHub already has a webhook for that URL, it is updated instead.

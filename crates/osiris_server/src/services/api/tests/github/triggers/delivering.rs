@@ -153,9 +153,11 @@ async fn publishes_a_delivery_too_large_to_carry_with_its_data_omitted(pool: PgP
 
     let events = fired(&app);
     assert_eq!(events.len(), 1, "{events:?}");
+    // The delivery's event is kept; its payload, too large to carry, is noted by its size.
     let data = events[0].data.as_ref().unwrap();
-    assert_eq!(data["omitted"], true, "{data}");
-    assert!(data["bytes"].as_u64().unwrap() > 256, "{data}");
+    assert_eq!(data["event"], "push", "{data}");
+    assert_eq!(data["payload"]["omitted"], true, "{data}");
+    assert!(data["payload"]["bytes"].as_u64().unwrap() > 256, "{data}");
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]

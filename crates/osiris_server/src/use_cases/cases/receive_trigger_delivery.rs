@@ -49,6 +49,7 @@ impl UseCases {
                 args.headers,
                 args.body,
                 trigger.secret.expose_secret(),
+                ctx.config.settings.triggers.max_event_data(),
             );
             match receipt {
                 // Said the same as a trigger that doesn't exist, so a guess learns nothing.
