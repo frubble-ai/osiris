@@ -25,7 +25,10 @@ pub struct GithubFileContent {
     pub url: Option<String>,
     pub download_url: Option<String>,
     pub encoding: String,
+    /// The content, base64-encoded, without the line breaks GitHub wraps it in.
     pub content_base64: String,
+    /// The content as text, when it is base64-encoded UTF-8; absent for a binary file.
+    pub decoded_content: Option<String>,
 }
 
 /// The commit a contents change made.

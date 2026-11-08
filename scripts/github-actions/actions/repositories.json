@@ -20,5 +20,262 @@
   "input": "GetBranch",
   "output": "GithubBranch",
   "summary": "a branch, by name."
+ },
+ {
+  "group": "repositories",
+  "name": "list_my_repositories",
+  "input": "ListMyRepositories",
+  "output": "GithubRepository",
+  "list": true,
+  "summary": "the repositories the authenticated user can see, a page at a time."
+ },
+ {
+  "group": "repositories",
+  "name": "create_repository",
+  "input": "CreateRepository",
+  "output": "GithubRepository",
+  "summary": "a new repository of the authenticated user's."
+ },
+ {
+  "group": "repositories",
+  "name": "delete_repository",
+  "input": "DeleteRepository",
+  "output": "GithubAcknowledgement",
+  "summary": "a repository deleted, by owner and name."
+ },
+ {
+  "group": "repositories",
+  "name": "update_repository",
+  "input": "UpdateRepository",
+  "output": "GithubRepository",
+  "summary": "a repository's settings and metadata changed."
+ },
+ {
+  "group": "repositories",
+  "name": "fork_repository",
+  "input": "ForkRepository",
+  "output": "GithubRepository",
+  "summary": "a fork of a repository, made in the background."
+ },
+ {
+  "group": "repositories",
+  "name": "list_repository_forks",
+  "input": "ListRepositoryForks",
+  "output": "GithubRepository",
+  "list": true,
+  "summary": "a repository's forks, a page at a time."
+ },
+ {
+  "group": "repositories",
+  "name": "list_organization_repositories",
+  "input": "ListOrganizationRepositories",
+  "output": "GithubRepository",
+  "list": true,
+  "summary": "an organization's repositories, a page at a time."
+ },
+ {
+  "group": "repositories",
+  "name": "list_user_repositories",
+  "input": "ListUserRepositories",
+  "output": "GithubRepository",
+  "list": true,
+  "summary": "a user's public repositories, a page at a time."
+ },
+ {
+  "group": "repositories",
+  "name": "list_commits",
+  "input": "ListCommits",
+  "output": "GithubCommit",
+  "list": true,
+  "summary": "a repository's commits, filtered by branch, path, author and date, a page at a time."
+ },
+ {
+  "group": "repositories",
+  "name": "get_commit",
+  "input": "GetCommit",
+  "output": "GithubCommit",
+  "summary": "a commit, with its stats and the files it changed."
+ },
+ {
+  "group": "repositories",
+  "name": "compare_commits",
+  "input": "CompareCommits",
+  "output": "GithubCommitComparison",
+  "summary": "two commits compared, with the commits and files between them."
+ },
+ {
+  "group": "repositories",
+  "name": "merge_branch",
+  "input": "MergeBranch",
+  "output": "GithubMergeResult",
+  "summary": "one branch merged into another."
+ },
+ {
+  "group": "repositories",
+  "name": "rename_branch",
+  "input": "RenameBranch",
+  "output": "GithubBranch",
+  "summary": "a branch given a new name."
+ },
+ {
+  "group": "repositories",
+  "name": "sync_fork_branch_with_upstream",
+  "input": "SyncForkBranchWithUpstream",
+  "output": "GithubForkSync",
+  "summary": "a fork's branch brought up to date with its upstream."
+ },
+ {
+  "group": "repositories",
+  "name": "create_ref",
+  "input": "CreateRef",
+  "output": "GithubGitRef",
+  "summary": "a new git reference pointing at a commit."
+ },
+ {
+  "group": "repositories",
+  "name": "get_ref",
+  "input": "GetRef",
+  "output": "GithubGitRef",
+  "summary": "a branch's or a tag's git reference."
+ },
+ {
+  "group": "repositories",
+  "name": "list_matching_refs",
+  "input": "ListMatchingRefs",
+  "output": "GithubGitRef",
+  "list": true,
+  "summary": "every git reference that starts with a prefix."
+ },
+ {
+  "group": "repositories",
+  "name": "update_ref",
+  "input": "UpdateRef",
+  "output": "GithubGitRef",
+  "summary": "a branch's or a tag's git reference pointed at another commit."
+ },
+ {
+  "group": "repositories",
+  "name": "delete_ref",
+  "input": "DeleteRef",
+  "output": "GithubAcknowledgement",
+  "summary": "a branch's or a tag's git reference deleted."
+ },
+ {
+  "group": "repositories",
+  "name": "list_directory_contents",
+  "input": "ListDirectoryContents",
+  "output": "GithubContentEntry",
+  "list": true,
+  "summary": "the entries of a directory of a repository."
+ },
+ {
+  "group": "repositories",
+  "name": "get_file_contents",
+  "input": "GetFileContents",
+  "output": "GithubFileContent",
+  "summary": "a file of a repository, in base64 and decoded when it is text."
+ },
+ {
+  "group": "repositories",
+  "name": "get_repository_readme",
+  "input": "GetRepositoryReadme",
+  "output": "GithubFileContent",
+  "summary": "a repository's README, in base64 and decoded when it is text."
+ },
+ {
+  "group": "repositories",
+  "name": "create_or_update_file",
+  "input": "CreateOrUpdateFile",
+  "output": "GithubContentChange",
+  "summary": "a file of a repository written, in a commit of its own."
+ },
+ {
+  "group": "repositories",
+  "name": "delete_file",
+  "input": "DeleteFile",
+  "output": "GithubContentChange",
+  "summary": "a file of a repository deleted, in a commit of its own."
+ },
+ {
+  "group": "repositories",
+  "name": "list_repository_tags",
+  "input": "ListRepositoryTags",
+  "output": "GithubTag",
+  "list": true,
+  "summary": "a repository's tags, a page at a time."
+ },
+ {
+  "group": "repositories",
+  "name": "list_repository_languages",
+  "input": "ListRepositoryLanguages",
+  "output": "GithubLanguage",
+  "list": true,
+  "summary": "the languages a repository is written in, by bytes of code."
+ },
+ {
+  "group": "repositories",
+  "name": "list_repository_contributors",
+  "input": "ListRepositoryContributors",
+  "output": "GithubContributor",
+  "list": true,
+  "summary": "who contributed to a repository, a page at a time."
+ },
+ {
+  "group": "repositories",
+  "name": "list_repository_topics",
+  "input": "ListRepositoryTopics",
+  "output": "GithubTopics",
+  "summary": "a repository's topics."
+ },
+ {
+  "group": "repositories",
+  "name": "replace_repository_topics",
+  "input": "ReplaceRepositoryTopics",
+  "output": "GithubTopics",
+  "summary": "a repository's topics replaced by a new set."
+ },
+ {
+  "group": "repositories",
+  "name": "list_repository_collaborators",
+  "input": "ListRepositoryCollaborators",
+  "output": "GithubCollaborator",
+  "list": true,
+  "summary": "a repository's collaborators, a page at a time."
+ },
+ {
+  "group": "repositories",
+  "name": "add_repository_collaborator",
+  "input": "AddRepositoryCollaborator",
+  "output": "GithubCollaboratorAddition",
+  "summary": "an account added to a repository as a collaborator, or invited to be one."
+ },
+ {
+  "group": "repositories",
+  "name": "remove_repository_collaborator",
+  "input": "RemoveRepositoryCollaborator",
+  "output": "GithubAcknowledgement",
+  "summary": "a collaborator removed from a repository."
+ },
+ {
+  "group": "repositories",
+  "name": "get_repository_permission_for_user",
+  "input": "GetRepositoryPermissionForUser",
+  "output": "GithubRepositoryPermission",
+  "summary": "what an account may do in a repository."
+ },
+ {
+  "group": "repositories",
+  "name": "create_commit_comment",
+  "input": "CreateCommitComment",
+  "output": "GithubCommitComment",
+  "summary": "a comment on a commit."
+ },
+ {
+  "group": "repositories",
+  "name": "list_commit_comments",
+  "input": "ListCommitComments",
+  "output": "GithubCommitComment",
+  "list": true,
+  "summary": "the comments on a commit, a page at a time."
  }
 ]

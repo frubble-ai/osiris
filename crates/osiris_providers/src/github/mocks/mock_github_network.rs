@@ -3,7 +3,7 @@
 use serde_json::{Value, json};
 use wiremock::{
     Mock, MockServer, ResponseTemplate,
-    matchers::{body_string_contains, header, method, path, path_regex, query_param},
+    matchers::{body_json, body_string_contains, header, method, path, path_regex, query_param},
 };
 
 pub struct MockGithubNetwork<'a> {
@@ -55,6 +55,22 @@ impl<'a> MockGithubNetwork<'a> {
                 "permissions": { "contents": "read", "metadata": "read" },
             })))
             .expect(expected_calls)
+    /// As [`Self::answer`], and only for a request whose JSON body is `request`: the test fails
+    /// unless GitHub is sent exactly that body, once.
+    pub async fn answer_with_body(
+        &self,
+        verb: &str,
+        route: &str,
+        request: Value,
+        status: u16,
+        body: Value,
+    ) {
+        Mock::given(method(verb))
+            .and(path(route))
+            .and(header("x-github-api-version", "2022-11-28"))
+            .and(body_json(request))
+            .respond_with(ResponseTemplate::new(status).set_body_json(body))
+            .expect(1)
             .mount(self.server)
             .await;
     }
@@ -68,6 +84,23 @@ impl<'a> MockGithubNetwork<'a> {
             .respond_with(
                 ResponseTemplate::new(status).set_body_json(json!({ "message": "Not Found" })),
             )
+    /// `verb route` answers `status` with no body at all, as GitHub's 204 does; the test fails
+    /// unless it is asked exactly once.
+    pub async fn answer_empty(&self, verb: &str, route: &str, status: u16) {
+        Mock::given(method(verb))
+            .and(path(route))
+            .and(header("x-github-api-version", "2022-11-28"))
+            .respond_with(ResponseTemplate::new(status))
+            .expect(1)
+            .mount(self.server)
+            .await;
+    }
+
+    /// No request may reach `route`; the test fails if one does.
+    pub async fn expect_nothing_at(&self, route: &str) {
+        Mock::given(path(route))
+            .respond_with(ResponseTemplate::new(500))
+            .expect(0)
             .mount(self.server)
             .await;
     }
