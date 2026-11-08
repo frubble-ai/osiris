@@ -3,6 +3,10 @@
 
 pub mod github_action_args;
 pub mod installations;
+<<<<<<< HEAD
 pub mod issues;
+=======
+pub mod pull_requests;
+>>>>>>> port/github-pull_requests
 pub mod repositories;
 pub mod users;

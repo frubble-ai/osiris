@@ -1,0 +1,176 @@
+[
+ {
+  "group": "pull_requests",
+  "name": "list_pull_requests",
+  "input": "ListPullRequests",
+  "output": "GithubPullRequest",
+  "list": true,
+  "summary": "a repository's pull requests, a page at a time."
+ },
+ {
+  "group": "pull_requests",
+  "name": "list_pull_requests_associated_with_commit",
+  "input": "ListPullRequestsAssociatedWithCommit",
+  "output": "GithubPullRequest",
+  "list": true,
+  "summary": "the pull requests a commit belongs to, a page at a time."
+ },
+ {
+  "group": "pull_requests",
+  "name": "list_pull_request_files",
+  "input": "ListPullRequestFiles",
+  "output": "GithubPullRequestFile",
+  "list": true,
+  "summary": "the files a pull request changes, a page at a time."
+ },
+ {
+  "group": "pull_requests",
+  "name": "list_pull_request_commits",
+  "input": "ListPullRequestCommits",
+  "output": "GithubCommit",
+  "list": true,
+  "summary": "the commits on a pull request, a page at a time."
+ },
+ {
+  "group": "pull_requests",
+  "name": "list_pull_request_requested_reviewers",
+  "input": "ListPullRequestRequestedReviewers",
+  "output": "GithubRequestedReviewers",
+  "summary": "the users and teams a pull request's review is requested from."
+ },
+ {
+  "group": "pull_requests",
+  "name": "list_pull_request_reviews",
+  "input": "ListPullRequestReviews",
+  "output": "GithubReview",
+  "list": true,
+  "summary": "the reviews of a pull request, a page at a time."
+ },
+ {
+  "group": "pull_requests",
+  "name": "list_pull_request_review_comments",
+  "input": "ListPullRequestReviewComments",
+  "output": "GithubReviewComment",
+  "list": true,
+  "summary": "the comments on a pull request's diff, a page at a time."
+ },
+ {
+  "group": "pull_requests",
+  "name": "create_pull_request_review",
+  "input": "CreatePullRequestReview",
+  "output": "GithubReview",
+  "summary": "a review of a pull request, with comments on lines of its diff if given."
+ },
+ {
+  "group": "pull_requests",
+  "name": "submit_pull_request_review",
+  "input": "SubmitPullRequestReview",
+  "output": "GithubReview",
+  "summary": "a pending review of a pull request, submitted."
+ },
+ {
+  "group": "pull_requests",
+  "name": "get_pull_request_review",
+  "input": "GetPullRequestReview",
+  "output": "GithubReview",
+  "summary": "a review of a pull request, by id."
+ },
+ {
+  "group": "pull_requests",
+  "name": "dismiss_pull_request_review",
+  "input": "DismissPullRequestReview",
+  "output": "GithubReview",
+  "summary": "a submitted review of a pull request, dismissed."
+ },
+ {
+  "group": "pull_requests",
+  "name": "delete_pending_pull_request_review",
+  "input": "DeletePendingPullRequestReview",
+  "output": "GithubReview",
+  "summary": "a pending review of a pull request, deleted; it answers the review deleted."
+ },
+ {
+  "group": "pull_requests",
+  "name": "create_pull_request_review_comment",
+  "input": "CreatePullRequestReviewComment",
+  "output": "GithubReviewComment",
+  "summary": "a comment on a line, or a range of lines, of a pull request's diff."
+ },
+ {
+  "group": "pull_requests",
+  "name": "reply_pull_request_review_comment",
+  "input": "ReplyPullRequestReviewComment",
+  "output": "GithubReviewComment",
+  "summary": "a reply to a comment on a pull request's diff."
+ },
+ {
+  "group": "pull_requests",
+  "name": "update_pull_request_review_comment",
+  "input": "UpdatePullRequestReviewComment",
+  "output": "GithubReviewComment",
+  "summary": "a comment on a pull request's diff, its text replaced."
+ },
+ {
+  "group": "pull_requests",
+  "name": "delete_pull_request_review_comment",
+  "input": "DeletePullRequestReviewComment",
+  "output": "GithubAcknowledgement",
+  "summary": "a comment on a pull request's diff, deleted."
+ },
+ {
+  "group": "pull_requests",
+  "name": "get_pull_request",
+  "input": "GetPullRequest",
+  "output": "GithubPullRequest",
+  "summary": "a pull request, by number."
+ },
+ {
+  "group": "pull_requests",
+  "name": "create_pull_request",
+  "input": "CreatePullRequest",
+  "output": "GithubPullRequest",
+  "summary": "a new pull request, from one branch into another."
+ },
+ {
+  "group": "pull_requests",
+  "name": "update_pull_request",
+  "input": "UpdatePullRequest",
+  "output": "GithubPullRequest",
+  "summary": "a pull request's title, text, state, base branch or whether maintainers may push to it, changed."
+ },
+ {
+  "group": "pull_requests",
+  "name": "update_pull_request_branch",
+  "input": "UpdatePullRequestBranch",
+  "output": "GithubPullRequestBranchUpdate",
+  "summary": "a pull request's branch brought up to date with the latest changes of its base branch."
+ },
+ {
+  "group": "pull_requests",
+  "name": "request_pull_request_reviewers",
+  "input": "RequestPullRequestReviewers",
+  "output": "GithubReviewRequest",
+  "summary": "a pull request's review requested from users and teams."
+ },
+ {
+  "group": "pull_requests",
+  "name": "remove_pull_request_reviewers",
+  "input": "RemovePullRequestReviewers",
+  "output": "GithubReviewRequest",
+  "summary": "users and teams removed from those a pull request's review is requested from."
+ },
+ {
+  "group": "pull_requests",
+  "name": "merge_pull_request",
+  "input": "MergePullRequest",
+  "output": "GithubMergeResult",
+  "summary": "a pull request merged into its base branch."
+ },
+ {
+  "group": "pull_requests",
+  "name": "check_pull_request_merged",
+  "input": "CheckPullRequestMerged",
+  "output": "GithubMergedCheck",
+  "summary": "whether a pull request has been merged."
+ }
+]

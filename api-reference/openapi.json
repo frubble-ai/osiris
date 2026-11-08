@@ -399,6 +399,7 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ActionResult_GithubFileContent": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -546,6 +547,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-pull_requests
       "ActionResult_GithubMergeResult": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -577,6 +580,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubPublicUser": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -687,6 +691,20 @@
               "is_pull_request",
               "created_at",
               "updated_at"
+=======
+      "ActionResult_GithubMergedCheck": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "Whether a pull request has been merged.",
+            "properties": {
+              "merged": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "merged"
+>>>>>>> port/github-pull_requests
             ],
             "type": "object"
           }
@@ -696,6 +714,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubIssueComment": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -704,13 +723,66 @@
             "properties": {
               "body": {
                 "type": "string"
+=======
+      "ActionResult_GithubPullRequest": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A pull request.",
+            "properties": {
+              "base": {
+                "$ref": "#/components/schemas/GithubPullRequestBranch"
+              },
+              "body": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "closed_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+>>>>>>> port/github-pull_requests
               },
               "created_at": {
                 "type": "string"
               },
+<<<<<<< HEAD
               "id": {
                 "type": "string"
               },
+=======
+              "draft": {
+                "type": "boolean"
+              },
+              "head": {
+                "$ref": "#/components/schemas/GithubPullRequestBranch"
+              },
+              "id": {
+                "type": "string"
+              },
+              "merged": {
+                "type": "boolean"
+              },
+              "merged_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "number": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "state": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+>>>>>>> port/github-pull_requests
               "updated_at": {
                 "type": "string"
               },
@@ -730,8 +802,19 @@
             },
             "required": [
               "id",
+<<<<<<< HEAD
               "url",
               "body",
+=======
+              "number",
+              "state",
+              "title",
+              "url",
+              "draft",
+              "merged",
+              "head",
+              "base",
+>>>>>>> port/github-pull_requests
               "created_at",
               "updated_at"
             ],
@@ -743,6 +826,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubIssueLock": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -886,10 +970,25 @@
               },
 >>>>>>> port/github-issues
               "url": {
+=======
+      "ActionResult_GithubPullRequestBranchUpdate": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A pull request's branch being brought up to date with its base branch, which GitHub does in\nthe background.",
+            "properties": {
+              "message": {
+                "description": "What GitHub says it is doing.",
+                "type": "string"
+              },
+              "url": {
+                "description": "The pull request's address on GitHub's API.",
+>>>>>>> port/github-pull_requests
                 "type": "string"
               }
             },
             "required": [
+<<<<<<< HEAD
               "id",
 <<<<<<< HEAD
               "login",
@@ -905,6 +1004,9 @@
               "state",
               "open_issues",
               "closed_issues",
+=======
+              "message",
+>>>>>>> port/github-pull_requests
               "url"
             ],
             "type": "object"
@@ -915,6 +1017,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubReaction": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -955,6 +1058,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-pull_requests
       "ActionResult_GithubRepository": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1026,6 +1131,7 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ActionResult_GithubRepositoryPermission": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1036,11 +1142,75 @@
                 "type": "string"
               },
               "role_name": {
+=======
+      "ActionResult_GithubRequestedReviewers": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "Who a pull request's review is requested from.",
+            "properties": {
+              "teams": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubTeam"
+                },
+                "type": "array"
+              },
+              "users": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubUser"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "users",
+              "teams"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubReview": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A review of a pull request.",
+            "properties": {
+              "body": {
+>>>>>>> port/github-pull_requests
                 "type": [
                   "string",
                   "null"
                 ]
               },
+<<<<<<< HEAD
+=======
+              "commit_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "submitted_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              },
+>>>>>>> port/github-pull_requests
               "user": {
                 "oneOf": [
                   {
@@ -1053,7 +1223,13 @@
               }
             },
             "required": [
+<<<<<<< HEAD
               "permission"
+=======
+              "id",
+              "state",
+              "url"
+>>>>>>> port/github-pull_requests
             ],
             "type": "object"
           }
@@ -1063,6 +1239,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubTopics": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1106,6 +1283,121 @@
               "incomplete_results",
               "items"
 >>>>>>> port/github-issues
+=======
+      "ActionResult_GithubReviewComment": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A comment on a line of a pull request's diff.",
+            "properties": {
+              "body": {
+                "type": "string"
+              },
+              "commit_id": {
+                "type": "string"
+              },
+              "diff_hunk": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "in_reply_to_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "line": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "original_commit_id": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "side": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "start_line": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "start_side": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": "string"
+              },
+              "user": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "path",
+              "body",
+              "commit_id",
+              "original_commit_id",
+              "diff_hunk",
+              "url"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubReviewRequest": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A pull request after reviewers were requested from it or removed from it, with who its review\nis now requested from.",
+            "properties": {
+              "pull_request": {
+                "$ref": "#/components/schemas/GithubPullRequest"
+              },
+              "requested_reviewers": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubUser"
+                },
+                "type": "array"
+              },
+              "requested_teams": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubTeam"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "pull_request",
+              "requested_reviewers",
+              "requested_teams"
+>>>>>>> port/github-pull_requests
             ],
             "type": "object"
           }
@@ -1147,6 +1439,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_Vec_GithubCollaborator": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1203,6 +1496,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-pull_requests
       "ActionResult_Vec_GithubCommit": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1309,6 +1604,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_Vec_GithubCommitComment": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1502,6 +1798,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-pull_requests
       "ActionResult_Vec_GithubInstallation": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1542,14 +1840,19 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ActionResult_Vec_GithubLanguage": {
 =======
       "ActionResult_Vec_GithubIssueComment": {
 >>>>>>> port/github-issues
+=======
+      "ActionResult_Vec_GithubPullRequest": {
+>>>>>>> port/github-pull_requests
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
             "items": {
+<<<<<<< HEAD
 <<<<<<< HEAD
               "description": "A language a repository is written in, by bytes of code.",
               "properties": {
@@ -1569,13 +1872,62 @@
               "properties": {
                 "body": {
                   "type": "string"
+=======
+              "description": "A pull request.",
+              "properties": {
+                "base": {
+                  "$ref": "#/components/schemas/GithubPullRequestBranch"
+                },
+                "body": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "closed_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+>>>>>>> port/github-pull_requests
                 },
                 "created_at": {
                   "type": "string"
                 },
+<<<<<<< HEAD
                 "id": {
                   "type": "string"
                 },
+=======
+                "draft": {
+                  "type": "boolean"
+                },
+                "head": {
+                  "$ref": "#/components/schemas/GithubPullRequestBranch"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "merged": {
+                  "type": "boolean"
+                },
+                "merged_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "number": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "state": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+>>>>>>> port/github-pull_requests
                 "updated_at": {
                   "type": "string"
                 },
@@ -1595,8 +1947,19 @@
               },
               "required": [
                 "id",
+<<<<<<< HEAD
                 "url",
                 "body",
+=======
+                "number",
+                "state",
+                "title",
+                "url",
+                "draft",
+                "merged",
+                "head",
+                "base",
+>>>>>>> port/github-pull_requests
                 "created_at",
                 "updated_at"
               ],
@@ -1610,11 +1973,16 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_Vec_GithubIssueEvent": {
+=======
+      "ActionResult_Vec_GithubPullRequestFile": {
+>>>>>>> port/github-pull_requests
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
             "items": {
+<<<<<<< HEAD
               "description": "Something that happened to an issue (labelled, closed, referenced…).",
               "properties": {
                 "actor": {
@@ -1628,11 +1996,32 @@
                   ]
                 },
                 "commit_id": {
+=======
+              "description": "A file a pull request changes.",
+              "properties": {
+                "additions": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "changes": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "deletions": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "filename": {
+                  "type": "string"
+                },
+                "patch": {
+>>>>>>> port/github-pull_requests
                   "type": [
                     "string",
                     "null"
                   ]
                 },
+<<<<<<< HEAD
                 "created_at": {
                   "type": "string"
                 },
@@ -1640,10 +2029,23 @@
                   "type": "string"
                 },
                 "id": {
+=======
+                "previous_filename": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sha": {
+                  "type": "string"
+                },
+                "status": {
+>>>>>>> port/github-pull_requests
                   "type": "string"
                 }
               },
               "required": [
+<<<<<<< HEAD
                 "id",
                 "event",
                 "created_at"
@@ -1749,6 +2151,14 @@
                 "closed_issues",
                 "url"
 >>>>>>> port/github-issues
+=======
+                "sha",
+                "filename",
+                "status",
+                "additions",
+                "deletions",
+                "changes"
+>>>>>>> port/github-pull_requests
               ],
               "type": "object"
             },
@@ -1834,14 +2244,19 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ActionResult_Vec_GithubTag": {
 =======
       "ActionResult_Vec_GithubTimelineEvent": {
 >>>>>>> port/github-issues
+=======
+      "ActionResult_Vec_GithubReview": {
+>>>>>>> port/github-pull_requests
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
             "items": {
+<<<<<<< HEAD
 <<<<<<< HEAD
               "description": "A tag.",
               "properties": {
@@ -1874,6 +2289,14 @@
                     {
                       "type": "null"
                     }
+=======
+              "description": "A review of a pull request.",
+              "properties": {
+                "body": {
+                  "type": [
+                    "string",
+                    "null"
+>>>>>>> port/github-pull_requests
                   ]
                 },
                 "commit_id": {
@@ -1882,12 +2305,23 @@
                     "null"
                   ]
                 },
+<<<<<<< HEAD
                 "created_at": {
+=======
+                "id": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string"
+                },
+                "submitted_at": {
+>>>>>>> port/github-pull_requests
                   "type": [
                     "string",
                     "null"
                   ]
                 },
+<<<<<<< HEAD
                 "event": {
                   "description": "What happened (`commented`, `committed`, `labeled`, `cross-referenced`…), as GitHub names\nit. An open string.",
                   "type": "string"
@@ -1934,15 +2368,124 @@
                 },
                 "url": {
                   "type": "string"
+=======
+                "url": {
+                  "type": "string"
+                },
+                "user": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+>>>>>>> port/github-pull_requests
                 }
               },
               "required": [
                 "id",
+<<<<<<< HEAD
                 "login",
                 "avatar_url",
                 "url",
                 "account_type"
 >>>>>>> port/github-issues
+=======
+                "state",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_Vec_GithubReviewComment": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A comment on a line of a pull request's diff.",
+              "properties": {
+                "body": {
+                  "type": "string"
+                },
+                "commit_id": {
+                  "type": "string"
+                },
+                "diff_hunk": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "in_reply_to_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line": {
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "original_commit_id": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "side": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "start_line": {
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "start_side": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "type": "string"
+                },
+                "user": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "path",
+                "body",
+                "commit_id",
+                "original_commit_id",
+                "diff_hunk",
+                "url"
+>>>>>>> port/github-pull_requests
               ],
               "type": "object"
             },
@@ -2158,6 +2701,7 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "CompareCommits": {
         "additionalProperties": false,
         "properties": {
@@ -2198,6 +2742,19 @@
           },
 =======
 >>>>>>> port/github-issues
+=======
+      "CheckPullRequestMerged": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+>>>>>>> port/github-pull_requests
           "repo": {
             "type": "string"
           }
@@ -2206,10 +2763,14 @@
           "owner",
           "repo",
 <<<<<<< HEAD
+<<<<<<< HEAD
           "basehead"
 =======
           "issue_number"
 >>>>>>> port/github-issues
+=======
+          "pull_number"
+>>>>>>> port/github-pull_requests
         ],
         "type": "object"
       },
@@ -2955,6 +3516,238 @@
         ],
         "type": "object"
       },
+      "CreatePullRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "base": {
+            "description": "The branch the changes go into.",
+            "type": "string"
+          },
+          "body": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "draft": {
+            "description": "Whether the pull request is opened as a draft.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "head": {
+            "description": "The branch the changes come from. A branch of another account's fork is named\n`account:branch`.",
+            "type": "string"
+          },
+          "maintainer_can_modify": {
+            "description": "Whether the base repository's maintainers may push to the head branch.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "title",
+          "head",
+          "base"
+        ],
+        "type": "object"
+      },
+      "CreatePullRequestReview": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "comments": {
+            "description": "Comments on lines of the diff, made with the review.",
+            "items": {
+              "$ref": "#/components/schemas/ReviewCommentInput"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "commit_id": {
+            "description": "The commit the review is of; the pull request's latest commit when left out.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReviewEvent",
+                "description": "What the review says of the pull request. Left out, the review stays pending."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "CreatePullRequestReviewComment": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "commit_id": {
+            "description": "The commit the comment is on, usually the pull request's latest.",
+            "type": "string"
+          },
+          "line": {
+            "description": "The line the comment is on, or the last line of a range of lines.",
+            "format": "int64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "path": {
+            "description": "The file's path in the repository.",
+            "type": "string"
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "side": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DiffSide",
+                "description": "The side of the diff `line` is on."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "start_line": {
+            "description": "The first line of a range of lines the comment is on.",
+            "format": "int64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "start_side": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DiffSide",
+                "description": "The side of the diff `start_line` is on."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "pull_number",
+          "body",
+          "commit_id",
+          "path"
+        ],
+        "type": "object"
+      },
+      "DeletePendingPullRequestReview": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "review_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "pull_number",
+          "review_id"
+        ],
+        "type": "object"
+      },
+      "DeletePullRequestReviewComment": {
+        "additionalProperties": false,
+        "properties": {
+          "comment_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "comment_id"
+        ],
+        "type": "object"
+      },
       "Deleted": {
         "properties": {
           "deleted": {
@@ -2967,6 +3760,47 @@
         "required": [
           "id",
           "deleted"
+        ],
+        "type": "object"
+      },
+      "DiffSide": {
+        "description": "The side of a diff a review comment is placed on: `LEFT` is the old version of the file, with\nthe lines removed, and `RIGHT` is the new version, with the lines added.",
+        "enum": [
+          "LEFT",
+          "RIGHT"
+        ],
+        "type": "string"
+      },
+      "DismissPullRequestReview": {
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "description": "Why the review is dismissed.",
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "review_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "pull_number",
+          "review_id",
+          "message"
         ],
         "type": "object"
       },
@@ -3104,12 +3938,17 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "GetCommit": {
+=======
+      "GetPullRequest": {
+>>>>>>> port/github-pull_requests
         "additionalProperties": false,
         "properties": {
           "owner": {
             "type": "string"
           },
+<<<<<<< HEAD
           "ref": {
             "description": "A commit SHA, a branch name or a tag name.",
 =======
@@ -3117,14 +3956,20 @@
         "additionalProperties": false,
         "properties": {
           "issue_number": {
+=======
+          "pull_number": {
+>>>>>>> port/github-pull_requests
             "format": "int64",
             "minimum": 0,
             "type": "integer"
           },
+<<<<<<< HEAD
           "owner": {
 >>>>>>> port/github-issues
             "type": "string"
           },
+=======
+>>>>>>> port/github-pull_requests
           "repo": {
             "type": "string"
           }
@@ -3133,16 +3978,25 @@
           "owner",
           "repo",
 <<<<<<< HEAD
+<<<<<<< HEAD
           "ref"
         ],
         "type": "object"
       },
       "GetFileContents": {
+=======
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "GetPullRequestReview": {
+>>>>>>> port/github-pull_requests
         "additionalProperties": false,
         "properties": {
           "owner": {
             "type": "string"
           },
+<<<<<<< HEAD
           "path": {
             "description": "The file, such as `src/lib.rs`.",
             "type": "string"
@@ -3184,10 +4038,14 @@
         "additionalProperties": false,
         "properties": {
           "comment_id": {
+=======
+          "pull_number": {
+>>>>>>> port/github-pull_requests
             "format": "int64",
             "minimum": 0,
             "type": "integer"
           },
+<<<<<<< HEAD
           "owner": {
             "type": "string"
           },
@@ -3239,13 +4097,27 @@
           },
           "repo": {
             "type": "string"
+=======
+          "repo": {
+            "type": "string"
+          },
+          "review_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+>>>>>>> port/github-pull_requests
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "milestone_number"
 >>>>>>> port/github-issues
+=======
+          "pull_number",
+          "review_id"
+>>>>>>> port/github-pull_requests
         ],
         "type": "object"
       },
@@ -3266,6 +4138,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
       "GetRepositoryPermissionForUser": {
         "additionalProperties": false,
@@ -3326,6 +4199,8 @@
       },
 =======
 >>>>>>> port/github-issues
+=======
+>>>>>>> port/github-pull_requests
       "GithubAcknowledgement": {
         "description": "An action that answers nothing of its own: `ok` once GitHub has done it.",
         "properties": {
@@ -3358,6 +4233,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubCollaborator": {
         "description": "A repository's collaborator.",
         "properties": {
@@ -3424,6 +4300,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-pull_requests
       "GithubCommit": {
         "description": "A commit.",
         "properties": {
@@ -3518,6 +4396,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubCommitComment": {
         "description": "A comment on a commit.",
         "properties": {
@@ -3614,6 +4493,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-pull_requests
       "GithubCommitFile": {
         "description": "A file a commit changed.",
         "properties": {
@@ -3674,6 +4555,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubContentChange": {
         "description": "A file written or deleted, and the commit that did it.",
         "properties": {
@@ -3790,6 +4672,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-pull_requests
       "GithubCurrentUser": {
         "description": "The authenticated user, with their profile.",
         "properties": {
@@ -3977,6 +4861,7 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "GithubLanguage": {
         "description": "A language a repository is written in, by bytes of code.",
         "properties": {
@@ -3994,6 +4879,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-pull_requests
       "GithubMergeResult": {
         "description": "A pull request merged, or a merge refused.",
         "properties": {
@@ -4016,6 +4903,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubPermissions": {
         "description": "What an account may do in a repository.",
         "properties": {
@@ -4032,10 +4920,17 @@
             "type": "boolean"
           },
           "triage": {
+=======
+      "GithubMergedCheck": {
+        "description": "Whether a pull request has been merged.",
+        "properties": {
+          "merged": {
+>>>>>>> port/github-pull_requests
             "type": "boolean"
           }
         },
         "required": [
+<<<<<<< HEAD
           "admin",
           "maintain",
           "push",
@@ -4087,6 +4982,17 @@
               "$ref": "#/components/schemas/GithubUser"
             },
             "type": "array"
+=======
+          "merged"
+        ],
+        "type": "object"
+      },
+      "GithubPullRequest": {
+        "description": "A pull request.",
+        "properties": {
+          "base": {
+            "$ref": "#/components/schemas/GithubPullRequestBranch"
+>>>>>>> port/github-pull_requests
           },
           "body": {
             "type": [
@@ -4100,6 +5006,7 @@
               "null"
             ]
           },
+<<<<<<< HEAD
           "comments": {
             "format": "int64",
             "type": "integer"
@@ -4107,10 +5014,21 @@
           "created_at": {
             "type": "string"
 >>>>>>> port/github-issues
+=======
+          "created_at": {
+            "type": "string"
+          },
+          "draft": {
+            "type": "boolean"
+          },
+          "head": {
+            "$ref": "#/components/schemas/GithubPullRequestBranch"
+>>>>>>> port/github-pull_requests
           },
           "id": {
             "type": "string"
           },
+<<<<<<< HEAD
 <<<<<<< HEAD
           "location": {
 =======
@@ -4131,6 +5049,15 @@
               {
                 "type": "null"
               }
+=======
+          "merged": {
+            "type": "boolean"
+          },
+          "merged_at": {
+            "type": [
+              "string",
+              "null"
+>>>>>>> port/github-pull_requests
             ]
           },
           "number": {
@@ -4163,6 +5090,7 @@
         "required": [
           "id",
           "number",
+<<<<<<< HEAD
           "title",
           "state",
           "url",
@@ -4170,11 +5098,21 @@
           "assignees",
           "labels",
           "is_pull_request",
+=======
+          "state",
+          "title",
+          "url",
+          "draft",
+          "merged",
+          "head",
+          "base",
+>>>>>>> port/github-pull_requests
           "created_at",
           "updated_at"
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubIssueComment": {
         "description": "A comment on an issue or a pull request.",
         "properties": {
@@ -4246,10 +5184,48 @@
             "type": "string"
           },
           "id": {
+=======
+      "GithubPullRequestBranch": {
+        "description": "The branch a pull request comes from (`head`) or goes into (`base`).",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "ref_name": {
+            "type": "string"
+          },
+          "repository_full_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sha": {
             "type": "string"
           }
         },
         "required": [
+          "ref_name",
+          "sha",
+          "label"
+        ],
+        "type": "object"
+      },
+      "GithubPullRequestBranchUpdate": {
+        "description": "A pull request's branch being brought up to date with its base branch, which GitHub does in\nthe background.",
+        "properties": {
+          "message": {
+            "description": "What GitHub says it is doing.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The pull request's address on GitHub's API.",
+>>>>>>> port/github-pull_requests
+            "type": "string"
+          }
+        },
+        "required": [
+<<<<<<< HEAD
           "id",
           "event",
           "created_at"
@@ -4381,10 +5357,14 @@
           "state",
           "open_issues",
           "closed_issues",
+=======
+          "message",
+>>>>>>> port/github-pull_requests
           "url"
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubReaction": {
         "description": "A reaction to an issue or a comment.",
         "properties": {
@@ -4413,6 +5393,52 @@
           "content",
           "created_at"
 >>>>>>> port/github-issues
+=======
+      "GithubPullRequestFile": {
+        "description": "A file a pull request changes.",
+        "properties": {
+          "additions": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "changes": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "deletions": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "patch": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "previous_filename": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sha": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sha",
+          "filename",
+          "status",
+          "additions",
+          "deletions",
+          "changes"
+>>>>>>> port/github-pull_requests
         ],
         "type": "object"
       },
@@ -4478,6 +5504,7 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "GithubRepositoryInvitation": {
         "description": "An invitation to collaborate on a repository, waiting for the invited account to accept it.",
         "properties": {
@@ -4541,11 +5568,40 @@
         "properties": {
           "body": {
 >>>>>>> port/github-issues
+=======
+      "GithubRequestedReviewers": {
+        "description": "Who a pull request's review is requested from.",
+        "properties": {
+          "teams": {
+            "items": {
+              "$ref": "#/components/schemas/GithubTeam"
+            },
+            "type": "array"
+          },
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/GithubUser"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "users",
+          "teams"
+        ],
+        "type": "object"
+      },
+      "GithubReview": {
+        "description": "A review of a pull request.",
+        "properties": {
+          "body": {
+>>>>>>> port/github-pull_requests
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
           "id": {
@@ -4570,11 +5626,33 @@
           },
           "title": {
             "type": "string"
+=======
+          "commit_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "submitted_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+>>>>>>> port/github-pull_requests
           },
           "url": {
             "type": "string"
           },
+<<<<<<< HEAD
 >>>>>>> port/github-issues
+=======
+>>>>>>> port/github-pull_requests
           "user": {
             "oneOf": [
               {
@@ -4587,6 +5665,7 @@
           }
         },
         "required": [
+<<<<<<< HEAD
 <<<<<<< HEAD
           "permission"
         ],
@@ -4670,6 +5749,71 @@
         "description": "Something on an issue's timeline: an event, a comment, a commit or a cross-reference. Unlike an\nissue event, a timeline entry may have no id, no actor and no time (a commit or a\ncross-reference has none of its own).",
         "properties": {
           "actor": {
+=======
+          "id",
+          "state",
+          "url"
+        ],
+        "type": "object"
+      },
+      "GithubReviewComment": {
+        "description": "A comment on a line of a pull request's diff.",
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "commit_id": {
+            "type": "string"
+          },
+          "diff_hunk": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "in_reply_to_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "original_commit_id": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "side": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "start_line": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "start_side": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "user": {
+>>>>>>> port/github-pull_requests
             "oneOf": [
               {
                 "$ref": "#/components/schemas/GithubUser"
@@ -4678,6 +5822,7 @@
                 "type": "null"
               }
             ]
+<<<<<<< HEAD
           },
           "commit_id": {
             "type": [
@@ -4705,6 +5850,64 @@
         "required": [
           "event"
 >>>>>>> port/github-issues
+=======
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "body",
+          "commit_id",
+          "original_commit_id",
+          "diff_hunk",
+          "url"
+        ],
+        "type": "object"
+      },
+      "GithubReviewRequest": {
+        "description": "A pull request after reviewers were requested from it or removed from it, with who its review\nis now requested from.",
+        "properties": {
+          "pull_request": {
+            "$ref": "#/components/schemas/GithubPullRequest"
+          },
+          "requested_reviewers": {
+            "items": {
+              "$ref": "#/components/schemas/GithubUser"
+            },
+            "type": "array"
+          },
+          "requested_teams": {
+            "items": {
+              "$ref": "#/components/schemas/GithubTeam"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "pull_request",
+          "requested_reviewers",
+          "requested_teams"
+        ],
+        "type": "object"
+      },
+      "GithubTeam": {
+        "description": "A team of an organization.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug"
+>>>>>>> port/github-pull_requests
         ],
         "type": "object"
       },
@@ -4829,11 +6032,304 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ListCommitComments": {
+=======
+      "ListPullRequestCommits": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "ListPullRequestFiles": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "ListPullRequestRequestedReviewers": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "ListPullRequestReviewComments": {
+        "additionalProperties": false,
+        "properties": {
+          "direction": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SortDirection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "since": {
+            "description": "Only comments updated at or after this time, in ISO 8601 (`2024-01-31T12:00:00Z`).",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sort": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReviewCommentSort"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "ListPullRequestReviews": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "ListPullRequests": {
+        "additionalProperties": false,
+        "properties": {
+          "base": {
+            "description": "Only pull requests into this branch.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "direction": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SortDirection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "head": {
+            "description": "Only pull requests from this branch, as `user:ref-name` or `organization:ref-name`.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "repo": {
+            "type": "string"
+          },
+          "sort": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PullRequestSort"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PullRequestStateFilter",
+                "description": "Open pull requests when left out."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "owner",
+          "repo"
+        ],
+        "type": "object"
+      },
+      "ListPullRequestsAssociatedWithCommit": {
+>>>>>>> port/github-pull_requests
         "additionalProperties": false,
         "properties": {
           "commit_sha": {
             "type": "string"
+<<<<<<< HEAD
 =======
       "ListIssueComments": {
         "additionalProperties": false,
@@ -4843,6 +6339,8 @@
             "minimum": 0,
             "type": "integer"
 >>>>>>> port/github-issues
+=======
+>>>>>>> port/github-pull_requests
           },
           "owner": {
             "type": "string"
@@ -4873,10 +6371,14 @@
           "owner",
           "repo",
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> port/github-pull_requests
           "commit_sha"
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ListCommits": {
         "additionalProperties": false,
         "properties": {
@@ -5619,6 +7121,8 @@
       },
 =======
 >>>>>>> port/github-issues
+=======
+>>>>>>> port/github-pull_requests
       "List_AuthConfig": {
         "properties": {
           "data": {
@@ -5817,6 +7321,7 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "MergeBranch": {
         "additionalProperties": false,
         "properties": {
@@ -5838,11 +7343,28 @@
           "lock_reason": {
             "description": "Why: `off-topic`, `too heated`, `resolved` or `spam`.",
 >>>>>>> port/github-issues
+=======
+      "MergeMethod": {
+        "description": "How a pull request's commits reach its base branch: a merge commit, one squashed commit, or\neach commit rebased onto the base branch.",
+        "enum": [
+          "merge",
+          "squash",
+          "rebase"
+        ],
+        "type": "string"
+      },
+      "MergePullRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "commit_message": {
+            "description": "The text added to the merge commit's message.",
+>>>>>>> port/github-pull_requests
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
 <<<<<<< HEAD
           "head": {
             "description": "The branch or commit SHA merged.",
@@ -5852,11 +7374,49 @@
           },
           "repo": {
             "type": "string"
+=======
+          "commit_title": {
+            "description": "The title of the merge commit; GitHub writes one when left out.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "merge_method": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MergeMethod",
+                "description": "The repository's default method when left out."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "sha": {
+            "description": "The head commit the pull request must be at for the merge to go ahead.",
+            "type": [
+              "string",
+              "null"
+            ]
+>>>>>>> port/github-pull_requests
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "issue_number"
         ],
         "type": "object"
@@ -5872,6 +7432,89 @@
             "type": "array"
           },
           "issue_number": {
+=======
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "PullRequestSort": {
+        "description": "What a list of pull requests is sorted by.",
+        "enum": [
+          "created",
+          "updated",
+          "popularity",
+          "long-running"
+        ],
+        "type": "string"
+      },
+      "PullRequestState": {
+        "description": "The state a pull request is put in: open, or closed without merging.",
+        "enum": [
+          "open",
+          "closed"
+        ],
+        "type": "string"
+      },
+      "PullRequestStateFilter": {
+        "description": "Which pull requests a list holds, by state.",
+        "enum": [
+          "open",
+          "closed",
+          "all"
+        ],
+        "type": "string"
+      },
+      "RemovePullRequestReviewers": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "reviewers": {
+            "description": "The users, by login.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "team_reviewers": {
+            "description": "The teams, by slug.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "ReplyPullRequestReviewComment": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "comment_id": {
+            "description": "The comment replied to. It must be a comment that is not itself a reply.",
+>>>>>>> port/github-pull_requests
             "format": "int64",
             "minimum": 0,
             "type": "integer"
@@ -5879,6 +7522,7 @@
           "owner": {
             "type": "string"
           },
+<<<<<<< HEAD
           "repo": {
             "type": "string"
           }
@@ -5895,10 +7539,14 @@
         "additionalProperties": false,
         "properties": {
           "issue_number": {
+=======
+          "pull_number": {
+>>>>>>> port/github-pull_requests
             "format": "int64",
             "minimum": 0,
             "type": "integer"
           },
+<<<<<<< HEAD
           "label": {
             "description": "The name of the label to take off.",
 >>>>>>> port/github-issues
@@ -5907,6 +7555,8 @@
           "owner": {
             "type": "string"
           },
+=======
+>>>>>>> port/github-pull_requests
           "repo": {
             "type": "string"
           }
@@ -5915,28 +7565,69 @@
           "owner",
           "repo",
 <<<<<<< HEAD
+<<<<<<< HEAD
           "base",
           "head"
         ],
         "type": "object"
       },
       "RemoveRepositoryCollaborator": {
+=======
+          "pull_number",
+          "comment_id",
+          "body"
+        ],
+        "type": "object"
+      },
+      "RequestPullRequestReviewers": {
+>>>>>>> port/github-pull_requests
         "additionalProperties": false,
         "properties": {
           "owner": {
             "type": "string"
           },
+<<<<<<< HEAD
           "repo": {
             "type": "string"
           },
           "username": {
             "description": "The collaborator's login.",
             "type": "string"
+=======
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "reviewers": {
+            "description": "The users, by login.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "team_reviewers": {
+            "description": "The teams, by slug.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+>>>>>>> port/github-pull_requests
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "username"
         ],
         "type": "object"
@@ -6054,21 +7745,59 @@
           "page": {
             "description": "From 1.",
             "format": "int32",
+=======
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "ReviewCommentInput": {
+        "additionalProperties": false,
+        "description": "A comment on a line of the diff, given with a new review.",
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "line": {
+            "description": "The line the comment is on, or the last line of a range of lines.",
+            "format": "int64",
+>>>>>>> port/github-pull_requests
             "minimum": 0,
             "type": [
               "integer",
               "null"
             ]
           },
+<<<<<<< HEAD
           "per_page": {
             "description": "At most 100.",
             "format": "int32",
+=======
+          "path": {
+            "description": "The file's path in the repository.",
+            "type": "string"
+          },
+          "side": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DiffSide",
+                "description": "The side of the diff `line` is on."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "start_line": {
+            "description": "The first line of a range of lines the comment is on.",
+            "format": "int64",
+>>>>>>> port/github-pull_requests
             "minimum": 0,
             "type": [
               "integer",
               "null"
             ]
           },
+<<<<<<< HEAD
           "q": {
             "description": "The same as `query`, used only when `query` is left out or empty.",
             "type": [
@@ -6149,6 +7878,43 @@
         ],
         "type": "object"
       },
+=======
+          "start_side": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DiffSide",
+                "description": "The side of the diff `start_line` is on."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "path",
+          "body"
+        ],
+        "type": "object"
+      },
+      "ReviewCommentSort": {
+        "description": "What a list of review comments is sorted by.",
+        "enum": [
+          "created",
+          "updated"
+        ],
+        "type": "string"
+      },
+      "ReviewEvent": {
+        "description": "What a review says of a pull request when it is submitted: it approves the changes, asks for\nchanges, or only comments.",
+        "enum": [
+          "APPROVE",
+          "REQUEST_CHANGES",
+          "COMMENT"
+        ],
+        "type": "string"
+      },
+>>>>>>> port/github-pull_requests
       "SlackChannel": {
         "description": "A channel the connected user can see.",
         "properties": {
@@ -6178,6 +7944,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "SyncForkBranchWithUpstream": {
         "additionalProperties": false,
         "properties": {
@@ -6192,12 +7959,56 @@
           "repo": {
             "description": "The fork's name.",
             "type": "string"
+=======
+      "SortDirection": {
+        "description": "The order a list is sorted in: ascending or descending.",
+        "enum": [
+          "asc",
+          "desc"
+        ],
+        "type": "string"
+      },
+      "SubmitPullRequestReview": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event": {
+            "$ref": "#/components/schemas/ReviewEvent",
+            "description": "What the review says of the pull request."
+          },
+          "owner": {
+            "type": "string"
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "review_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+>>>>>>> port/github-pull_requests
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "branch"
+=======
+          "pull_number",
+          "review_id",
+          "event"
+>>>>>>> port/github-pull_requests
         ],
         "type": "object"
       },
@@ -6300,6 +8111,7 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "UpdateRef": {
         "additionalProperties": false,
         "properties": {
@@ -6324,11 +8136,19 @@
           },
           "body": {
             "description": "The issue's text, in Markdown.",
+=======
+      "UpdatePullRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "base": {
+            "description": "The branch the changes go into.",
+>>>>>>> port/github-pull_requests
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "issue_number": {
             "format": "int64",
             "minimum": 0,
@@ -6351,6 +8171,18 @@
             "type": [
               "integer",
 >>>>>>> port/github-issues
+=======
+          "body": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "maintainer_can_modify": {
+            "description": "Whether the base repository's maintainers may push to the head branch.",
+            "type": [
+              "boolean",
+>>>>>>> port/github-pull_requests
               "null"
             ]
           },
@@ -6358,13 +8190,21 @@
             "type": "string"
           },
 <<<<<<< HEAD
+<<<<<<< HEAD
           "ref": {
             "description": "The reference without `refs/`, such as `heads/main` or `tags/v1.0.0`.",
             "type": "string"
+=======
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+>>>>>>> port/github-pull_requests
           },
           "repo": {
             "type": "string"
           },
+<<<<<<< HEAD
           "sha": {
             "description": "The commit it points at from now on.",
 =======
@@ -6376,6 +8216,16 @@
             "type": [
               "string",
               "null"
+=======
+          "state": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PullRequestState"
+              },
+              {
+                "type": "null"
+              }
+>>>>>>> port/github-pull_requests
             ]
           },
           "title": {
@@ -6388,6 +8238,7 @@
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "issue_number"
         ],
         "type": "object"
@@ -6397,6 +8248,46 @@
         "properties": {
           "body": {
             "description": "The comment's new text, in Markdown.",
+=======
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "UpdatePullRequestBranch": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_head_sha": {
+            "description": "The head commit the branch is expected to be at. GitHub refuses the update when the\nbranch has moved on since.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "pull_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "pull_number"
+        ],
+        "type": "object"
+      },
+      "UpdatePullRequestReviewComment": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "description": "The comment's new text.",
+>>>>>>> port/github-pull_requests
             "type": "string"
           },
           "comment_id": {
@@ -6408,13 +8299,17 @@
             "type": "string"
           },
           "repo": {
+<<<<<<< HEAD
 >>>>>>> port/github-issues
+=======
+>>>>>>> port/github-pull_requests
             "type": "string"
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
 <<<<<<< HEAD
           "ref",
           "sha"
@@ -6456,10 +8351,13 @@
           },
           "default_branch": {
 =======
+=======
+>>>>>>> port/github-pull_requests
           "comment_id",
           "body"
         ],
         "type": "object"
+<<<<<<< HEAD
       },
       "UpdateLabel": {
         "additionalProperties": false,
@@ -6616,6 +8514,8 @@
 >>>>>>> port/github-issues
         ],
         "type": "object"
+=======
+>>>>>>> port/github-pull_requests
       }
     },
     "securitySchemes": {
@@ -7635,6 +9535,7 @@
       }
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.add_repository_collaborator": {
       "post": {
         "operationId": "github_add_repository_collaborator",
@@ -7643,6 +9544,11 @@
       "post": {
         "operationId": "github_add_issue_assignees",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.check_pull_request_merged": {
+      "post": {
+        "operationId": "github_check_pull_request_merged",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -7670,10 +9576,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/AddRepositoryCollaborator"
 =======
                 "$ref": "#/components/schemas/AddIssueAssignees"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/CheckPullRequestMerged"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -7685,10 +9595,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubCollaboratorAddition"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssue"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubMergedCheck"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -7798,15 +9712,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "An account added to a repository as a collaborator, or invited to be one.",
 =======
         "summary": "People assigned to an issue, beside those assigned now.",
 >>>>>>> port/github-issues
+=======
+        "summary": "Whether a pull request has been merged.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.compare_commits": {
       "post": {
@@ -7816,6 +9735,11 @@
       "post": {
         "operationId": "github_add_issue_labels",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.create_pull_request": {
+      "post": {
+        "operationId": "github_create_pull_request",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -7843,10 +9767,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/CompareCommits"
 =======
                 "$ref": "#/components/schemas/AddIssueLabels"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/CreatePullRequest"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -7858,10 +9786,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubCommitComparison"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubPullRequest"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -7971,15 +9903,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "Two commits compared, with the commits and files between them.",
 =======
         "summary": "Labels added to an issue, beside those it has.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A new pull request, from one branch into another.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.create_commit_comment": {
       "post": {
@@ -7989,6 +9926,11 @@
       "post": {
         "operationId": "github_clear_issue_labels",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.create_pull_request_review": {
+      "post": {
+        "operationId": "github_create_pull_request_review",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -8016,7 +9958,11 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/CreateCommitComment"
+=======
+                "$ref": "#/components/schemas/CreatePullRequestReview"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -8027,7 +9973,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubCommitComment"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubReview"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -8136,15 +10086,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A comment on a commit.",
+=======
+        "summary": "A review of a pull request, with comments on lines of its diff if given.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.create_or_update_file": {
       "post": {
         "operationId": "github_create_or_update_file",
+=======
+    "/v1/connected-accounts/{id}/actions/github.create_pull_request_review_comment": {
+      "post": {
+        "operationId": "github_create_pull_request_review_comment",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -8171,7 +10131,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/CreateOrUpdateFile"
+=======
+                "$ref": "#/components/schemas/CreatePullRequestReviewComment"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -8182,7 +10146,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubContentChange"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubReviewComment"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -8291,15 +10259,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A file of a repository written, in a commit of its own.",
+=======
+        "summary": "A comment on a line, or a range of lines, of a pull request's diff.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.create_ref": {
       "post": {
         "operationId": "github_create_ref",
+=======
+    "/v1/connected-accounts/{id}/actions/github.delete_pending_pull_request_review": {
+      "post": {
+        "operationId": "github_delete_pending_pull_request_review",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -8326,7 +10304,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/CreateRef"
+=======
+                "$ref": "#/components/schemas/DeletePendingPullRequestReview"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -8337,7 +10319,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubGitRef"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubReview"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -8446,15 +10432,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A new git reference pointing at a commit.",
+=======
+        "summary": "A pending review of a pull request, deleted; it answers the review deleted.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.create_repository": {
       "post": {
         "operationId": "github_create_repository",
+=======
+    "/v1/connected-accounts/{id}/actions/github.delete_pull_request_review_comment": {
+      "post": {
+        "operationId": "github_delete_pull_request_review_comment",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -8481,6 +10477,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/CreateRepository"
               }
             }
@@ -8795,6 +10792,9 @@
 =======
                 "$ref": "#/components/schemas/ClearIssueLabels"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/DeletePullRequestReviewComment"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -8915,15 +10915,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A branch's or a tag's git reference deleted.",
 =======
         "summary": "Every label taken off an issue.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A comment on a pull request's diff, deleted.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.delete_repository": {
       "post": {
@@ -8933,6 +10938,11 @@
       "post": {
         "operationId": "github_create_issue",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.dismiss_pull_request_review": {
+      "post": {
+        "operationId": "github_dismiss_pull_request_review",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -8960,9 +10970,13 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/DeleteRepository"
 =======
                 "$ref": "#/components/schemas/CreateIssue"
+=======
+                "$ref": "#/components/schemas/DismissPullRequestReview"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -8973,7 +10987,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubIssue"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubReview"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -9082,6 +11100,7 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A new issue in a repository.",
         "tags": [
           "actions"
@@ -10346,6 +12365,9 @@
         ],
         "summary": "A milestone deleted from a repository.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A submitted review of a pull request, dismissed.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
@@ -10807,6 +12829,7 @@
       }
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_file_contents": {
       "post": {
         "operationId": "github_get_file_contents",
@@ -10815,6 +12838,11 @@
       "post": {
         "operationId": "github_get_issue",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_pull_request": {
+      "post": {
+        "operationId": "github_get_pull_request",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -10842,10 +12870,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetFileContents"
 =======
                 "$ref": "#/components/schemas/GetIssue"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/GetPullRequest"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -10857,10 +12889,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubFileContent"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssue"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubPullRequest"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -10970,15 +13006,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A file of a repository, in base64 and decoded when it is text.",
 =======
         "summary": "An issue, by number.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A pull request, by number.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_ref": {
       "post": {
@@ -10988,6 +13029,11 @@
       "post": {
         "operationId": "github_get_issue_comment",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_pull_request_review": {
+      "post": {
+        "operationId": "github_get_pull_request_review",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -11015,10 +13061,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetRef"
 =======
                 "$ref": "#/components/schemas/GetIssueComment"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/GetPullRequestReview"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -11030,10 +13080,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubGitRef"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssueComment"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubReview"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -11142,6 +13196,7 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
 <<<<<<< HEAD
         "summary": "A branch's or a tag's git reference.",
 =======
@@ -11457,6 +13512,9 @@
         ],
         "summary": "A milestone, by number.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A review of a pull request, by id.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
@@ -12866,6 +14924,7 @@
       }
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_matching_refs": {
       "post": {
         "operationId": "github_list_matching_refs",
@@ -12874,6 +14933,11 @@
       "post": {
         "operationId": "github_list_issue_comments",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_pull_request_commits": {
+      "post": {
+        "operationId": "github_list_pull_request_commits",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -12901,10 +14965,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListMatchingRefs"
 =======
                 "$ref": "#/components/schemas/ListIssueComments"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/ListPullRequestCommits"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -12916,10 +14984,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubGitRef"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubIssueComment"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubCommit"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -13029,15 +15101,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "Every git reference that starts with a prefix.",
 =======
         "summary": "The comments on an issue, a page at a time.",
 >>>>>>> port/github-issues
+=======
+        "summary": "The commits on a pull request, a page at a time.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_my_repositories": {
       "post": {
@@ -13047,6 +15124,11 @@
       "post": {
         "operationId": "github_list_issue_events",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_pull_request_files": {
+      "post": {
+        "operationId": "github_list_pull_request_files",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -13074,10 +15156,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListMyRepositories"
 =======
                 "$ref": "#/components/schemas/ListIssueEvents"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/ListPullRequestFiles"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -13089,10 +15175,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubIssueEvent"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubPullRequestFile"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -13202,15 +15292,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "The repositories the authenticated user can see, a page at a time.",
 =======
         "summary": "What happened to an issue, a page at a time.",
 >>>>>>> port/github-issues
+=======
+        "summary": "The files a pull request changes, a page at a time.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_organization_repositories": {
       "post": {
@@ -13220,6 +15315,11 @@
       "post": {
         "operationId": "github_list_issue_labels",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_pull_request_requested_reviewers": {
+      "post": {
+        "operationId": "github_list_pull_request_requested_reviewers",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -13246,11 +15346,15 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
                 "$ref": "#/components/schemas/ListOrganizationRepositories"
 =======
                 "$ref": "#/components/schemas/ListIssueLabels"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/ListPullRequestRequestedReviewers"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -13261,11 +15365,15 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubRequestedReviewers"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -13375,17 +15483,27 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "An organization's repositories, a page at a time.",
 =======
         "summary": "The labels on an issue, a page at a time.",
+=======
+        "summary": "The users and teams a pull request's review is requested from.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_issue_timeline_events": {
       "post": {
         "operationId": "github_list_issue_timeline_events",
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_pull_request_review_comments": {
+      "post": {
+        "operationId": "github_list_pull_request_review_comments",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -13412,7 +15530,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListIssueTimelineEvents"
+=======
+                "$ref": "#/components/schemas/ListPullRequestReviewComments"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -13423,7 +15545,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubTimelineEvent"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubReviewComment"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -13532,15 +15658,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "Everything on an issue's timeline, a page at a time.",
+=======
+        "summary": "The comments on a pull request's diff, a page at a time.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_milestones": {
       "post": {
         "operationId": "github_list_milestones",
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_pull_request_reviews": {
+      "post": {
+        "operationId": "github_list_pull_request_reviews",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -13567,7 +15703,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListMilestones"
+=======
+                "$ref": "#/components/schemas/ListPullRequestReviews"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -13578,7 +15718,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubMilestone"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubReview"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -13687,8 +15831,322 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A repository's milestones, a page at a time.",
 >>>>>>> port/github-issues
+=======
+        "summary": "The reviews of a pull request, a page at a time.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.list_pull_requests": {
+      "post": {
+        "operationId": "github_list_pull_requests",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListPullRequests"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubPullRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A repository's pull requests, a page at a time.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.list_pull_requests_associated_with_commit": {
+      "post": {
+        "operationId": "github_list_pull_requests_associated_with_commit",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListPullRequestsAssociatedWithCommit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubPullRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "The pull requests a commit belongs to, a page at a time.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
@@ -13840,6 +16298,7 @@
       }
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_collaborators": {
       "post": {
         "operationId": "github_list_repository_collaborators",
@@ -13848,6 +16307,11 @@
       "post": {
         "operationId": "github_list_repository_issue_events",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.merge_pull_request": {
+      "post": {
+        "operationId": "github_merge_pull_request",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -13875,10 +16339,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryCollaborators"
 =======
                 "$ref": "#/components/schemas/ListRepositoryIssueEvents"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/MergePullRequest"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -13889,6 +16357,7 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubCollaborator"
 =======
@@ -15105,6 +17574,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubMergeResult"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -15214,15 +17686,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "One branch merged into another.",
 =======
         "summary": "An issue's labels replaced with those given.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A pull request merged into its base branch.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.remove_repository_collaborator": {
       "post": {
@@ -15232,6 +17709,11 @@
       "post": {
         "operationId": "github_unlock_issue",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.remove_pull_request_reviewers": {
+      "post": {
+        "operationId": "github_remove_pull_request_reviewers",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -15259,10 +17741,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/RemoveRepositoryCollaborator"
 =======
                 "$ref": "#/components/schemas/UnlockIssue"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/RemovePullRequestReviewers"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -15274,10 +17760,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssueLock"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubReviewRequest"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -15387,15 +17877,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A collaborator removed from a repository.",
 =======
         "summary": "An issue's conversation unlocked.",
 >>>>>>> port/github-issues
+=======
+        "summary": "Users and teams removed from those a pull request's review is requested from.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.rename_branch": {
       "post": {
@@ -15405,6 +17900,11 @@
       "post": {
         "operationId": "github_update_issue",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.reply_pull_request_review_comment": {
+      "post": {
+        "operationId": "github_reply_pull_request_review_comment",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -15432,10 +17932,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/RenameBranch"
 =======
                 "$ref": "#/components/schemas/UpdateIssue"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/ReplyPullRequestReviewComment"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -15447,10 +17951,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubBranch"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssue"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubReviewComment"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -15560,15 +18068,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A branch given a new name.",
 =======
         "summary": "An issue's title, text, state, assignees, labels or milestone changed.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A reply to a comment on a pull request's diff.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.replace_repository_topics": {
       "post": {
@@ -15578,6 +18091,11 @@
       "post": {
         "operationId": "github_update_issue_comment",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.request_pull_request_reviewers": {
+      "post": {
+        "operationId": "github_request_pull_request_reviewers",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -15605,10 +18123,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ReplaceRepositoryTopics"
 =======
                 "$ref": "#/components/schemas/UpdateIssueComment"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/RequestPullRequestReviewers"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -15620,10 +18142,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubTopics"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssueComment"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubReviewRequest"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -15733,15 +18259,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A repository's topics replaced by a new set.",
 =======
         "summary": "A comment on an issue, its text replaced.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A pull request's review requested from users and teams.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.sync_fork_branch_with_upstream": {
       "post": {
@@ -15751,6 +18282,11 @@
       "post": {
         "operationId": "github_update_label",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.submit_pull_request_review": {
+      "post": {
+        "operationId": "github_submit_pull_request_review",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -15778,10 +18314,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/SyncForkBranchWithUpstream"
 =======
                 "$ref": "#/components/schemas/UpdateLabel"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/SubmitPullRequestReview"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -15793,10 +18333,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubForkSync"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubLabel"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubReview"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -15906,15 +18450,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A fork's branch brought up to date with its upstream.",
 =======
         "summary": "A label renamed, recolored or described anew.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A pending review of a pull request, submitted.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.update_ref": {
       "post": {
@@ -15924,6 +18473,11 @@
       "post": {
         "operationId": "github_update_milestone",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.update_pull_request": {
+      "post": {
+        "operationId": "github_update_pull_request",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -15950,11 +18504,15 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
                 "$ref": "#/components/schemas/UpdateRef"
 =======
                 "$ref": "#/components/schemas/UpdateMilestone"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/UpdatePullRequest"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -15966,10 +18524,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubGitRef"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubMilestone"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubPullRequest"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -16079,15 +18641,25 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A branch's or a tag's git reference pointed at another commit.",
+=======
+        "summary": "A pull request's title, text, state, base branch or whether maintainers may push to it, changed.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.update_repository": {
       "post": {
         "operationId": "github_update_repository",
+=======
+    "/v1/connected-accounts/{id}/actions/github.update_pull_request_branch": {
+      "post": {
+        "operationId": "github_update_pull_request_branch",
+>>>>>>> port/github-pull_requests
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -16114,7 +18686,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/UpdateRepository"
+=======
+                "$ref": "#/components/schemas/UpdatePullRequestBranch"
+>>>>>>> port/github-pull_requests
               }
             }
           },
@@ -16125,7 +18701,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubRepository"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubPullRequestBranchUpdate"
+>>>>>>> port/github-pull_requests
                 }
               }
             }
@@ -16234,10 +18814,169 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A repository's settings and metadata changed.",
 =======
         "summary": "A milestone's title, state, description or due date changed.",
 >>>>>>> port/github-issues
+=======
+        "summary": "A pull request's branch brought up to date with the latest changes of its base branch.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.update_pull_request_review_comment": {
+      "post": {
+        "operationId": "github_update_pull_request_review_comment",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePullRequestReviewComment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubReviewComment"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A comment on a pull request's diff, its text replaced.",
+>>>>>>> port/github-pull_requests
         "tags": [
           "actions"
         ]
