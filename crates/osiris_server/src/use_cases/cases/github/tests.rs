@@ -18,6 +18,7 @@ fn github() -> Github {
             concurrency: 1,
             max_items: 10,
             max_log_bytes: 262_144,
+            max_scan_pages: 10,
         },
     )
     .unwrap()

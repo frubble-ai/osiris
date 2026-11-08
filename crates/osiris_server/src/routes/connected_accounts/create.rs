@@ -3,9 +3,7 @@
 
 use crate::{
     http::{auth::Auth, error::ApiResult, json_body::JsonBody, server_wrap, state::ApiState},
-    use_cases::cases::{
-        connect_installation::ConnectInstallationArgs, start_connect::StartConnectArgs,
-    },
+    use_cases::cases::create_connected_account::CreateConnectedAccountArgs,
 };
 use axum::{
     Json,
@@ -16,7 +14,6 @@ use osiris_api_models::{
     connected_accounts::{ConnectedAccountCreated, CreateConnectedAccount},
     errors::ErrorBody,
 };
-use osiris_domain::DomainError;
 use osiris_env::Flow;
 
 /// Start connecting a user: a pending connection and the provider's consent URL. After the
@@ -38,36 +35,19 @@ pub async fn create_connected_account(
         Auth::Api,
         StatusCode::CREATED,
         |use_cases| async move {
-            if let Some(installation_id) = body.installation_id {
-                let account = use_cases
-                    .connect_installation(ConnectInstallationArgs {
-                        auth_config_id: body.auth_config_id,
-                        user_id: body.user_id,
-                        alias: body.alias,
-                        installation_id,
-                    })
-                    .await?;
-                return Ok(ConnectedAccountCreated {
-                    id: account.id,
-                    status: account.status,
-                    redirect_url: None,
-                });
-            }
-            let callback_url = body.callback_url.ok_or_else(|| {
-                DomainError::Invalid("callback_url is required for a consent".into())
-            })?;
-            let (account, redirect_url) = use_cases
-                .start_connect(StartConnectArgs {
+            let created = use_cases
+                .create_connected_account(CreateConnectedAccountArgs {
                     auth_config_id: body.auth_config_id,
                     user_id: body.user_id,
                     alias: body.alias,
-                    callback_url,
+                    callback_url: body.callback_url,
+                    installation_id: body.installation_id,
                 })
                 .await?;
             Ok(ConnectedAccountCreated {
-                id: account.id,
-                status: account.status,
-                redirect_url: Some(redirect_url),
+                id: created.account.id,
+                status: created.account.status,
+                redirect_url: created.redirect_url,
             })
         },
     )

@@ -393,6 +393,7 @@ async fn keeps_only_the_end_of_a_log_longer_than_osiris_answers() {
             concurrency: 1,
             max_items: 10,
             max_log_bytes: 10,
+            max_scan_pages: 10,
         },
     )
     .unwrap();

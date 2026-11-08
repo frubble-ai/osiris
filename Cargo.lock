@@ -2374,6 +2374,7 @@ dependencies = [
  "futures",
  "hex",
  "jsonwebtoken",
+ "osiris_common",
  "osiris_interfaces",
  "osiris_providers",
  "reqwest",

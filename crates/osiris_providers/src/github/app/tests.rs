@@ -10,6 +10,7 @@
 use super::{AppCredentials, app_jwt::app_jwt};
 use crate::github::mocks::{github_on::github_on, mock_github_app_key::MockGithubAppKey};
 use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode};
+use osiris_common::secret::ExposeSecret;
 use rstest::rstest;
 use serde_json::{Value, json};
 use wiremock::{
@@ -110,6 +111,6 @@ async fn mints_an_installation_token_as_the_app() {
         .await
         .unwrap();
 
-    assert_eq!(minted.token, "ghs_installation");
+    assert_eq!(minted.token.expose_secret(), "ghs_installation");
     assert_eq!(minted.expires_at, "2026-11-08T04:00:00Z");
 }

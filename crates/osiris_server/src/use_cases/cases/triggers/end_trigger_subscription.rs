@@ -4,7 +4,7 @@
 //! can only be ended at the provider by hand.
 
 use crate::use_cases::{
-    UseCases, cases::run_connected_account_action::RunConnectedAccountActionArgs,
+    UseCaseResult, UseCases, cases::run_connected_account_action::RunConnectedAccountActionArgs,
     lib::tasks::cancel_quietly::cancel_quietly,
 };
 use osiris_common::secret::{ExposeSecret, Secret};
@@ -22,38 +22,45 @@ pub struct EndTriggerSubscriptionArgs<'a> {
 }
 
 impl UseCases {
-    pub async fn end_trigger_subscription(&self, args: EndTriggerSubscriptionArgs<'_>) {
-        let ctx = self.context();
-        if let (Some(subscription_id), Some(implementation)) =
-            (args.subscription_id, ctx.providers.get(args.provider))
-        {
-            let (http, kind, config) = (&ctx.http, args.kind, args.config);
-            let ended = self
-                .run_connected_account_action(RunConnectedAccountActionArgs {
-                    id: args.connected_account_id,
-                    provider: args.provider,
-                    action: kind,
-                    required_scopes: &[],
-                    user_only: false,
-                    call: |token: Secret, _acting: ActingAs| async move {
-                        implementation
-                            .unsubscribe_trigger(
-                                http,
-                                token.expose_secret(),
-                                kind,
-                                config,
-                                subscription_id,
-                            )
-                            .await
-                    },
-                })
-                .await;
-            if let Err(report) = ended {
-                tracing::warn!(error = ?report, trigger_id = args.trigger_id, "the trigger's subscription could not be ended at the provider");
+    pub async fn end_trigger_subscription(
+        &self,
+        args: EndTriggerSubscriptionArgs<'_>,
+    ) -> UseCaseResult<()> {
+        self.run("end_trigger_subscription", async {
+            let ctx = self.context();
+            if let (Some(subscription_id), Some(implementation)) =
+                (args.subscription_id, ctx.providers.get(args.provider))
+            {
+                let (http, kind, config) = (&ctx.http, args.kind, args.config);
+                let ended = self
+                    .run_connected_account_action(RunConnectedAccountActionArgs {
+                        id: args.connected_account_id,
+                        provider: args.provider,
+                        action: kind,
+                        required_scopes: &[],
+                        user_only: false,
+                        call: |token: Secret, _acting: ActingAs| async move {
+                            implementation
+                                .unsubscribe_trigger(
+                                    http,
+                                    token.expose_secret(),
+                                    kind,
+                                    config,
+                                    subscription_id,
+                                )
+                                .await
+                        },
+                    })
+                    .await;
+                if let Err(report) = ended {
+                    tracing::warn!(error = ?report, trigger_id = args.trigger_id, "the trigger's subscription could not be ended at the provider");
+                }
             }
-        }
-        if let Some(task) = args.poll_task {
-            cancel_quietly(ctx.scheduling(), task).await;
-        }
+            if let Some(task) = args.poll_task {
+                cancel_quietly(ctx.scheduling(), task).await;
+            }
+            Ok(())
+        })
+        .await
     }
 }

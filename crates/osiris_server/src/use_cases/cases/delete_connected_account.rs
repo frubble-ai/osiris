@@ -1,6 +1,6 @@
-//! Disconnects: ends its triggers' subscriptions at the provider, ends the grant at the provider
-//! whenever osiris holds tokens for it (active,
-//! expired or disabled), deletes the connection, and cancels its pending refresh task by name. A
+//! Disconnects: ends its triggers' subscriptions at the provider (marking them failed), ends the
+//! grant at the provider whenever osiris holds tokens for it (active, expired or disabled),
+//! deletes the connection, and cancels its pending refresh task by name. A
 //! grant the provider no longer has counts as ended. If the provider cannot be reached, the
 //! connection is kept so the call can be tried again. If cancelling the task fails, the task does
 //! nothing when it runs, because the connection is gone.
@@ -12,11 +12,16 @@ use crate::use_cases::{
         oauth::oauth_client::oauth_client,
         shared::{domain_errors::provider as provider_error, redirect_uri::redirect_uri},
         tasks::cancel_quietly::cancel_quietly,
+        triggers::TriggerState,
     },
 };
 use osiris_common::secret::ExposeSecret;
-use osiris_domain::DomainError;
+use osiris_domain::{DomainError, TriggerStatus};
 use osiris_interfaces::ProviderError;
+
+/// What a trigger of a connection being deleted says, if the connection is kept after all.
+const DISCONNECTING: &str =
+    "its connection is being deleted; connect again and create the trigger again";
 
 pub struct DeleteConnectedAccountArgs<'a> {
     pub id: &'a str,
@@ -32,7 +37,9 @@ impl UseCases {
             let id = args.id;
             let account = ctx.db.connected_account(id).await?;
             // Its triggers' subscriptions are ended first, while its token still reaches the
-            // provider; deleting the connection deletes the triggers.
+            // provider, and each trigger is marked failed: if the grant can't be ended below and
+            // the connection is kept, its triggers say they no longer work. Deleting the
+            // connection deletes them.
             for trigger in ctx.db.connection_triggers(id).await? {
                 self.end_trigger_subscription(EndTriggerSubscriptionArgs {
                     trigger_id: &trigger.id,
@@ -43,7 +50,17 @@ impl UseCases {
                     subscription_id: trigger.subscription_id.as_deref(),
                     poll_task: trigger.poll_task.as_deref(),
                 })
-                .await;
+                .await?;
+                let ended = TriggerState {
+                    status: TriggerStatus::Failed,
+                    checkpoint: trigger.checkpoint.clone(),
+                    last_error: Some(DISCONNECTING.into()),
+                    poll_task: None,
+                    poll_task_at: None,
+                };
+                ctx.db
+                    .update_trigger_state(&trigger.id, trigger.poll_task.as_deref(), ended)
+                    .await?;
             }
             // Whatever its status, a connection that holds tokens has a grant to end at the
             // provider.

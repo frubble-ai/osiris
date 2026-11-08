@@ -24,7 +24,7 @@ impl UseCases {
                 subscription_id: trigger.subscription_id.as_deref(),
                 poll_task: trigger.poll_task.as_deref(),
             })
-            .await;
+            .await?;
             ctx.db.delete_trigger(args.id).await
         })
         .await

@@ -112,7 +112,8 @@ impl UseCases {
                 Ok(trigger) => Ok(trigger),
                 Err(report) => {
                     // Nothing will know of the subscription: it is ended now, not left behind.
-                    self.end_trigger_subscription(EndTriggerSubscriptionArgs {
+                    let ended = self
+                        .end_trigger_subscription(EndTriggerSubscriptionArgs {
                         trigger_id: &trigger_id,
                         connected_account_id: &connected_account_id,
                         provider: &provider,
@@ -120,8 +121,11 @@ impl UseCases {
                         config: &config,
                         subscription_id: subscription_id.as_deref(),
                         poll_task: None,
-                    })
-                    .await;
+                        })
+                        .await;
+                    if let Err(cleanup) = ended {
+                        tracing::warn!(error = ?cleanup, trigger_id = %trigger_id, "the new trigger's subscription could not be ended after its creation failed");
+                    }
                     Err(report)
                 }
             }

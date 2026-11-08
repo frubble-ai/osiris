@@ -1,5 +1,6 @@
 //! Deleting a trigger removes its webhook at GitHub, and the trigger is deleted even when GitHub
-//! fails to remove it; deleting the connection removes its triggers' webhooks first.
+//! fails to remove it; deleting the connection removes its triggers' webhooks first, and marks
+//! the triggers failed if the connection is kept because GitHub can't be reached.
 
 #![allow(
     clippy::unwrap_used,
@@ -73,4 +74,32 @@ async fn removes_the_triggers_webhooks_when_the_connection_is_deleted(pool: PgPo
 
     assert_eq!(deleted.status, StatusCode::OK, "{}", deleted.body);
     assert_eq!(get_trigger(&app, &id).await.status, StatusCode::NOT_FOUND);
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn marks_the_triggers_failed_when_the_connection_is_kept_because_github_is_down(
+    pool: PgPool,
+) {
+    let app = setup_test_context(pool).await;
+    let (connection, id) = watching_repo_events(&app).await;
+    let github = MockGithubNetwork::on(&app.provider);
+    github.answer_empty("DELETE", HOOK, 204).await;
+    github.answer_revoke(503, None).await;
+
+    let kept = app
+        .send(
+            "DELETE",
+            &format!("/v1/connected-accounts/{connection}"),
+            Some(API_KEY),
+            None,
+            &[],
+        )
+        .await;
+
+    assert_ne!(kept.status, StatusCode::OK, "{}", kept.body);
+    assert_eq!(app.account(&connection).await["status"], "active");
+    let trigger = get_trigger(&app, &id).await;
+    assert_eq!(trigger.status, StatusCode::OK, "{}", trigger.body);
+    assert_eq!(trigger.body["status"], "failed");
+    assert!(trigger.body["last_error"].is_string());
 }

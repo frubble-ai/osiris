@@ -4,7 +4,7 @@
 use super::InstallationTokenCache;
 use crate::use_cases::UseCaseResult;
 use crate::use_cases::lib::shared::domain_errors::provider;
-use osiris_common::secret::{ExposeSecret, Secret, secret};
+use osiris_common::secret::{ExposeSecret, Secret};
 use osiris_domain::{AuthConfig, DomainError};
 use osiris_interfaces::Provider;
 use serde_json::Value;
@@ -40,7 +40,7 @@ pub async fn installation_token(
         .await
         .map_err(provider)?;
     // A token whose expiry can't be read is used once and not kept.
-    let token = secret(minted.token);
+    let token = minted.token;
     if let Ok(expires_at) = OffsetDateTime::parse(&minted.expires_at, &Rfc3339) {
         cache.put(&config.id, installation_id, token.clone(), expires_at);
     }

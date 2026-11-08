@@ -28,6 +28,7 @@ fn slack(server: &MockServer, max_items: usize) -> Slack {
             concurrency: 1,
             max_items,
             max_log_bytes: 262_144,
+            max_scan_pages: 10,
         },
     )
     .unwrap()

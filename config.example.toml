@@ -99,6 +99,9 @@ concurrency = 4
 max_items = 5000
 # How much of a downloaded text (a job's logs) is answered: its last bytes.
 max_log_bytes = 262144
+# The most pages read looking for one item a provider has no lookup for (an existing webhook, by the
+# URL it delivers to).
+max_scan_pages = 10
 
 [providers.installation_tokens]
 # An app installation's token (one that lives an hour, for example) is minted again this long

@@ -7,8 +7,6 @@ use crate::{
 use reqwest::Method;
 use serde::Deserialize;
 
-/// How many pages of a repository's webhooks are read looking for one, as `OpenConnector` reads.
-const MAX_PAGES: u32 = 10;
 /// GitHub's largest page, a fact of its API.
 const PER_PAGE: u32 = 100;
 
@@ -40,7 +38,8 @@ impl Github {
             path_segment(owner),
             path_segment(repo)
         );
-        for page in 1..=MAX_PAGES {
+        // At most `[providers.listing] max_scan_pages` pages are read looking for it.
+        for page in 1..=self.limits.max_scan_pages {
             let hooks: Vec<HookAnswer> = match send::<_, ()>(
                 self,
                 http,

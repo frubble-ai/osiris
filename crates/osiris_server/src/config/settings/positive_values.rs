@@ -45,6 +45,10 @@ impl Settings {
                 u64::try_from(self.providers.listing.max_log_bytes).unwrap_or(u64::MAX),
             ),
             (
+                "providers.listing.max_scan_pages",
+                u64::from(self.providers.listing.max_scan_pages),
+            ),
+            (
                 "providers.listing.max_items",
                 u64::try_from(self.providers.listing.max_items).unwrap_or(u64::MAX),
             ),

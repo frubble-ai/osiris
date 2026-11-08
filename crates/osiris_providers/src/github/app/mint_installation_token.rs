@@ -7,6 +7,7 @@ use crate::{
     InstallationToken, ProviderError,
     github::{Github, path_segment::path_segment, request::send},
 };
+use osiris_common::secret::secret;
 use reqwest::Method;
 use serde::Deserialize;
 
@@ -40,7 +41,7 @@ impl Github {
         )
         .await?;
         Ok(InstallationToken {
-            token: minted.token,
+            token: secret(minted.token),
             expires_at: minted.expires_at,
         })
     }

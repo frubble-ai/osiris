@@ -23,6 +23,7 @@ const LIMITS: ListLimits = ListLimits {
     concurrency: 2,
     max_items: 5000,
     max_log_bytes: 262_144,
+    max_scan_pages: 10,
 };
 
 fn github(server: &MockServer, limits: ListLimits) -> Github {
@@ -186,6 +187,7 @@ async fn stops_reading_repositories_at_the_cap() {
             concurrency: 1,
             max_items: 50,
             max_log_bytes: 262_144,
+            max_scan_pages: 10,
         },
     )
     .list_repositories(

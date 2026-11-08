@@ -31,6 +31,7 @@ fn linear_capped_at(server: &MockServer, max_items: usize) -> Linear {
             concurrency: 2,
             max_items,
             max_log_bytes: 262_144,
+            max_scan_pages: 10,
         },
     )
     .unwrap()

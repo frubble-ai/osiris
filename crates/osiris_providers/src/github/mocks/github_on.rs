@@ -17,6 +17,7 @@ pub fn github_on(server: &MockServer) -> Github {
             concurrency: 2,
             max_items: 5000,
             max_log_bytes: 262_144,
+            max_scan_pages: 10,
         },
     )
     .expect("the faked network's URLs")

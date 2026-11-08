@@ -18,3 +18,6 @@ pub fn status_error(provider: &'static str, status: StatusCode, body: &str) -> P
         _ => ProviderError::unavailable(provider, message),
     }
 }
+
+#[cfg(test)]
+mod tests;

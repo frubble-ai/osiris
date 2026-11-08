@@ -49,6 +49,8 @@ pub struct ListingSettings {
     pub max_items: usize,
     /// The most of a downloaded text (a workflow job's logs) answered, in bytes: its end.
     pub max_log_bytes: usize,
+    /// Pages read at most looking for one item a provider has no lookup for.
+    pub max_scan_pages: u32,
 }
 
 impl ListingSettings {
@@ -57,6 +59,7 @@ impl ListingSettings {
             concurrency: self.concurrency,
             max_items: self.max_items,
             max_log_bytes: self.max_log_bytes,
+            max_scan_pages: self.max_scan_pages,
         }
     }
 }
@@ -68,6 +71,8 @@ impl Default for ListingSettings {
             max_items: 5000,
             // OpenConnector's cap on a job log: its last 256 KiB.
             max_log_bytes: 262_144,
+            // As many as OpenConnector reads looking for a webhook it created before.
+            max_scan_pages: 10,
         }
     }
 }

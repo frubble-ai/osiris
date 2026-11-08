@@ -21,7 +21,8 @@ pub struct UseCaseContext {
     /// The HTTP client for providers.
     pub http: reqwest::Client,
     /// App installations' tokens this process minted, reused until shortly before they expire.
-    /// The one state the context holds: never a request's, and never stored.
+    /// The one state the context holds, as rule 1 of `docs/style-guide/use-cases.md` allows:
+    /// never a request's, and never stored.
     pub installation_tokens: Arc<InstallationTokenCache>,
 }
 
