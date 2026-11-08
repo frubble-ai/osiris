@@ -16,7 +16,11 @@ use super::{
 use crate::{
     ProviderError,
     github::mocks::{
-        MockGithubNetwork, generate_github::generate_github,
+        MockGithubNetwork,
+        generate_github::generate_github,
+        generate_github_names::{
+            generate_github_login, generate_github_repo, generate_github_token,
+        },
         generate_github_repository::generate_github_repository,
         generate_github_user::generate_github_user,
     },
@@ -27,6 +31,7 @@ use wiremock::MockServer;
 
 #[tokio::test]
 async fn lists_a_page_of_the_public_feed() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let events = [
         generate_github_event(1, "WatchEvent"),
@@ -47,7 +52,7 @@ async fn lists_a_page_of_the_public_feed() {
     };
 
     let listed = generate_github(&server)
-        .list_public_events(&reqwest::Client::new(), "token", &input)
+        .list_public_events(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -71,6 +76,7 @@ async fn lists_a_page_of_the_public_feed() {
 #[case::own_received("own_received", "/users/octo%20cat/received_events")]
 #[tokio::test]
 async fn lists_a_page_of_a_users_feed(#[case] feed: &str, #[case] route: &str) {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
@@ -92,7 +98,7 @@ async fn lists_a_page_of_a_users_feed(#[case] feed: &str, #[case] route: &str) {
                 per_page: None,
                 page: Some(2),
             };
-            github.list_user_public_events(&http, "token", &input).await
+            github.list_user_public_events(&http, &token, &input).await
         }
         "received_public" => {
             let input = ListUserReceivedPublicEvents {
@@ -101,7 +107,7 @@ async fn lists_a_page_of_a_users_feed(#[case] feed: &str, #[case] route: &str) {
                 page: Some(2),
             };
             github
-                .list_user_received_public_events(&http, "token", &input)
+                .list_user_received_public_events(&http, &token, &input)
                 .await
         }
         "own" => {
@@ -111,7 +117,7 @@ async fn lists_a_page_of_a_users_feed(#[case] feed: &str, #[case] route: &str) {
                 page: Some(2),
             };
             github
-                .list_authenticated_user_events(&http, "token", &input)
+                .list_authenticated_user_events(&http, &token, &input)
                 .await
         }
         _ => {
@@ -121,7 +127,7 @@ async fn lists_a_page_of_a_users_feed(#[case] feed: &str, #[case] route: &str) {
                 page: Some(2),
             };
             github
-                .list_authenticated_user_received_events(&http, "token", &input)
+                .list_authenticated_user_received_events(&http, &token, &input)
                 .await
         }
     }
@@ -133,25 +139,28 @@ async fn lists_a_page_of_a_users_feed(#[case] feed: &str, #[case] route: &str) {
 
 #[tokio::test]
 async fn lists_a_page_of_the_events_of_a_repository() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/events",
+            &format!("/repos/{owner}/{repo}/events"),
             &[("per_page", "10")],
             200,
             json!([generate_github_event(4, "ForkEvent")]),
         )
         .await;
     let input = ListRepositoryEvents {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         per_page: Some(10),
         page: None,
     };
 
     let listed = generate_github(&server)
-        .list_repository_events(&reqwest::Client::new(), "token", &input)
+        .list_repository_events(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -164,25 +173,34 @@ async fn lists_a_page_of_the_events_of_a_repository() {
 #[case::unstar("DELETE")]
 #[tokio::test]
 async fn stars_and_unstars_a_repository_and_acknowledges_it(#[case] verb: &str) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
-        .answer(verb, "/user/starred/octo/hello", &[], 204, Value::Null)
+        .answer(
+            verb,
+            &format!("/user/starred/{owner}/{repo}"),
+            &[],
+            204,
+            Value::Null,
+        )
         .await;
     let github = generate_github(&server);
     let http = reqwest::Client::new();
 
     let acknowledged = if verb == "PUT" {
         let input = StarRepository {
-            owner: "octo".into(),
-            repo: "hello".into(),
+            owner: owner.clone(),
+            repo: repo.clone(),
         };
-        github.star_repository(&http, "token", &input).await
+        github.star_repository(&http, &token, &input).await
     } else {
         let input = UnstarRepository {
-            owner: "octo".into(),
-            repo: "hello".into(),
+            owner: owner.clone(),
+            repo: repo.clone(),
         };
-        github.unstar_repository(&http, "token", &input).await
+        github.unstar_repository(&http, &token, &input).await
     };
 
     assert!(acknowledged.unwrap().ok);
@@ -193,6 +211,9 @@ async fn stars_and_unstars_a_repository_and_acknowledges_it(#[case] verb: &str) 
 #[case::not_starred(404, false)]
 #[tokio::test]
 async fn checks_whether_a_repository_is_starred(#[case] status: u16, #[case] starred: bool) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let body = if status == 404 {
         json!({ "message": "Not Found" })
@@ -200,15 +221,21 @@ async fn checks_whether_a_repository_is_starred(#[case] status: u16, #[case] sta
         Value::Null
     };
     MockGithubNetwork::on(&server)
-        .answer("GET", "/user/starred/octo/hello", &[], status, body)
+        .answer(
+            "GET",
+            &format!("/user/starred/{owner}/{repo}"),
+            &[],
+            status,
+            body,
+        )
         .await;
     let input = CheckRepositoryStarred {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
     };
 
     let check = generate_github(&server)
-        .check_repository_starred(&reqwest::Client::new(), "token", &input)
+        .check_repository_starred(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -221,23 +248,26 @@ async fn checks_whether_a_repository_is_starred(#[case] status: u16, #[case] sta
 #[case::outage(503)]
 #[tokio::test]
 async fn a_star_check_github_refuses_otherwise_is_an_error(#[case] status: u16) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/user/starred/octo/hello",
+            &format!("/user/starred/{owner}/{repo}"),
             &[],
             status,
             json!({ "message": "no" }),
         )
         .await;
     let input = CheckRepositoryStarred {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
     };
 
     let error = generate_github(&server)
-        .check_repository_starred(&reqwest::Client::new(), "token", &input)
+        .check_repository_starred(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap_err();
 
@@ -250,16 +280,19 @@ async fn a_star_check_github_refuses_otherwise_is_an_error(#[case] status: u16) 
 }
 
 #[rstest]
-#[case::stargazers("/repos/octo/hello/stargazers")]
-#[case::watchers("/repos/octo/hello/subscribers")]
+#[case::stargazers("stargazers")]
+#[case::watchers("subscribers")]
 #[tokio::test]
-async fn lists_a_page_of_the_stargazers_or_watchers_of_a_repository(#[case] route: &str) {
+async fn lists_a_page_of_the_stargazers_or_watchers_of_a_repository(#[case] endpoint: &str) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let users = [generate_github_user(5), generate_github_user(6)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            route,
+            &format!("/repos/{owner}/{repo}/{endpoint}"),
             &[("per_page", "2"), ("page", "1")],
             200,
             json!(users),
@@ -268,26 +301,24 @@ async fn lists_a_page_of_the_stargazers_or_watchers_of_a_repository(#[case] rout
     let github = generate_github(&server);
     let http = reqwest::Client::new();
 
-    let listed = if route.ends_with("stargazers") {
+    let listed = if endpoint == "stargazers" {
         let input = ListRepositoryStargazers {
-            owner: "octo".into(),
-            repo: "hello".into(),
+            owner: owner.clone(),
+            repo: repo.clone(),
             per_page: Some(2),
             page: Some(1),
         };
         github
-            .list_repository_stargazers(&http, "token", &input)
+            .list_repository_stargazers(&http, &token, &input)
             .await
     } else {
         let input = ListRepositoryWatchers {
-            owner: "octo".into(),
-            repo: "hello".into(),
+            owner: owner.clone(),
+            repo: repo.clone(),
             per_page: Some(2),
             page: Some(1),
         };
-        github
-            .list_repository_watchers(&http, "token", &input)
-            .await
+        github.list_repository_watchers(&http, &token, &input).await
     }
     .unwrap();
 
@@ -299,6 +330,7 @@ async fn lists_a_page_of_the_stargazers_or_watchers_of_a_repository(#[case] rout
 
 #[tokio::test]
 async fn lists_the_repositories_the_user_starred_sorted_as_asked() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let repositories = [generate_github_repository(7)];
     MockGithubNetwork::on(&server)
@@ -322,7 +354,7 @@ async fn lists_the_repositories_the_user_starred_sorted_as_asked() {
     };
 
     let listed = generate_github(&server)
-        .list_my_starred_repositories(&reqwest::Client::new(), "token", &input)
+        .list_my_starred_repositories(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -336,6 +368,7 @@ async fn lists_the_repositories_the_user_starred_sorted_as_asked() {
 
 #[tokio::test]
 async fn sends_the_starred_sort_trimmed_and_leaves_out_a_blank_direction() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer_filtered(
@@ -353,7 +386,7 @@ async fn sends_the_starred_sort_trimmed_and_leaves_out_a_blank_direction() {
     };
 
     let listed = generate_github(&server)
-        .list_my_starred_repositories(&reqwest::Client::new(), "token", &input)
+        .list_my_starred_repositories(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 

@@ -30,8 +30,13 @@ use super::{
 use crate::{
     ProviderError,
     github::mocks::{
-        MockGithubNetwork, generate_github::generate_github,
-        generate_github_user::generate_github_user, generate_sha::generate_sha,
+        MockGithubNetwork,
+        generate_github::generate_github,
+        generate_github_names::{
+            generate_github_login, generate_github_repo, generate_github_token,
+        },
+        generate_github_user::generate_github_user,
+        generate_sha::generate_sha,
     },
 };
 use fake::{Fake, faker::lorem::en::Sentence};
@@ -50,6 +55,9 @@ fn text(value: &Value) -> &str {
 #[tokio::test]
 async fn lists_a_page_of_pull_requests_filtered_and_sorted() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let head = format!("{}:feature", generate_github_login());
     let pulls = [
         generate_github_pull_request(11, 1),
         generate_github_pull_request(12, 2),
@@ -57,10 +65,10 @@ async fn lists_a_page_of_pull_requests_filtered_and_sorted() {
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/pulls",
+            &format!("/repos/{owner}/{repo}/pulls"),
             &[
                 ("state", "all"),
-                ("head", "octo:feature"),
+                ("head", head.as_str()),
                 ("base", "main"),
                 ("sort", "long-running"),
                 ("direction", "asc"),
@@ -72,10 +80,10 @@ async fn lists_a_page_of_pull_requests_filtered_and_sorted() {
         )
         .await;
     let input = ListPullRequests {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         state: Some(PullRequestStateFilter::All),
-        head: Some("octo:feature".into()),
+        head: Some(head.clone()),
         base: Some("main".into()),
         sort: Some(PullRequestSort::LongRunning),
         direction: Some(SortDirection::Asc),
@@ -84,7 +92,7 @@ async fn lists_a_page_of_pull_requests_filtered_and_sorted() {
     };
 
     let listed = generate_github(&server)
-        .list_pull_requests(&http(), "token", &input)
+        .list_pull_requests(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -110,18 +118,20 @@ async fn lists_a_page_of_pull_requests_filtered_and_sorted() {
 #[tokio::test]
 async fn leaves_out_a_blank_branch_and_trims_a_padded_one_in_a_pull_request_list() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/pulls",
+            &format!("/repos/{owner}/{repo}/pulls"),
             &[("base", "main")],
             200,
             json!([]),
         )
         .await;
     let input = ListPullRequests {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         state: None,
         head: Some("   ".into()),
         base: Some("  main  ".into()),
@@ -132,7 +142,7 @@ async fn leaves_out_a_blank_branch_and_trims_a_padded_one_in_a_pull_request_list
     };
 
     let listed = generate_github(&server)
-        .list_pull_requests(&http(), "token", &input)
+        .list_pull_requests(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -149,28 +159,30 @@ async fn leaves_out_a_blank_branch_and_trims_a_padded_one_in_a_pull_request_list
 #[tokio::test]
 async fn lists_the_pull_requests_a_commit_belongs_to() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let sha = generate_sha();
     let mut merged = generate_github_pull_request(21, 7);
     merged["merged_at"] = json!("2024-01-03T00:00:00Z");
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            &format!("/repos/octo/hello/commits/{sha}/pulls"),
+            &format!("/repos/{owner}/{repo}/commits/{sha}/pulls"),
             &[("per_page", "10"), ("page", "1")],
             200,
             json!([merged]),
         )
         .await;
     let input = ListPullRequestsAssociatedWithCommit {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         commit_sha: sha,
         per_page: Some(10),
         page: Some(1),
     };
 
     let listed = generate_github(&server)
-        .list_pull_requests_associated_with_commit(&http(), "token", &input)
+        .list_pull_requests_associated_with_commit(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -183,26 +195,28 @@ async fn lists_the_pull_requests_a_commit_belongs_to() {
 #[tokio::test]
 async fn lists_the_files_a_pull_request_changes() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let file = generate_github_pull_request_file(3, 2);
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/pulls/5/files",
+            &format!("/repos/{owner}/{repo}/pulls/5/files"),
             &[("per_page", "50")],
             200,
             json!([file]),
         )
         .await;
     let input = ListPullRequestFiles {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         per_page: Some(50),
         page: None,
     };
 
     let files = generate_github(&server)
-        .list_pull_request_files(&http(), "token", &input)
+        .list_pull_request_files(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -220,26 +234,28 @@ async fn lists_the_files_a_pull_request_changes() {
 #[tokio::test]
 async fn lists_the_commits_on_a_pull_request() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let commit = generate_github_commit(77);
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/pulls/5/commits",
+            &format!("/repos/{owner}/{repo}/pulls/5/commits"),
             &[("page", "2")],
             200,
             json!([commit]),
         )
         .await;
     let input = ListPullRequestCommits {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         per_page: None,
         page: Some(2),
     };
 
     let commits = generate_github(&server)
-        .list_pull_request_commits(&http(), "token", &input)
+        .list_pull_request_commits(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -257,24 +273,26 @@ async fn lists_the_commits_on_a_pull_request() {
 #[tokio::test]
 async fn lists_who_a_pull_requests_review_is_requested_from() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let (user, team) = (generate_github_user(31), generate_github_team(41));
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/pulls/5/requested_reviewers",
+            &format!("/repos/{owner}/{repo}/pulls/5/requested_reviewers"),
             &[],
             200,
             json!({ "users": [user], "teams": [team] }),
         )
         .await;
     let input = ListPullRequestRequestedReviewers {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
     };
 
     let requested = generate_github(&server)
-        .list_pull_request_requested_reviewers(&http(), "token", &input)
+        .list_pull_request_requested_reviewers(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -288,6 +306,8 @@ async fn lists_who_a_pull_requests_review_is_requested_from() {
 #[tokio::test]
 async fn lists_the_reviews_of_a_pull_request() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let reviews = [
         generate_github_review(51, "APPROVED"),
         generate_github_review(52, "CHANGES_REQUESTED"),
@@ -295,22 +315,22 @@ async fn lists_the_reviews_of_a_pull_request() {
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/pulls/5/reviews",
+            &format!("/repos/{owner}/{repo}/pulls/5/reviews"),
             &[("per_page", "2"), ("page", "1")],
             200,
             json!(reviews),
         )
         .await;
     let input = ListPullRequestReviews {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         per_page: Some(2),
         page: Some(1),
     };
 
     let listed = generate_github(&server)
-        .list_pull_request_reviews(&http(), "token", &input)
+        .list_pull_request_reviews(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -328,6 +348,8 @@ async fn lists_the_reviews_of_a_pull_request() {
 #[tokio::test]
 async fn lists_the_comments_on_a_pull_requests_diff_sorted_and_since_a_time() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let comments = [
         generate_github_review_comment(61, None),
         generate_github_review_comment(62, Some(61)),
@@ -335,7 +357,7 @@ async fn lists_the_comments_on_a_pull_requests_diff_sorted_and_since_a_time() {
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/pulls/5/comments",
+            &format!("/repos/{owner}/{repo}/pulls/5/comments"),
             &[
                 ("sort", "updated"),
                 ("direction", "desc"),
@@ -347,8 +369,8 @@ async fn lists_the_comments_on_a_pull_requests_diff_sorted_and_since_a_time() {
         )
         .await;
     let input = ListPullRequestReviewComments {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         sort: Some(ReviewCommentSort::Updated),
         direction: Some(SortDirection::Desc),
@@ -358,7 +380,7 @@ async fn lists_the_comments_on_a_pull_requests_diff_sorted_and_since_a_time() {
     };
 
     let listed = generate_github(&server)
-        .list_pull_request_review_comments(&http(), "token", &input)
+        .list_pull_request_review_comments(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -375,13 +397,15 @@ async fn lists_the_comments_on_a_pull_requests_diff_sorted_and_since_a_time() {
 #[tokio::test]
 async fn creates_a_review_with_comments_on_lines_of_the_diff() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let review = generate_github_review(71, "CHANGES_REQUESTED");
     let sha = generate_sha();
     let (summary, remark): (String, String) = (Sentence(3..6).fake(), Sentence(3..6).fake());
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/pulls/5/reviews",
+            &format!("/repos/{owner}/{repo}/pulls/5/reviews"),
             json!({
                 "body": summary,
                 "event": "REQUEST_CHANGES",
@@ -403,8 +427,8 @@ async fn creates_a_review_with_comments_on_lines_of_the_diff() {
         )
         .await;
     let input = CreatePullRequestReview {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         body: Some(summary),
         event: Some(ReviewEvent::RequestChanges),
@@ -430,7 +454,7 @@ async fn creates_a_review_with_comments_on_lines_of_the_diff() {
     };
 
     let created = generate_github(&server)
-        .create_pull_request_review(&http(), "token", &input)
+        .create_pull_request_review(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -442,18 +466,20 @@ async fn creates_a_review_with_comments_on_lines_of_the_diff() {
 #[tokio::test]
 async fn creates_a_pending_review_when_nothing_is_given() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/pulls/5/reviews",
+            &format!("/repos/{owner}/{repo}/pulls/5/reviews"),
             json!({}),
             200,
             generate_github_review(72, "PENDING"),
         )
         .await;
     let input = CreatePullRequestReview {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         body: None,
         event: None,
@@ -462,7 +488,7 @@ async fn creates_a_pending_review_when_nothing_is_given() {
     };
 
     let created = generate_github(&server)
-        .create_pull_request_review(&http(), "token", &input)
+        .create_pull_request_review(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -480,19 +506,21 @@ async fn submits_a_pending_review_with_its_verdict(
     #[case] state: &str,
 ) {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let body: String = Sentence(3..6).fake();
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/pulls/5/reviews/81/events",
+            &format!("/repos/{owner}/{repo}/pulls/5/reviews/81/events"),
             json!({ "event": named, "body": body }),
             200,
             generate_github_review(81, state),
         )
         .await;
     let input = SubmitPullRequestReview {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         review_id: 81,
         event,
@@ -500,7 +528,7 @@ async fn submits_a_pending_review_with_its_verdict(
     };
 
     let submitted = generate_github(&server)
-        .submit_pull_request_review(&http(), "token", &input)
+        .submit_pull_request_review(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -511,25 +539,27 @@ async fn submits_a_pending_review_with_its_verdict(
 #[tokio::test]
 async fn reads_a_review_by_id() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let review = generate_github_review(91, "COMMENTED");
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/pulls/5/reviews/91",
+            &format!("/repos/{owner}/{repo}/pulls/5/reviews/91"),
             &[],
             200,
             review.clone(),
         )
         .await;
     let input = GetPullRequestReview {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         review_id: 91,
     };
 
     let read = generate_github(&server)
-        .get_pull_request_review(&http(), "token", &input)
+        .get_pull_request_review(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -544,26 +574,28 @@ async fn reads_a_review_by_id() {
 #[tokio::test]
 async fn dismisses_a_review_with_a_reason() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let reason: String = Sentence(3..6).fake();
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "PUT",
-            "/repos/octo/hello/pulls/5/reviews/92/dismissals",
+            &format!("/repos/{owner}/{repo}/pulls/5/reviews/92/dismissals"),
             json!({ "message": reason }),
             200,
             generate_github_review(92, "DISMISSED"),
         )
         .await;
     let input = DismissPullRequestReview {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         review_id: 92,
         message: reason,
     };
 
     let dismissed = generate_github(&server)
-        .dismiss_pull_request_review(&http(), "token", &input)
+        .dismiss_pull_request_review(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -573,24 +605,26 @@ async fn dismisses_a_review_with_a_reason() {
 #[tokio::test]
 async fn deletes_a_pending_review_and_answers_it() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "DELETE",
-            "/repos/octo/hello/pulls/5/reviews/93",
+            &format!("/repos/{owner}/{repo}/pulls/5/reviews/93"),
             &[],
             200,
             generate_github_review(93, "PENDING"),
         )
         .await;
     let input = DeletePendingPullRequestReview {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         review_id: 93,
     };
 
     let deleted = generate_github(&server)
-        .delete_pending_pull_request_review(&http(), "token", &input)
+        .delete_pending_pull_request_review(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -601,13 +635,15 @@ async fn deletes_a_pending_review_and_answers_it() {
 #[tokio::test]
 async fn comments_on_a_range_of_lines_of_the_diff() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let comment = generate_github_review_comment(101, None);
     let sha = generate_sha();
     let body: String = Sentence(3..6).fake();
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/pulls/5/comments",
+            &format!("/repos/{owner}/{repo}/pulls/5/comments"),
             json!({
                 "body": body,
                 "commit_id": sha,
@@ -622,8 +658,8 @@ async fn comments_on_a_range_of_lines_of_the_diff() {
         )
         .await;
     let input = CreatePullRequestReviewComment {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         body,
         commit_id: sha,
@@ -635,7 +671,7 @@ async fn comments_on_a_range_of_lines_of_the_diff() {
     };
 
     let created = generate_github(&server)
-        .create_pull_request_review_comment(&http(), "token", &input)
+        .create_pull_request_review_comment(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -648,26 +684,28 @@ async fn comments_on_a_range_of_lines_of_the_diff() {
 #[tokio::test]
 async fn replies_to_a_comment_on_the_diff() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let body: String = Sentence(3..6).fake();
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/pulls/5/comments/101/replies",
+            &format!("/repos/{owner}/{repo}/pulls/5/comments/101/replies"),
             json!({ "body": body }),
             201,
             generate_github_review_comment(102, Some(101)),
         )
         .await;
     let input = ReplyPullRequestReviewComment {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 5,
         comment_id: 101,
         body,
     };
 
     let reply = generate_github(&server)
-        .reply_pull_request_review_comment(&http(), "token", &input)
+        .reply_pull_request_review_comment(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -678,27 +716,29 @@ async fn replies_to_a_comment_on_the_diff() {
 #[tokio::test]
 async fn replaces_the_text_of_a_comment_on_the_diff() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let body: String = Sentence(3..6).fake();
     let mut comment = generate_github_review_comment(103, None);
     comment["body"] = json!(body);
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "PATCH",
-            "/repos/octo/hello/pulls/comments/103",
+            &format!("/repos/{owner}/{repo}/pulls/comments/103"),
             json!({ "body": body }),
             200,
             comment,
         )
         .await;
     let input = UpdatePullRequestReviewComment {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         comment_id: 103,
         body: body.clone(),
     };
 
     let updated = generate_github(&server)
-        .update_pull_request_review_comment(&http(), "token", &input)
+        .update_pull_request_review_comment(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -709,23 +749,25 @@ async fn replaces_the_text_of_a_comment_on_the_diff() {
 #[tokio::test]
 async fn deletes_a_comment_on_the_diff_and_acknowledges_it() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "DELETE",
-            "/repos/octo/hello/pulls/comments/104",
+            &format!("/repos/{owner}/{repo}/pulls/comments/104"),
             &[],
             204,
             Value::Null,
         )
         .await;
     let input = DeletePullRequestReviewComment {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         comment_id: 104,
     };
 
     let deleted = generate_github(&server)
-        .delete_pull_request_review_comment(&http(), "token", &input)
+        .delete_pull_request_review_comment(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -735,20 +777,28 @@ async fn deletes_a_comment_on_the_diff_and_acknowledges_it() {
 #[tokio::test]
 async fn reads_a_pull_request_by_number() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let mut pull = generate_github_pull_request(111, 9);
     pull["merged"] = json!(true);
     pull["draft"] = json!(true);
     MockGithubNetwork::on(&server)
-        .answer("GET", "/repos/octo/hello/pulls/9", &[], 200, pull.clone())
+        .answer(
+            "GET",
+            &format!("/repos/{owner}/{repo}/pulls/9"),
+            &[],
+            200,
+            pull.clone(),
+        )
         .await;
     let input = GetPullRequest {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 9,
     };
 
     let read = generate_github(&server)
-        .get_pull_request(&http(), "token", &input)
+        .get_pull_request(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -764,16 +814,19 @@ async fn reads_a_pull_request_by_number() {
 #[tokio::test]
 async fn opens_a_pull_request_from_one_branch_into_another() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let head = format!("{}:feature", generate_github_login());
     let (title, body): (String, String) = (Sentence(3..6).fake(), Sentence(3..6).fake());
     let mut pull = generate_github_pull_request(121, 10);
     pull["title"] = json!(title);
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/pulls",
+            &format!("/repos/{owner}/{repo}/pulls"),
             json!({
                 "title": title,
-                "head": "octo:feature",
+                "head": head,
                 "base": "main",
                 "body": body,
                 "draft": true,
@@ -784,10 +837,10 @@ async fn opens_a_pull_request_from_one_branch_into_another() {
         )
         .await;
     let input = CreatePullRequest {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         title: title.clone(),
-        head: "octo:feature".into(),
+        head: head.clone(),
         base: "main".into(),
         body: Some(body),
         draft: Some(true),
@@ -795,7 +848,7 @@ async fn opens_a_pull_request_from_one_branch_into_another() {
     };
 
     let created = generate_github(&server)
-        .create_pull_request(&http(), "token", &input)
+        .create_pull_request(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -807,21 +860,23 @@ async fn opens_a_pull_request_from_one_branch_into_another() {
 #[tokio::test]
 async fn changes_only_what_is_given_of_a_pull_request() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let mut pull = generate_github_pull_request(131, 11);
     pull["state"] = json!("closed");
     pull["closed_at"] = json!("2024-01-04T00:00:00Z");
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "PATCH",
-            "/repos/octo/hello/pulls/11",
+            &format!("/repos/{owner}/{repo}/pulls/11"),
             json!({ "state": "closed", "base": "release" }),
             200,
             pull,
         )
         .await;
     let input = UpdatePullRequest {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 11,
         title: None,
         body: None,
@@ -831,7 +886,7 @@ async fn changes_only_what_is_given_of_a_pull_request() {
     };
 
     let updated = generate_github(&server)
-        .update_pull_request(&http(), "token", &input)
+        .update_pull_request(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -848,18 +903,20 @@ async fn sends_the_base_branch_of_a_pull_request_trimmed(
     #[case] expected: Value,
 ) {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "PATCH",
-            "/repos/octo/hello/pulls/11",
+            &format!("/repos/{owner}/{repo}/pulls/11"),
             expected,
             200,
             generate_github_pull_request(131, 11),
         )
         .await;
     let input = UpdatePullRequest {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 11,
         title: None,
         body: None,
@@ -869,7 +926,7 @@ async fn sends_the_base_branch_of_a_pull_request_trimmed(
     };
 
     let updated = generate_github(&server)
-        .update_pull_request(&http(), "token", &input)
+        .update_pull_request(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -882,7 +939,10 @@ async fn sends_the_base_branch_of_a_pull_request_trimmed(
 #[tokio::test]
 async fn brings_a_pull_requests_branch_up_to_date(#[case] expected_head_sha: Option<String>) {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let message: String = Sentence(3..6).fake();
+    let url = format!("https://api.github.com/repos/{owner}/{repo}/pulls/12");
     let expected = match &expected_head_sha {
         Some(sha) => json!({ "expected_head_sha": sha }),
         None => json!({}),
@@ -890,29 +950,26 @@ async fn brings_a_pull_requests_branch_up_to_date(#[case] expected_head_sha: Opt
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "PUT",
-            "/repos/octo/hello/pulls/12/update-branch",
+            &format!("/repos/{owner}/{repo}/pulls/12/update-branch"),
             expected,
             202,
-            json!({ "message": message, "url": "https://api.github.com/repos/octo/hello/pulls/12" }),
+            json!({ "message": message, "url": url }),
         )
         .await;
     let input = UpdatePullRequestBranch {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 12,
         expected_head_sha,
     };
 
     let update = generate_github(&server)
-        .update_pull_request_branch(&http(), "token", &input)
+        .update_pull_request_branch(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
     assert_eq!(update.message, message);
-    assert_eq!(
-        update.url,
-        "https://api.github.com/repos/octo/hello/pulls/12"
-    );
+    assert_eq!(update.url, url);
 }
 
 /// A pull request whose review is requested from `user` and `team`.
@@ -926,26 +983,28 @@ fn pull_request_requesting(user: &Value, team: &Value) -> Value {
 #[tokio::test]
 async fn requests_a_review_from_users_and_teams() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let (user, team) = (generate_github_user(151), generate_github_team(161));
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/pulls/13/requested_reviewers",
+            &format!("/repos/{owner}/{repo}/pulls/13/requested_reviewers"),
             json!({ "reviewers": [user["login"]], "team_reviewers": [team["slug"]] }),
             201,
             pull_request_requesting(&user, &team),
         )
         .await;
     let input = RequestPullRequestReviewers {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 13,
         reviewers: Some(vec![text(&user["login"]).into()]),
         team_reviewers: Some(vec![text(&team["slug"]).into()]),
     };
 
     let requested = generate_github(&server)
-        .request_pull_request_reviewers(&http(), "token", &input)
+        .request_pull_request_reviewers(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -960,26 +1019,28 @@ async fn requests_a_review_from_users_and_teams() {
 #[tokio::test]
 async fn removes_users_from_those_a_review_is_requested_from() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let user = generate_github_user(152);
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "DELETE",
-            "/repos/octo/hello/pulls/13/requested_reviewers",
+            &format!("/repos/{owner}/{repo}/pulls/13/requested_reviewers"),
             json!({ "reviewers": [user["login"]] }),
             200,
             generate_github_pull_request(142, 13),
         )
         .await;
     let input = RemovePullRequestReviewers {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 13,
         reviewers: Some(vec![text(&user["login"]).into()]),
         team_reviewers: None,
     };
 
     let remaining = generate_github(&server)
-        .remove_pull_request_reviewers(&http(), "token", &input)
+        .remove_pull_request_reviewers(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -998,20 +1059,22 @@ async fn merges_a_pull_request_by_the_method_asked(
     #[case] named: &str,
 ) {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let (head, merge) = (generate_sha(), generate_sha());
     let title: String = Sentence(3..6).fake();
     MockPullRequestNetwork::on(&server)
         .answer_body(
             "PUT",
-            "/repos/octo/hello/pulls/14/merge",
+            &format!("/repos/{owner}/{repo}/pulls/14/merge"),
             json!({ "commit_title": title, "sha": head, "merge_method": named }),
             200,
             json!({ "sha": merge, "merged": true, "message": "Pull Request successfully merged" }),
         )
         .await;
     let input = MergePullRequest {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 14,
         commit_title: Some(title),
         commit_message: None,
@@ -1020,7 +1083,7 @@ async fn merges_a_pull_request_by_the_method_asked(
     };
 
     let merged = generate_github(&server)
-        .merge_pull_request(&http(), "token", &input)
+        .merge_pull_request(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -1035,6 +1098,8 @@ async fn merges_a_pull_request_by_the_method_asked(
 #[tokio::test]
 async fn tells_whether_a_pull_request_has_been_merged(#[case] status: u16, #[case] merged: bool) {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let answer = if status == 404 {
         json!({ "message": "Not Found" })
     } else {
@@ -1043,20 +1108,20 @@ async fn tells_whether_a_pull_request_has_been_merged(#[case] status: u16, #[cas
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/pulls/15/merge",
+            &format!("/repos/{owner}/{repo}/pulls/15/merge"),
             &[],
             status,
             answer,
         )
         .await;
     let input = CheckPullRequestMerged {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 15,
     };
 
     let check = generate_github(&server)
-        .check_pull_request_merged(&http(), "token", &input)
+        .check_pull_request_merged(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -1066,23 +1131,25 @@ async fn tells_whether_a_pull_request_has_been_merged(#[case] status: u16, #[cas
 #[tokio::test]
 async fn passes_on_any_other_refusal_of_the_merge_check() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/pulls/15/merge",
+            &format!("/repos/{owner}/{repo}/pulls/15/merge"),
             &[],
             403,
             json!({ "message": "Resource not accessible by integration" }),
         )
         .await;
     let input = CheckPullRequestMerged {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         pull_number: 15,
     };
 
     let refused = generate_github(&server)
-        .check_pull_request_merged(&http(), "token", &input)
+        .check_pull_request_merged(&http(), &generate_github_token(), &input)
         .await;
 
     assert!(matches!(refused, Err(ProviderError::Refused { .. })));
@@ -1109,7 +1176,7 @@ async fn encodes_an_owner_a_repository_and_a_commit_into_one_segment_each() {
     };
 
     let listed = generate_github(&server)
-        .list_pull_requests_associated_with_commit(&http(), "token", &input)
+        .list_pull_requests_associated_with_commit(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -1135,7 +1202,7 @@ async fn encodes_an_owner_and_a_repository_in_a_comment_path() {
     };
 
     let deleted = generate_github(&server)
-        .delete_pull_request_review_comment(&http(), "token", &input)
+        .delete_pull_request_review_comment(&http(), &generate_github_token(), &input)
         .await
         .unwrap();
 

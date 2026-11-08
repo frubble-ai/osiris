@@ -34,7 +34,11 @@ use super::{
 use crate::{
     ProviderError,
     github::mocks::{
-        MockGithubNetwork, generate_github::generate_github,
+        MockGithubNetwork,
+        generate_github::generate_github,
+        generate_github_names::{
+            generate_github_login, generate_github_repo, generate_github_token,
+        },
         generate_github_user::generate_github_user,
     },
 };
@@ -59,6 +63,9 @@ fn text(answer: &Value, field: &str) -> String {
 
 #[tokio::test]
 async fn lists_a_page_of_issues_without_its_pull_requests_and_counts_the_whole_page() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let page = [
         generate_github_issue(11, 1, false),
@@ -68,7 +75,7 @@ async fn lists_a_page_of_issues_without_its_pull_requests_and_counts_the_whole_p
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/issues",
+            &format!("/repos/{owner}/{repo}/issues"),
             &[
                 ("state", "all"),
                 ("labels", "bug,help wanted"),
@@ -83,8 +90,8 @@ async fn lists_a_page_of_issues_without_its_pull_requests_and_counts_the_whole_p
         )
         .await;
     let input = ListRepositoryIssues {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         state: Some("all".into()),
         labels: Some(vec!["bug".into(), "help wanted".into()]),
         sort: Some("updated".into()),
@@ -95,7 +102,7 @@ async fn lists_a_page_of_issues_without_its_pull_requests_and_counts_the_whole_p
     };
 
     let listed = generate_github(&server)
-        .list_repository_issues(&http(), "token", &input)
+        .list_repository_issues(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -108,19 +115,22 @@ async fn lists_a_page_of_issues_without_its_pull_requests_and_counts_the_whole_p
 
 #[tokio::test]
 async fn asks_for_github_s_default_page_size_when_none_is_given() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/issues",
+            &format!("/repos/{owner}/{repo}/issues"),
             &[("per_page", "30")],
             200,
             json!([generate_github_issue(21, 4, true)]),
         )
         .await;
     let input = ListRepositoryIssues {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         state: None,
         labels: None,
         sort: None,
@@ -131,7 +141,7 @@ async fn asks_for_github_s_default_page_size_when_none_is_given() {
     };
 
     let listed = generate_github(&server)
-        .list_repository_issues(&http(), "token", &input)
+        .list_repository_issues(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -141,18 +151,21 @@ async fn asks_for_github_s_default_page_size_when_none_is_given() {
 
 #[tokio::test]
 async fn sends_the_issue_filters_trimmed_and_leaves_out_the_blank_ones() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer_filtered(
-            "/repos/octo/hello/issues",
+            &format!("/repos/{owner}/{repo}/issues"),
             &[("state", "closed"), ("since", "2026-11-01T00:00:00Z")],
             &["sort", "direction"],
             json!([]),
         )
         .await;
     let input = ListRepositoryIssues {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         state: Some("  closed ".into()),
         labels: None,
         sort: Some("   ".into()),
@@ -163,7 +176,7 @@ async fn sends_the_issue_filters_trimmed_and_leaves_out_the_blank_ones() {
     };
 
     let listed = generate_github(&server)
-        .list_repository_issues(&http(), "token", &input)
+        .list_repository_issues(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -172,21 +185,24 @@ async fn sends_the_issue_filters_trimmed_and_leaves_out_the_blank_ones() {
 
 #[tokio::test]
 async fn creates_an_issue_with_only_the_fields_given() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_issue(31, 7, false);
     let title = word();
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/issues",
+            &format!("/repos/{owner}/{repo}/issues"),
             json!({ "title": title, "labels": ["bug"], "milestone": 2 }),
             201,
             Some(answer.clone()),
         )
         .await;
     let input = CreateIssue {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         title,
         body: None,
         assignees: None,
@@ -195,7 +211,7 @@ async fn creates_an_issue_with_only_the_fields_given() {
     };
 
     let issue = generate_github(&server)
-        .create_issue(&http(), "token", &input)
+        .create_issue(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -217,6 +233,7 @@ async fn reads_an_issue_with_its_owner_and_repo_encoded(
     #[case] repo: &str,
     #[case] route: &str,
 ) {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_issue(41, 9, false);
     MockGithubNetwork::on(&server)
@@ -229,7 +246,7 @@ async fn reads_an_issue_with_its_owner_and_repo_encoded(
     };
 
     let issue = generate_github(&server)
-        .get_issue(&http(), "token", &input)
+        .get_issue(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -240,24 +257,27 @@ async fn reads_an_issue_with_its_owner_and_repo_encoded(
 
 #[tokio::test]
 async fn reads_a_pull_request_answered_as_an_issue_as_one() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/issues/5",
+            &format!("/repos/{owner}/{repo}/issues/5"),
             &[],
             200,
             generate_github_issue(42, 5, true),
         )
         .await;
     let input = GetIssue {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 5,
     };
 
     let issue = generate_github(&server)
-        .get_issue(&http(), "token", &input)
+        .get_issue(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -266,19 +286,22 @@ async fn reads_a_pull_request_answered_as_an_issue_as_one() {
 
 #[tokio::test]
 async fn updates_an_issue_with_only_the_fields_given() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "PATCH",
-            "/repos/octo/hello/issues/3",
+            &format!("/repos/{owner}/{repo}/issues/3"),
             json!({ "state": "closed", "assignees": ["alice", "bob"] }),
             200,
             Some(generate_github_issue(51, 3, false)),
         )
         .await;
     let input = UpdateIssue {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 3,
         title: None,
         body: None,
@@ -289,7 +312,7 @@ async fn updates_an_issue_with_only_the_fields_given() {
     };
 
     let issue = generate_github(&server)
-        .update_issue(&http(), "token", &input)
+        .update_issue(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -300,26 +323,29 @@ async fn updates_an_issue_with_only_the_fields_given() {
 
 #[tokio::test]
 async fn lists_a_page_of_a_repository_s_labels() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let labels = [generate_github_label(61), generate_github_label(62)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/labels",
+            &format!("/repos/{owner}/{repo}/labels"),
             &[("per_page", "2"), ("page", "1")],
             200,
             json!(labels),
         )
         .await;
     let input = ListRepositoryLabels {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         per_page: Some(2),
         page: Some(1),
     };
 
     let listed = generate_github(&server)
-        .list_repository_labels(&http(), "token", &input)
+        .list_repository_labels(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -331,27 +357,30 @@ async fn lists_a_page_of_a_repository_s_labels() {
 
 #[tokio::test]
 async fn creates_a_label() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_label(71);
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/labels",
+            &format!("/repos/{owner}/{repo}/labels"),
             json!({ "name": "bug", "color": "d73a4a", "description": "Broken" }),
             201,
             Some(answer.clone()),
         )
         .await;
     let input = CreateLabel {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         name: "bug".into(),
         color: "d73a4a".into(),
         description: Some("Broken".into()),
     };
 
     let label = generate_github(&server)
-        .create_label(&http(), "token", &input)
+        .create_label(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -361,26 +390,29 @@ async fn creates_a_label() {
 
 #[tokio::test]
 async fn lists_a_page_of_an_issue_s_labels() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/issues/4/labels",
+            &format!("/repos/{owner}/{repo}/issues/4/labels"),
             &[("per_page", "10")],
             200,
             json!([generate_github_label(81)]),
         )
         .await;
     let input = ListIssueLabels {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 4,
         per_page: Some(10),
         page: None,
     };
 
     let listed = generate_github(&server)
-        .list_issue_labels(&http(), "token", &input)
+        .list_issue_labels(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -389,11 +421,14 @@ async fn lists_a_page_of_an_issue_s_labels() {
 
 #[tokio::test]
 async fn adds_labels_to_an_issue_and_answers_every_label_it_has() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/issues/4/labels",
+            &format!("/repos/{owner}/{repo}/issues/4/labels"),
             json!({ "labels": ["bug", "urgent"] }),
             200,
             Some(json!([
@@ -404,14 +439,14 @@ async fn adds_labels_to_an_issue_and_answers_every_label_it_has() {
         )
         .await;
     let input = AddIssueLabels {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 4,
         labels: vec!["bug".into(), "urgent".into()],
     };
 
     let labels = generate_github(&server)
-        .add_issue_labels(&http(), "token", &input)
+        .add_issue_labels(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -424,25 +459,28 @@ async fn adds_labels_to_an_issue_and_answers_every_label_it_has() {
 #[case::no_label(Vec::new())]
 #[tokio::test]
 async fn replaces_an_issue_s_labels(#[case] labels: Vec<String>) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "PUT",
-            "/repos/octo/hello/issues/4/labels",
+            &format!("/repos/{owner}/{repo}/issues/4/labels"),
             json!({ "labels": labels }),
             200,
             Some(json!([generate_github_label(101)])),
         )
         .await;
     let input = SetIssueLabels {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 4,
         labels,
     };
 
     let set = generate_github(&server)
-        .set_issue_labels(&http(), "token", &input)
+        .set_issue_labels(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -451,25 +489,28 @@ async fn replaces_an_issue_s_labels(#[case] labels: Vec<String>) {
 
 #[tokio::test]
 async fn removes_one_label_named_with_a_space_from_an_issue() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "DELETE",
-            "/repos/octo/hello/issues/4/labels/help%20wanted",
+            &format!("/repos/{owner}/{repo}/issues/4/labels/help%20wanted"),
             &[],
             200,
             json!([generate_github_label(111)]),
         )
         .await;
     let input = RemoveIssueLabel {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 4,
         label: "help wanted".into(),
     };
 
     let kept = generate_github(&server)
-        .remove_issue_label(&http(), "token", &input)
+        .remove_issue_label(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -478,18 +519,25 @@ async fn removes_one_label_named_with_a_space_from_an_issue() {
 
 #[tokio::test]
 async fn clears_an_issue_s_labels() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
-        .answer_empty("DELETE", "/repos/octo/hello/issues/4/labels", 204)
+        .answer_empty(
+            "DELETE",
+            &format!("/repos/{owner}/{repo}/issues/4/labels"),
+            204,
+        )
         .await;
     let input = ClearIssueLabels {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 4,
     };
 
     let done = generate_github(&server)
-        .clear_issue_labels(&http(), "token", &input)
+        .clear_issue_labels(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -498,25 +546,28 @@ async fn clears_an_issue_s_labels() {
 
 #[tokio::test]
 async fn reads_a_label_by_a_name_with_reserved_characters() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_label(121);
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/labels/type%3A%20bug%2Fcrash",
+            &format!("/repos/{owner}/{repo}/labels/type%3A%20bug%2Fcrash"),
             &[],
             200,
             answer.clone(),
         )
         .await;
     let input = GetLabel {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         name: "type: bug/crash".into(),
     };
 
     let label = generate_github(&server)
-        .get_label(&http(), "token", &input)
+        .get_label(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -526,19 +577,22 @@ async fn reads_a_label_by_a_name_with_reserved_characters() {
 
 #[tokio::test]
 async fn updates_a_label_with_only_the_fields_given() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "PATCH",
-            "/repos/octo/hello/labels/bug",
+            &format!("/repos/{owner}/{repo}/labels/bug"),
             json!({ "new_name": "defect", "color": "A1b2C3" }),
             200,
             Some(generate_github_label(131)),
         )
         .await;
     let input = UpdateLabel {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         name: "bug".into(),
         new_name: Some("defect".into()),
         color: Some("A1b2C3".into()),
@@ -546,7 +600,7 @@ async fn updates_a_label_with_only_the_fields_given() {
     };
 
     let label = generate_github(&server)
-        .update_label(&http(), "token", &input)
+        .update_label(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -561,11 +615,14 @@ async fn updates_a_label_with_only_the_fields_given() {
 async fn refuses_a_label_color_that_is_not_six_hex_digits_without_asking_github(
     #[case] color: &str,
 ) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server).expect_nothing().await;
     let input = UpdateLabel {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         name: "bug".into(),
         new_name: None,
         color: Some(color.into()),
@@ -573,7 +630,7 @@ async fn refuses_a_label_color_that_is_not_six_hex_digits_without_asking_github(
     };
 
     let error = generate_github(&server)
-        .update_label(&http(), "token", &input)
+        .update_label(&http(), &token, &input)
         .await
         .unwrap_err();
 
@@ -582,18 +639,25 @@ async fn refuses_a_label_color_that_is_not_six_hex_digits_without_asking_github(
 
 #[tokio::test]
 async fn deletes_a_label() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
-        .answer_empty("DELETE", "/repos/octo/hello/labels/won%27t%20fix", 204)
+        .answer_empty(
+            "DELETE",
+            &format!("/repos/{owner}/{repo}/labels/won%27t%20fix"),
+            204,
+        )
         .await;
     let input = DeleteLabel {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         name: "won't fix".into(),
     };
 
     let done = generate_github(&server)
-        .delete_label(&http(), "token", &input)
+        .delete_label(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -604,25 +668,28 @@ async fn deletes_a_label() {
 
 #[tokio::test]
 async fn assigns_people_to_an_issue() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/issues/6/assignees",
+            &format!("/repos/{owner}/{repo}/issues/6/assignees"),
             json!({ "assignees": ["alice"] }),
             201,
             Some(generate_github_issue(141, 6, false)),
         )
         .await;
     let input = AddIssueAssignees {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 6,
         assignees: vec!["alice".into()],
     };
 
     let issue = generate_github(&server)
-        .add_issue_assignees(&http(), "token", &input)
+        .add_issue_assignees(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -632,25 +699,28 @@ async fn assigns_people_to_an_issue() {
 
 #[tokio::test]
 async fn unassigns_people_from_an_issue() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "DELETE",
-            "/repos/octo/hello/issues/6/assignees",
+            &format!("/repos/{owner}/{repo}/issues/6/assignees"),
             json!({ "assignees": ["alice", "bob"] }),
             200,
             Some(generate_github_issue(151, 6, false)),
         )
         .await;
     let input = RemoveIssueAssignees {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 6,
         assignees: vec!["alice".into(), "bob".into()],
     };
 
     let issue = generate_github(&server)
-        .remove_issue_assignees(&http(), "token", &input)
+        .remove_issue_assignees(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -659,26 +729,29 @@ async fn unassigns_people_from_an_issue() {
 
 #[tokio::test]
 async fn lists_a_page_of_the_people_issues_can_be_assigned_to() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let people = [generate_github_user(161), generate_github_user(162)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/assignees",
+            &format!("/repos/{owner}/{repo}/assignees"),
             &[("page", "2")],
             200,
             json!(people),
         )
         .await;
     let input = ListAssignees {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         per_page: None,
         page: Some(2),
     };
 
     let listed = generate_github(&server)
-        .list_assignees(&http(), "token", &input)
+        .list_assignees(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -695,19 +768,28 @@ async fn lists_a_page_of_the_people_issues_can_be_assigned_to() {
 #[case::without_a_reason(None, json!({}))]
 #[tokio::test]
 async fn locks_an_issue_s_conversation(#[case] reason: Option<&str>, #[case] sent: Value) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
-        .answer_body("PUT", "/repos/octo/hello/issues/8/lock", sent, 204, None)
+        .answer_body(
+            "PUT",
+            &format!("/repos/{owner}/{repo}/issues/8/lock"),
+            sent,
+            204,
+            None,
+        )
         .await;
     let input = LockIssue {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 8,
         lock_reason: reason.map(str::to_owned),
     };
 
     let lock = generate_github(&server)
-        .lock_issue(&http(), "token", &input)
+        .lock_issue(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -716,18 +798,25 @@ async fn locks_an_issue_s_conversation(#[case] reason: Option<&str>, #[case] sen
 
 #[tokio::test]
 async fn unlocks_an_issue_s_conversation() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
-        .answer_empty("DELETE", "/repos/octo/hello/issues/8/lock", 204)
+        .answer_empty(
+            "DELETE",
+            &format!("/repos/{owner}/{repo}/issues/8/lock"),
+            204,
+        )
         .await;
     let input = UnlockIssue {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 8,
     };
 
     let lock = generate_github(&server)
-        .unlock_issue(&http(), "token", &input)
+        .unlock_issue(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -738,27 +827,30 @@ async fn unlocks_an_issue_s_conversation() {
 
 #[tokio::test]
 async fn lists_a_page_of_an_issue_s_comments() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let comments = [generate_github_issue_comment(171)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/issues/2/comments",
+            &format!("/repos/{owner}/{repo}/issues/2/comments"),
             &[("per_page", "5"), ("page", "3")],
             200,
             json!(comments),
         )
         .await;
     let input = ListIssueComments {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 2,
         per_page: Some(5),
         page: Some(3),
     };
 
     let listed = generate_github(&server)
-        .list_issue_comments(&http(), "token", &input)
+        .list_issue_comments(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -770,26 +862,29 @@ async fn lists_a_page_of_an_issue_s_comments() {
 
 #[tokio::test]
 async fn comments_on_an_issue() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let body = word();
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/issues/2/comments",
+            &format!("/repos/{owner}/{repo}/issues/2/comments"),
             json!({ "body": body }),
             201,
             Some(generate_github_issue_comment(181)),
         )
         .await;
     let input = CreateIssueComment {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 2,
         body,
     };
 
     let comment = generate_github(&server)
-        .create_issue_comment(&http(), "token", &input)
+        .create_issue_comment(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -798,25 +893,28 @@ async fn comments_on_an_issue() {
 
 #[tokio::test]
 async fn reads_a_comment_on_an_issue_by_id() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_issue_comment(191);
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/issues/comments/191",
+            &format!("/repos/{owner}/{repo}/issues/comments/191"),
             &[],
             200,
             answer.clone(),
         )
         .await;
     let input = GetIssueComment {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         comment_id: 191,
     };
 
     let comment = generate_github(&server)
-        .get_issue_comment(&http(), "token", &input)
+        .get_issue_comment(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -826,26 +924,29 @@ async fn reads_a_comment_on_an_issue_by_id() {
 
 #[tokio::test]
 async fn replaces_a_comment_s_text() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let body = word();
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "PATCH",
-            "/repos/octo/hello/issues/comments/201",
+            &format!("/repos/{owner}/{repo}/issues/comments/201"),
             json!({ "body": body }),
             200,
             Some(generate_github_issue_comment(201)),
         )
         .await;
     let input = UpdateIssueComment {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         comment_id: 201,
         body,
     };
 
     let comment = generate_github(&server)
-        .update_issue_comment(&http(), "token", &input)
+        .update_issue_comment(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -854,18 +955,25 @@ async fn replaces_a_comment_s_text() {
 
 #[tokio::test]
 async fn deletes_a_comment_on_an_issue() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
-        .answer_empty("DELETE", "/repos/octo/hello/issues/comments/211", 204)
+        .answer_empty(
+            "DELETE",
+            &format!("/repos/{owner}/{repo}/issues/comments/211"),
+            204,
+        )
         .await;
     let input = DeleteIssueComment {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         comment_id: 211,
     };
 
     let done = generate_github(&server)
-        .delete_issue_comment(&http(), "token", &input)
+        .delete_issue_comment(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -876,27 +984,30 @@ async fn deletes_a_comment_on_an_issue() {
 
 #[tokio::test]
 async fn lists_an_issue_s_timeline_including_entries_with_no_id_of_their_own() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let commit = generate_github_timeline_commit();
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/issues/2/timeline",
+            &format!("/repos/{owner}/{repo}/issues/2/timeline"),
             &[("per_page", "2")],
             200,
             json!([generate_github_timeline_comment(221), commit]),
         )
         .await;
     let input = ListIssueTimelineEvents {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 2,
         per_page: Some(2),
         page: None,
     };
 
     let timeline = generate_github(&server)
-        .list_issue_timeline_events(&http(), "token", &input)
+        .list_issue_timeline_events(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -911,27 +1022,30 @@ async fn lists_an_issue_s_timeline_including_entries_with_no_id_of_their_own() {
 
 #[tokio::test]
 async fn lists_a_page_of_what_happened_to_an_issue() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let events = [generate_github_issue_event(231, "labeled")];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/issues/2/events",
+            &format!("/repos/{owner}/{repo}/issues/2/events"),
             &[("page", "4")],
             200,
             json!(events),
         )
         .await;
     let input = ListIssueEvents {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 2,
         per_page: None,
         page: Some(4),
     };
 
     let listed = generate_github(&server)
-        .list_issue_events(&http(), "token", &input)
+        .list_issue_events(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -946,11 +1060,14 @@ async fn lists_a_page_of_what_happened_to_an_issue() {
 
 #[tokio::test]
 async fn lists_a_page_of_what_happened_to_a_repository_s_issues() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/issues/events",
+            &format!("/repos/{owner}/{repo}/issues/events"),
             &[("per_page", "50")],
             200,
             json!([
@@ -960,14 +1077,14 @@ async fn lists_a_page_of_what_happened_to_a_repository_s_issues() {
         )
         .await;
     let input = ListRepositoryIssueEvents {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         per_page: Some(50),
         page: None,
     };
 
     let listed = generate_github(&server)
-        .list_repository_issue_events(&http(), "token", &input)
+        .list_repository_issue_events(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -980,12 +1097,15 @@ async fn lists_a_page_of_what_happened_to_a_repository_s_issues() {
 
 #[tokio::test]
 async fn lists_a_page_of_milestones_filtered_and_sorted() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let milestones = [generate_github_milestone(251, 1)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/milestones",
+            &format!("/repos/{owner}/{repo}/milestones"),
             &[
                 ("state", "closed"),
                 ("sort", "completeness"),
@@ -998,8 +1118,8 @@ async fn lists_a_page_of_milestones_filtered_and_sorted() {
         )
         .await;
     let input = ListMilestones {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         state: Some("closed".into()),
         sort: Some("completeness".into()),
         direction: Some("desc".into()),
@@ -1008,7 +1128,7 @@ async fn lists_a_page_of_milestones_filtered_and_sorted() {
     };
 
     let listed = generate_github(&server)
-        .list_milestones(&http(), "token", &input)
+        .list_milestones(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1022,25 +1142,28 @@ async fn lists_a_page_of_milestones_filtered_and_sorted() {
 
 #[tokio::test]
 async fn reads_a_milestone_by_number() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_milestone(261, 3);
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/milestones/3",
+            &format!("/repos/{owner}/{repo}/milestones/3"),
             &[],
             200,
             answer.clone(),
         )
         .await;
     let input = GetMilestone {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         milestone_number: 3,
     };
 
     let milestone = generate_github(&server)
-        .get_milestone(&http(), "token", &input)
+        .get_milestone(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1051,20 +1174,23 @@ async fn reads_a_milestone_by_number() {
 
 #[tokio::test]
 async fn creates_a_milestone_with_only_the_fields_given() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let title = word();
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/milestones",
+            &format!("/repos/{owner}/{repo}/milestones"),
             json!({ "title": title, "due_on": "2026-12-31T00:00:00Z" }),
             201,
             Some(generate_github_milestone(271, 4)),
         )
         .await;
     let input = CreateMilestone {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         title,
         state: None,
         description: None,
@@ -1072,7 +1198,7 @@ async fn creates_a_milestone_with_only_the_fields_given() {
     };
 
     let milestone = generate_github(&server)
-        .create_milestone(&http(), "token", &input)
+        .create_milestone(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1081,20 +1207,23 @@ async fn creates_a_milestone_with_only_the_fields_given() {
 
 #[tokio::test]
 async fn creates_a_milestone_with_its_state_trimmed_and_a_blank_due_date_left_out() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let title = word();
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/milestones",
+            &format!("/repos/{owner}/{repo}/milestones"),
             json!({ "title": title, "state": "closed", "description": "  kept as given  " }),
             201,
             Some(generate_github_milestone(272, 4)),
         )
         .await;
     let input = CreateMilestone {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         title,
         state: Some(" closed ".into()),
         description: Some("  kept as given  ".into()),
@@ -1102,7 +1231,7 @@ async fn creates_a_milestone_with_its_state_trimmed_and_a_blank_due_date_left_ou
     };
 
     let milestone = generate_github(&server)
-        .create_milestone(&http(), "token", &input)
+        .create_milestone(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1111,19 +1240,22 @@ async fn creates_a_milestone_with_its_state_trimmed_and_a_blank_due_date_left_ou
 
 #[tokio::test]
 async fn updates_a_milestone_with_only_the_fields_given() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "PATCH",
-            "/repos/octo/hello/milestones/4",
+            &format!("/repos/{owner}/{repo}/milestones/4"),
             json!({ "state": "closed", "description": "Shipped" }),
             200,
             Some(generate_github_milestone(281, 4)),
         )
         .await;
     let input = UpdateMilestone {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         milestone_number: 4,
         title: None,
         state: Some("closed".into()),
@@ -1132,7 +1264,7 @@ async fn updates_a_milestone_with_only_the_fields_given() {
     };
 
     let milestone = generate_github(&server)
-        .update_milestone(&http(), "token", &input)
+        .update_milestone(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1141,18 +1273,25 @@ async fn updates_a_milestone_with_only_the_fields_given() {
 
 #[tokio::test]
 async fn deletes_a_milestone() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
-        .answer_empty("DELETE", "/repos/octo/hello/milestones/4", 204)
+        .answer_empty(
+            "DELETE",
+            &format!("/repos/{owner}/{repo}/milestones/4"),
+            204,
+        )
         .await;
     let input = DeleteMilestone {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         milestone_number: 4,
     };
 
     let done = generate_github(&server)
-        .delete_milestone(&http(), "token", &input)
+        .delete_milestone(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1163,25 +1302,28 @@ async fn deletes_a_milestone() {
 
 #[tokio::test]
 async fn reacts_to_an_issue() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/issues/2/reactions",
+            &format!("/repos/{owner}/{repo}/issues/2/reactions"),
             json!({ "content": "+1" }),
             201,
             Some(generate_github_reaction(291, "+1")),
         )
         .await;
     let input = CreateIssueReaction {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         issue_number: 2,
         content: "+1".into(),
     };
 
     let reaction = generate_github(&server)
-        .create_issue_reaction(&http(), "token", &input)
+        .create_issue_reaction(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1192,25 +1334,28 @@ async fn reacts_to_an_issue() {
 
 #[tokio::test]
 async fn reacts_to_a_comment_on_an_issue() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubIssuesNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/issues/comments/301/reactions",
+            &format!("/repos/{owner}/{repo}/issues/comments/301/reactions"),
             json!({ "content": "rocket" }),
             201,
             Some(generate_github_reaction(302, "rocket")),
         )
         .await;
     let input = CreateIssueCommentReaction {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         comment_id: 301,
         content: "rocket".into(),
     };
 
     let reaction = generate_github(&server)
-        .create_issue_comment_reaction(&http(), "token", &input)
+        .create_issue_comment_reaction(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1222,7 +1367,11 @@ async fn reacts_to_a_comment_on_an_issue() {
 
 #[tokio::test]
 async fn searches_issues_and_pull_requests_with_the_filters_as_qualifiers() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
+    let query = format!("crash repo:{owner}/{repo} state:open label:\"help wanted\"");
     let items = [
         generate_github_search_issue(311, 1, false),
         generate_github_search_issue(312, 2, true),
@@ -1232,10 +1381,7 @@ async fn searches_issues_and_pull_requests_with_the_filters_as_qualifiers() {
             "GET",
             "/search/issues",
             &[
-                (
-                    "q",
-                    "crash repo:octo/hello state:open label:\"help wanted\"",
-                ),
+                ("q", query.as_str()),
                 ("sort", "comments"),
                 ("order", "asc"),
                 ("per_page", "2"),
@@ -1247,8 +1393,8 @@ async fn searches_issues_and_pull_requests_with_the_filters_as_qualifiers() {
         .await;
     let input = SearchIssuesAndPullRequests {
         query: Some("crash".into()),
-        owner: Some("octo".into()),
-        repo: Some("hello".into()),
+        owner: Some(owner.clone()),
+        repo: Some(repo.clone()),
         state: Some("open".into()),
         label: Some("help wanted".into()),
         sort: Some("comments".into()),
@@ -1259,7 +1405,7 @@ async fn searches_issues_and_pull_requests_with_the_filters_as_qualifiers() {
     };
 
     let found = generate_github(&server)
-        .search_issues_and_pull_requests(&http(), "token", &input)
+        .search_issues_and_pull_requests(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1270,7 +1416,7 @@ async fn searches_issues_and_pull_requests_with_the_filters_as_qualifiers() {
     assert_eq!(found.items[0].url, text(&items[0], "html_url"));
     assert_eq!(
         found.items[0].repository_url,
-        "https://api.github.com/repos/octo/hello"
+        text(&items[0], "repository_url")
     );
     assert!(!found.items[0].is_pull_request);
     assert!(found.items[1].is_pull_request);
@@ -1278,13 +1424,14 @@ async fn searches_issues_and_pull_requests_with_the_filters_as_qualifiers() {
 
 #[tokio::test]
 async fn reads_a_search_answer_without_items_as_nothing_found() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer("GET", "/search/issues", &[("q", "")], 200, json!({}))
         .await;
 
     let found = generate_github(&server)
-        .search_issues_and_pull_requests(&http(), "token", &SearchIssuesAndPullRequests::default())
+        .search_issues_and_pull_requests(&http(), &token, &SearchIssuesAndPullRequests::default())
         .await
         .unwrap();
 

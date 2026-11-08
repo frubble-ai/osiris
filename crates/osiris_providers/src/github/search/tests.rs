@@ -19,7 +19,11 @@ use super::{
         generate_github_search_user::generate_github_search_user,
     },
 };
-use crate::github::mocks::{MockGithubNetwork, generate_github::generate_github};
+use crate::github::mocks::{
+    MockGithubNetwork,
+    generate_github::generate_github,
+    generate_github_names::{generate_github_login, generate_github_repo, generate_github_token},
+};
 use rstest::rstest;
 use serde_json::json;
 use wiremock::MockServer;
@@ -29,6 +33,7 @@ use wiremock::MockServer;
 #[case::incomplete(true)]
 #[tokio::test]
 async fn searches_repositories_sorted_as_asked(#[case] incomplete: bool) {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let items = [
         generate_github_search_repository(1),
@@ -59,7 +64,7 @@ async fn searches_repositories_sorted_as_asked(#[case] incomplete: bool) {
     };
 
     let found = generate_github(&server)
-        .search_repositories(&reqwest::Client::new(), "token", &input)
+        .search_repositories(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -80,6 +85,7 @@ async fn searches_repositories_sorted_as_asked(#[case] incomplete: bool) {
 
 #[tokio::test]
 async fn searches_users() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let items = [generate_github_search_user(3)];
     MockGithubNetwork::on(&server)
@@ -100,7 +106,7 @@ async fn searches_users() {
     };
 
     let found = generate_github(&server)
-        .search_users(&reqwest::Client::new(), "token", &input)
+        .search_users(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -111,19 +117,25 @@ async fn searches_users() {
 
 #[tokio::test]
 async fn searches_commits() {
+    let token = generate_github_token();
+    let query = format!(
+        "repo:{}/{} fix",
+        generate_github_login(),
+        generate_github_repo()
+    );
     let server = MockServer::start().await;
     let items = [generate_github_search_commit(4)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
             "/search/commits",
-            &[("q", "repo:octo/hello fix"), ("order", "asc")],
+            &[("q", query.as_str()), ("order", "asc")],
             200,
             generate_github_search_page(&items, false),
         )
         .await;
     let input = SearchCommits {
-        query: "repo:octo/hello fix".into(),
+        query: query.clone(),
         sort: None,
         order: Some("asc".into()),
         per_page: None,
@@ -131,7 +143,7 @@ async fn searches_commits() {
     };
 
     let found = generate_github(&server)
-        .search_commits(&reqwest::Client::new(), "token", &input)
+        .search_commits(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -147,6 +159,7 @@ async fn searches_commits() {
 
 #[tokio::test]
 async fn searches_code() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let items = [generate_github_search_code(5)];
     MockGithubNetwork::on(&server)
@@ -167,7 +180,7 @@ async fn searches_code() {
     };
 
     let found = generate_github(&server)
-        .search_code(&reqwest::Client::new(), "token", &input)
+        .search_code(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -180,6 +193,7 @@ async fn searches_code() {
 
 #[tokio::test]
 async fn searches_the_labels_of_a_repository_by_its_id() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let items = [generate_github_search_label(7)];
     MockGithubNetwork::on(&server)
@@ -205,7 +219,7 @@ async fn searches_the_labels_of_a_repository_by_its_id() {
     };
 
     let found = generate_github(&server)
-        .search_labels(&reqwest::Client::new(), "token", &input)
+        .search_labels(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -216,6 +230,7 @@ async fn searches_the_labels_of_a_repository_by_its_id() {
 
 #[tokio::test]
 async fn searches_topics() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let items = [generate_github_search_topic(true)];
     MockGithubNetwork::on(&server)
@@ -234,7 +249,7 @@ async fn searches_topics() {
     };
 
     let found = generate_github(&server)
-        .search_topics(&reqwest::Client::new(), "token", &input)
+        .search_topics(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -244,6 +259,7 @@ async fn searches_topics() {
 
 #[tokio::test]
 async fn a_search_answer_without_items_reads_as_none_found() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
@@ -261,7 +277,7 @@ async fn a_search_answer_without_items_reads_as_none_found() {
     };
 
     let found = generate_github(&server)
-        .search_topics(&reqwest::Client::new(), "token", &input)
+        .search_topics(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -271,6 +287,7 @@ async fn a_search_answer_without_items_reads_as_none_found() {
 
 #[tokio::test]
 async fn sends_the_sort_trimmed_and_leaves_out_a_blank_order() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer_filtered(
@@ -289,7 +306,7 @@ async fn sends_the_sort_trimmed_and_leaves_out_a_blank_order() {
     };
 
     let found = generate_github(&server)
-        .search_repositories(&reqwest::Client::new(), "token", &input)
+        .search_repositories(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 

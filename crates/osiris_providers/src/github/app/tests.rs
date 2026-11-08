@@ -9,7 +9,8 @@
 
 use super::{AppCredentials, app_jwt::app_jwt};
 use crate::github::mocks::{
-    MockGithubNetwork, generate_github::generate_github, mock_github_app_key::MockGithubAppKey,
+    MockGithubNetwork, generate_github::generate_github,
+    generate_github_names::generate_github_token, mock_github_app_key::MockGithubAppKey,
 };
 use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode};
 use osiris_common::secret::ExposeSecret;
@@ -89,8 +90,9 @@ fn signs_a_jwt_the_app_s_public_key_verifies_issued_by_the_app() {
 #[tokio::test]
 async fn mints_an_installation_token_as_the_app() {
     let server = MockServer::start().await;
+    let token = generate_github_token();
     MockGithubNetwork::on(&server)
-        .answer_installation_token("678", "ghs_installation", 1)
+        .answer_installation_token("678", &token, 1)
         .await;
     let credentials = AppCredentials {
         app_id: "12345".into(),
@@ -102,6 +104,6 @@ async fn mints_an_installation_token_as_the_app() {
         .await
         .unwrap();
 
-    assert_eq!(minted.token.expose_secret(), "ghs_installation");
+    assert_eq!(minted.token.expose_secret(), token);
     assert_eq!(minted.expires_at, "2999-01-01T00:00:00Z");
 }

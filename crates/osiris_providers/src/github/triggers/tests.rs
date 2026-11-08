@@ -18,6 +18,9 @@ use crate::{
         mocks::{
             MockGithubNetwork,
             generate_github::{generate_github, generate_github_with},
+            generate_github_names::{
+                generate_github_login, generate_github_repo, generate_github_token,
+            },
             generate_sha::generate_sha,
         },
         pull_requests::mocks::generate_github_pull_request::generate_github_pull_request,
@@ -45,7 +48,7 @@ fn signed(body: &[u8], secret: &str, event: &str) -> HeaderMap {
 }
 
 fn repo_events(events: &[&str]) -> Value {
-    json!({ "owner": "octo", "repo": "hello", "events": events })
+    json!({ "owner": generate_github_login(), "repo": generate_github_repo(), "events": events })
 }
 
 #[rstest]
@@ -151,7 +154,8 @@ fn fires_on_every_event_for_a_star() {
 
 #[test]
 fn checks_a_watched_pull_request_only_on_its_own_deliveries() {
-    let config = json!({ "owner": "octo", "repo": "hello", "number": 7 });
+    let config =
+        json!({ "owner": generate_github_login(), "repo": generate_github_repo(), "number": 7 });
     let ours = br#"{"number":7,"action":"synchronize"}"#;
     let another = br#"{"number":8,"action":"synchronize"}"#;
 
@@ -177,10 +181,12 @@ fn checks_a_watched_pull_request_only_on_its_own_deliveries() {
 #[tokio::test]
 async fn creates_the_webhook_delivering_to_the_trigger() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer_with_partial_body(
             "POST",
-            "/repos/octo/hello/hooks",
+            &format!("/repos/{owner}/{repo}/hooks"),
             json!({
                 "name": "web",
                 "events": ["push"],
@@ -194,9 +200,9 @@ async fn creates_the_webhook_delivering_to_the_trigger() {
     let id = generate_github(&server)
         .create_hook(
             &reqwest::Client::new(),
-            "token",
-            "octo",
-            "hello",
+            &generate_github_token(),
+            &owner,
+            &repo,
             "https://osiris.test/webhooks/triggers/tr_1",
             SECRET,
             &["push".to_owned()],
@@ -210,11 +216,13 @@ async fn creates_the_webhook_delivering_to_the_trigger() {
 #[tokio::test]
 async fn aligns_the_webhook_github_says_already_exists() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let url = "https://osiris.test/webhooks/triggers/tr_1";
     MockGithubNetwork::on(&server)
         .answer_times(
             "POST",
-            "/repos/octo/hello/hooks",
+            &format!("/repos/{owner}/{repo}/hooks"),
             422,
             json!({ "message": "Hook already exists on this repository" }),
             1,
@@ -223,7 +231,7 @@ async fn aligns_the_webhook_github_says_already_exists() {
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/hooks",
+            &format!("/repos/{owner}/{repo}/hooks"),
             &[("page", "1"), ("per_page", "100")],
             200,
             json!([{ "id": 5, "config": { "url": "https://elsewhere.test" } }, { "id": 6, "config": { "url": url } }]),
@@ -232,7 +240,7 @@ async fn aligns_the_webhook_github_says_already_exists() {
     MockGithubNetwork::on(&server)
         .answer_times(
             "PATCH",
-            "/repos/octo/hello/hooks/6",
+            &format!("/repos/{owner}/{repo}/hooks/6"),
             200,
             json!({ "id": 6 }),
             1,
@@ -242,9 +250,9 @@ async fn aligns_the_webhook_github_says_already_exists() {
     let id = generate_github(&server)
         .create_hook(
             &reqwest::Client::new(),
-            "token",
-            "octo",
-            "hello",
+            &generate_github_token(),
+            &owner,
+            &repo,
             url,
             SECRET,
             &["push".to_owned()],
@@ -264,13 +272,17 @@ fn hooks_elsewhere(first_id: u64, count: u64) -> Value {
     )
 }
 
-async fn create_on(github: &crate::github::Github) -> Result<String, crate::ProviderError> {
+async fn create_on(
+    github: &crate::github::Github,
+    owner: &str,
+    repo: &str,
+) -> Result<String, crate::ProviderError> {
     github
         .create_hook(
             &reqwest::Client::new(),
-            "token",
-            "octo",
-            "hello",
+            &generate_github_token(),
+            owner,
+            repo,
             "https://osiris.test/webhooks/triggers/tr_1",
             SECRET,
             &["push".to_owned()],
@@ -281,11 +293,13 @@ async fn create_on(github: &crate::github::Github) -> Result<String, crate::Prov
 #[tokio::test]
 async fn keeps_github_s_refusal_when_no_webhook_delivers_to_the_trigger() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let network = MockGithubNetwork::on(&server);
     network
         .answer_times(
             "POST",
-            "/repos/octo/hello/hooks",
+            &format!("/repos/{owner}/{repo}/hooks"),
             422,
             json!({ "message": "Validation Failed", "errors": [{ "field": "events" }] }),
             1,
@@ -294,14 +308,16 @@ async fn keeps_github_s_refusal_when_no_webhook_delivers_to_the_trigger() {
     network
         .answer(
             "GET",
-            "/repos/octo/hello/hooks",
+            &format!("/repos/{owner}/{repo}/hooks"),
             &[("page", "1"), ("per_page", "100")],
             200,
             hooks_elsewhere(1, 2),
         )
         .await;
 
-    let refused = create_on(&generate_github(&server)).await.unwrap_err();
+    let refused = create_on(&generate_github(&server), &owner, &repo)
+        .await
+        .unwrap_err();
 
     assert_eq!(refused.status(), Some(422), "{refused}");
     assert!(
@@ -313,11 +329,13 @@ async fn keeps_github_s_refusal_when_no_webhook_delivers_to_the_trigger() {
 #[tokio::test]
 async fn finds_the_existing_webhook_past_a_full_first_page() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let network = MockGithubNetwork::on(&server);
     network
         .answer_times(
             "POST",
-            "/repos/octo/hello/hooks",
+            &format!("/repos/{owner}/{repo}/hooks"),
             422,
             json!({ "message": "Hook already exists on this repository" }),
             1,
@@ -326,7 +344,7 @@ async fn finds_the_existing_webhook_past_a_full_first_page() {
     network
         .answer(
             "GET",
-            "/repos/octo/hello/hooks",
+            &format!("/repos/{owner}/{repo}/hooks"),
             &[("page", "1"), ("per_page", "100")],
             200,
             hooks_elsewhere(1, 100),
@@ -335,7 +353,7 @@ async fn finds_the_existing_webhook_past_a_full_first_page() {
     network
         .answer(
             "GET",
-            "/repos/octo/hello/hooks",
+            &format!("/repos/{owner}/{repo}/hooks"),
             &[("page", "2"), ("per_page", "100")],
             200,
             json!([{ "id": 777, "config": { "url": "https://osiris.test/webhooks/triggers/tr_1" } }]),
@@ -344,14 +362,16 @@ async fn finds_the_existing_webhook_past_a_full_first_page() {
     network
         .answer_times(
             "PATCH",
-            "/repos/octo/hello/hooks/777",
+            &format!("/repos/{owner}/{repo}/hooks/777"),
             200,
             json!({ "id": 777 }),
             1,
         )
         .await;
 
-    let id = create_on(&generate_github(&server)).await.unwrap();
+    let id = create_on(&generate_github(&server), &owner, &repo)
+        .await
+        .unwrap();
 
     assert_eq!(id, "777");
 }
@@ -359,11 +379,13 @@ async fn finds_the_existing_webhook_past_a_full_first_page() {
 #[tokio::test]
 async fn stops_looking_for_the_existing_webhook_at_the_page_cap() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let network = MockGithubNetwork::on(&server);
     network
         .answer_times(
             "POST",
-            "/repos/octo/hello/hooks",
+            &format!("/repos/{owner}/{repo}/hooks"),
             422,
             json!({ "message": "Hook already exists on this repository" }),
             1,
@@ -374,7 +396,7 @@ async fn stops_looking_for_the_existing_webhook_at_the_page_cap() {
         network
             .answer(
                 "GET",
-                "/repos/octo/hello/hooks",
+                &format!("/repos/{owner}/{repo}/hooks"),
                 &[("page", page), ("per_page", "100")],
                 200,
                 hooks_elsewhere(page.parse::<u64>().unwrap() * 1000, 100),
@@ -391,7 +413,7 @@ async fn stops_looking_for_the_existing_webhook_at_the_page_cap() {
         },
     );
 
-    let refused = create_on(&github).await.unwrap_err();
+    let refused = create_on(&github, &owner, &repo).await.unwrap_err();
 
     assert_eq!(refused.status(), Some(422), "{refused}");
 }
@@ -399,14 +421,16 @@ async fn stops_looking_for_the_existing_webhook_at_the_page_cap() {
 #[tokio::test]
 async fn deletes_a_webhook_or_counts_one_already_gone_as_deleted() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let network = MockGithubNetwork::on(&server);
     network
-        .answer_empty("DELETE", "/repos/octo/hello/hooks/6", 204)
+        .answer_empty("DELETE", &format!("/repos/{owner}/{repo}/hooks/6"), 204)
         .await;
     network
         .answer(
             "DELETE",
-            "/repos/octo/hello/hooks/7",
+            &format!("/repos/{owner}/{repo}/hooks/7"),
             &[],
             404,
             json!({ "message": "Not Found" }),
@@ -416,11 +440,11 @@ async fn deletes_a_webhook_or_counts_one_already_gone_as_deleted() {
     let http = reqwest::Client::new();
 
     github
-        .delete_hook(&http, "token", "octo", "hello", "6")
+        .delete_hook(&http, &generate_github_token(), &owner, &repo, "6")
         .await
         .unwrap();
     github
-        .delete_hook(&http, "token", "octo", "hello", "7")
+        .delete_hook(&http, &generate_github_token(), &owner, &repo, "7")
         .await
         .unwrap();
 }
@@ -428,10 +452,12 @@ async fn deletes_a_webhook_or_counts_one_already_gone_as_deleted() {
 #[tokio::test]
 async fn sees_each_change_to_a_watched_pull_request_once() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let mut pull_request = generate_github_pull_request(70, 7);
     let config = WatchPullRequestConfig {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         number: 7,
     };
     let github = generate_github(&server);
@@ -440,7 +466,7 @@ async fn sees_each_change_to_a_watched_pull_request_once() {
     let first_mock = MockGithubNetwork::on(&server)
         .answer_while(
             "GET",
-            "/repos/octo/hello/pulls/7",
+            &format!("/repos/{owner}/{repo}/pulls/7"),
             200,
             pull_request.clone(),
             None,
@@ -448,13 +474,18 @@ async fn sees_each_change_to_a_watched_pull_request_once() {
         .await;
     // The first check records the state, firing nothing.
     let first = github
-        .check_pull_request(&http, "token", &config, None)
+        .check_pull_request(&http, &generate_github_token(), &config, None)
         .await
         .unwrap();
     assert!(first.fired.is_none());
     // The same state again fires nothing.
     let same = github
-        .check_pull_request(&http, "token", &config, Some(&first.checkpoint))
+        .check_pull_request(
+            &http,
+            &generate_github_token(),
+            &config,
+            Some(&first.checkpoint),
+        )
         .await
         .unwrap();
     assert!(same.fired.is_none());
@@ -463,10 +494,21 @@ async fn sees_each_change_to_a_watched_pull_request_once() {
 
     pull_request["head"]["sha"] = json!(generate_sha());
     MockGithubNetwork::on(&server)
-        .answer_times("GET", "/repos/octo/hello/pulls/7", 200, pull_request, 1)
+        .answer_times(
+            "GET",
+            &format!("/repos/{owner}/{repo}/pulls/7"),
+            200,
+            pull_request,
+            1,
+        )
         .await;
     let changed = github
-        .check_pull_request(&http, "token", &config, Some(&first.checkpoint))
+        .check_pull_request(
+            &http,
+            &generate_github_token(),
+            &config,
+            Some(&first.checkpoint),
+        )
         .await
         .unwrap();
 

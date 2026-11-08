@@ -23,7 +23,13 @@ use crate::{
     ListLimits, ProviderError, ProviderUrls,
     github::{
         Github,
-        mocks::{MockGithubNetwork, generate_github::generate_github},
+        mocks::{
+            MockGithubNetwork,
+            generate_github::generate_github,
+            generate_github_names::{
+                generate_github_login, generate_github_repo, generate_github_token,
+            },
+        },
     },
 };
 use fake::{Fake, faker::lorem::en::Paragraph};
@@ -35,25 +41,27 @@ use wiremock::MockServer;
 #[tokio::test]
 async fn lists_a_page_of_the_workflows_of_a_repository() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let workflows = [generate_github_workflow(1), generate_github_workflow(2)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/actions/workflows",
+            &format!("/repos/{owner}/{repo}/actions/workflows"),
             &[("per_page", "2"), ("page", "1")],
             200,
             json!({ "total_count": 2, "workflows": workflows }),
         )
         .await;
     let input = ListRepositoryWorkflows {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         per_page: Some(2),
         page: Some(1),
     };
 
     let listed = generate_github(&server)
-        .list_repository_workflows(&reqwest::Client::new(), "token", &input)
+        .list_repository_workflows(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -70,23 +78,25 @@ async fn lists_a_page_of_the_workflows_of_a_repository() {
 #[tokio::test]
 async fn reads_a_workflow_by_id_or_file_name(#[case] workflow_id: &str, #[case] segment: &str) {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            &format!("/repos/octo/hello/actions/workflows/{segment}"),
+            &format!("/repos/{owner}/{repo}/actions/workflows/{segment}"),
             &[],
             200,
             generate_github_workflow(161_335),
         )
         .await;
     let input = GetWorkflow {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         workflow_id: workflow_id.into(),
     };
 
     let workflow = generate_github(&server)
-        .get_workflow(&reqwest::Client::new(), "token", &input)
+        .get_workflow(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -106,25 +116,27 @@ async fn dispatches_a_workflow_on_a_ref(
     #[case] body: serde_json::Value,
 ) {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubWorkflowsNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/actions/workflows/deploy.yml/dispatches",
+            &format!("/repos/{owner}/{repo}/actions/workflows/deploy.yml/dispatches"),
             body,
             204,
             serde_json::Value::Null,
         )
         .await;
     let input = DispatchWorkflow {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         workflow_id: "deploy.yml".into(),
         git_ref: "main".into(),
         inputs,
     };
 
     let acknowledged = generate_github(&server)
-        .dispatch_workflow(&reqwest::Client::new(), "token", &input)
+        .dispatch_workflow(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -134,23 +146,25 @@ async fn dispatches_a_workflow_on_a_ref(
 #[tokio::test]
 async fn enables_a_workflow() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "PUT",
-            "/repos/octo/hello/actions/workflows/ci.yml/enable",
+            &format!("/repos/{owner}/{repo}/actions/workflows/ci.yml/enable"),
             &[],
             204,
             serde_json::Value::Null,
         )
         .await;
     let input = EnableWorkflow {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         workflow_id: "ci.yml".into(),
     };
 
     let acknowledged = generate_github(&server)
-        .enable_workflow(&reqwest::Client::new(), "token", &input)
+        .enable_workflow(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -160,23 +174,25 @@ async fn enables_a_workflow() {
 #[tokio::test]
 async fn disables_a_workflow() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "PUT",
-            "/repos/octo/hello/actions/workflows/161335/disable",
+            &format!("/repos/{owner}/{repo}/actions/workflows/161335/disable"),
             &[],
             204,
             serde_json::Value::Null,
         )
         .await;
     let input = DisableWorkflow {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         workflow_id: "161335".into(),
     };
 
     let acknowledged = generate_github(&server)
-        .disable_workflow(&reqwest::Client::new(), "token", &input)
+        .disable_workflow(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -186,6 +202,9 @@ async fn disables_a_workflow() {
 #[tokio::test]
 async fn lists_workflow_runs_filtered_as_asked() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let actor = generate_github_login();
     let runs = [
         generate_github_workflow_run(30, 161_335),
         generate_github_workflow_run(29, 161_335),
@@ -193,9 +212,9 @@ async fn lists_workflow_runs_filtered_as_asked() {
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/actions/runs",
+            &format!("/repos/{owner}/{repo}/actions/runs"),
             &[
-                ("actor", "octocat"),
+                ("actor", actor.as_str()),
                 ("branch", "main"),
                 ("created", ">=2024-01-01"),
                 ("check_suite_id", "77"),
@@ -211,9 +230,9 @@ async fn lists_workflow_runs_filtered_as_asked() {
         )
         .await;
     let input = ListWorkflowRuns {
-        owner: "octo".into(),
-        repo: "hello".into(),
-        actor: Some("octocat".into()),
+        owner: owner.clone(),
+        repo: repo.clone(),
+        actor: Some(actor.clone()),
         branch: Some("main".into()),
         created: Some(">=2024-01-01".into()),
         check_suite_id: Some(77),
@@ -226,7 +245,7 @@ async fn lists_workflow_runs_filtered_as_asked() {
     };
 
     let listed = generate_github(&server)
-        .list_workflow_runs(&reqwest::Client::new(), "token", &input)
+        .list_workflow_runs(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -239,18 +258,20 @@ async fn lists_workflow_runs_filtered_as_asked() {
 #[tokio::test]
 async fn leaves_out_a_blank_actor_and_trims_a_padded_branch_of_a_run_list() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/actions/runs",
+            &format!("/repos/{owner}/{repo}/actions/runs"),
             &[("branch", "main")],
             200,
             json!({ "total_count": 0, "workflow_runs": [] }),
         )
         .await;
     let input = ListWorkflowRuns {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         actor: Some("   ".into()),
         branch: Some("  main  ".into()),
         created: None,
@@ -264,7 +285,7 @@ async fn leaves_out_a_blank_actor_and_trims_a_padded_branch_of_a_run_list() {
     };
 
     let listed = generate_github(&server)
-        .list_workflow_runs(&reqwest::Client::new(), "token", &input)
+        .list_workflow_runs(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -281,24 +302,26 @@ async fn leaves_out_a_blank_actor_and_trims_a_padded_branch_of_a_run_list() {
 #[tokio::test]
 async fn reads_a_workflow_run_by_id() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let answer = generate_github_workflow_run(30, 161_335);
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/actions/runs/30",
+            &format!("/repos/{owner}/{repo}/actions/runs/30"),
             &[],
             200,
             answer.clone(),
         )
         .await;
     let input = GetWorkflowRun {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         run_id: 30,
     };
 
     let run = generate_github(&server)
-        .get_workflow_run(&reqwest::Client::new(), "token", &input)
+        .get_workflow_run(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -310,19 +333,21 @@ async fn reads_a_workflow_run_by_id() {
 #[tokio::test]
 async fn lists_the_jobs_of_a_run_with_their_steps() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let jobs = [generate_github_workflow_job(400, 30)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/actions/runs/30/jobs",
+            &format!("/repos/{owner}/{repo}/actions/runs/30/jobs"),
             &[("filter", "all"), ("per_page", "5")],
             200,
             json!({ "total_count": 1, "jobs": jobs }),
         )
         .await;
     let input = ListWorkflowRunJobs {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         run_id: 30,
         filter: Some("all".into()),
         per_page: Some(5),
@@ -330,7 +355,7 @@ async fn lists_the_jobs_of_a_run_with_their_steps() {
     };
 
     let listed = generate_github(&server)
-        .list_workflow_run_jobs(&reqwest::Client::new(), "token", &input)
+        .list_workflow_run_jobs(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -347,23 +372,25 @@ async fn lists_the_jobs_of_a_run_with_their_steps() {
 #[tokio::test]
 async fn reads_the_logs_of_a_job_from_where_github_redirects() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let logs: String = Paragraph(3..6).fake();
     MockGithubWorkflowsNetwork::on(&server)
         .answer_redirect(
-            "/repos/octo/hello/actions/jobs/400/logs",
+            &format!("/repos/{owner}/{repo}/actions/jobs/400/logs"),
             "/storage/logs/400.txt",
             200,
             &logs,
         )
         .await;
     let input = GetWorkflowJobLogs {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         job_id: 400,
     };
 
     let read = generate_github(&server)
-        .get_workflow_job_logs(&reqwest::Client::new(), "token", &input)
+        .get_workflow_job_logs(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -374,10 +401,12 @@ async fn reads_the_logs_of_a_job_from_where_github_redirects() {
 #[tokio::test]
 async fn keeps_only_the_end_of_a_log_longer_than_osiris_answers() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let logs = format!("{}THE-END", "x".repeat(100));
     MockGithubWorkflowsNetwork::on(&server)
         .answer_redirect(
-            "/repos/octo/hello/actions/jobs/400/logs",
+            &format!("/repos/{owner}/{repo}/actions/jobs/400/logs"),
             "/storage/logs/400.txt",
             200,
             &logs,
@@ -398,13 +427,13 @@ async fn keeps_only_the_end_of_a_log_longer_than_osiris_answers() {
     )
     .unwrap();
     let input = GetWorkflowJobLogs {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         job_id: 400,
     };
 
     let read = github
-        .get_workflow_job_logs(&reqwest::Client::new(), "token", &input)
+        .get_workflow_job_logs(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -415,23 +444,25 @@ async fn keeps_only_the_end_of_a_log_longer_than_osiris_answers() {
 #[tokio::test]
 async fn refuses_the_logs_of_a_job_github_no_longer_keeps() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/actions/jobs/400/logs",
+            &format!("/repos/{owner}/{repo}/actions/jobs/400/logs"),
             &[],
             410,
             json!({ "message": "Gone" }),
         )
         .await;
     let input = GetWorkflowJobLogs {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         job_id: 400,
     };
 
     let refused = generate_github(&server)
-        .get_workflow_job_logs(&reqwest::Client::new(), "token", &input)
+        .get_workflow_job_logs(&reqwest::Client::new(), &generate_github_token(), &input)
         .await;
 
     assert!(matches!(refused, Err(ProviderError::Refused { .. })));
@@ -446,24 +477,26 @@ async fn reruns_a_whole_workflow_run(
     #[case] body: serde_json::Value,
 ) {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubWorkflowsNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/actions/runs/30/rerun",
+            &format!("/repos/{owner}/{repo}/actions/runs/30/rerun"),
             body,
             201,
             json!({}),
         )
         .await;
     let input = RerunWorkflow {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         run_id: 30,
         enable_debug_logging,
     };
 
     let acknowledged = generate_github(&server)
-        .rerun_workflow(&reqwest::Client::new(), "token", &input)
+        .rerun_workflow(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -473,24 +506,26 @@ async fn reruns_a_whole_workflow_run(
 #[tokio::test]
 async fn reruns_only_the_failed_jobs_of_a_run() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubWorkflowsNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/actions/runs/30/rerun-failed-jobs",
+            &format!("/repos/{owner}/{repo}/actions/runs/30/rerun-failed-jobs"),
             json!({ "enable_debug_logging": false }),
             201,
             json!({}),
         )
         .await;
     let input = RerunFailedJobs {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         run_id: 30,
         enable_debug_logging: Some(false),
     };
 
     let acknowledged = generate_github(&server)
-        .rerun_failed_jobs(&reqwest::Client::new(), "token", &input)
+        .rerun_failed_jobs(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -500,23 +535,25 @@ async fn reruns_only_the_failed_jobs_of_a_run() {
 #[tokio::test]
 async fn cancels_a_workflow_run() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "POST",
-            "/repos/octo/hello/actions/runs/30/cancel",
+            &format!("/repos/{owner}/{repo}/actions/runs/30/cancel"),
             &[],
             202,
             json!({}),
         )
         .await;
     let input = CancelWorkflowRun {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         run_id: 30,
     };
 
     let acknowledged = generate_github(&server)
-        .cancel_workflow_run(&reqwest::Client::new(), "token", &input)
+        .cancel_workflow_run(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -526,19 +563,21 @@ async fn cancels_a_workflow_run() {
 #[tokio::test]
 async fn lists_the_artifacts_of_a_run_by_name() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let artifacts = [generate_github_artifact(500)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/actions/runs/30/artifacts",
+            &format!("/repos/{owner}/{repo}/actions/runs/30/artifacts"),
             &[("name", "coverage"), ("page", "1")],
             200,
             json!({ "total_count": 1, "artifacts": artifacts }),
         )
         .await;
     let input = ListWorkflowRunArtifacts {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         run_id: 30,
         name: Some("coverage".into()),
         per_page: None,
@@ -546,7 +585,7 @@ async fn lists_the_artifacts_of_a_run_by_name() {
     };
 
     let listed = generate_github(&server)
-        .list_workflow_run_artifacts(&reqwest::Client::new(), "token", &input)
+        .list_workflow_run_artifacts(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -562,22 +601,24 @@ async fn lists_the_artifacts_of_a_run_by_name() {
 #[tokio::test]
 async fn answers_the_signed_url_github_redirects_an_artifact_to() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubWorkflowsNetwork::on(&server)
         .answer_redirect(
-            "/repos/octo/hello/actions/artifacts/500/zip",
+            &format!("/repos/{owner}/{repo}/actions/artifacts/500/zip"),
             "/storage/artifacts/500.zip",
             200,
             "PK",
         )
         .await;
     let input = DownloadWorkflowArtifact {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         artifact_id: 500,
     };
 
     let download = generate_github(&server)
-        .download_workflow_artifact(&reqwest::Client::new(), "token", &input)
+        .download_workflow_artifact(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -590,23 +631,25 @@ async fn answers_the_signed_url_github_redirects_an_artifact_to() {
 #[tokio::test]
 async fn refuses_an_artifact_that_has_expired() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/actions/artifacts/500/zip",
+            &format!("/repos/{owner}/{repo}/actions/artifacts/500/zip"),
             &[],
             410,
             json!({ "message": "Artifact has expired" }),
         )
         .await;
     let input = DownloadWorkflowArtifact {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         artifact_id: 500,
     };
 
     let refused = generate_github(&server)
-        .download_workflow_artifact(&reqwest::Client::new(), "token", &input)
+        .download_workflow_artifact(&reqwest::Client::new(), &generate_github_token(), &input)
         .await;
 
     assert!(matches!(refused, Err(ProviderError::Refused { .. })));

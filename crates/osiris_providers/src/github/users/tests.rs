@@ -12,7 +12,10 @@ use super::{
 };
 use crate::github::{
     mocks::generate_github::generate_github,
-    mocks::{MockGithubNetwork, generate_github_user::generate_github_current_user},
+    mocks::{
+        MockGithubNetwork, generate_github_names::generate_github_token,
+        generate_github_user::generate_github_current_user,
+    },
 };
 use wiremock::MockServer;
 
@@ -25,7 +28,11 @@ async fn reads_the_authenticated_user() {
         .await;
 
     let user = generate_github(&server)
-        .get_current_user(&reqwest::Client::new(), "token", &GetCurrentUser {})
+        .get_current_user(
+            &reqwest::Client::new(),
+            &generate_github_token(),
+            &GetCurrentUser {},
+        )
         .await
         .unwrap();
 
@@ -47,7 +54,7 @@ async fn reads_a_users_public_profile_by_login() {
     };
 
     let user = generate_github(&server)
-        .get_user(&reqwest::Client::new(), "token", &input)
+        .get_user(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 

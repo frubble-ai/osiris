@@ -17,7 +17,13 @@ use super::{
 };
 use crate::{
     ProviderError,
-    github::mocks::{MockGithubNetwork, generate_github::generate_github},
+    github::mocks::{
+        MockGithubNetwork,
+        generate_github::generate_github,
+        generate_github_names::{
+            generate_github_login, generate_github_repo, generate_github_token,
+        },
+    },
 };
 use fake::{Fake, faker::lorem::en::Sentence};
 use rstest::rstest;
@@ -26,6 +32,9 @@ use wiremock::MockServer;
 
 #[tokio::test]
 async fn lists_a_page_of_releases() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let releases = [
         generate_github_release(11, "v2.0.0"),
@@ -34,21 +43,21 @@ async fn lists_a_page_of_releases() {
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/releases",
+            &format!("/repos/{owner}/{repo}/releases"),
             &[("per_page", "2"), ("page", "1")],
             200,
             json!(releases),
         )
         .await;
     let input = ListReleases {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         per_page: Some(2),
         page: Some(1),
     };
 
     let listed = generate_github(&server)
-        .list_releases(&reqwest::Client::new(), "token", &input)
+        .list_releases(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -64,12 +73,15 @@ async fn lists_a_page_of_releases() {
 
 #[tokio::test]
 async fn creates_a_release_sending_only_the_fields_given() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let notes: String = Sentence(3..8).fake();
     MockGithubReleaseRequests::on(&server)
         .answer_with_body(
             "POST",
-            "/repos/octo/hello/releases",
+            &format!("/repos/{owner}/{repo}/releases"),
             json!({
                 "tag_name": "v1.0.0",
                 "body": notes,
@@ -81,8 +93,8 @@ async fn creates_a_release_sending_only_the_fields_given() {
         )
         .await;
     let input = CreateRelease {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         tag_name: "v1.0.0".into(),
         target_commitish: None,
         name: None,
@@ -94,7 +106,7 @@ async fn creates_a_release_sending_only_the_fields_given() {
     };
 
     let release = generate_github(&server)
-        .create_release(&reqwest::Client::new(), "token", &input)
+        .create_release(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -104,11 +116,14 @@ async fn creates_a_release_sending_only_the_fields_given() {
 
 #[tokio::test]
 async fn creates_a_release_with_its_target_trimmed_a_blank_latest_left_out_and_its_name_as_given() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubReleaseRequests::on(&server)
         .answer_with_body(
             "POST",
-            "/repos/octo/hello/releases",
+            &format!("/repos/{owner}/{repo}/releases"),
             json!({
                 "tag_name": "v1.0.0",
                 "target_commitish": "main",
@@ -119,8 +134,8 @@ async fn creates_a_release_with_its_target_trimmed_a_blank_latest_left_out_and_i
         )
         .await;
     let input = CreateRelease {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         tag_name: "v1.0.0".into(),
         target_commitish: Some(" main ".into()),
         name: Some("  Spring  ".into()),
@@ -132,7 +147,7 @@ async fn creates_a_release_with_its_target_trimmed_a_blank_latest_left_out_and_i
     };
 
     let release = generate_github(&server)
-        .create_release(&reqwest::Client::new(), "token", &input)
+        .create_release(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -141,25 +156,28 @@ async fn creates_a_release_with_its_target_trimmed_a_blank_latest_left_out_and_i
 
 #[tokio::test]
 async fn reads_a_release_by_its_id() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_release(13, "v1.2.0");
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/releases/13",
+            &format!("/repos/{owner}/{repo}/releases/13"),
             &[],
             200,
             answer.clone(),
         )
         .await;
     let input = GetRelease {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         release_id: 13,
     };
 
     let release = generate_github(&server)
-        .get_release(&reqwest::Client::new(), "token", &input)
+        .get_release(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -173,23 +191,26 @@ async fn reads_a_release_by_its_id() {
 
 #[tokio::test]
 async fn reads_the_latest_release() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/releases/latest",
+            &format!("/repos/{owner}/{repo}/releases/latest"),
             &[],
             200,
             generate_github_release(14, "v3.0.0"),
         )
         .await;
     let input = GetLatestRelease {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
     };
 
     let release = generate_github(&server)
-        .get_latest_release(&reqwest::Client::new(), "token", &input)
+        .get_latest_release(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -198,25 +219,34 @@ async fn reads_the_latest_release() {
 }
 
 #[rstest]
-#[case::plain("v1.0.0", "/repos/octo/hello/releases/tags/v1.0.0")]
-#[case::with_a_slash("release/1.0", "/repos/octo/hello/releases/tags/release%2F1.0")]
+#[case::plain("v1.0.0", "releases/tags/v1.0.0")]
+#[case::with_a_slash("release/1.0", "releases/tags/release%2F1.0")]
 #[tokio::test]
 async fn reads_a_release_by_its_tag_encoded_into_one_segment(
     #[case] tag: &str,
     #[case] route: &str,
 ) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
-        .answer("GET", route, &[], 200, generate_github_release(15, tag))
+        .answer(
+            "GET",
+            &format!("/repos/{owner}/{repo}/{route}"),
+            &[],
+            200,
+            generate_github_release(15, tag),
+        )
         .await;
     let input = GetReleaseByTag {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         tag: tag.into(),
     };
 
     let release = generate_github(&server)
-        .get_release_by_tag(&reqwest::Client::new(), "token", &input)
+        .get_release_by_tag(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -225,27 +255,30 @@ async fn reads_a_release_by_its_tag_encoded_into_one_segment(
 
 #[tokio::test]
 async fn lists_a_page_of_a_releases_assets() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let assets = [generate_github_release_asset(21)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/releases/16/assets",
+            &format!("/repos/{owner}/{repo}/releases/16/assets"),
             &[("per_page", "50")],
             200,
             json!(assets),
         )
         .await;
     let input = ListReleaseAssets {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         release_id: 16,
         per_page: Some(50),
         page: None,
     };
 
     let listed = generate_github(&server)
-        .list_release_assets(&reqwest::Client::new(), "token", &input)
+        .list_release_assets(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -260,19 +293,22 @@ async fn lists_a_page_of_a_releases_assets() {
 
 #[tokio::test]
 async fn updates_a_release_sending_only_the_fields_given() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubReleaseRequests::on(&server)
         .answer_with_body(
             "PATCH",
-            "/repos/octo/hello/releases/17",
+            &format!("/repos/{owner}/{repo}/releases/17"),
             json!({ "name": "Spring", "draft": false }),
             200,
             generate_github_release(17, "v1.0.0"),
         )
         .await;
     let input = UpdateRelease {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         release_id: 17,
         tag_name: None,
         target_commitish: None,
@@ -284,7 +320,7 @@ async fn updates_a_release_sending_only_the_fields_given() {
     };
 
     let release = generate_github(&server)
-        .update_release(&reqwest::Client::new(), "token", &input)
+        .update_release(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -293,20 +329,23 @@ async fn updates_a_release_sending_only_the_fields_given() {
 
 #[tokio::test]
 async fn generates_release_notes_for_a_tag() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let body: String = Sentence(3..8).fake();
     MockGithubReleaseRequests::on(&server)
         .answer_with_body(
             "POST",
-            "/repos/octo/hello/releases/generate-notes",
+            &format!("/repos/{owner}/{repo}/releases/generate-notes"),
             json!({ "tag_name": "v2.0.0", "previous_tag_name": "v1.0.0" }),
             200,
             json!({ "name": "v2.0.0", "body": body }),
         )
         .await;
     let input = GenerateReleaseNotes {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         tag_name: "v2.0.0".into(),
         target_commitish: None,
         previous_tag_name: Some("v1.0.0".into()),
@@ -314,7 +353,7 @@ async fn generates_release_notes_for_a_tag() {
     };
 
     let notes = generate_github(&server)
-        .generate_release_notes(&reqwest::Client::new(), "token", &input)
+        .generate_release_notes(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -324,25 +363,28 @@ async fn generates_release_notes_for_a_tag() {
 
 #[tokio::test]
 async fn reads_a_release_asset_by_its_id() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_release_asset(22);
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/releases/assets/22",
+            &format!("/repos/{owner}/{repo}/releases/assets/22"),
             &[],
             200,
             answer.clone(),
         )
         .await;
     let input = GetReleaseAsset {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         asset_id: 22,
     };
 
     let asset = generate_github(&server)
-        .get_release_asset(&reqwest::Client::new(), "token", &input)
+        .get_release_asset(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -353,34 +395,43 @@ async fn reads_a_release_asset_by_its_id() {
 }
 
 #[rstest]
-#[case::release("/repos/octo/hello/releases/18", false)]
-#[case::asset("/repos/octo/hello/releases/assets/18", true)]
+#[case::release("releases/18", false)]
+#[case::asset("releases/assets/18", true)]
 #[tokio::test]
 async fn deletes_a_release_or_an_asset_and_acknowledges_it(
     #[case] route: &str,
     #[case] asset: bool,
 ) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
-        .answer("DELETE", route, &[], 204, Value::Null)
+        .answer(
+            "DELETE",
+            &format!("/repos/{owner}/{repo}/{route}"),
+            &[],
+            204,
+            Value::Null,
+        )
         .await;
     let github = generate_github(&server);
     let http = reqwest::Client::new();
 
     let acknowledged = if asset {
         let input = DeleteReleaseAsset {
-            owner: "octo".into(),
-            repo: "hello".into(),
+            owner: owner.clone(),
+            repo: repo.clone(),
             asset_id: 18,
         };
-        github.delete_release_asset(&http, "token", &input).await
+        github.delete_release_asset(&http, &token, &input).await
     } else {
         let input = DeleteRelease {
-            owner: "octo".into(),
-            repo: "hello".into(),
+            owner: owner.clone(),
+            repo: repo.clone(),
             release_id: 18,
         };
-        github.delete_release(&http, "token", &input).await
+        github.delete_release(&http, &token, &input).await
     };
 
     assert!(acknowledged.unwrap().ok);
@@ -388,23 +439,26 @@ async fn deletes_a_release_or_an_asset_and_acknowledges_it(
 
 #[tokio::test]
 async fn a_missing_release_is_a_refusal() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/releases/latest",
+            &format!("/repos/{owner}/{repo}/releases/latest"),
             &[],
             404,
             json!({ "message": "Not Found" }),
         )
         .await;
     let input = GetLatestRelease {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
     };
 
     let error = generate_github(&server)
-        .get_latest_release(&reqwest::Client::new(), "token", &input)
+        .get_latest_release(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap_err();
 

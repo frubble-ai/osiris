@@ -6,7 +6,7 @@
     reason = "tests: a failure here is the test failing"
 )]
 
-use super::support::{HOOK, PULL_REQUEST, answer, answer_hook_creation, create};
+use super::support::{Watched, answer, answer_hook_creation, create};
 use crate::testing::{API_KEY, setup_test_context};
 use axum::http::StatusCode;
 use osiris_providers::github::mocks::MockGithubNetwork;
@@ -17,16 +17,11 @@ use sqlx::PgPool;
 async fn refuses_a_config_the_provider_cannot_watch(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let connection = app.connected_to_github(3600).await;
+    let watched = Watched::generate();
 
     for (trigger, config) in [
-        (
-            "github.on_repo_event",
-            json!({ "owner": "octo", "repo": "hello", "events": ["pushes"] }),
-        ),
-        (
-            "github.watch_pull_request",
-            json!({ "owner": "octo", "repo": "hello", "number": 0 }),
-        ),
+        ("github.on_repo_event", watched.repo_events(&["pushes"])),
+        ("github.watch_pull_request", watched.watch(0)),
         ("github.on_nothing", json!({})),
     ] {
         let refused = create(&app, &connection, trigger, config).await;
@@ -44,25 +39,26 @@ async fn refuses_a_config_the_provider_cannot_watch(pool: PgPool) {
 async fn deletes_the_webhook_again_when_the_first_check_fails(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let connection = app.connected_to_github(3600).await;
-    answer_hook_creation(&app).await;
+    let watched = Watched::generate();
+    answer_hook_creation(&app, &watched).await;
     answer(
         &app,
         "GET",
-        PULL_REQUEST,
+        &watched.pull_request(),
         404,
         json!({ "message": "Not Found" }),
         1,
     )
     .await;
     MockGithubNetwork::on(&app.provider)
-        .answer_empty("DELETE", HOOK, 204)
+        .answer_empty("DELETE", &watched.hook(), 204)
         .await;
 
     let refused = create(
         &app,
         &connection,
         "github.watch_pull_request",
-        json!({ "owner": "octo", "repo": "hello", "number": 7 }),
+        watched.watch(7),
     )
     .await;
 

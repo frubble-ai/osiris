@@ -4,10 +4,10 @@
 //! - On schedule, the next check is scheduled, and the state is written only while the trigger is
 //!   still waiting for this check, so two checks at once never stop its schedule.
 //! - A delivery that asks for a check writes only what it saw and leaves the schedule alone.
-//! - A check the provider refuses for good (the item is gone, the config can't work) fails the
-//!   trigger.
-//! - A connection that can't be used now (disabled, expired, missing a scope) keeps the trigger
-//!   active: it is checked again on schedule, and works again once the connection does.
+//! - A check the provider refuses for good (the item is gone) fails the trigger.
+//! - A connection that can't be used now (disabled, expired, missing a scope, app credentials
+//!   that can't mint its token) keeps the trigger active: it is checked again on schedule, and
+//!   works again once the connection does.
 //! - An outage is tried again.
 
 use crate::use_cases::{
@@ -193,19 +193,19 @@ impl UseCases {
         match checked {
             Ok(answer) => Ok(Checked::Answered(answer)),
             // The provider answered for good: the item is gone or the config can't work.
-            Err(report)
-                if matches!(
-                    report.current_context(),
-                    DomainError::ProviderRefused(_) | DomainError::Invalid(_)
-                ) =>
-            {
+            // Only the provider answering for good fails the trigger.
+            Err(report) if matches!(report.current_context(), DomainError::ProviderRefused(_)) => {
                 tracing::warn!(error = ?report, trigger_id = %trigger.id, "the provider refuses the trigger's check; the trigger fails");
                 Ok(Checked::Refused)
             }
+            // A connection that can't be used now, or credentials that can't mint its token yet
+            // (an auth config the operator can fix), leave the trigger waiting.
             Err(report)
                 if matches!(
                     report.current_context(),
-                    DomainError::NotActive(_) | DomainError::MissingScopes(_)
+                    DomainError::NotActive(_)
+                        | DomainError::MissingScopes(_)
+                        | DomainError::Invalid(_)
                 ) =>
             {
                 tracing::info!(error = ?report, trigger_id = %trigger.id, "the trigger's connection can't be used now");

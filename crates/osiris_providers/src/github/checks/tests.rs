@@ -16,7 +16,13 @@ use super::{
 };
 use crate::{
     ProviderError,
-    github::mocks::{MockGithubNetwork, generate_github::generate_github},
+    github::mocks::{
+        MockGithubNetwork,
+        generate_github::generate_github,
+        generate_github_names::{
+            generate_github_login, generate_github_repo, generate_github_token,
+        },
+    },
 };
 use rstest::rstest;
 use serde_json::json;
@@ -25,19 +31,21 @@ use wiremock::MockServer;
 #[tokio::test]
 async fn sets_a_status_on_a_commit_with_only_the_fields_given() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let answer = generate_github_commit_status(7, "success");
     MockGithubChecksNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/statuses/abc123",
+            &format!("/repos/{owner}/{repo}/statuses/abc123"),
             json!({ "state": "success", "context": "ci/build" }),
             201,
             answer.clone(),
         )
         .await;
     let input = CreateCommitStatus {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         sha: "abc123".into(),
         state: "success".into(),
         context: Some("ci/build".into()),
@@ -46,7 +54,7 @@ async fn sets_a_status_on_a_commit_with_only_the_fields_given() {
     };
 
     let status = generate_github(&server)
-        .create_commit_status(&reqwest::Client::new(), "token", &input)
+        .create_commit_status(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -59,18 +67,20 @@ async fn sets_a_status_on_a_commit_with_only_the_fields_given() {
 #[tokio::test]
 async fn leaves_out_a_blank_link_and_trims_a_padded_context_of_a_status() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubChecksNetwork::on(&server)
         .answer_body(
             "POST",
-            "/repos/octo/hello/statuses/abc123",
+            &format!("/repos/{owner}/{repo}/statuses/abc123"),
             json!({ "state": "success", "context": "ci/build", "description": " Built " }),
             201,
             generate_github_commit_status(7, "success"),
         )
         .await;
     let input = CreateCommitStatus {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         sha: "abc123".into(),
         state: "success".into(),
         context: Some("  ci/build  ".into()),
@@ -79,7 +89,7 @@ async fn leaves_out_a_blank_link_and_trims_a_padded_context_of_a_status() {
     };
 
     let status = generate_github(&server)
-        .create_commit_status(&reqwest::Client::new(), "token", &input)
+        .create_commit_status(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -89,6 +99,8 @@ async fn leaves_out_a_blank_link_and_trims_a_padded_context_of_a_status() {
 #[tokio::test]
 async fn lists_a_page_of_the_statuses_on_a_branch() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let statuses = [
         generate_github_commit_status(2, "failure"),
         generate_github_commit_status(1, "pending"),
@@ -96,22 +108,22 @@ async fn lists_a_page_of_the_statuses_on_a_branch() {
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/commits/feature%2Flogin/statuses",
+            &format!("/repos/{owner}/{repo}/commits/feature%2Flogin/statuses"),
             &[("per_page", "2"), ("page", "1")],
             200,
             json!(statuses),
         )
         .await;
     let input = GetCommitStatuses {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         git_ref: "feature/login".into(),
         per_page: Some(2),
         page: Some(1),
     };
 
     let listed = generate_github(&server)
-        .get_commit_statuses(&reqwest::Client::new(), "token", &input)
+        .get_commit_statuses(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -124,6 +136,8 @@ async fn lists_a_page_of_the_statuses_on_a_branch() {
 #[tokio::test]
 async fn lists_the_check_runs_of_a_ref_filtered_as_asked() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     let runs = [
         generate_github_check_run(11, "success"),
         generate_github_check_run(12, "failure"),
@@ -131,7 +145,7 @@ async fn lists_the_check_runs_of_a_ref_filtered_as_asked() {
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/commits/main/check-runs",
+            &format!("/repos/{owner}/{repo}/commits/main/check-runs"),
             &[
                 ("app_id", "15368"),
                 ("check_name", "build"),
@@ -145,8 +159,8 @@ async fn lists_the_check_runs_of_a_ref_filtered_as_asked() {
         )
         .await;
     let input = ListCheckRunsForRef {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         git_ref: "main".into(),
         app_id: Some(15368),
         check_name: Some("build".into()),
@@ -157,7 +171,7 @@ async fn lists_the_check_runs_of_a_ref_filtered_as_asked() {
     };
 
     let listed = generate_github(&server)
-        .list_check_runs_for_ref(&reqwest::Client::new(), "token", &input)
+        .list_check_runs_for_ref(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -171,18 +185,20 @@ async fn lists_the_check_runs_of_a_ref_filtered_as_asked() {
 #[tokio::test]
 async fn leaves_out_a_blank_check_name_and_trims_a_padded_status() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/commits/main/check-runs",
+            &format!("/repos/{owner}/{repo}/commits/main/check-runs"),
             &[("status", "completed")],
             200,
             json!({ "total_count": 0, "check_runs": [] }),
         )
         .await;
     let input = ListCheckRunsForRef {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         git_ref: "main".into(),
         app_id: None,
         check_name: Some("   ".into()),
@@ -193,7 +209,7 @@ async fn leaves_out_a_blank_check_name_and_trims_a_padded_status() {
     };
 
     let listed = generate_github(&server)
-        .list_check_runs_for_ref(&reqwest::Client::new(), "token", &input)
+        .list_check_runs_for_ref(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -213,23 +229,25 @@ async fn leaves_out_a_blank_check_name_and_trims_a_padded_status() {
 #[tokio::test]
 async fn acknowledges_a_check_run_rerequested(#[case] answer: serde_json::Value) {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "POST",
-            "/repos/octo/hello/check-runs/42/rerequest",
+            &format!("/repos/{owner}/{repo}/check-runs/42/rerequest"),
             &[],
             201,
             answer,
         )
         .await;
     let input = RerequestCheckRun {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         check_run_id: 42,
     };
 
     let acknowledged = generate_github(&server)
-        .rerequest_check_run(&reqwest::Client::new(), "token", &input)
+        .rerequest_check_run(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -239,23 +257,25 @@ async fn acknowledges_a_check_run_rerequested(#[case] answer: serde_json::Value)
 #[tokio::test]
 async fn acknowledges_a_check_suite_rerequested() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "POST",
-            "/repos/octo/hello/check-suites/9/rerequest",
+            &format!("/repos/{owner}/{repo}/check-suites/9/rerequest"),
             &[],
             201,
             json!({}),
         )
         .await;
     let input = RerequestCheckSuite {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         check_suite_id: 9,
     };
 
     let acknowledged = generate_github(&server)
-        .rerequest_check_suite(&reqwest::Client::new(), "token", &input)
+        .rerequest_check_suite(&reqwest::Client::new(), &generate_github_token(), &input)
         .await
         .unwrap();
 
@@ -265,23 +285,25 @@ async fn acknowledges_a_check_suite_rerequested() {
 #[tokio::test]
 async fn refuses_a_check_run_github_will_not_rerequest() {
     let server = MockServer::start().await;
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
     MockGithubNetwork::on(&server)
         .answer(
             "POST",
-            "/repos/octo/hello/check-runs/42/rerequest",
+            &format!("/repos/{owner}/{repo}/check-runs/42/rerequest"),
             &[],
             403,
             json!({ "message": "Resource not accessible by integration" }),
         )
         .await;
     let input = RerequestCheckRun {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         check_run_id: 42,
     };
 
     let refused = generate_github(&server)
-        .rerequest_check_run(&reqwest::Client::new(), "token", &input)
+        .rerequest_check_run(&reqwest::Client::new(), &generate_github_token(), &input)
         .await;
 
     assert!(matches!(refused, Err(ProviderError::Refused { .. })));

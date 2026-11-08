@@ -20,7 +20,7 @@ struct Claims<'a> {
     exp: u64,
 }
 
-/// A JWT for the app, valid from now until nine minutes from now.
+/// A JWT for the app, issued a minute ago (for clock skew) and valid for nine minutes from then.
 pub fn app_jwt(credentials: &AppCredentials) -> Result<String, ProviderError> {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)

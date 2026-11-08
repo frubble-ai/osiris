@@ -9,15 +9,17 @@
 use crate::testing::{API_KEY, setup_test_context};
 use axum::http::StatusCode;
 use osiris_providers::github::mocks::{
-    MockGithubNetwork, generate_github_repository::generate_github_repository,
+    MockGithubNetwork,
+    generate_github_names::{generate_github_login, generate_github_repo, generate_github_token},
+    generate_github_repository::generate_github_repository,
 };
 use serde_json::json;
 use sqlx::PgPool;
 
 fn token_answer(scope: &str) -> serde_json::Value {
     json!({
-        "access_token": "a-token",
-        "refresh_token": "a-refresh-token",
+        "access_token": generate_github_token(),
+        "refresh_token": generate_github_token(),
         "expires_in": 28800,
         "scope": scope,
     })
@@ -26,12 +28,19 @@ fn token_answer(scope: &str) -> serde_json::Value {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn reads_a_repository_with_a_connection_granted_repo(pool: PgPool) {
     let app = setup_test_context(pool).await;
+    let (owner, repo) = (generate_github_login(), generate_github_repo());
     let id = app
         .connected_to_github_with(token_answer("repo,read:user"))
         .await;
     let repository = generate_github_repository(42);
     MockGithubNetwork::on(&app.provider)
-        .answer("GET", "/repos/octo/hello", &[], 200, repository.clone())
+        .answer(
+            "GET",
+            &format!("/repos/{owner}/{repo}"),
+            &[],
+            200,
+            repository.clone(),
+        )
         .await;
 
     let answer = app
@@ -39,7 +48,7 @@ async fn reads_a_repository_with_a_connection_granted_repo(pool: PgPool) {
             "POST",
             &format!("/v1/connected-accounts/{id}/actions/github.get_repository"),
             Some(API_KEY),
-            Some(json!({ "owner": "octo", "repo": "hello" })),
+            Some(json!({ "owner": owner, "repo": repo })),
             &[],
         )
         .await;
@@ -52,6 +61,7 @@ async fn reads_a_repository_with_a_connection_granted_repo(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_an_action_whose_scopes_the_connection_lacks(pool: PgPool) {
     let app = setup_test_context(pool).await;
+    let (owner, repo) = (generate_github_login(), generate_github_repo());
     let id = app
         .connected_to_github_with(token_answer("read:user"))
         .await;
@@ -61,7 +71,7 @@ async fn refuses_an_action_whose_scopes_the_connection_lacks(pool: PgPool) {
             "POST",
             &format!("/v1/connected-accounts/{id}/actions/github.get_repository"),
             Some(API_KEY),
-            Some(json!({ "owner": "octo", "repo": "hello" })),
+            Some(json!({ "owner": owner, "repo": repo })),
             &[],
         )
         .await;
@@ -80,12 +90,13 @@ async fn refuses_an_action_whose_scopes_the_connection_lacks(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn runs_an_action_on_a_github_app_token_with_no_scopes(pool: PgPool) {
     let app = setup_test_context(pool).await;
+    let (owner, repo) = (generate_github_login(), generate_github_repo());
     // A GitHub App's user token carries no scopes; the app's permissions decide instead.
     let id = app.connected_to_github_with(token_answer("")).await;
     MockGithubNetwork::on(&app.provider)
         .answer(
             "GET",
-            "/repos/octo/hello",
+            &format!("/repos/{owner}/{repo}"),
             &[],
             200,
             generate_github_repository(1),
@@ -97,7 +108,7 @@ async fn runs_an_action_on_a_github_app_token_with_no_scopes(pool: PgPool) {
             "POST",
             &format!("/v1/connected-accounts/{id}/actions/github.get_repository"),
             Some(API_KEY),
-            Some(json!({ "owner": "octo", "repo": "hello" })),
+            Some(json!({ "owner": owner, "repo": repo })),
             &[],
         )
         .await;
@@ -108,6 +119,7 @@ async fn runs_an_action_on_a_github_app_token_with_no_scopes(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_an_input_with_a_field_the_action_does_not_take(pool: PgPool) {
     let app = setup_test_context(pool).await;
+    let (owner, repo) = (generate_github_login(), generate_github_repo());
     let id = app.connected_to_github_with(token_answer("repo")).await;
 
     let answer = app
@@ -115,7 +127,7 @@ async fn refuses_an_input_with_a_field_the_action_does_not_take(pool: PgPool) {
             "POST",
             &format!("/v1/connected-accounts/{id}/actions/github.get_repository"),
             Some(API_KEY),
-            Some(json!({ "owner": "octo", "repo": "hello", "nope": true })),
+            Some(json!({ "owner": owner, "repo": repo, "nope": true })),
             &[],
         )
         .await;

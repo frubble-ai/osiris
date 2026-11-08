@@ -1,6 +1,6 @@
-//! What the trigger tests share: GitHub answering a webhook's creation and a watched pull
-//! request, a trigger created and read through the API, a delivery signed as GitHub signs it, and
-//! what was published and scheduled.
+//! What the trigger tests share: the repository a test watches, generated for it, GitHub
+//! answering a webhook's creation and a watched pull request, a trigger created and read through
+//! the API, a delivery signed as GitHub signs it, and what was published and scheduled.
 
 #![allow(
     clippy::unwrap_used,
@@ -13,23 +13,59 @@ use osiris_domain::EventType;
 use osiris_events::catalog::events::EventMessage;
 use osiris_providers::github::{
     mocks::{
-        MockGithubNetwork, generate_github_delivery_signature::generate_github_delivery_signature,
+        MockGithubNetwork,
+        generate_github_delivery_signature::generate_github_delivery_signature,
+        generate_github_names::{generate_github_login, generate_github_repo},
     },
     pull_requests::mocks::generate_github_pull_request::generate_github_pull_request,
 };
 use serde_json::{Value, json};
 
-/// The repository every trigger test watches.
-pub const HOOKS: &str = "/repos/octo/hello/hooks";
-/// The webhook GitHub creates for a trigger.
-pub const HOOK: &str = "/repos/octo/hello/hooks/99";
-/// The pull request a watch looks at.
-pub const PULL_REQUEST: &str = "/repos/octo/hello/pulls/7";
+/// The repository a trigger test watches, generated for the test; GitHub's routes for it are
+/// built from it.
+pub struct Watched {
+    pub owner: String,
+    pub repo: String,
+}
 
-/// Answers GitHub's webhook creation with hook 99, once.
-pub async fn answer_hook_creation(app: &TestContext) {
+impl Watched {
+    pub fn generate() -> Self {
+        Self {
+            owner: generate_github_login(),
+            repo: generate_github_repo(),
+        }
+    }
+
+    /// The repository's webhooks.
+    pub fn hooks(&self) -> String {
+        format!("/repos/{}/{}/hooks", self.owner, self.repo)
+    }
+
+    /// The webhook GitHub creates for a trigger.
+    pub fn hook(&self) -> String {
+        format!("{}/99", self.hooks())
+    }
+
+    /// The pull request a watch looks at.
+    pub fn pull_request(&self) -> String {
+        format!("/repos/{}/{}/pulls/7", self.owner, self.repo)
+    }
+
+    /// A repository-event trigger's config, watching `events`.
+    pub fn repo_events(&self, events: &[&str]) -> Value {
+        json!({ "owner": self.owner, "repo": self.repo, "events": events })
+    }
+
+    /// A pull request watch's config, watching pull request `number`.
+    pub fn watch(&self, number: i64) -> Value {
+        json!({ "owner": self.owner, "repo": self.repo, "number": number })
+    }
+}
+
+/// Answers GitHub's webhook creation on `watched` with hook 99, once.
+pub async fn answer_hook_creation(app: &TestContext, watched: &Watched) {
     MockGithubNetwork::on(&app.provider)
-        .answer_hook_creation("octo", "hello", 99)
+        .answer_hook_creation(&watched.owner, &watched.repo, 99)
         .await;
 }
 
@@ -58,32 +94,45 @@ pub async fn create(app: &TestContext, connection: &str, trigger: &str, config: 
     .await
 }
 
-/// A connection to GitHub with a repository-event trigger on it; answers both ids.
-pub async fn watching_repo_events(app: &TestContext) -> (String, String) {
+/// A connection to GitHub with a repository-event trigger on a generated repository; answers
+/// both ids and the repository.
+pub async fn watching_repo_events(app: &TestContext) -> (String, String, Watched) {
+    let watched = Watched::generate();
     let connection = app.connected_to_github(3600).await;
-    answer_hook_creation(app).await;
+    answer_hook_creation(app, &watched).await;
     let created = create(
         app,
         &connection,
         "github.on_repo_event",
-        json!({ "owner": "octo", "repo": "hello", "events": ["push"] }),
+        watched.repo_events(&["push"]),
     )
     .await;
     assert_eq!(created.status, StatusCode::CREATED, "{}", created.body);
     let id = created.body["id"].as_str().unwrap().to_owned();
-    (connection, id)
+    (connection, id, watched)
 }
 
-/// A connection to GitHub watching pull request 7, whose first check GitHub answered; answers
-/// the connection's id, the trigger's and its pending scheduled check. GitHub's answer to the
-/// pull request is the test's to arrange from here.
-pub async fn watching_a_pull_request(app: &TestContext) -> (String, String, String) {
+/// A connection to GitHub watching pull request 7 of a generated repository, whose first check
+/// GitHub answered; answers the connection's id, the trigger's, its pending scheduled check and
+/// the repository. GitHub's answer to the pull request is the test's to arrange from here.
+pub async fn watching_a_pull_request(app: &TestContext) -> (String, String, String, Watched) {
     let connection = app.connected_to_github(3600).await;
-    answer_hook_creation(app).await;
+    let (id, task, watched) = watch_a_pull_request(app, &connection).await;
+    (connection, id, task, watched)
+}
+
+/// `connection` watching pull request 7 of a generated repository, whose first check GitHub
+/// answered; answers the trigger's id, its pending scheduled check and the repository.
+pub async fn watch_a_pull_request(
+    app: &TestContext,
+    connection: &str,
+) -> (String, String, Watched) {
+    let watched = Watched::generate();
+    answer_hook_creation(app, &watched).await;
     let first_state = MockGithubNetwork::on(&app.provider)
         .answer_while(
             "GET",
-            PULL_REQUEST,
+            &watched.pull_request(),
             200,
             generate_github_pull_request(70, 7),
             None,
@@ -91,16 +140,16 @@ pub async fn watching_a_pull_request(app: &TestContext) -> (String, String, Stri
         .await;
     let created = create(
         app,
-        &connection,
+        connection,
         "github.watch_pull_request",
-        json!({ "owner": "octo", "repo": "hello", "number": 7 }),
+        watched.watch(7),
     )
     .await;
     assert_eq!(created.status, StatusCode::CREATED, "{}", created.body);
     drop(first_state);
     let id = created.body["id"].as_str().unwrap().to_owned();
     let task = pending_check(app, &id);
-    (connection, id, task)
+    (id, task, watched)
 }
 
 /// The trigger, as the API answers it.
@@ -115,12 +164,14 @@ pub async fn get_trigger(app: &TestContext, id: &str) -> Answer {
     .await
 }
 
-/// The secret osiris gave GitHub for the trigger's webhook, from the creation GitHub received.
-pub async fn webhook_secret(app: &TestContext) -> String {
+/// The secret osiris gave GitHub for the trigger's webhook on `watched`, from the creation GitHub
+/// received.
+pub async fn webhook_secret(app: &TestContext, watched: &Watched) -> String {
+    let hooks = watched.hooks();
     let requests = app.provider.received_requests().await.unwrap();
     let creation = requests
         .iter()
-        .find(|request| request.method.as_str() == "POST" && request.url.path() == HOOKS)
+        .find(|request| request.method.as_str() == "POST" && request.url.path() == hooks)
         .expect("the webhook's creation");
     let body: Value = serde_json::from_slice(&creation.body).unwrap();
     body["config"]["secret"].as_str().unwrap().to_owned()

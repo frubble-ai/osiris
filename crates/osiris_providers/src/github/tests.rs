@@ -11,6 +11,7 @@ use super::{
     installations::{ListInstallations, ListRepositories},
     mocks::{
         MockGithubNetwork, generate_github_installation::generate_github_installation,
+        generate_github_names::generate_github_token,
         generate_github_repository::generate_github_repository,
     },
 };
@@ -41,16 +42,17 @@ fn github(server: &MockServer, limits: ListLimits) -> Github {
 #[tokio::test]
 async fn lists_the_installations_the_user_can_see_with_their_token() {
     let server = MockServer::start().await;
+    let token = generate_github_token();
     let installations = [
         generate_github_installation(1, false),
         generate_github_installation(2, true),
     ];
     MockGithubNetwork::on(&server)
-        .answer_installations_for_token("the-token", &installations)
+        .answer_installations_for_token(&token, &installations)
         .await;
 
     let listed = github(&server, LIMITS)
-        .list_installations(&reqwest::Client::new(), "the-token", &ListInstallations {})
+        .list_installations(&reqwest::Client::new(), &token, &ListInstallations {})
         .await
         .unwrap();
 
@@ -77,12 +79,13 @@ async fn passes_values_github_adds_on_instead_of_refusing_the_page(
     let mut installation = generate_github_installation(1, true);
     installation["account"]["type"] = kind.into();
     installation["repository_selection"] = selection.into();
+    let token = generate_github_token();
     MockGithubNetwork::on(&server)
-        .answer_installations_for_token("the-token", &[installation])
+        .answer_installations_for_token(&token, &[installation])
         .await;
 
     let listed = github(&server, LIMITS)
-        .list_installations(&reqwest::Client::new(), "the-token", &ListInstallations {})
+        .list_installations(&reqwest::Client::new(), &token, &ListInstallations {})
         .await
         .unwrap();
 
@@ -124,7 +127,7 @@ async fn lists_every_repository_once_across_installations_and_pages() {
     let repositories = github(&server, LIMITS)
         .list_repositories(
             &reqwest::Client::new(),
-            "token",
+            &generate_github_token(),
             &ListRepositories {},
             ActingAs::User,
         )
@@ -157,7 +160,7 @@ async fn reads_an_installation_s_own_repositories_on_an_installation_connection(
     let repositories = github(&server, LIMITS)
         .list_repositories(
             &reqwest::Client::new(),
-            "token",
+            &generate_github_token(),
             &ListRepositories {},
             ActingAs::Installation,
         )
@@ -192,7 +195,7 @@ async fn stops_reading_repositories_at_the_cap() {
     )
     .list_repositories(
         &reqwest::Client::new(),
-        "token",
+        &generate_github_token(),
         &ListRepositories {},
         ActingAs::User,
     )
@@ -213,7 +216,11 @@ async fn tells_a_rejected_token_from_a_refusal(#[case] status: u16, #[case] reje
         .await;
 
     let error = github(&server, LIMITS)
-        .list_installations(&reqwest::Client::new(), "token", &ListInstallations {})
+        .list_installations(
+            &reqwest::Client::new(),
+            &generate_github_token(),
+            &ListInstallations {},
+        )
         .await
         .unwrap_err();
 
@@ -241,7 +248,11 @@ async fn reads_a_rate_limit_as_a_failure_for_now_not_a_refusal(
         .await;
 
     let error = github(&server, LIMITS)
-        .list_installations(&reqwest::Client::new(), "token", &ListInstallations {})
+        .list_installations(
+            &reqwest::Client::new(),
+            &generate_github_token(),
+            &ListInstallations {},
+        )
         .await
         .unwrap_err();
 
@@ -269,7 +280,7 @@ async fn ends_a_grant_or_counts_one_github_no_longer_has_as_ended(#[case] status
     };
 
     let ended = github(&server, LIMITS)
-        .revoke(&reqwest::Client::new(), &client, "token")
+        .revoke(&reqwest::Client::new(), &client, &generate_github_token())
         .await;
 
     assert!(ended.is_ok());

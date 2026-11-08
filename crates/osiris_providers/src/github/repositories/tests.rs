@@ -39,8 +39,13 @@ use crate::{
     github::{
         mocks::generate_github::generate_github,
         mocks::{
-            MockGithubNetwork, generate_github_branch::generate_github_branch,
-            generate_github_repository::generate_github_repository, generate_sha::generate_sha,
+            MockGithubNetwork,
+            generate_github_branch::generate_github_branch,
+            generate_github_names::{
+                generate_github_login, generate_github_repo, generate_github_token,
+            },
+            generate_github_repository::generate_github_repository,
+            generate_sha::generate_sha,
         },
     },
 };
@@ -56,18 +61,27 @@ fn http() -> reqwest::Client {
 
 #[tokio::test]
 async fn reads_a_repository_by_owner_and_name() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_repository(42);
     MockGithubNetwork::on(&server)
-        .answer("GET", "/repos/octo/hello", &[], 200, answer.clone())
+        .answer(
+            "GET",
+            &format!("/repos/{owner}/{repo}"),
+            &[],
+            200,
+            answer.clone(),
+        )
         .await;
     let input = GetRepository {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
     };
 
     let repository = generate_github(&server)
-        .get_repository(&reqwest::Client::new(), "token", &input)
+        .get_repository(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -82,27 +96,30 @@ async fn reads_a_repository_by_owner_and_name() {
 
 #[tokio::test]
 async fn lists_a_page_of_branches_filtered_by_protection() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let branches = [generate_github_branch(true), generate_github_branch(true)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/branches",
+            &format!("/repos/{owner}/{repo}/branches"),
             &[("protected", "true"), ("per_page", "2"), ("page", "3")],
             200,
             serde_json::json!(branches),
         )
         .await;
     let input = ListBranches {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         protected: Some(true),
         per_page: Some(2),
         page: Some(3),
     };
 
     let listed = generate_github(&server)
-        .list_branches(&reqwest::Client::new(), "token", &input)
+        .list_branches(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -117,24 +134,27 @@ async fn lists_a_page_of_branches_filtered_by_protection() {
 
 #[tokio::test]
 async fn encodes_a_branch_name_with_a_slash_into_one_segment() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/branches/feature%2Flogin",
+            &format!("/repos/{owner}/{repo}/branches/feature%2Flogin"),
             &[],
             200,
             generate_github_branch(false),
         )
         .await;
     let input = GetBranch {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         branch: "feature/login".into(),
     };
 
     let branch = generate_github(&server)
-        .get_branch(&reqwest::Client::new(), "token", &input)
+        .get_branch(&reqwest::Client::new(), &token, &input)
         .await
         .unwrap();
 
@@ -143,6 +163,7 @@ async fn encodes_a_branch_name_with_a_slash_into_one_segment() {
 
 #[tokio::test]
 async fn lists_the_users_repositories_sorted_and_filtered() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let repositories = [generate_github_repository(1), generate_github_repository(2)];
     MockGithubNetwork::on(&server)
@@ -169,7 +190,7 @@ async fn lists_the_users_repositories_sorted_and_filtered() {
     };
 
     let listed = generate_github(&server)
-        .list_my_repositories(&http(), "token", &input, ActingAs::User)
+        .list_my_repositories(&http(), &token, &input, ActingAs::User)
         .await
         .unwrap();
 
@@ -180,6 +201,7 @@ async fn lists_the_users_repositories_sorted_and_filtered() {
 
 #[tokio::test]
 async fn lists_an_installation_s_repositories_on_an_installation_connection() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let repositories = [generate_github_repository(3)];
     MockGithubNetwork::on(&server)
@@ -198,7 +220,7 @@ async fn lists_an_installation_s_repositories_on_an_installation_connection() {
     };
 
     let listed = generate_github(&server)
-        .list_my_repositories(&http(), "token", &input, ActingAs::Installation)
+        .list_my_repositories(&http(), &token, &input, ActingAs::Installation)
         .await
         .unwrap();
 
@@ -215,11 +237,12 @@ async fn refuses_a_user_s_filter_on_an_installation_connection_without_asking_gi
     #[case] input: ListMyRepositories,
     #[case] named: &str,
 ) {
+    let token = generate_github_token();
     // No answer is arranged: a request to GitHub would fail the call another way.
     let server = MockServer::start().await;
 
     let refused = generate_github(&server)
-        .list_my_repositories(&http(), "token", &input, ActingAs::Installation)
+        .list_my_repositories(&http(), &token, &input, ActingAs::Installation)
         .await
         .unwrap_err();
 
@@ -231,6 +254,8 @@ async fn refuses_a_user_s_filter_on_an_installation_connection_without_asking_gi
 
 #[tokio::test]
 async fn creates_a_repository_sending_only_the_settings_given() {
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_repository(77);
     MockGithubNetwork::on(&server)
@@ -238,7 +263,7 @@ async fn creates_a_repository_sending_only_the_settings_given() {
             "POST",
             "/user/repos",
             json!({
-                "name": "hello",
+                "name": repo,
                 "description": " a greeting ",
                 "private": true,
                 "auto_init": true,
@@ -249,7 +274,7 @@ async fn creates_a_repository_sending_only_the_settings_given() {
         )
         .await;
     let input = CreateRepository {
-        name: "hello".into(),
+        name: repo.clone(),
         description: Some(" a greeting ".into()),
         homepage: Some("  ".into()),
         private: Some(true),
@@ -263,7 +288,7 @@ async fn creates_a_repository_sending_only_the_settings_given() {
     };
 
     let repository = generate_github(&server)
-        .create_repository(&http(), "token", &input)
+        .create_repository(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -273,17 +298,19 @@ async fn creates_a_repository_sending_only_the_settings_given() {
 
 #[tokio::test]
 async fn deletes_a_repository_and_acknowledges_it() {
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
-        .answer_empty("DELETE", "/repos/octo%20cat/hello", 204)
+        .answer_empty("DELETE", &format!("/repos/octo%20cat/{repo}"), 204)
         .await;
     let input = DeleteRepository {
         owner: "octo cat".into(),
-        repo: "hello".into(),
+        repo: repo.clone(),
     };
 
     let done = generate_github(&server)
-        .delete_repository(&http(), "token", &input)
+        .delete_repository(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -293,19 +320,22 @@ async fn deletes_a_repository_and_acknowledges_it() {
 
 #[tokio::test]
 async fn updates_the_settings_of_a_repository() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "PATCH",
-            "/repos/octo/hello",
+            &format!("/repos/{owner}/{repo}"),
             json!({ "name": "hi", "default_branch": "trunk", "archived": true }),
             200,
             generate_github_repository(5),
         )
         .await;
     let input = UpdateRepository {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         name: Some("hi".into()),
         description: None,
         homepage: None,
@@ -325,7 +355,7 @@ async fn updates_the_settings_of_a_repository() {
     };
 
     let repository = generate_github(&server)
-        .update_repository(&http(), "token", &input)
+        .update_repository(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -334,26 +364,29 @@ async fn updates_the_settings_of_a_repository() {
 
 #[tokio::test]
 async fn forks_a_repository_into_an_organization() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "POST",
-            "/repos/octo/hello/forks",
+            &format!("/repos/{owner}/{repo}/forks"),
             json!({ "organization": "acme", "default_branch_only": true }),
             202,
             generate_github_repository(9),
         )
         .await;
     let input = ForkRepository {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         organization: Some("acme".into()),
         name: None,
         default_branch_only: Some(true),
     };
 
     let fork = generate_github(&server)
-        .fork_repository(&http(), "token", &input)
+        .fork_repository(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -362,26 +395,29 @@ async fn forks_a_repository_into_an_organization() {
 
 #[tokio::test]
 async fn lists_the_forks_of_a_repository() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/forks",
+            &format!("/repos/{owner}/{repo}/forks"),
             &[("sort", "stargazers"), ("page", "2")],
             200,
             json!([generate_github_repository(3)]),
         )
         .await;
     let input = ListRepositoryForks {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         sort: Some("stargazers".into()),
         per_page: None,
         page: Some(2),
     };
 
     let forks = generate_github(&server)
-        .list_repository_forks(&http(), "token", &input)
+        .list_repository_forks(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -390,6 +426,7 @@ async fn lists_the_forks_of_a_repository() {
 
 #[tokio::test]
 async fn lists_an_organizations_repositories_by_type() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
@@ -410,7 +447,7 @@ async fn lists_an_organizations_repositories_by_type() {
     };
 
     let listed = generate_github(&server)
-        .list_organization_repositories(&http(), "token", &input)
+        .list_organization_repositories(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -419,6 +456,7 @@ async fn lists_an_organizations_repositories_by_type() {
 
 #[tokio::test]
 async fn lists_a_users_repositories() {
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
@@ -439,7 +477,7 @@ async fn lists_a_users_repositories() {
     };
 
     let listed = generate_github(&server)
-        .list_user_repositories(&http(), "token", &input)
+        .list_user_repositories(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -448,12 +486,15 @@ async fn lists_a_users_repositories() {
 
 #[tokio::test]
 async fn lists_commits_filtered_by_path_and_author() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let commits = [generate_github_commit(21), generate_github_commit(22)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/commits",
+            &format!("/repos/{owner}/{repo}/commits"),
             &[
                 ("sha", "main"),
                 ("path", "src/lib.rs"),
@@ -466,8 +507,8 @@ async fn lists_commits_filtered_by_path_and_author() {
         )
         .await;
     let input = ListCommits {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         sha: Some("main".into()),
         path: Some("src/lib.rs".into()),
         author: Some("mona".into()),
@@ -479,7 +520,7 @@ async fn lists_commits_filtered_by_path_and_author() {
     };
 
     let listed = generate_github(&server)
-        .list_commits(&http(), "token", &input)
+        .list_commits(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -494,25 +535,28 @@ async fn lists_commits_filtered_by_path_and_author() {
 
 #[tokio::test]
 async fn reads_a_commit_with_its_stats_and_files() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_commit(31);
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/commits/release%2F1.0",
+            &format!("/repos/{owner}/{repo}/commits/release%2F1.0"),
             &[],
             200,
             answer.clone(),
         )
         .await;
     let input = GetCommit {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         reference: "release/1.0".into(),
     };
 
     let commit = generate_github(&server)
-        .get_commit(&http(), "token", &input)
+        .get_commit(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -534,27 +578,30 @@ async fn reads_a_commit_with_its_stats_and_files() {
 
 #[tokio::test]
 async fn compares_two_commits() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_commit_comparison(3);
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/compare/main...mona%3Afeature",
+            &format!("/repos/{owner}/{repo}/compare/main...mona%3Afeature"),
             &[("per_page", "10")],
             200,
             answer.clone(),
         )
         .await;
     let input = CompareCommits {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         basehead: "main...mona:feature".into(),
         per_page: Some(10),
         page: None,
     };
 
     let comparison = generate_github(&server)
-        .compare_commits(&http(), "token", &input)
+        .compare_commits(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -569,27 +616,30 @@ async fn compares_two_commits() {
 
 #[tokio::test]
 async fn merges_a_branch_and_answers_the_merge_commit() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_commit(41);
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "POST",
-            "/repos/octo/hello/merges",
+            &format!("/repos/{owner}/{repo}/merges"),
             json!({ "base": "main", "head": "feature", "commit_message": "Merge it" }),
             201,
             answer.clone(),
         )
         .await;
     let input = MergeBranch {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         base: "main".into(),
         head: "feature".into(),
         commit_message: Some("Merge it".into()),
     };
 
     let merge = generate_github(&server)
-        .merge_branch(&http(), "token", &input)
+        .merge_branch(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -600,20 +650,23 @@ async fn merges_a_branch_and_answers_the_merge_commit() {
 
 #[tokio::test]
 async fn a_merge_with_nothing_to_merge_answers_not_merged() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
-        .answer_empty("POST", "/repos/octo/hello/merges", 204)
+        .answer_empty("POST", &format!("/repos/{owner}/{repo}/merges"), 204)
         .await;
     let input = MergeBranch {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         base: "main".into(),
         head: "main".into(),
         commit_message: None,
     };
 
     let merge = generate_github(&server)
-        .merge_branch(&http(), "token", &input)
+        .merge_branch(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -623,26 +676,29 @@ async fn a_merge_with_nothing_to_merge_answers_not_merged() {
 
 #[tokio::test]
 async fn renames_a_branch() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_branch(false);
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "POST",
-            "/repos/octo/hello/branches/feature%2Fold/rename",
+            &format!("/repos/{owner}/{repo}/branches/feature%2Fold/rename"),
             json!({ "new_name": "feature/new" }),
             201,
             answer.clone(),
         )
         .await;
     let input = RenameBranch {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         branch: "feature/old".into(),
         new_name: "feature/new".into(),
     };
 
     let branch = generate_github(&server)
-        .rename_branch(&http(), "token", &input)
+        .rename_branch(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -651,25 +707,28 @@ async fn renames_a_branch() {
 
 #[tokio::test]
 async fn syncs_a_fork_branch_with_its_upstream() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let answer = generate_github_fork_sync("main");
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "POST",
-            "/repos/mona/hello/merge-upstream",
+            &format!("/repos/{owner}/{repo}/merge-upstream"),
             json!({ "branch": "main" }),
             200,
             answer.clone(),
         )
         .await;
     let input = SyncForkBranchWithUpstream {
-        owner: "mona".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         branch: "main".into(),
     };
 
     let sync = generate_github(&server)
-        .sync_fork_branch_with_upstream(&http(), "token", &input)
+        .sync_fork_branch_with_upstream(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -680,27 +739,30 @@ async fn syncs_a_fork_branch_with_its_upstream() {
 
 #[tokio::test]
 async fn creates_a_reference() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let sha = generate_sha();
     let answer = generate_github_git_ref("refs/heads/feature");
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "POST",
-            "/repos/octo/hello/git/refs",
+            &format!("/repos/{owner}/{repo}/git/refs"),
             json!({ "ref": "refs/heads/feature", "sha": sha }),
             201,
             answer.clone(),
         )
         .await;
     let input = CreateRef {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         reference: "refs/heads/feature".into(),
         sha,
     };
 
     let reference = generate_github(&server)
-        .create_ref(&http(), "token", &input)
+        .create_ref(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -711,24 +773,27 @@ async fn creates_a_reference() {
 
 #[tokio::test]
 async fn reads_a_reference_keeping_its_slashes_and_encoding_its_parts() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/git/ref/heads/feature/a%20b",
+            &format!("/repos/{owner}/{repo}/git/ref/heads/feature/a%20b"),
             &[],
             200,
             generate_github_git_ref("refs/heads/feature/a b"),
         )
         .await;
     let input = GetRef {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         reference: "heads/feature/a b".into(),
     };
 
     let reference = generate_github(&server)
-        .get_ref(&http(), "token", &input)
+        .get_ref(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -737,11 +802,14 @@ async fn reads_a_reference_keeping_its_slashes_and_encoding_its_parts() {
 
 #[tokio::test]
 async fn lists_the_references_matching_a_prefix() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/git/matching-refs/heads/feat",
+            &format!("/repos/{owner}/{repo}/git/matching-refs/heads/feat"),
             &[],
             200,
             json!([
@@ -751,13 +819,13 @@ async fn lists_the_references_matching_a_prefix() {
         )
         .await;
     let input = ListMatchingRefs {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         reference: "heads/feat".into(),
     };
 
     let references = generate_github(&server)
-        .list_matching_refs(&http(), "token", &input)
+        .list_matching_refs(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -767,27 +835,30 @@ async fn lists_the_references_matching_a_prefix() {
 
 #[tokio::test]
 async fn moves_a_reference_by_force() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let sha = generate_sha();
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "PATCH",
-            "/repos/octo/hello/git/refs/tags/v1",
+            &format!("/repos/{owner}/{repo}/git/refs/tags/v1"),
             json!({ "sha": sha, "force": true }),
             200,
             generate_github_git_ref("refs/tags/v1"),
         )
         .await;
     let input = UpdateRef {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         reference: "tags/v1".into(),
         sha,
         force: Some(true),
     };
 
     let reference = generate_github(&server)
-        .update_ref(&http(), "token", &input)
+        .update_ref(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -796,18 +867,25 @@ async fn moves_a_reference_by_force() {
 
 #[tokio::test]
 async fn deletes_a_reference_and_acknowledges_it() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
-        .answer_empty("DELETE", "/repos/octo/hello/git/refs/heads/old", 204)
+        .answer_empty(
+            "DELETE",
+            &format!("/repos/{owner}/{repo}/git/refs/heads/old"),
+            204,
+        )
         .await;
     let input = DeleteRef {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         reference: "heads/old".into(),
     };
 
     let done = generate_github(&server)
-        .delete_ref(&http(), "token", &input)
+        .delete_ref(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -822,18 +900,21 @@ async fn deletes_a_reference_and_acknowledges_it() {
 async fn refuses_a_reference_that_is_not_a_branch_or_a_tag_without_asking_github(
     #[case] action: &str,
 ) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
-        .expect_nothing_at("/repos/octo/hello/git/ref/pull/1/head")
+        .expect_nothing_at(&format!("/repos/{owner}/{repo}/git/ref/pull/1/head"))
         .await;
     let github = generate_github(&server);
-    let (owner, repo, reference) = ("octo".to_owned(), "hello".to_owned(), "pull/1/head");
+    let (owner, repo, reference) = (owner.clone(), repo.clone(), "pull/1/head");
 
     let refused = match action {
         "get" => github
             .get_ref(
                 &http(),
-                "token",
+                &token,
                 &GetRef {
                     owner,
                     repo,
@@ -845,7 +926,7 @@ async fn refuses_a_reference_that_is_not_a_branch_or_a_tag_without_asking_github
         "update" => github
             .update_ref(
                 &http(),
-                "token",
+                &token,
                 &UpdateRef {
                     owner,
                     repo,
@@ -859,7 +940,7 @@ async fn refuses_a_reference_that_is_not_a_branch_or_a_tag_without_asking_github
         _ => github
             .delete_ref(
                 &http(),
-                "token",
+                &token,
                 &DeleteRef {
                     owner,
                     repo,
@@ -875,29 +956,38 @@ async fn refuses_a_reference_that_is_not_a_branch_or_a_tag_without_asking_github
 }
 
 #[rstest]
-#[case::root(None, "/repos/octo/hello/contents")]
-#[case::empty(Some(""), "/repos/octo/hello/contents")]
-#[case::slashes_trimmed(Some("/src/lib/"), "/repos/octo/hello/contents/src/lib")]
-#[case::parts_encoded(Some("my docs/a#b"), "/repos/octo/hello/contents/my%20docs/a%23b")]
+#[case::root(None, "contents")]
+#[case::empty(Some(""), "contents")]
+#[case::slashes_trimmed(Some("/src/lib/"), "contents/src/lib")]
+#[case::parts_encoded(Some("my docs/a#b"), "contents/my%20docs/a%23b")]
 #[tokio::test]
 async fn lists_the_entries_of_a_directory(#[case] path: Option<&str>, #[case] route: &str) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let entries = [
         generate_github_content_entry("src/lib.rs", "file"),
         generate_github_content_entry("src/bin", "dir"),
     ];
     MockGithubNetwork::on(&server)
-        .answer("GET", route, &[("ref", "v1")], 200, json!(entries))
+        .answer(
+            "GET",
+            &format!("/repos/{owner}/{repo}/{route}"),
+            &[("ref", "v1")],
+            200,
+            json!(entries),
+        )
         .await;
     let input = ListDirectoryContents {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         path: path.map(str::to_owned),
         reference: Some("v1".into()),
     };
 
     let listed = generate_github(&server)
-        .list_directory_contents(&http(), "token", &input)
+        .list_directory_contents(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -910,25 +1000,28 @@ async fn lists_the_entries_of_a_directory(#[case] path: Option<&str>, #[case] ro
 
 #[tokio::test]
 async fn refuses_to_list_a_file_as_a_directory() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/contents/README.md",
+            &format!("/repos/{owner}/{repo}/contents/README.md"),
             &[],
             200,
             generate_github_file_content("README.md", b"hi"),
         )
         .await;
     let input = ListDirectoryContents {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         path: Some("README.md".into()),
         reference: None,
     };
 
     let refused = generate_github(&server)
-        .list_directory_contents(&http(), "token", &input)
+        .list_directory_contents(&http(), &token, &input)
         .await;
 
     assert!(matches!(refused, Err(ProviderError::Refused { .. })));
@@ -936,26 +1029,29 @@ async fn refuses_to_list_a_file_as_a_directory() {
 
 #[tokio::test]
 async fn reads_a_text_file_decoded() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let text = generate_text().repeat(5);
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/contents/docs/guide%201.md",
+            &format!("/repos/{owner}/{repo}/contents/docs/guide%201.md"),
             &[("ref", "main")],
             200,
             generate_github_file_content("docs/guide 1.md", text.as_bytes()),
         )
         .await;
     let input = GetFileContents {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         path: "docs/guide 1.md".into(),
         reference: Some("main".into()),
     };
 
     let file = generate_github(&server)
-        .get_file_contents(&http(), "token", &input)
+        .get_file_contents(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -966,26 +1062,29 @@ async fn reads_a_text_file_decoded() {
 
 #[tokio::test]
 async fn reads_a_binary_file_without_decoding_it() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let bytes = [0xff_u8, 0xfe, 0x00, 0x80];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/contents/logo.png",
+            &format!("/repos/{owner}/{repo}/contents/logo.png"),
             &[],
             200,
             generate_github_file_content("logo.png", &bytes),
         )
         .await;
     let input = GetFileContents {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         path: "logo.png".into(),
         reference: None,
     };
 
     let file = generate_github(&server)
-        .get_file_contents(&http(), "token", &input)
+        .get_file_contents(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -998,19 +1097,28 @@ async fn reads_a_binary_file_without_decoding_it() {
 #[case::a_symlink(generate_github_content_entry("src", "symlink"))]
 #[tokio::test]
 async fn refuses_to_read_what_is_not_a_regular_file(#[case] answer: serde_json::Value) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
-        .answer("GET", "/repos/octo/hello/contents/src", &[], 200, answer)
+        .answer(
+            "GET",
+            &format!("/repos/{owner}/{repo}/contents/src"),
+            &[],
+            200,
+            answer,
+        )
         .await;
     let input = GetFileContents {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         path: "src".into(),
         reference: None,
     };
 
     let refused = generate_github(&server)
-        .get_file_contents(&http(), "token", &input)
+        .get_file_contents(&http(), &token, &input)
         .await;
 
     assert!(matches!(refused, Err(ProviderError::Refused { .. })));
@@ -1018,25 +1126,28 @@ async fn refuses_to_read_what_is_not_a_regular_file(#[case] answer: serde_json::
 
 #[tokio::test]
 async fn reads_the_readme_decoded() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let text = generate_text();
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/readme",
+            &format!("/repos/{owner}/{repo}/readme"),
             &[("ref", "dev")],
             200,
             generate_github_file_content("README.md", text.as_bytes()),
         )
         .await;
     let input = GetRepositoryReadme {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         reference: Some("dev".into()),
     };
 
     let readme = generate_github(&server)
-        .get_repository_readme(&http(), "token", &input)
+        .get_repository_readme(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1054,21 +1165,24 @@ async fn writes_a_file_with_its_content_base64_encoded(
     #[case] content_base64: Option<&str>,
     #[case] sent: &str,
 ) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let message: String = Sentence(3..6).fake();
     let answer = generate_github_content_change(Some("docs/a b.md"));
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "PUT",
-            "/repos/octo/hello/contents/docs/a%20b.md",
+            &format!("/repos/{owner}/{repo}/contents/docs/a%20b.md"),
             json!({ "message": message, "content": sent, "branch": "dev" }),
             201,
             answer.clone(),
         )
         .await;
     let input = CreateOrUpdateFile {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         path: "docs/a b.md".into(),
         message: message.clone(),
         content: content.map(str::to_owned),
@@ -1078,7 +1192,7 @@ async fn writes_a_file_with_its_content_base64_encoded(
     };
 
     let change = generate_github(&server)
-        .create_or_update_file(&http(), "token", &input)
+        .create_or_update_file(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1092,21 +1206,24 @@ async fn writes_a_file_with_its_content_base64_encoded(
 
 #[tokio::test]
 async fn deletes_a_file_in_a_commit() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let sha = generate_sha();
     let answer = generate_github_content_change(None);
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "DELETE",
-            "/repos/octo/hello/contents/old.txt",
+            &format!("/repos/{owner}/{repo}/contents/old.txt"),
             json!({ "message": "Remove it", "sha": sha }),
             200,
             answer.clone(),
         )
         .await;
     let input = DeleteFile {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         path: "old.txt".into(),
         message: "Remove it".into(),
         sha,
@@ -1114,7 +1231,7 @@ async fn deletes_a_file_in_a_commit() {
     };
 
     let change = generate_github(&server)
-        .delete_file(&http(), "token", &input)
+        .delete_file(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1130,26 +1247,29 @@ async fn deletes_a_file_in_a_commit() {
 async fn refuses_a_file_path_that_climbs_out_of_the_repository_without_asking_github(
     #[case] path: &str,
 ) {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     // No answer is arranged: a request reaching GitHub would fail the test another way.
     let server = MockServer::start().await;
     let github = generate_github(&server);
     let read = GetFileContents {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         path: path.into(),
         reference: None,
     };
     let delete = DeleteFile {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         path: path.into(),
         message: "Remove it".into(),
         sha: generate_sha(),
         branch: None,
     };
 
-    let read = github.get_file_contents(&http(), "token", &read).await;
-    let deleted = github.delete_file(&http(), "token", &delete).await;
+    let read = github.get_file_contents(&http(), &token, &read).await;
+    let deleted = github.delete_file(&http(), &token, &delete).await;
 
     assert!(
         matches!(read, Err(ProviderError::Invalid { .. })),
@@ -1164,26 +1284,29 @@ async fn refuses_a_file_path_that_climbs_out_of_the_repository_without_asking_gi
 
 #[tokio::test]
 async fn lists_the_tags_of_a_repository() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let tags = [generate_github_tag(), generate_github_tag()];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/tags",
+            &format!("/repos/{owner}/{repo}/tags"),
             &[("per_page", "2")],
             200,
             json!(tags),
         )
         .await;
     let input = ListRepositoryTags {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         per_page: Some(2),
         page: None,
     };
 
     let listed = generate_github(&server)
-        .list_repository_tags(&http(), "token", &input)
+        .list_repository_tags(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1196,25 +1319,28 @@ async fn lists_the_tags_of_a_repository() {
 
 #[tokio::test]
 async fn lists_the_languages_of_a_repository_most_used_first() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let rust: i64 = (10_000..20_000).fake();
     let shell: i64 = (1..1000).fake();
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/languages",
+            &format!("/repos/{owner}/{repo}/languages"),
             &[],
             200,
             json!({ "Shell": shell, "Rust": rust }),
         )
         .await;
     let input = ListRepositoryLanguages {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
     };
 
     let languages = generate_github(&server)
-        .list_repository_languages(&http(), "token", &input)
+        .list_repository_languages(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1231,27 +1357,30 @@ async fn lists_the_languages_of_a_repository_most_used_first() {
 
 #[tokio::test]
 async fn lists_the_contributors_of_a_repository_with_anonymous_ones() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let contributors = [generate_github_contributor(51)];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/contributors",
+            &format!("/repos/{owner}/{repo}/contributors"),
             &[("anon", "true"), ("page", "1")],
             200,
             json!(contributors),
         )
         .await;
     let input = ListRepositoryContributors {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         anon: Some(true),
         per_page: None,
         page: Some(1),
     };
 
     let listed = generate_github(&server)
-        .list_repository_contributors(&http(), "token", &input)
+        .list_repository_contributors(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1264,20 +1393,23 @@ async fn lists_the_contributors_of_a_repository_with_anonymous_ones() {
 
 #[tokio::test]
 async fn an_empty_repository_has_no_contributors() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
-        .answer_empty("GET", "/repos/octo/empty/contributors", 204)
+        .answer_empty("GET", &format!("/repos/{owner}/{repo}/contributors"), 204)
         .await;
     let input = ListRepositoryContributors {
-        owner: "octo".into(),
-        repo: "empty".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         anon: None,
         per_page: None,
         page: None,
     };
 
     let listed = generate_github(&server)
-        .list_repository_contributors(&http(), "token", &input)
+        .list_repository_contributors(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1286,25 +1418,28 @@ async fn an_empty_repository_has_no_contributors() {
 
 #[tokio::test]
 async fn lists_the_topics_of_a_repository() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/topics",
+            &format!("/repos/{owner}/{repo}/topics"),
             &[("per_page", "5")],
             200,
             json!({ "names": ["rust", "api"] }),
         )
         .await;
     let input = ListRepositoryTopics {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         per_page: Some(5),
         page: None,
     };
 
     let topics = generate_github(&server)
-        .list_repository_topics(&http(), "token", &input)
+        .list_repository_topics(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1313,24 +1448,27 @@ async fn lists_the_topics_of_a_repository() {
 
 #[tokio::test]
 async fn replaces_the_topics_of_a_repository() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "PUT",
-            "/repos/octo/hello/topics",
+            &format!("/repos/{owner}/{repo}/topics"),
             json!({ "names": ["cli"] }),
             200,
             json!({ "names": ["cli"] }),
         )
         .await;
     let input = ReplaceRepositoryTopics {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         names: vec!["cli".into()],
     };
 
     let topics = generate_github(&server)
-        .replace_repository_topics(&http(), "token", &input)
+        .replace_repository_topics(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1339,19 +1477,22 @@ async fn replaces_the_topics_of_a_repository() {
 
 #[tokio::test]
 async fn lists_the_collaborators_of_a_repository() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/collaborators",
+            &format!("/repos/{owner}/{repo}/collaborators"),
             &[("affiliation", "direct"), ("permission", "push")],
             200,
             json!([generate_github_collaborator(61)]),
         )
         .await;
     let input = ListRepositoryCollaborators {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         affiliation: Some("direct".into()),
         permission: Some("push".into()),
         per_page: None,
@@ -1359,7 +1500,7 @@ async fn lists_the_collaborators_of_a_repository() {
     };
 
     let listed = generate_github(&server)
-        .list_repository_collaborators(&http(), "token", &input)
+        .list_repository_collaborators(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1370,25 +1511,28 @@ async fn lists_the_collaborators_of_a_repository() {
 
 #[tokio::test]
 async fn invites_a_collaborator_who_must_accept() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "PUT",
-            "/repos/octo/hello/collaborators/mona%2Bx",
+            &format!("/repos/{owner}/{repo}/collaborators/mona%2Bx"),
             json!({ "permission": "maintain" }),
             201,
             generate_github_repository_invitation(71, 72, "maintain"),
         )
         .await;
     let input = AddRepositoryCollaborator {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         username: "mona+x".into(),
         permission: Some("maintain".into()),
     };
 
     let added = generate_github(&server)
-        .add_repository_collaborator(&http(), "token", &input)
+        .add_repository_collaborator(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1401,19 +1545,26 @@ async fn invites_a_collaborator_who_must_accept() {
 
 #[tokio::test]
 async fn adds_a_collaborator_at_once_without_an_invitation() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
-        .answer_empty("PUT", "/repos/octo/hello/collaborators/mona", 204)
+        .answer_empty(
+            "PUT",
+            &format!("/repos/{owner}/{repo}/collaborators/mona"),
+            204,
+        )
         .await;
     let input = AddRepositoryCollaborator {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         username: "mona".into(),
         permission: None,
     };
 
     let added = generate_github(&server)
-        .add_repository_collaborator(&http(), "token", &input)
+        .add_repository_collaborator(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1423,18 +1574,25 @@ async fn adds_a_collaborator_at_once_without_an_invitation() {
 
 #[tokio::test]
 async fn removes_a_collaborator_and_acknowledges_it() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
-        .answer_empty("DELETE", "/repos/octo/hello/collaborators/mona", 204)
+        .answer_empty(
+            "DELETE",
+            &format!("/repos/{owner}/{repo}/collaborators/mona"),
+            204,
+        )
         .await;
     let input = RemoveRepositoryCollaborator {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         username: "mona".into(),
     };
 
     let done = generate_github(&server)
-        .remove_repository_collaborator(&http(), "token", &input)
+        .remove_repository_collaborator(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1443,24 +1601,27 @@ async fn removes_a_collaborator_and_acknowledges_it() {
 
 #[tokio::test]
 async fn reads_an_accounts_permission_in_a_repository() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            "/repos/octo/hello/collaborators/mona/permission",
+            &format!("/repos/{owner}/{repo}/collaborators/mona/permission"),
             &[],
             200,
             generate_github_repository_permission(81, "admin"),
         )
         .await;
     let input = GetRepositoryPermissionForUser {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         username: "mona".into(),
     };
 
     let permission = generate_github(&server)
-        .get_repository_permission_for_user(&http(), "token", &input)
+        .get_repository_permission_for_user(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1470,21 +1631,24 @@ async fn reads_an_accounts_permission_in_a_repository() {
 
 #[tokio::test]
 async fn comments_on_a_line_of_a_commit() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let sha = generate_sha();
     let answer = generate_github_commit_comment(91, 92, "src/lib.rs", 4);
     MockGithubNetwork::on(&server)
         .answer_with_body(
             "POST",
-            &format!("/repos/octo/hello/commits/{sha}/comments"),
+            &format!("/repos/{owner}/{repo}/commits/{sha}/comments"),
             json!({ "body": "Nice", "path": "src/lib.rs", "position": 4 }),
             201,
             answer.clone(),
         )
         .await;
     let input = CreateCommitComment {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         commit_sha: sha,
         body: "Nice".into(),
         path: Some("src/lib.rs".into()),
@@ -1492,7 +1656,7 @@ async fn comments_on_a_line_of_a_commit() {
     };
 
     let comment = generate_github(&server)
-        .create_commit_comment(&http(), "token", &input)
+        .create_commit_comment(&http(), &token, &input)
         .await
         .unwrap();
 
@@ -1504,27 +1668,30 @@ async fn comments_on_a_line_of_a_commit() {
 
 #[tokio::test]
 async fn lists_the_comments_on_a_commit() {
+    let owner = generate_github_login();
+    let repo = generate_github_repo();
+    let token = generate_github_token();
     let server = MockServer::start().await;
     let sha = generate_sha();
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
-            &format!("/repos/octo/hello/commits/{sha}/comments"),
+            &format!("/repos/{owner}/{repo}/commits/{sha}/comments"),
             &[("per_page", "30"), ("page", "2")],
             200,
             json!([generate_github_commit_comment(93, 94, "README.md", 1)]),
         )
         .await;
     let input = ListCommitComments {
-        owner: "octo".into(),
-        repo: "hello".into(),
+        owner: owner.clone(),
+        repo: repo.clone(),
         commit_sha: sha,
         per_page: Some(30),
         page: Some(2),
     };
 
     let listed = generate_github(&server)
-        .list_commit_comments(&http(), "token", &input)
+        .list_commit_comments(&http(), &token, &input)
         .await
         .unwrap();
 

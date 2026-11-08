@@ -10,14 +10,16 @@ use crate::testing::{ADMIN_KEY, API_KEY, TestContext, setup_test_context};
 use axum::http::StatusCode;
 use osiris_domain::EventType;
 use osiris_providers::github::mocks::{
-    MockGithubNetwork, generate_github_repository::generate_github_repository,
+    MockGithubNetwork,
+    generate_github_names::{generate_github_login, generate_github_repo, generate_github_token},
+    generate_github_repository::generate_github_repository,
     mock_github_app_key::MockGithubAppKey,
 };
 use serde_json::{Value, json};
 use sqlx::PgPool;
 
 /// A GitHub app holding App credentials; answers its id.
-async fn app_with_credentials(app: &TestContext) -> String {
+pub(super) async fn app_with_credentials(app: &TestContext) -> String {
     let answer = app
         .send(
             "POST",
@@ -40,7 +42,7 @@ async fn app_with_credentials(app: &TestContext) -> String {
     answer.body["id"].as_str().unwrap().to_owned()
 }
 
-async fn connect(
+pub(super) async fn connect(
     app: &TestContext,
     config: &str,
     installation: &str,
@@ -60,7 +62,7 @@ async fn connect(
 async fn installation_connection(app: &TestContext) -> String {
     let config = app_with_credentials(app).await;
     MockGithubNetwork::on(&app.provider)
-        .answer_installation_token("77", "ghs_installation", 1)
+        .answer_installation_token("77", &generate_github_token(), 1)
         .await;
     let created = connect(app, &config, "77").await;
     assert_eq!(created.status, StatusCode::CREATED, "{}", created.body);
@@ -83,12 +85,17 @@ async fn run(
     .await
 }
 
-async fn get_repository(app: &TestContext, id: &str) -> crate::testing::requests::Answer {
+/// The connection's `github.get_repository` of `owner/repo`.
+async fn get_repository(
+    app: &TestContext,
+    id: &str,
+    (owner, repo): (&str, &str),
+) -> crate::testing::requests::Answer {
     app.send(
         "POST",
         &format!("/v1/connected-accounts/{id}/actions/github.get_repository"),
         Some(API_KEY),
-        Some(json!({ "owner": "octo", "repo": "hello" })),
+        Some(json!({ "owner": owner, "repo": repo })),
         &[],
     )
     .await
@@ -98,15 +105,18 @@ async fn get_repository(app: &TestContext, id: &str) -> crate::testing::requests
 async fn connects_as_an_installation_and_acts_with_one_minted_token(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app_with_credentials(&app).await;
+    let (owner, repo, token) = (
+        generate_github_login(),
+        generate_github_repo(),
+        generate_github_token(),
+    );
     let github = MockGithubNetwork::on(&app.provider);
     // Minted once at connect, then reused by both actions.
-    github
-        .answer_installation_token("77", "ghs_installation", 1)
-        .await;
+    github.answer_installation_token("77", &token, 1).await;
     github
         .answer_for_token(
-            "/repos/octo/hello",
-            "ghs_installation",
+            &format!("/repos/{owner}/{repo}"),
+            &token,
             generate_github_repository(5),
             2,
         )
@@ -118,8 +128,11 @@ async fn connects_as_an_installation_and_acts_with_one_minted_token(pool: PgPool
     assert_eq!(created.body["redirect_url"], Value::Null);
     let id = created.body["id"].as_str().unwrap();
 
-    assert_eq!(get_repository(&app, id).await.status, StatusCode::OK);
-    let second = get_repository(&app, id).await;
+    assert_eq!(
+        get_repository(&app, id, (&owner, &repo)).await.status,
+        StatusCode::OK
+    );
+    let second = get_repository(&app, id, (&owner, &repo)).await;
     assert_eq!(second.status, StatusCode::OK, "{}", second.body);
     assert_eq!(second.body["data"]["id"], "5");
 
@@ -138,30 +151,23 @@ async fn connects_as_an_installation_and_acts_with_one_minted_token(pool: PgPool
 async fn mints_again_once_when_github_refuses_the_installation_s_token(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app_with_credentials(&app).await;
+    let (owner, repo) = (generate_github_login(), generate_github_repo());
+    let route = format!("/repos/{owner}/{repo}");
     let github = MockGithubNetwork::on(&app.provider);
-    github.answer_installation_token("77", "ghs_new", 2).await;
+    github
+        .answer_installation_token("77", &generate_github_token(), 2)
+        .await;
     let created = connect(&app, &config, "77").await;
     let id = created.body["id"].as_str().unwrap().to_owned();
     // The first call is refused, the call with the newly minted token answers.
     github
-        .answer_once(
-            "GET",
-            "/repos/octo/hello",
-            401,
-            json!({ "message": "Bad credentials" }),
-        )
+        .answer_once("GET", &route, 401, json!({ "message": "Bad credentials" }))
         .await;
     github
-        .answer_times(
-            "GET",
-            "/repos/octo/hello",
-            200,
-            generate_github_repository(6),
-            1,
-        )
+        .answer_times("GET", &route, 200, generate_github_repository(6), 1)
         .await;
 
-    let answer = get_repository(&app, &id).await;
+    let answer = get_repository(&app, &id, (&owner, &repo)).await;
 
     assert_eq!(answer.status, StatusCode::OK, "{}", answer.body);
     assert_eq!(app.account(&id).await["status"], "active");
@@ -242,7 +248,7 @@ async fn refuses_an_installation_connection_made_with_the_api_key(pool: PgPool) 
     let config = app_with_credentials(&app).await;
     // No token may be minted: the key is refused before GitHub is asked.
     MockGithubNetwork::on(&app.provider)
-        .answer_installation_token("77", "ghs_installation", 0)
+        .answer_installation_token("77", &generate_github_token(), 0)
         .await;
 
     let refused = app

@@ -9,7 +9,7 @@
 )]
 
 use super::support::{
-    PULL_REQUEST, answer, create, deliver, deliver_as, fired, get_trigger, watching_a_pull_request,
+    Watched, answer, create, deliver, deliver_as, fired, get_trigger, watching_a_pull_request,
     watching_repo_events, webhook_secret,
 };
 use crate::testing::{API_KEY, setup_test_context};
@@ -23,13 +23,14 @@ use sqlx::PgPool;
 async fn publishes_each_signed_delivery_of_a_repository_s_events(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let connection = app.connected_to_github(3600).await;
-    super::support::answer_hook_creation(&app).await;
+    let watched = Watched::generate();
+    super::support::answer_hook_creation(&app, &watched).await;
 
     let created = create(
         &app,
         &connection,
         "github.on_repo_event",
-        json!({ "owner": "octo", "repo": "hello", "events": ["push"] }),
+        watched.repo_events(&["push"]),
     )
     .await;
     assert_eq!(created.status, StatusCode::CREATED, "{}", created.body);
@@ -37,7 +38,7 @@ async fn publishes_each_signed_delivery_of_a_repository_s_events(pool: PgPool) {
     assert_eq!(created.body["subscription_id"], "99");
     assert!(created.body.get("secret").is_none());
     let id = created.body["id"].as_str().unwrap();
-    let secret = webhook_secret(&app).await;
+    let secret = webhook_secret(&app, &watched).await;
 
     let push = json!({ "ref": "refs/heads/main", "after": generate_sha() });
     assert_eq!(
@@ -87,12 +88,13 @@ async fn refuses_a_delivery_not_signed_with_the_trigger_s_secret_as_if_it_did_no
 ) {
     let app = setup_test_context(pool).await;
     let connection = app.connected_to_github(3600).await;
-    super::support::answer_hook_creation(&app).await;
+    let watched = Watched::generate();
+    super::support::answer_hook_creation(&app, &watched).await;
     let created = create(
         &app,
         &connection,
         "github.on_repo_event",
-        json!({ "owner": "octo", "repo": "hello", "events": ["*"] }),
+        watched.repo_events(&["*"]),
     )
     .await;
     let id = created.body["id"].as_str().unwrap();
@@ -116,8 +118,8 @@ async fn refuses_a_delivery_not_signed_with_the_trigger_s_secret_as_if_it_did_no
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn publishes_a_delivery_that_names_no_delivery_id_once(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let (_, id) = watching_repo_events(&app).await;
-    let secret = webhook_secret(&app).await;
+    let (_, id, watched) = watching_repo_events(&app).await;
+    let secret = webhook_secret(&app, &watched).await;
     let push = json!({ "ref": "refs/heads/main", "after": generate_sha() });
 
     assert_eq!(
@@ -137,12 +139,12 @@ async fn publishes_a_delivery_that_names_no_delivery_id_once(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn takes_and_ignores_a_signed_delivery_to_a_failed_trigger(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let (_, id, task) = watching_a_pull_request(&app).await;
-    let secret = webhook_secret(&app).await;
+    let (_, id, task, watched) = watching_a_pull_request(&app).await;
+    let secret = webhook_secret(&app, &watched).await;
     // GitHub no longer has the pull request: the scheduled check fails the trigger. It answers
     // that once, so the delivery below checks nothing at GitHub.
     let gone = json!({ "message": "Not Found" });
-    answer(&app, "GET", PULL_REQUEST, 404, gone, 1).await;
+    answer(&app, "GET", &watched.pull_request(), 404, gone, 1).await;
     assert_eq!(app.run_pending(&task).await.unwrap(), TaskOutcome::Failed);
     assert_eq!(get_trigger(&app, &id).await.body["status"], "failed");
 
