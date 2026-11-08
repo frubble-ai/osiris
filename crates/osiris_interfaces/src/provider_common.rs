@@ -1,7 +1,7 @@
 //! What every provider is, whatever it does: its id, where its API is, how a request carries the
 //! token, and how its errors read.
 
-use crate::ProviderError;
+use crate::{ProviderError, status_error::status_error};
 use reqwest::{
     StatusCode,
     header::{AUTHORIZATION, HeaderName},
@@ -26,16 +26,9 @@ pub trait ProviderCommon: Send + Sync {
         (AUTHORIZATION, format!("Bearer {token}"))
     }
 
-    /// An error answer as a [`ProviderError`]: 401 is a rejected token, another 4xx a refusal,
-    /// the rest a failure. A provider whose errors read otherwise overrides it.
+    /// An error answer as a [`ProviderError`], read by its status ([`status_error`]). A provider
+    /// whose errors read otherwise overrides it.
     fn parse_error(&self, status: StatusCode, body: &str) -> ProviderError {
-        let message = format!("{status}: {body}");
-        match status {
-            StatusCode::UNAUTHORIZED => ProviderError::unauthorized(self.id(), message),
-            status if status.is_client_error() => {
-                ProviderError::refused_with_status(self.id(), status.as_u16(), message)
-            }
-            _ => ProviderError::unavailable(self.id(), message),
-        }
+        status_error(self.id(), status, body)
     }
 }

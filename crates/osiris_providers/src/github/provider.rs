@@ -12,7 +12,10 @@ use crate::{
     ProviderUrls, TriggerCheck, TriggerReceipt,
 };
 use async_trait::async_trait;
-use osiris_interfaces::oauth::{ClientAuth, OAuth2Definition};
+use osiris_interfaces::{
+    no_settings::no_settings,
+    oauth::{ClientAuth, OAuth2Definition},
+};
 use reqwest::header::HeaderMap;
 use serde_json::Value;
 use url::Url;
@@ -50,6 +53,10 @@ impl ProviderCommon for Github {
 
     fn base_url(&self) -> &Url {
         &self.api_base
+    }
+
+    fn parse_error(&self, status: reqwest::StatusCode, body: &str) -> ProviderError {
+        super::parse_error::parse_error(status, body)
     }
 
     /// GitHub's scopes nest: `repo` covers `repo:status` and the other `repo:` scopes, `user`
@@ -96,8 +103,7 @@ impl Provider for Github {
         settings: &Value,
         secret_settings: Option<&Value>,
     ) -> Result<(), String> {
-        let empty = |value: &Value| value.as_object().is_none_or(serde_json::Map::is_empty);
-        if empty(settings) && secret_settings.is_none_or(empty) {
+        if no_settings(settings, secret_settings) {
             return Ok(());
         }
         AppCredentials::read(settings, secret_settings).map(|_| ())

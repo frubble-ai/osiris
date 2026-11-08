@@ -1122,6 +1122,46 @@ async fn deletes_a_file_in_a_commit() {
     assert_eq!(change.commit.sha, answer["commit"]["sha"].as_str().unwrap());
 }
 
+#[rstest]
+#[case::up_to_the_user("../../../../user")]
+#[case::up_to_the_repository("..")]
+#[case::current_folder("./notes/../../hooks")]
+#[tokio::test]
+async fn refuses_a_file_path_that_climbs_out_of_the_repository_without_asking_github(
+    #[case] path: &str,
+) {
+    // No answer is arranged: a request reaching GitHub would fail the test another way.
+    let server = MockServer::start().await;
+    let github = github_on(&server);
+    let read = GetFileContents {
+        owner: "octo".into(),
+        repo: "hello".into(),
+        path: path.into(),
+        reference: None,
+    };
+    let delete = DeleteFile {
+        owner: "octo".into(),
+        repo: "hello".into(),
+        path: path.into(),
+        message: "Remove it".into(),
+        sha: generate_sha(),
+        branch: None,
+    };
+
+    let read = github.get_file_contents(&http(), "token", &read).await;
+    let deleted = github.delete_file(&http(), "token", &delete).await;
+
+    assert!(
+        matches!(read, Err(ProviderError::Invalid { .. })),
+        "{read:?}"
+    );
+    assert!(
+        matches!(deleted, Err(ProviderError::Invalid { .. })),
+        "{deleted:?}"
+    );
+    assert!(server.received_requests().await.unwrap().is_empty());
+}
+
 #[tokio::test]
 async fn lists_the_tags_of_a_repository() {
     let server = MockServer::start().await;

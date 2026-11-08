@@ -16,7 +16,7 @@ pub mod slack;
 pub use list_limits::ListLimits;
 pub use osiris_interfaces::{
     ActingAs, InstallationToken, OAuthClient, Provider, ProviderCommon, ProviderError, Tokens,
-    TriggerCheck, TriggerReceipt,
+    TriggerCheck, TriggerReceipt, request_path,
 };
 pub use provider_urls::ProviderUrls;
 pub use providers::Providers;

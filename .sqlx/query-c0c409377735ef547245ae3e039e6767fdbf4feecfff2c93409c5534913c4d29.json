@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE trigger SET checkpoint = $2, last_error = NULL, updated_at = now()\n             WHERE id = $1 AND status = 'active'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c0c409377735ef547245ae3e039e6767fdbf4feecfff2c93409c5534913c4d29"
+}

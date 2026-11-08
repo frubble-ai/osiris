@@ -1,34 +1,7 @@
 //! A missing scope is named; a granted, a covering, or an unscoped token passes.
 
-use super::missing_scopes;
-use osiris_interfaces::ProviderCommon;
+use super::{missing_scopes, mocks::nesting_provider::nesting};
 use rstest::rstest;
-use url::Url;
-
-/// A provider whose `admin` scope covers every `admin:` one, as a provider with nesting scopes
-/// says.
-struct Nesting(Url);
-
-impl ProviderCommon for Nesting {
-    fn id(&self) -> &'static str {
-        "nesting"
-    }
-
-    fn base_url(&self) -> &Url {
-        &self.0
-    }
-
-    fn scope_covers(&self, granted: &str, required: &str) -> bool {
-        granted == required
-            || required
-                .strip_prefix(granted)
-                .is_some_and(|rest| rest.starts_with(':'))
-    }
-}
-
-fn nesting() -> Nesting {
-    Nesting(Url::parse("https://nesting.test").unwrap())
-}
 
 #[rstest]
 #[case::granted(Some("read,write"), &["read"], &[])]

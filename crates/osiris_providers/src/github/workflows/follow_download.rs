@@ -12,6 +12,7 @@
 use crate::{
     ProviderCommon, ProviderError,
     github::{Github, request::API_VERSION},
+    request_path,
 };
 
 /// `GET path` as the user `token`, with the headers GitHub asks every request to carry, followed
@@ -26,7 +27,7 @@ pub async fn follow_download(
 ) -> Result<reqwest::Response, ProviderError> {
     let url = github
         .base_url()
-        .join(path)
+        .join(request_path(github.id(), path)?)
         .map_err(|error| ProviderError::unavailable(github.id(), format!("{path}: {error}")))?;
     let (header, value) = github.auth_header(token);
     let response = http

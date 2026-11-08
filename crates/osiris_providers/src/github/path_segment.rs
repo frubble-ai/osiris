@@ -1,5 +1,7 @@
-//! A value placed in a URL path, percent-encoded so an owner, a branch or a file name can't change
-//! the path it is placed in.
+//! A value placed in a URL path, percent-encoded so an owner, a branch or a file name can't add a
+//! segment to the path it is placed in. A value of `.` or `..` stays a segment the URL parser
+//! would collapse, so every request's path is checked before it is sent
+//! ([`request_path`](crate::request_path)), which refuses one.
 
 use std::fmt::Write;
 

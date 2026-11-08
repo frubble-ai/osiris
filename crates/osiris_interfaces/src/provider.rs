@@ -3,6 +3,7 @@
 //! installation's token is minted, and for a provider with triggers how one is subscribed to, how
 //! its deliveries are read, and how it is checked on a schedule. A provider without them refuses.
 
+use crate::no_settings::no_settings;
 use crate::{
     InstallationToken, OAuthClient, ProviderCommon, ProviderError, TriggerCheck, TriggerReceipt,
     oauth::OAuth2Definition,
@@ -31,8 +32,7 @@ pub trait Provider: ProviderCommon {
         settings: &Value,
         secret_settings: Option<&Value>,
     ) -> Result<(), String> {
-        let empty = |value: &Value| value.as_object().is_none_or(serde_json::Map::is_empty);
-        if empty(settings) && secret_settings.is_none_or(empty) {
+        if no_settings(settings, secret_settings) {
             Ok(())
         } else {
             Err(format!("{} takes no settings", self.id()))

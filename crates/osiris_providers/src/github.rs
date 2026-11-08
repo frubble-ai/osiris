@@ -11,6 +11,7 @@ pub mod issues;
 #[cfg(any(test, feature = "testing"))]
 pub mod mocks;
 pub mod paging;
+pub mod parse_error;
 pub mod path_segment;
 pub mod provider;
 pub mod pull_requests;

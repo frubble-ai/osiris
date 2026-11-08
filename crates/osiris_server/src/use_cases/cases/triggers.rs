@@ -5,6 +5,7 @@
 pub mod check_trigger;
 pub mod create_trigger;
 pub mod delete_trigger;
+pub mod end_trigger_subscription;
 pub mod get_trigger;
 pub mod list_triggers;
 pub mod receive_trigger_delivery;

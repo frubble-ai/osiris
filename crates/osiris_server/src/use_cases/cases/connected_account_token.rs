@@ -13,7 +13,7 @@ use crate::use_cases::{
         refresh_connected_account::RefreshConnectedAccountArgs,
     },
     lib::{
-        installation_tokens::connection_token::connection_token,
+        installation_tokens::connection_token::{TokenSources, connection_token},
         refresh::{When, restore::restore},
         shared::missing_scopes::missing_scopes,
     },
@@ -64,7 +64,14 @@ impl UseCases {
                     ))
                     .into());
                 }
-                let token = connection_token(ctx, &account, provider).await?;
+                let sources = TokenSources {
+                    db: &ctx.db,
+                    providers: &ctx.providers,
+                    http: &ctx.http,
+                    cache: &ctx.installation_tokens,
+                    margin: ctx.config.settings.providers.installation_tokens.margin(),
+                };
+                let token = connection_token(sources, &account, provider).await?;
                 return Ok((token, ActingAs::Installation));
             }
             // Only a token about to expire takes the refresh lock; a valid one is used as it is.

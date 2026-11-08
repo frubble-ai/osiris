@@ -12,9 +12,11 @@ use crate::use_cases::lib::{
     auth_configs::NewAuthConfig,
     connected_accounts::{NewPending, NewTokens, ScheduledRefresh},
     database::Db,
+    triggers::NewTrigger,
 };
 use fake::Fake;
-use osiris_common::{crypto::MasterKey, secret::secret};
+use osiris_common::{crypto::MasterKey, ids, secret::secret};
+use osiris_domain::TriggerStatus;
 use osiris_providers::mocks::fake::FAKE_ID;
 use sqlx::PgPool;
 use time::{Duration, OffsetDateTime};
@@ -145,4 +147,26 @@ pub async fn active_with(db: &Db, user_id: &str, state: &str, tokens: &NewTokens
     .await
     .unwrap();
     id
+}
+
+/// An active trigger of the fake provider on `connected_account_id`, signed with `secret`, waiting
+/// for the scheduled check `poll_task`.
+pub fn generate_trigger(
+    connected_account_id: &str,
+    secret_value: &str,
+    poll_task: Option<&str>,
+) -> NewTrigger {
+    NewTrigger {
+        id: ids::id("tr"),
+        connected_account_id: connected_account_id.into(),
+        kind: format!("{FAKE_ID}.on_event"),
+        config: serde_json::json!({}),
+        secret: secret(secret_value),
+        status: TriggerStatus::Active,
+        subscription_id: Some(generate_secret("subscription")),
+        checkpoint: None,
+        last_error: None,
+        poll_task: poll_task.map(str::to_owned),
+        poll_task_at: poll_task.map(|_| OffsetDateTime::now_utc() + Duration::hours(1)),
+    }
 }

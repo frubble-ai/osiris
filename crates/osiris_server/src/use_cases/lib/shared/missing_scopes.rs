@@ -32,4 +32,6 @@ pub fn missing_scopes<'a>(
 }
 
 #[cfg(test)]
+mod mocks;
+#[cfg(test)]
 mod tests;

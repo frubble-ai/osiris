@@ -1,4 +1,5 @@
-//! Disconnects: ends the grant at the provider whenever osiris holds tokens for it (active,
+//! Disconnects: ends its triggers' subscriptions at the provider, ends the grant at the provider
+//! whenever osiris holds tokens for it (active,
 //! expired or disabled), deletes the connection, and cancels its pending refresh task by name. A
 //! grant the provider no longer has counts as ended. If the provider cannot be reached, the
 //! connection is kept so the call can be tried again. If cancelling the task fails, the task does
@@ -6,6 +7,7 @@
 
 use crate::use_cases::{
     UseCaseResult, UseCases,
+    cases::triggers::end_trigger_subscription::EndTriggerSubscriptionArgs,
     lib::{
         oauth::oauth_client::oauth_client,
         shared::{domain_errors::provider as provider_error, redirect_uri::redirect_uri},
@@ -29,6 +31,20 @@ impl UseCases {
             let ctx = self.context();
             let id = args.id;
             let account = ctx.db.connected_account(id).await?;
+            // Its triggers' subscriptions are ended first, while its token still reaches the
+            // provider; deleting the connection deletes the triggers.
+            for trigger in ctx.db.connection_triggers(id).await? {
+                self.end_trigger_subscription(EndTriggerSubscriptionArgs {
+                    trigger_id: &trigger.id,
+                    connected_account_id: &trigger.connected_account_id,
+                    provider: &trigger.provider,
+                    kind: &trigger.kind,
+                    config: &trigger.config,
+                    subscription_id: trigger.subscription_id.as_deref(),
+                    poll_task: trigger.poll_task.as_deref(),
+                })
+                .await;
+            }
             // Whatever its status, a connection that holds tokens has a grant to end at the
             // provider.
             if let Some(tokens) = &account.tokens {

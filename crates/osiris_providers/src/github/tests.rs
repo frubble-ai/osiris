@@ -223,6 +223,34 @@ async fn tells_a_rejected_token_from_a_refusal(#[case] status: u16, #[case] reje
 }
 
 #[rstest]
+#[case::primary_rate_limit(403, "API rate limit exceeded for user ID 1.", true)]
+#[case::secondary_rate_limit(403, "You have exceeded a secondary rate limit.", true)]
+#[case::too_many_requests(429, "Too many requests", true)]
+#[case::forbidden(403, "Resource not accessible by integration", false)]
+#[tokio::test]
+async fn reads_a_rate_limit_as_a_failure_for_now_not_a_refusal(
+    #[case] status: u16,
+    #[case] message: &str,
+    #[case] for_now: bool,
+) {
+    let server = MockServer::start().await;
+    MockGithubNetwork::on(&server)
+        .fail_installations(status, message)
+        .await;
+
+    let error = github(&server, LIMITS)
+        .list_installations(&reqwest::Client::new(), "token", &ListInstallations {})
+        .await
+        .unwrap_err();
+
+    assert_eq!(
+        matches!(error, ProviderError::Unavailable { .. }),
+        for_now,
+        "{error}"
+    );
+}
+
+#[rstest]
 #[case::revoked_now(204)]
 #[case::already_gone(404)]
 #[tokio::test]
