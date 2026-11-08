@@ -1,6 +1,6 @@
 //! `github.watch_pull_request`'s configuration: the pull request it watches.
 
-use super::repo_event_config::repository_names;
+use super::repository_names::repository_names;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 

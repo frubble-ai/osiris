@@ -12,6 +12,7 @@ pub mod hook_body;
 pub mod kinds;
 pub mod receive_delivery;
 pub mod repo_event_config;
+pub mod repository_names;
 pub mod verify_signature;
 pub mod watch_pull_request_config;
 

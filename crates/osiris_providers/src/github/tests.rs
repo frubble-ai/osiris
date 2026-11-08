@@ -172,6 +172,41 @@ async fn reads_an_installation_s_own_repositories_on_an_installation_connection(
 }
 
 #[tokio::test]
+async fn answers_no_more_of_an_installation_s_repositories_than_the_cap() {
+    let server = MockServer::start().await;
+    let page: Vec<_> = (1..=100).map(generate_github_repository).collect();
+    MockGithubNetwork::on(&server)
+        .answer(
+            "GET",
+            "/installation/repositories",
+            &[("per_page", "100"), ("page", "1")],
+            200,
+            serde_json::json!({ "total_count": 300, "repositories": page }),
+        )
+        .await;
+
+    let repositories = github(
+        &server,
+        ListLimits {
+            concurrency: 1,
+            max_items: 50,
+            max_log_bytes: 262_144,
+            max_scan_pages: 10,
+        },
+    )
+    .list_repositories(
+        &reqwest::Client::new(),
+        &generate_github_token(),
+        &ListRepositories {},
+        ActingAs::Installation,
+    )
+    .await
+    .unwrap();
+
+    assert_eq!(repositories.len(), 50);
+}
+
+#[tokio::test]
 async fn stops_reading_repositories_at_the_cap() {
     let server = MockServer::start().await;
     let network = MockGithubNetwork::on(&server);

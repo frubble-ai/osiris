@@ -84,6 +84,8 @@ impl Github {
             repositories.extend(next.repositories.into_iter().map(GithubRepository::from));
             let seen = u64::try_from(repositories.len()).unwrap_or(u64::MAX);
             if short || seen >= next.total_count || repositories.len() >= self.limits.max_items {
+                // A page may end past the cap; no list answers more than it.
+                repositories.truncate(self.limits.max_items);
                 return Ok(repositories);
             }
             page += 1;
