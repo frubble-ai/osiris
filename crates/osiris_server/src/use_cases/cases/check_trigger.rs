@@ -14,7 +14,10 @@ use crate::use_cases::{
     UseCaseResult, UseCases,
     cases::run_connected_account_action::RunConnectedAccountActionArgs,
     lib::{
-        events::{publish::publish, trigger_event_id::trigger_event_id},
+        events::{
+            bounded_trigger_data::bounded_trigger_data, publish::publish,
+            trigger_event_id::trigger_event_id,
+        },
         installation_tokens::mint_refused::MintRefused,
         tasks::{next_trigger_check::next_trigger_check, schedule::schedule},
         triggers::TriggerState,
@@ -233,7 +236,7 @@ impl UseCases {
             TriggerFired {
                 trigger_id: trigger.id.clone(),
                 trigger: trigger.kind.clone(),
-                data,
+                data: bounded_trigger_data(data, ctx.config.settings.triggers.max_event_data()),
             },
         );
         publish(&ctx.messages, ctx.scheduling(), &event).await;

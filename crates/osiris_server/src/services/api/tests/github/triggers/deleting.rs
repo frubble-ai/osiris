@@ -64,7 +64,8 @@ async fn keeps_the_trigger_to_delete_again_while_github_can_t_be_reached(pool: P
 
     let kept = delete_trigger(&app, &id).await;
 
-    assert_ne!(kept.status, StatusCode::OK, "{}", kept.body);
+    assert_eq!(kept.status, StatusCode::BAD_GATEWAY, "{}", kept.body);
+    assert_eq!(kept.body["error"]["code"], "OS_05");
     let trigger = get_trigger(&app, &id).await;
     assert_eq!(trigger.status, StatusCode::OK, "{}", trigger.body);
     assert_eq!(trigger.body["status"], "active");
@@ -112,7 +113,8 @@ async fn marks_the_triggers_failed_when_the_connection_is_kept_because_github_is
         )
         .await;
 
-    assert_ne!(kept.status, StatusCode::OK, "{}", kept.body);
+    assert_eq!(kept.status, StatusCode::BAD_GATEWAY, "{}", kept.body);
+    assert_eq!(kept.body["error"]["code"], "OS_05");
     assert_eq!(app.account(&connection).await["status"], "active");
     let trigger = get_trigger(&app, &id).await;
     assert_eq!(trigger.status, StatusCode::OK, "{}", trigger.body);

@@ -14,7 +14,8 @@ pub struct TriggerEvent {
     /// The trigger's kind, `<provider>.<kind>`, on a `trigger.fired` event.
     pub trigger: Option<String>,
     /// What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape,
-    /// which its provider's documentation describes.
+    /// which its provider's documentation describes. Data larger than osiris carries in one event
+    /// is `{"omitted": true, "bytes": <length>}` instead: read what changed from the provider.
     #[schema(value_type = Option<Object>)]
     pub data: Option<serde_json::Value>,
 }

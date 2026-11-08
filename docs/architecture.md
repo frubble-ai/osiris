@@ -230,6 +230,9 @@ A trigger (`tr_…`) subscribes at a connection's provider and publishes what it
   signed with the trigger's own random secret (HMAC-SHA256), which is encrypted at rest. The route
   is public and trusts only the signature: a delivery not signed with the secret is answered 404,
   as a missing trigger is. A signed delivery is answered 202, whether it is published or ignored.
+- **Event size**: a fired event's `data` over `[triggers] max_event_data_bytes` (under a Cloud
+  Tasks task's 1 MB, which carries an event whose publish failed) is replaced by
+  `{"omitted": true, "bytes": <length>}`.
 - **Event ids**: a fired event's id is derived from the trigger and the provider's delivery id, so
   a delivery sent twice is published with the same `event_id`.
 - **Checks on a schedule**: a kind that checks on a schedule records the state it starts

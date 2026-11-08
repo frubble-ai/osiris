@@ -12,7 +12,7 @@ use super::support::{
     Watched, answer, create, deliver, deliver_as, fired, get_trigger, watching_a_pull_request,
     watching_repo_events, webhook_secret,
 };
-use crate::testing::{API_KEY, setup_test_context};
+use crate::testing::{API_KEY, setup_test_context, setup_test_context_with};
 use axum::http::StatusCode;
 use osiris_domain::TaskOutcome;
 use osiris_providers::github::mocks::generate_sha::generate_sha;
@@ -134,6 +134,28 @@ async fn publishes_a_delivery_that_names_no_delivery_id_once(pool: PgPool) {
         events[0].data.as_ref().unwrap()["payload"]["ref"],
         "refs/heads/main"
     );
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn publishes_a_delivery_too_large_to_carry_with_its_data_omitted(pool: PgPool) {
+    let app = setup_test_context_with(pool, |config| {
+        config.settings.triggers.max_event_data_bytes = 256;
+    })
+    .await;
+    let (_, id, watched) = watching_repo_events(&app).await;
+    let secret = webhook_secret(&app, &watched).await;
+    let push = json!({ "ref": "refs/heads/main", "commits": "x".repeat(1024) });
+
+    assert_eq!(
+        deliver(&app, &id, "push", &push, Some(&secret)).await,
+        StatusCode::ACCEPTED
+    );
+
+    let events = fired(&app);
+    assert_eq!(events.len(), 1, "{events:?}");
+    let data = events[0].data.as_ref().unwrap();
+    assert_eq!(data["omitted"], true, "{data}");
+    assert!(data["bytes"].as_u64().unwrap() > 256, "{data}");
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]

@@ -12448,7 +12448,7 @@
             "type": "string"
           },
           "data": {
-            "description": "What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape,\nwhich its provider's documentation describes.",
+            "description": "What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape,\nwhich its provider's documentation describes. Data larger than osiris carries in one event\nis `{\"omitted\": true, \"bytes\": <length>}` instead: read what changed from the provider.",
             "type": [
               "object",
               "null"

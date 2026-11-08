@@ -6,7 +6,10 @@
 use crate::use_cases::{
     UseCaseResult, UseCases,
     cases::check_trigger::CheckTriggerArgs,
-    lib::events::{publish::publish, trigger_event_id::trigger_event_id},
+    lib::events::{
+        bounded_trigger_data::bounded_trigger_data, publish::publish,
+        trigger_event_id::trigger_event_id,
+    },
 };
 use axum::http::HeaderMap;
 use osiris_common::{ids, secret::ExposeSecret};
@@ -66,7 +69,10 @@ impl UseCases {
                         TriggerFired {
                             trigger_id: trigger.id.clone(),
                             trigger: trigger.kind.clone(),
-                            data,
+                            data: bounded_trigger_data(
+                                data,
+                                ctx.config.settings.triggers.max_event_data(),
+                            ),
                         },
                     );
                     publish(&ctx.messages, ctx.scheduling(), &event).await;
