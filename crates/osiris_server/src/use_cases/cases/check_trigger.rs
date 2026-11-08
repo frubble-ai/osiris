@@ -119,7 +119,7 @@ impl UseCases {
             };
             let written = ctx
                 .db
-                .update_trigger_state(&trigger.id, Some(name), state)
+                .update_trigger_state(&trigger.id, Some(name), trigger.checkpoint.as_ref(), state)
                 .await?;
             if written.is_none() {
                 // Another check moved the trigger on meanwhile; the next check it scheduled is
@@ -146,7 +146,11 @@ impl UseCases {
             Checked::Answered(answer) => {
                 self.publish_change(trigger, answer.fired).await;
                 ctx.db
-                    .update_trigger_checkpoint(&trigger.id, &answer.checkpoint)
+                    .update_trigger_checkpoint(
+                        &trigger.id,
+                        trigger.checkpoint.as_ref(),
+                        &answer.checkpoint,
+                    )
                     .await?;
                 Ok((TaskOutcome::TriggerChecked, None))
             }
@@ -160,7 +164,12 @@ impl UseCases {
                     poll_task_at: None,
                 };
                 ctx.db
-                    .update_trigger_state(&trigger.id, trigger.poll_task.as_deref(), state)
+                    .update_trigger_state(
+                        &trigger.id,
+                        trigger.poll_task.as_deref(),
+                        trigger.checkpoint.as_ref(),
+                        state,
+                    )
                     .await?;
                 Ok((TaskOutcome::Failed, Some(REFUSED)))
             }

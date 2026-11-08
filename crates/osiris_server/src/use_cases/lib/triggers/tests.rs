@@ -168,13 +168,13 @@ async fn writes_a_state_only_while_the_trigger_waits_for_that_check(pool: PgPool
 
     // A check the trigger no longer waits for writes nothing.
     assert!(
-        db.update_trigger_state(&id, Some("check-0"), checked("check-9"))
+        db.update_trigger_state(&id, Some("check-0"), None, checked("check-9"))
             .await
             .unwrap()
             .is_none()
     );
     assert!(
-        db.update_trigger_state(&id, None, checked("check-9"))
+        db.update_trigger_state(&id, None, None, checked("check-9"))
             .await
             .unwrap()
             .is_none()
@@ -187,7 +187,7 @@ async fn writes_a_state_only_while_the_trigger_waits_for_that_check(pool: PgPool
     let state = checked("check-2");
     let checkpoint = state.checkpoint.clone();
     let written = db
-        .update_trigger_state(&id, Some("check-1"), state)
+        .update_trigger_state(&id, Some("check-1"), None, state)
         .await
         .unwrap()
         .unwrap();
@@ -195,7 +195,7 @@ async fn writes_a_state_only_while_the_trigger_waits_for_that_check(pool: PgPool
     assert_eq!(written.checkpoint, checkpoint);
     // The check that just ran is no longer the one the trigger waits for.
     assert!(
-        db.update_trigger_state(&id, Some("check-1"), checked("check-3"))
+        db.update_trigger_state(&id, Some("check-1"), None, checked("check-3"))
             .await
             .unwrap()
             .is_none()
@@ -203,7 +203,7 @@ async fn writes_a_state_only_while_the_trigger_waits_for_that_check(pool: PgPool
     // A trigger that is gone writes nothing either.
     db.delete_trigger(&id).await.unwrap();
     assert!(
-        db.update_trigger_state(&id, Some("check-2"), checked("check-3"))
+        db.update_trigger_state(&id, Some("check-2"), None, checked("check-3"))
             .await
             .unwrap()
             .is_none()
@@ -218,7 +218,11 @@ async fn writes_a_checkpoint_only_on_an_active_trigger_and_leaves_its_schedule(p
     let before = db.trigger(&id).await.unwrap();
 
     let seen = json!({ "version": "a" });
-    assert!(db.update_trigger_checkpoint(&id, &seen).await.unwrap());
+    assert!(
+        db.update_trigger_checkpoint(&id, None, &seen)
+            .await
+            .unwrap()
+    );
     let after = db.trigger(&id).await.unwrap();
     assert_eq!(after.checkpoint, Some(seen));
     assert_eq!(after.poll_task, before.poll_task);
@@ -231,12 +235,12 @@ async fn writes_a_checkpoint_only_on_an_active_trigger_and_leaves_its_schedule(p
         poll_task: None,
         poll_task_at: None,
     };
-    db.update_trigger_state(&id, Some("check-1"), failed)
+    db.update_trigger_state(&id, Some("check-1"), after.checkpoint.as_ref(), failed)
         .await
         .unwrap()
         .unwrap();
     assert!(
-        !db.update_trigger_checkpoint(&id, &json!({ "version": "b" }))
+        !db.update_trigger_checkpoint(&id, after.checkpoint.as_ref(), &json!({ "version": "b" }))
             .await
             .unwrap()
     );
@@ -245,10 +249,40 @@ async fn writes_a_checkpoint_only_on_an_active_trigger_and_leaves_its_schedule(p
     assert_eq!(unchanged.checkpoint, after.checkpoint);
     assert_eq!(unchanged.last_error.as_deref(), Some("refused"));
     assert!(
-        !db.update_trigger_checkpoint("tr_missing", &json!({}))
+        !db.update_trigger_checkpoint("tr_missing", None, &json!({}))
             .await
             .unwrap()
     );
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn keeps_a_newer_checkpoint_another_check_wrote_meanwhile(pool: PgPool) {
+    let db = db(pool);
+    let account = connection(&db).await;
+    let id = trigger(&db, &account, Some("check-1")).await;
+    // Two checks start from no checkpoint; the one a delivery asked for writes first.
+    let newer = json!({ "version": "delivery", "sequence": 1 });
+    assert!(
+        db.update_trigger_checkpoint(&id, None, &newer)
+            .await
+            .unwrap()
+    );
+
+    // The slower one from the same start doesn't overwrite it, and still moves the schedule on.
+    let written = db
+        .update_trigger_state(&id, Some("check-1"), None, checked("check-2"))
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(written.checkpoint, Some(newer.clone()));
+    assert_eq!(written.poll_task.as_deref(), Some("check-2"));
+    // Nor does a delivery's check that started from the old one.
+    assert!(
+        !db.update_trigger_checkpoint(&id, None, &json!({ "version": "stale" }))
+            .await
+            .unwrap()
+    );
+    assert_eq!(db.trigger(&id).await.unwrap().checkpoint, Some(newer));
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]

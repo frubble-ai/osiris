@@ -87,3 +87,20 @@ async fn deletes_the_webhook_again_when_the_first_check_fails(pool: PgPool) {
         "no check is scheduled for a trigger that was never created"
     );
 }
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn answers_404_for_a_trigger_on_a_connection_that_does_not_exist(pool: PgPool) {
+    let app = setup_test_context(pool).await;
+    let watched = Watched::generate();
+
+    let missing = create(
+        &app,
+        "ca_missing",
+        "github.on_repo_event",
+        watched.repo_events(&["push"]),
+    )
+    .await;
+
+    assert_eq!(missing.status, StatusCode::NOT_FOUND, "{}", missing.body);
+    assert_eq!(missing.body["error"]["code"], "OS_01");
+}

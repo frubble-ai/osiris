@@ -105,7 +105,12 @@ impl UseCases {
         };
         self.context()
             .db
-            .update_trigger_state(&trigger.id, trigger.poll_task.as_deref(), ended)
+            .update_trigger_state(
+                &trigger.id,
+                trigger.poll_task.as_deref(),
+                trigger.checkpoint.as_ref(),
+                ended,
+            )
             .await?;
         Ok(())
     }
