@@ -1,8 +1,0 @@
-[
- {"group":"installations","name":"list_installations","input":"ListInstallations","output":"GithubInstallation","list":true,"no_input":true,"summary":"where the GitHub App is installed, of what the connected user can see."},
- {"group":"installations","name":"list_repositories","input":"ListRepositories","output":"GithubRepository","list":true,"no_input":true,"summary":"every repository the GitHub App's installations give the connected user, each once."},
- {"group":"users","name":"get_current_user","input":"GetCurrentUser","output":"GithubCurrentUser","no_input":true,"summary":"the authenticated user and their profile."},
- {"group":"repositories","name":"get_repository","input":"GetRepository","output":"GithubRepository","summary":"a repository, by owner and name."},
- {"group":"repositories","name":"list_branches","input":"ListBranches","output":"GithubBranch","list":true,"summary":"a repository's branches, a page at a time."},
- {"group":"repositories","name":"get_branch","input":"GetBranch","output":"GithubBranch","summary":"a branch, by name."}
-]

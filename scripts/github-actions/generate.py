@@ -1,15 +1,16 @@
-"""Writes the GitHub actions' use cases and routes, which all share one shape, from actions.json, and
+"""Writes the GitHub actions' use cases and routes, which all share one shape, from actions/*.json (one
+file per group), and
 the group modules and the router that list them. The provider call, its input and its answer's
 type are written by hand in osiris_providers/src/github/<group>/<action>.rs.
 
 Each entry: group, name, input (the input type), output (the answer's type), summary (what it
 does, for the docs), list (true when it answers a list), no_input (true when it takes no body).
 
-Usage, from the repository's root: python3 scripts/github-actions/generate.py . scripts/github-actions/actions.json
+Usage, from the repository's root: python3 scripts/github-actions/generate.py . scripts/github-actions/actions
 Then `cargo fmt`."""
 import json, os, sys
 root = sys.argv[1]
-actions = json.load(open(sys.argv[2]))
+actions = [action for name in sorted(os.listdir(sys.argv[2])) if name.endswith(".json") for action in json.load(open(os.path.join(sys.argv[2], name)))]
 cases = f"{root}/crates/osiris_server/src/use_cases/cases/github"
 routes = f"{root}/crates/osiris_server/src/routes/actions/github"
 

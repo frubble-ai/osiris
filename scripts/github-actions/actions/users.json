@@ -1,0 +1,10 @@
+[
+ {
+  "group": "users",
+  "name": "get_current_user",
+  "input": "GetCurrentUser",
+  "output": "GithubCurrentUser",
+  "no_input": true,
+  "summary": "the authenticated user and their profile."
+ }
+]
