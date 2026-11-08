@@ -2,21 +2,25 @@
 //! text, followed by a GitHub qualifier for each filter given, as `OpenConnector` builds it.
 
 use super::SearchIssuesAndPullRequests;
+use crate::github::trimmed::trimmed;
 
 /// The caller's search text (`query`, else `q`), then the qualifiers its filters stand for, joined
 /// by spaces. A filter left out, empty or only spaces adds nothing.
 pub fn search_query(input: &SearchIssuesAndPullRequests) -> String {
     let mut parts: Vec<String> = Vec::new();
-    if let Some(text) = given(input.query.as_ref()).or_else(|| given(input.q.as_ref())) {
+    if let Some(text) = trimmed(input.query.as_deref()).or_else(|| trimmed(input.q.as_deref())) {
         parts.push(text.to_owned());
     }
-    match (given(input.owner.as_ref()), given(input.repo.as_ref())) {
+    match (
+        trimmed(input.owner.as_deref()),
+        trimmed(input.repo.as_deref()),
+    ) {
         (Some(owner), Some(repo)) => parts.push(format!("repo:{owner}/{repo}")),
         (_, Some(repo)) if repo.contains('/') => parts.push(format!("repo:{repo}")),
         (Some(owner), _) => parts.push(format!("user:{owner}")),
         _ => {}
     }
-    if let Some(state) = given(input.state.as_ref())
+    if let Some(state) = trimmed(input.state.as_deref())
         && state != "all"
     {
         parts.push(format!("state:{state}"));
@@ -35,7 +39,7 @@ pub fn search_query(input: &SearchIssuesAndPullRequests) -> String {
         (&input.base_branch, "base"),
         (&input.head_branch, "head"),
     ] {
-        if let Some(value) = given(value.as_ref()) {
+        if let Some(value) = trimmed(value.as_deref()) {
             parts.push(format!("{qualifier}:{}", quoted(value)));
         }
     }
@@ -45,13 +49,6 @@ pub fn search_query(input: &SearchIssuesAndPullRequests) -> String {
         None => {}
     }
     parts.join(" ").trim().to_owned()
-}
-
-/// `value` without its surrounding spaces, or nothing when that leaves it empty.
-fn given(value: Option<&String>) -> Option<&str> {
-    value
-        .map(|value| value.trim())
-        .filter(|value| !value.is_empty())
 }
 
 /// `value` in double quotes, escaped as JSON, when it holds a space, so that GitHub reads it as

@@ -6,7 +6,8 @@ use crate::{
     ProviderError,
     github::{
         Github, paging::paging, path_segment::path_segment, request::send,
-        transformers::review_comment::ReviewCommentAnswer, types::GithubReviewComment,
+        transformers::review_comment::ReviewCommentAnswer, trimmed::trimmed,
+        types::GithubReviewComment,
     },
 };
 use reqwest::Method;
@@ -73,8 +74,8 @@ impl Github {
         if let Some(direction) = input.direction {
             query.push(("direction", direction.as_str().to_owned()));
         }
-        if let Some(since) = &input.since {
-            query.push(("since", since.clone()));
+        if let Some(since) = trimmed(input.since.as_deref()) {
+            query.push(("since", since.to_owned()));
         }
         let answer: Vec<ReviewCommentAnswer> =
             send::<_, ()>(self, http, token, Method::GET, &path, &query, None).await?;

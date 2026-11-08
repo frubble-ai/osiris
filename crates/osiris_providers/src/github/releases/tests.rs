@@ -103,6 +103,43 @@ async fn creates_a_release_sending_only_the_fields_given() {
 }
 
 #[tokio::test]
+async fn creates_a_release_with_its_target_trimmed_a_blank_latest_left_out_and_its_name_as_given() {
+    let server = MockServer::start().await;
+    MockGithubReleaseRequests::on(&server)
+        .answer_with_body(
+            "POST",
+            "/repos/octo/hello/releases",
+            json!({
+                "tag_name": "v1.0.0",
+                "target_commitish": "main",
+                "name": "  Spring  ",
+            }),
+            201,
+            generate_github_release(13, "v1.0.0"),
+        )
+        .await;
+    let input = CreateRelease {
+        owner: "octo".into(),
+        repo: "hello".into(),
+        tag_name: "v1.0.0".into(),
+        target_commitish: Some(" main ".into()),
+        name: Some("  Spring  ".into()),
+        body: None,
+        draft: None,
+        prerelease: None,
+        generate_release_notes: None,
+        make_latest: Some("   ".into()),
+    };
+
+    let release = github_on(&server)
+        .create_release(&reqwest::Client::new(), "token", &input)
+        .await
+        .unwrap();
+
+    assert_eq!(release.id, "13");
+}
+
+#[tokio::test]
 async fn reads_a_release_by_its_id() {
     let server = MockServer::start().await;
     let answer = generate_github_release(13, "v1.2.0");

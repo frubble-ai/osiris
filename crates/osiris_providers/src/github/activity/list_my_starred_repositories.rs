@@ -5,7 +5,7 @@ use crate::{
     ProviderError,
     github::{
         Github, paging::paging, request::send, transformers::repository::RepositoryAnswer,
-        types::GithubRepository,
+        trimmed::trimmed, types::GithubRepository,
     },
 };
 use reqwest::Method;
@@ -40,11 +40,11 @@ impl Github {
         input: &ListMyStarredRepositories,
     ) -> Result<Vec<GithubRepository>, ProviderError> {
         let mut query = Vec::new();
-        if let Some(sort) = &input.sort {
-            query.push(("sort", sort.clone()));
+        if let Some(sort) = trimmed(input.sort.as_deref()) {
+            query.push(("sort", sort.to_owned()));
         }
-        if let Some(direction) = &input.direction {
-            query.push(("direction", direction.clone()));
+        if let Some(direction) = trimmed(input.direction.as_deref()) {
+            query.push(("direction", direction.to_owned()));
         }
         query.extend(paging(input.per_page, input.page));
         let answer: Vec<RepositoryAnswer> = send::<_, ()>(

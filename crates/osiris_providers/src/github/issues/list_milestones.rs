@@ -4,7 +4,7 @@ use crate::{
     ProviderError,
     github::{
         Github, paging::paging, path_segment::path_segment, request::send,
-        transformers::milestone::MilestoneAnswer, types::GithubMilestone,
+        transformers::milestone::MilestoneAnswer, trimmed::trimmed, types::GithubMilestone,
     },
 };
 use reqwest::Method;
@@ -47,14 +47,14 @@ impl Github {
             path_segment(&input.repo)
         );
         let mut query = paging(input.per_page, input.page);
-        if let Some(state) = &input.state {
-            query.push(("state", state.clone()));
+        if let Some(state) = trimmed(input.state.as_deref()) {
+            query.push(("state", state.to_owned()));
         }
-        if let Some(sort) = &input.sort {
-            query.push(("sort", sort.clone()));
+        if let Some(sort) = trimmed(input.sort.as_deref()) {
+            query.push(("sort", sort.to_owned()));
         }
-        if let Some(direction) = &input.direction {
-            query.push(("direction", direction.clone()));
+        if let Some(direction) = trimmed(input.direction.as_deref()) {
+            query.push(("direction", direction.to_owned()));
         }
         let answer: Vec<MilestoneAnswer> =
             send::<_, ()>(self, http, token, Method::GET, &path, &query, None).await?;

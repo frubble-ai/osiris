@@ -6,7 +6,7 @@ use crate::{
     ProviderError,
     github::{
         Github, path_segment::path_segment, request::send, transformers::review::ReviewAnswer,
-        types::GithubReview,
+        trimmed::trimmed, types::GithubReview,
     },
 };
 use reqwest::Method;
@@ -63,7 +63,7 @@ impl Github {
         let payload = Payload {
             body: input.body.as_deref(),
             event: input.event,
-            commit_id: input.commit_id.as_deref(),
+            commit_id: trimmed(input.commit_id.as_deref()),
             comments: input
                 .comments
                 .as_ref()

@@ -4,7 +4,7 @@ use crate::{
     ProviderError,
     github::{
         Github, path_segment::path_segment, request::send, transformers::issue::IssueAnswer,
-        types::GithubIssue,
+        trimmed::trimmed, types::GithubIssue,
     },
 };
 use reqwest::Method;
@@ -69,7 +69,7 @@ impl Github {
         let body = UpdateIssueBody {
             title: input.title.as_deref(),
             body: input.body.as_deref(),
-            state: input.state.as_deref(),
+            state: trimmed(input.state.as_deref()),
             assignees: input.assignees.as_deref(),
             labels: input.labels.as_deref(),
             milestone: input.milestone,

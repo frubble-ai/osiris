@@ -5,7 +5,7 @@ use crate::{
     ProviderError,
     github::{
         Github, path_segment::path_segment, request::send,
-        transformers::release::ReleaseNotesAnswer, types::GithubReleaseNotes,
+        transformers::release::ReleaseNotesAnswer, trimmed::trimmed, types::GithubReleaseNotes,
     },
 };
 use reqwest::Method;
@@ -61,9 +61,9 @@ impl Github {
         );
         let body = GenerateReleaseNotesBody {
             tag_name: &input.tag_name,
-            target_commitish: input.target_commitish.as_deref(),
-            previous_tag_name: input.previous_tag_name.as_deref(),
-            configuration_file_path: input.configuration_file_path.as_deref(),
+            target_commitish: trimmed(input.target_commitish.as_deref()),
+            previous_tag_name: trimmed(input.previous_tag_name.as_deref()),
+            configuration_file_path: trimmed(input.configuration_file_path.as_deref()),
         };
         let answer: ReleaseNotesAnswer =
             send(self, http, token, Method::POST, &path, &[], Some(&body)).await?;

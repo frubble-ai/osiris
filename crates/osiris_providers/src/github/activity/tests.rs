@@ -22,7 +22,10 @@ use crate::{
 };
 use rstest::rstest;
 use serde_json::{Value, json};
-use wiremock::MockServer;
+use wiremock::{
+    Mock, MockServer, ResponseTemplate,
+    matchers::{method, path, query_param, query_param_is_missing},
+};
 
 #[tokio::test]
 async fn lists_a_page_of_the_public_feed() {
@@ -331,4 +334,30 @@ async fn lists_the_repositories_the_user_starred_sorted_as_asked() {
         listed[0].full_name,
         repositories[0]["full_name"].as_str().unwrap()
     );
+}
+
+#[tokio::test]
+async fn sends_the_starred_sort_trimmed_and_leaves_out_a_blank_direction() {
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/user/starred"))
+        .and(query_param("sort", "created"))
+        .and(query_param_is_missing("direction"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!([])))
+        .expect(1)
+        .mount(&server)
+        .await;
+    let input = ListMyStarredRepositories {
+        sort: Some(" created  ".into()),
+        direction: Some("   ".into()),
+        per_page: None,
+        page: None,
+    };
+
+    let listed = github_on(&server)
+        .list_my_starred_repositories(&reqwest::Client::new(), "token", &input)
+        .await
+        .unwrap();
+
+    assert!(listed.is_empty());
 }

@@ -237,6 +237,48 @@ async fn lists_workflow_runs_filtered_as_asked() {
 }
 
 #[tokio::test]
+async fn leaves_out_a_blank_actor_and_trims_a_padded_branch_of_a_run_list() {
+    let server = MockServer::start().await;
+    MockGithubNetwork::on(&server)
+        .answer(
+            "GET",
+            "/repos/octo/hello/actions/runs",
+            &[("branch", "main")],
+            200,
+            json!({ "total_count": 0, "workflow_runs": [] }),
+        )
+        .await;
+    let input = ListWorkflowRuns {
+        owner: "octo".into(),
+        repo: "hello".into(),
+        actor: Some("   ".into()),
+        branch: Some("  main  ".into()),
+        created: None,
+        check_suite_id: None,
+        event: None,
+        head_sha: None,
+        status: None,
+        exclude_pull_requests: None,
+        per_page: None,
+        page: None,
+    };
+
+    let listed = github_on(&server)
+        .list_workflow_runs(&reqwest::Client::new(), "token", &input)
+        .await
+        .unwrap();
+
+    assert!(listed.is_empty());
+    let requests = server.received_requests().await.unwrap();
+    assert!(
+        !requests[0]
+            .url
+            .query_pairs()
+            .any(|(name, _)| name == "actor")
+    );
+}
+
+#[tokio::test]
 async fn reads_a_workflow_run_by_id() {
     let server = MockServer::start().await;
     let answer = generate_github_workflow_run(30, 161_335);

@@ -3,8 +3,8 @@
 use crate::{
     ProviderError,
     github::{
-        Github, paging::paging, repositories::trimmed::trimmed, request::send,
-        transformers::repository::RepositoryAnswer, types::GithubRepository,
+        Github, paging::paging, request::send, transformers::repository::RepositoryAnswer,
+        trimmed::trimmed, types::GithubRepository,
     },
 };
 use reqwest::Method;

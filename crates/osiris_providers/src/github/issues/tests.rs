@@ -40,7 +40,10 @@ use crate::{
 use fake::{Fake, faker::lorem::en::Word};
 use rstest::rstest;
 use serde_json::{Value, json};
-use wiremock::MockServer;
+use wiremock::{
+    Mock, MockServer, ResponseTemplate,
+    matchers::{method, path, query_param, query_param_is_missing},
+};
 
 fn http() -> reqwest::Client {
     reqwest::Client::new()
@@ -136,6 +139,39 @@ async fn asks_for_github_s_default_page_size_when_none_is_given() {
 
     assert_eq!(listed.fetched, 1);
     assert!(listed.issues.is_empty());
+}
+
+#[tokio::test]
+async fn sends_the_issue_filters_trimmed_and_leaves_out_the_blank_ones() {
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/repos/octo/hello/issues"))
+        .and(query_param("state", "closed"))
+        .and(query_param("since", "2026-11-01T00:00:00Z"))
+        .and(query_param_is_missing("sort"))
+        .and(query_param_is_missing("direction"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!([])))
+        .expect(1)
+        .mount(&server)
+        .await;
+    let input = ListRepositoryIssues {
+        owner: "octo".into(),
+        repo: "hello".into(),
+        state: Some("  closed ".into()),
+        labels: None,
+        sort: Some("   ".into()),
+        direction: Some(String::new()),
+        since: Some(" 2026-11-01T00:00:00Z ".into()),
+        per_page: None,
+        page: None,
+    };
+
+    let listed = github_on(&server)
+        .list_repository_issues(&http(), "token", &input)
+        .await
+        .unwrap();
+
+    assert_eq!(listed.fetched, 0);
 }
 
 #[tokio::test]
@@ -1045,6 +1081,36 @@ async fn creates_a_milestone_with_only_the_fields_given() {
         .unwrap();
 
     assert_eq!(milestone.id, "271");
+}
+
+#[tokio::test]
+async fn creates_a_milestone_with_its_state_trimmed_and_a_blank_due_date_left_out() {
+    let server = MockServer::start().await;
+    let title = word();
+    MockGithubIssuesNetwork::on(&server)
+        .answer_body(
+            "POST",
+            "/repos/octo/hello/milestones",
+            json!({ "title": title, "state": "closed", "description": "  kept as given  " }),
+            201,
+            Some(generate_github_milestone(272, 4)),
+        )
+        .await;
+    let input = CreateMilestone {
+        owner: "octo".into(),
+        repo: "hello".into(),
+        title,
+        state: Some(" closed ".into()),
+        description: Some("  kept as given  ".into()),
+        due_on: Some("  ".into()),
+    };
+
+    let milestone = github_on(&server)
+        .create_milestone(&http(), "token", &input)
+        .await
+        .unwrap();
+
+    assert_eq!(milestone.id, "272");
 }
 
 #[tokio::test]

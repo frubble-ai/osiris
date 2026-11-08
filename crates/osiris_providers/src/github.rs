@@ -21,6 +21,7 @@ pub mod revoke;
 pub mod search;
 pub mod transformers;
 pub mod triggers;
+pub mod trimmed;
 pub mod types;
 pub mod users;
 pub mod workflows;

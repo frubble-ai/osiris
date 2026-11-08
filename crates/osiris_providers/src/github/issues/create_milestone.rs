@@ -4,7 +4,7 @@ use crate::{
     ProviderError,
     github::{
         Github, path_segment::path_segment, request::send,
-        transformers::milestone::MilestoneAnswer, types::GithubMilestone,
+        transformers::milestone::MilestoneAnswer, trimmed::trimmed, types::GithubMilestone,
     },
 };
 use reqwest::Method;
@@ -55,9 +55,9 @@ impl Github {
         );
         let body = CreateMilestoneBody {
             title: &input.title,
-            state: input.state.as_deref(),
+            state: trimmed(input.state.as_deref()),
             description: input.description.as_deref(),
-            due_on: input.due_on.as_deref(),
+            due_on: trimmed(input.due_on.as_deref()),
         };
         let answer: MilestoneAnswer =
             send(self, http, token, Method::POST, &path, &[], Some(&body)).await?;

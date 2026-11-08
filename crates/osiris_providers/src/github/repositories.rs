@@ -3,7 +3,6 @@
 
 mod contents_path;
 mod git_ref_path;
-mod trimmed;
 
 pub mod add_repository_collaborator;
 pub mod compare_commits;

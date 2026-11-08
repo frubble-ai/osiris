@@ -4,11 +4,8 @@
 use crate::{
     ProviderError,
     github::{
-        Github,
-        repositories::{contents_path::contents_path, trimmed::trimmed},
-        request::send,
-        transformers::content::ContentChangeAnswer,
-        types::GithubContentChange,
+        Github, repositories::contents_path::contents_path, request::send,
+        transformers::content::ContentChangeAnswer, trimmed::trimmed, types::GithubContentChange,
     },
 };
 use reqwest::Method;

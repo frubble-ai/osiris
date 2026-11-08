@@ -4,7 +4,8 @@ use crate::{
     ProviderError,
     github::{
         Github, paging::paging, path_segment::path_segment, request::send,
-        transformers::workflow_jobs_page::WorkflowJobsPage, types::GithubWorkflowJob,
+        transformers::workflow_jobs_page::WorkflowJobsPage, trimmed::trimmed,
+        types::GithubWorkflowJob,
     },
 };
 use reqwest::Method;
@@ -45,8 +46,8 @@ impl Github {
             path_segment(&input.run_id.to_string())
         );
         let mut query = paging(input.per_page, input.page);
-        if let Some(filter) = &input.filter {
-            query.push(("filter", filter.clone()));
+        if let Some(filter) = trimmed(input.filter.as_deref()) {
+            query.push(("filter", filter.to_owned()));
         }
         let answer: WorkflowJobsPage =
             send::<_, ()>(self, http, token, Method::GET, &path, &query, None).await?;

@@ -7,6 +7,7 @@ use crate::{
         paging::paging,
         request::send,
         transformers::{search::SearchRepositoryAnswer, search_results::SearchResultsAnswer},
+        trimmed::trimmed,
         types::GithubRepositorySearchResults,
     },
 };
@@ -43,11 +44,11 @@ impl Github {
         input: &SearchRepositories,
     ) -> Result<GithubRepositorySearchResults, ProviderError> {
         let mut query = vec![("q", input.query.clone())];
-        if let Some(sort) = &input.sort {
-            query.push(("sort", sort.clone()));
+        if let Some(sort) = trimmed(input.sort.as_deref()) {
+            query.push(("sort", sort.to_owned()));
         }
-        if let Some(order) = &input.order {
-            query.push(("order", order.clone()));
+        if let Some(order) = trimmed(input.order.as_deref()) {
+            query.push(("order", order.to_owned()));
         }
         query.extend(paging(input.per_page, input.page));
         let answer: SearchResultsAnswer<SearchRepositoryAnswer> = send::<_, ()>(

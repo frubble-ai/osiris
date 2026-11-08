@@ -5,7 +5,7 @@ use crate::{
     ProviderError,
     github::{
         Github, paging::paging, path_segment::path_segment, request::send,
-        transformers::pull_request::PullRequestAnswer, types::GithubPullRequest,
+        transformers::pull_request::PullRequestAnswer, trimmed::trimmed, types::GithubPullRequest,
     },
 };
 use reqwest::Method;
@@ -95,11 +95,10 @@ impl Github {
         if let Some(state) = input.state {
             query.push(("state", state.as_str().to_owned()));
         }
-        if let Some(head) = &input.head {
-            query.push(("head", head.clone()));
-        }
-        if let Some(base) = &input.base {
-            query.push(("base", base.clone()));
+        for (name, value) in [("head", &input.head), ("base", &input.base)] {
+            if let Some(value) = trimmed(value.as_deref()) {
+                query.push((name, value.to_owned()));
+            }
         }
         if let Some(sort) = input.sort {
             query.push(("sort", sort.as_str().to_owned()));

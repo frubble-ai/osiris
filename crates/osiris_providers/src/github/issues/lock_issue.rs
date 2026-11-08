@@ -2,7 +2,9 @@
 
 use crate::{
     ProviderError,
-    github::{Github, path_segment::path_segment, request::send, types::GithubIssueLock},
+    github::{
+        Github, path_segment::path_segment, request::send, trimmed::trimmed, types::GithubIssueLock,
+    },
 };
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
@@ -44,7 +46,7 @@ impl Github {
             path_segment(&input.issue_number.to_string())
         );
         let body = LockIssueBody {
-            lock_reason: input.lock_reason.as_deref(),
+            lock_reason: trimmed(input.lock_reason.as_deref()),
         };
         send::<(), _>(self, http, token, Method::PUT, &path, &[], Some(&body)).await?;
         Ok(GithubIssueLock { locked: true })

@@ -4,7 +4,8 @@ use crate::{
     ProviderError,
     github::{
         Github, paging::paging, path_segment::path_segment, request::send,
-        transformers::workflow_runs_page::WorkflowRunsPage, types::GithubWorkflowRun,
+        transformers::workflow_runs_page::WorkflowRunsPage, trimmed::trimmed,
+        types::GithubWorkflowRun,
     },
 };
 use reqwest::Method;
@@ -58,17 +59,18 @@ impl Github {
             path_segment(&input.repo)
         );
         let mut query = paging(input.per_page, input.page);
+        let text = |value: &Option<String>| trimmed(value.as_deref()).map(str::to_owned);
         let filters = [
-            ("actor", input.actor.clone()),
-            ("branch", input.branch.clone()),
-            ("created", input.created.clone()),
+            ("actor", text(&input.actor)),
+            ("branch", text(&input.branch)),
+            ("created", text(&input.created)),
             (
                 "check_suite_id",
                 input.check_suite_id.map(|id| id.to_string()),
             ),
-            ("event", input.event.clone()),
-            ("head_sha", input.head_sha.clone()),
-            ("status", input.status.clone()),
+            ("event", text(&input.event)),
+            ("head_sha", text(&input.head_sha)),
+            ("status", text(&input.status)),
             (
                 "exclude_pull_requests",
                 input

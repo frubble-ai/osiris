@@ -57,6 +57,36 @@ async fn sets_a_status_on_a_commit_with_only_the_fields_given() {
 }
 
 #[tokio::test]
+async fn leaves_out_a_blank_link_and_trims_a_padded_context_of_a_status() {
+    let server = MockServer::start().await;
+    MockGithubChecksNetwork::on(&server)
+        .answer_body(
+            "POST",
+            "/repos/octo/hello/statuses/abc123",
+            json!({ "state": "success", "context": "ci/build", "description": " Built " }),
+            201,
+            generate_github_commit_status(7, "success"),
+        )
+        .await;
+    let input = CreateCommitStatus {
+        owner: "octo".into(),
+        repo: "hello".into(),
+        sha: "abc123".into(),
+        state: "success".into(),
+        context: Some("  ci/build  ".into()),
+        target_url: Some("   ".into()),
+        description: Some(" Built ".into()),
+    };
+
+    let status = github_on(&server)
+        .create_commit_status(&reqwest::Client::new(), "token", &input)
+        .await
+        .unwrap();
+
+    assert_eq!(status.id, "7");
+}
+
+#[tokio::test]
 async fn lists_a_page_of_the_statuses_on_a_branch() {
     let server = MockServer::start().await;
     let statuses = [
@@ -136,6 +166,45 @@ async fn lists_the_check_runs_of_a_ref_filtered_as_asked() {
     assert_eq!(listed[1].conclusion.as_deref(), Some("failure"));
     assert_eq!(listed[0].head_sha, runs[0]["head_sha"].as_str().unwrap());
     assert_eq!(listed[0].url.as_deref(), runs[0]["html_url"].as_str());
+}
+
+#[tokio::test]
+async fn leaves_out_a_blank_check_name_and_trims_a_padded_status() {
+    let server = MockServer::start().await;
+    MockGithubNetwork::on(&server)
+        .answer(
+            "GET",
+            "/repos/octo/hello/commits/main/check-runs",
+            &[("status", "completed")],
+            200,
+            json!({ "total_count": 0, "check_runs": [] }),
+        )
+        .await;
+    let input = ListCheckRunsForRef {
+        owner: "octo".into(),
+        repo: "hello".into(),
+        git_ref: "main".into(),
+        app_id: None,
+        check_name: Some("   ".into()),
+        filter: None,
+        status: Some(" completed ".into()),
+        per_page: None,
+        page: None,
+    };
+
+    let listed = github_on(&server)
+        .list_check_runs_for_ref(&reqwest::Client::new(), "token", &input)
+        .await
+        .unwrap();
+
+    assert!(listed.is_empty());
+    let requests = server.received_requests().await.unwrap();
+    assert!(
+        !requests[0]
+            .url
+            .query_pairs()
+            .any(|(name, _)| name == "check_name")
+    );
 }
 
 #[rstest]

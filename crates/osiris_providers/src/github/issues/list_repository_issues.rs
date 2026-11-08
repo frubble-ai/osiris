@@ -9,6 +9,7 @@ use crate::{
         path_segment::path_segment,
         request::send,
         transformers::issue::IssueAnswer,
+        trimmed::trimmed,
         types::{GithubIssue, GithubIssuePage},
     },
 };
@@ -64,20 +65,20 @@ impl Github {
             Some(input.per_page.unwrap_or(GITHUB_DEFAULT_PER_PAGE)),
             input.page,
         );
-        if let Some(state) = &input.state {
-            query.push(("state", state.clone()));
+        if let Some(state) = trimmed(input.state.as_deref()) {
+            query.push(("state", state.to_owned()));
         }
         if let Some(labels) = &input.labels {
             query.push(("labels", labels.join(",")));
         }
-        if let Some(sort) = &input.sort {
-            query.push(("sort", sort.clone()));
+        if let Some(sort) = trimmed(input.sort.as_deref()) {
+            query.push(("sort", sort.to_owned()));
         }
-        if let Some(direction) = &input.direction {
-            query.push(("direction", direction.clone()));
+        if let Some(direction) = trimmed(input.direction.as_deref()) {
+            query.push(("direction", direction.to_owned()));
         }
-        if let Some(since) = &input.since {
-            query.push(("since", since.clone()));
+        if let Some(since) = trimmed(input.since.as_deref()) {
+            query.push(("since", since.to_owned()));
         }
         let answer: Vec<IssueAnswer> =
             send::<_, ()>(self, http, token, Method::GET, &path, &query, None).await?;

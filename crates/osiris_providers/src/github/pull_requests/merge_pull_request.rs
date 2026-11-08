@@ -4,7 +4,7 @@ use crate::{
     ProviderError,
     github::{
         Github, path_segment::path_segment, request::send,
-        transformers::merge_result::MergeResultAnswer, types::GithubMergeResult,
+        transformers::merge_result::MergeResultAnswer, trimmed::trimmed, types::GithubMergeResult,
     },
 };
 use reqwest::Method;
@@ -72,7 +72,7 @@ impl Github {
         let payload = Payload {
             commit_title: input.commit_title.as_deref(),
             commit_message: input.commit_message.as_deref(),
-            sha: input.sha.as_deref(),
+            sha: trimmed(input.sha.as_deref()),
             merge_method: input.merge_method,
         };
         let answer: MergeResultAnswer =

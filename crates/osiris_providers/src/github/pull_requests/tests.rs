@@ -108,6 +108,45 @@ async fn lists_a_page_of_pull_requests_filtered_and_sorted() {
 }
 
 #[tokio::test]
+async fn leaves_out_a_blank_branch_and_trims_a_padded_one_in_a_pull_request_list() {
+    let server = MockServer::start().await;
+    MockGithubNetwork::on(&server)
+        .answer(
+            "GET",
+            "/repos/octo/hello/pulls",
+            &[("base", "main")],
+            200,
+            json!([]),
+        )
+        .await;
+    let input = ListPullRequests {
+        owner: "octo".into(),
+        repo: "hello".into(),
+        state: None,
+        head: Some("   ".into()),
+        base: Some("  main  ".into()),
+        sort: None,
+        direction: None,
+        per_page: None,
+        page: None,
+    };
+
+    let listed = github_on(&server)
+        .list_pull_requests(&http(), "token", &input)
+        .await
+        .unwrap();
+
+    assert!(listed.is_empty());
+    let requests = server.received_requests().await.unwrap();
+    assert!(
+        !requests[0]
+            .url
+            .query_pairs()
+            .any(|(name, _)| name == "head")
+    );
+}
+
+#[tokio::test]
 async fn lists_the_pull_requests_a_commit_belongs_to() {
     let server = MockServer::start().await;
     let sha = generate_sha();
@@ -798,6 +837,43 @@ async fn changes_only_what_is_given_of_a_pull_request() {
 
     assert_eq!(updated.state, "closed");
     assert_eq!(updated.closed_at.as_deref(), Some("2024-01-04T00:00:00Z"));
+}
+
+#[rstest]
+#[case::blank_left_out(" ", json!({ "state": "closed" }))]
+#[case::padded_trimmed("  release  ", json!({ "state": "closed", "base": "release" }))]
+#[tokio::test]
+async fn sends_the_base_branch_of_a_pull_request_trimmed(
+    #[case] base: &str,
+    #[case] expected: Value,
+) {
+    let server = MockServer::start().await;
+    MockPullRequestNetwork::on(&server)
+        .answer_body(
+            "PATCH",
+            "/repos/octo/hello/pulls/11",
+            expected,
+            200,
+            generate_github_pull_request(131, 11),
+        )
+        .await;
+    let input = UpdatePullRequest {
+        owner: "octo".into(),
+        repo: "hello".into(),
+        pull_number: 11,
+        title: None,
+        body: None,
+        state: Some(PullRequestState::Closed),
+        base: Some(base.into()),
+        maintainer_can_modify: None,
+    };
+
+    let updated = github_on(&server)
+        .update_pull_request(&http(), "token", &input)
+        .await
+        .unwrap();
+
+    assert_eq!(updated.id, "131");
 }
 
 #[rstest]

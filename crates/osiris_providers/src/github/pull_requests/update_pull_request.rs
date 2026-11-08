@@ -5,7 +5,7 @@ use crate::{
     ProviderError,
     github::{
         Github, path_segment::path_segment, request::send,
-        transformers::pull_request::PullRequestAnswer, types::GithubPullRequest,
+        transformers::pull_request::PullRequestAnswer, trimmed::trimmed, types::GithubPullRequest,
     },
 };
 use reqwest::Method;
@@ -73,7 +73,7 @@ impl Github {
             title: input.title.as_deref(),
             body: input.body.as_deref(),
             state: input.state,
-            base: input.base.as_deref(),
+            base: trimmed(input.base.as_deref()),
             maintainer_can_modify: input.maintainer_can_modify,
         };
         let answer: PullRequestAnswer =

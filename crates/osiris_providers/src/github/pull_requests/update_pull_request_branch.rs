@@ -5,7 +5,7 @@ use crate::{
     ProviderError,
     github::{
         Github, path_segment::path_segment, request::send,
-        transformers::pull_request_branch_update::PullRequestBranchUpdateAnswer,
+        transformers::pull_request_branch_update::PullRequestBranchUpdateAnswer, trimmed::trimmed,
         types::GithubPullRequestBranchUpdate,
     },
 };
@@ -51,7 +51,7 @@ impl Github {
             path_segment(&input.pull_number.to_string())
         );
         let payload = Payload {
-            expected_head_sha: input.expected_head_sha.as_deref(),
+            expected_head_sha: trimmed(input.expected_head_sha.as_deref()),
         };
         let answer: PullRequestBranchUpdateAnswer =
             send(self, http, token, Method::PUT, &path, &[], Some(&payload)).await?;

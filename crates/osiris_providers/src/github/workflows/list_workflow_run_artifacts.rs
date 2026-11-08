@@ -4,7 +4,7 @@ use crate::{
     ProviderError,
     github::{
         Github, paging::paging, path_segment::path_segment, request::send,
-        transformers::artifacts_page::ArtifactsPage, types::GithubArtifact,
+        transformers::artifacts_page::ArtifactsPage, trimmed::trimmed, types::GithubArtifact,
     },
 };
 use reqwest::Method;
@@ -45,8 +45,8 @@ impl Github {
             path_segment(&input.run_id.to_string())
         );
         let mut query = paging(input.per_page, input.page);
-        if let Some(name) = &input.name {
-            query.push(("name", name.clone()));
+        if let Some(name) = trimmed(input.name.as_deref()) {
+            query.push(("name", name.to_owned()));
         }
         let answer: ArtifactsPage =
             send::<_, ()>(self, http, token, Method::GET, &path, &query, None).await?;

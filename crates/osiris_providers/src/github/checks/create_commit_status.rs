@@ -4,7 +4,8 @@ use crate::{
     ProviderError,
     github::{
         Github, path_segment::path_segment, request::send,
-        transformers::commit_status::CommitStatusAnswer, types::GithubCommitStatus,
+        transformers::commit_status::CommitStatusAnswer, trimmed::trimmed,
+        types::GithubCommitStatus,
     },
 };
 use reqwest::Method;
@@ -62,8 +63,8 @@ impl Github {
         );
         let body = Body {
             state: &input.state,
-            context: input.context.as_deref(),
-            target_url: input.target_url.as_deref(),
+            context: trimmed(input.context.as_deref()),
+            target_url: trimmed(input.target_url.as_deref()),
             description: input.description.as_deref(),
         };
         let answer: CommitStatusAnswer =

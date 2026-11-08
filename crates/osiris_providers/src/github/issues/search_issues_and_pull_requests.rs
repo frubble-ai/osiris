@@ -6,7 +6,7 @@ use crate::{
     ProviderError,
     github::{
         Github, paging::paging, request::send,
-        transformers::search_issue_results::SearchIssueResultsAnswer,
+        transformers::search_issue_results::SearchIssueResultsAnswer, trimmed::trimmed,
         types::GithubSearchIssueResults,
     },
 };
@@ -74,11 +74,11 @@ impl Github {
         input: &SearchIssuesAndPullRequests,
     ) -> Result<GithubSearchIssueResults, ProviderError> {
         let mut query = vec![("q", search_query(input))];
-        if let Some(sort) = &input.sort {
-            query.push(("sort", sort.clone()));
+        if let Some(sort) = trimmed(input.sort.as_deref()) {
+            query.push(("sort", sort.to_owned()));
         }
-        if let Some(order) = &input.order {
-            query.push(("order", order.clone()));
+        if let Some(order) = trimmed(input.order.as_deref()) {
+            query.push(("order", order.to_owned()));
         }
         query.extend(paging(input.per_page, input.page));
         let answer: SearchIssueResultsAnswer = send::<_, ()>(

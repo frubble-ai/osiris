@@ -5,7 +5,7 @@ use crate::{
     ProviderError,
     github::{
         Github, paging::paging, path_segment::path_segment, request::send,
-        transformers::check_runs_page::CheckRunsPage, types::GithubCheckRun,
+        transformers::check_runs_page::CheckRunsPage, trimmed::trimmed, types::GithubCheckRun,
     },
 };
 use reqwest::Method;
@@ -57,14 +57,14 @@ impl Github {
         if let Some(app_id) = input.app_id {
             query.push(("app_id", app_id.to_string()));
         }
-        if let Some(check_name) = &input.check_name {
-            query.push(("check_name", check_name.clone()));
-        }
-        if let Some(filter) = &input.filter {
-            query.push(("filter", filter.clone()));
-        }
-        if let Some(status) = &input.status {
-            query.push(("status", status.clone()));
+        for (name, value) in [
+            ("check_name", &input.check_name),
+            ("filter", &input.filter),
+            ("status", &input.status),
+        ] {
+            if let Some(value) = trimmed(value.as_deref()) {
+                query.push((name, value.to_owned()));
+            }
         }
         let answer: CheckRunsPage =
             send::<_, ()>(self, http, token, Method::GET, &path, &query, None).await?;
