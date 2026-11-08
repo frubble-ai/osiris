@@ -22,6 +22,8 @@ pub mod installation;
 pub mod issue;
 pub mod issue_comment;
 pub mod issue_event;
+pub mod issue_lock;
+pub mod issue_page;
 pub mod label;
 pub mod language;
 pub mod merge_result;
@@ -38,9 +40,14 @@ pub mod requested_reviewers;
 pub mod review;
 pub mod review_comment;
 pub mod search;
+pub mod search_issue_results;
 pub mod tag;
 pub mod team;
+<<<<<<< HEAD
 pub mod topics;
+=======
+pub mod timeline_event;
+>>>>>>> port/github-issues
 pub mod user;
 pub mod workflow;
 pub mod workflow_job;
@@ -68,6 +75,8 @@ pub use installation::GithubInstallation;
 pub use issue::GithubIssue;
 pub use issue_comment::GithubIssueComment;
 pub use issue_event::GithubIssueEvent;
+pub use issue_lock::GithubIssueLock;
+pub use issue_page::GithubIssuePage;
 pub use label::GithubLabel;
 pub use language::GithubLanguage;
 pub use merge_result::GithubMergeResult;
@@ -88,9 +97,14 @@ pub use search::{
     GithubSearchIssue, GithubSearchLabel, GithubSearchRepository, GithubSearchTopic,
     GithubSearchUser,
 };
+pub use search_issue_results::GithubSearchIssueResults;
 pub use tag::GithubTag;
 pub use team::GithubTeam;
+<<<<<<< HEAD
 pub use topics::GithubTopics;
+=======
+pub use timeline_event::GithubTimelineEvent;
+>>>>>>> port/github-issues
 pub use user::{GithubCurrentUser, GithubUser};
 pub use workflow::GithubWorkflow;
 pub use workflow_job::{GithubWorkflowJob, GithubWorkflowStep};

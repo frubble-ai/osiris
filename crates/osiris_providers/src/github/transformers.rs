@@ -36,9 +36,14 @@ pub mod requested_reviewers;
 pub mod review;
 pub mod review_comment;
 pub mod search;
+pub mod search_issue_results;
 pub mod tag;
 pub mod team;
+<<<<<<< HEAD
 pub mod topics;
+=======
+pub mod timeline_event;
+>>>>>>> port/github-issues
 pub mod user;
 pub mod workflow;
 pub mod workflow_job;

@@ -1,0 +1,37 @@
+//! GitHub's action routes: issues.
+
+pub mod add_issue_assignees;
+pub mod add_issue_labels;
+pub mod clear_issue_labels;
+pub mod create_issue;
+pub mod create_issue_comment;
+pub mod create_issue_comment_reaction;
+pub mod create_issue_reaction;
+pub mod create_label;
+pub mod create_milestone;
+pub mod delete_issue_comment;
+pub mod delete_label;
+pub mod delete_milestone;
+pub mod get_issue;
+pub mod get_issue_comment;
+pub mod get_label;
+pub mod get_milestone;
+pub mod list_assignees;
+pub mod list_issue_comments;
+pub mod list_issue_events;
+pub mod list_issue_labels;
+pub mod list_issue_timeline_events;
+pub mod list_milestones;
+pub mod list_repository_issue_events;
+pub mod list_repository_issues;
+pub mod list_repository_labels;
+pub mod lock_issue;
+pub mod remove_issue_assignees;
+pub mod remove_issue_label;
+pub mod search_issues_and_pull_requests;
+pub mod set_issue_labels;
+pub mod unlock_issue;
+pub mod update_issue;
+pub mod update_issue_comment;
+pub mod update_label;
+pub mod update_milestone;

@@ -398,6 +398,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubFileContent": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -410,17 +411,37 @@
               },
               "decoded_content": {
                 "description": "The content as text, when it is base64-encoded UTF-8; absent for a binary file.",
+=======
+      "ActionResult_GithubIssue": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "An issue (GitHub also answers pull requests as issues; `is_pull_request` says which).",
+            "properties": {
+              "assignees": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubUser"
+                },
+                "type": "array"
+              },
+              "body": {
+>>>>>>> port/github-issues
                 "type": [
                   "string",
                   "null"
                 ]
               },
+<<<<<<< HEAD
               "download_url": {
+=======
+              "closed_at": {
+>>>>>>> port/github-issues
                 "type": [
                   "string",
                   "null"
                 ]
               },
+<<<<<<< HEAD
               "encoding": {
                 "type": "string"
               },
@@ -593,35 +614,284 @@
               "following": {
                 "format": "int64",
                 "type": "integer"
+=======
+              "comments": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "created_at": {
+                "type": "string"
+>>>>>>> port/github-issues
               },
               "id": {
                 "type": "string"
               },
+<<<<<<< HEAD
               "location": {
+=======
+              "is_pull_request": {
+                "type": "boolean"
+              },
+              "labels": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubLabel"
+                },
+                "type": "array"
+              },
+              "milestone": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubMilestone"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "number": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "state": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "user": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "number",
+              "title",
+              "state",
+              "url",
+              "comments",
+              "assignees",
+              "labels",
+              "is_pull_request",
+              "created_at",
+              "updated_at"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubIssueComment": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A comment on an issue or a pull request.",
+            "properties": {
+              "body": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "user": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "url",
+              "body",
+              "created_at",
+              "updated_at"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubIssueLock": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "Whether an issue's conversation is locked, once GitHub has locked or unlocked it.",
+            "properties": {
+              "locked": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "locked"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubIssuePage": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A page of a repository's issues, with the pull requests GitHub mixes in left out.",
+            "properties": {
+              "fetched": {
+                "description": "How many items GitHub answered on this page before the pull requests were left out. A\ncaller reading page after page goes on while this equals the page size asked for (30 when\nnone was asked), even when `issues` comes back short or empty.",
+                "format": "int64",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "issues": {
+                "description": "The page's issues, without its pull requests.",
+                "items": {
+                  "$ref": "#/components/schemas/GithubIssue"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "issues",
+              "fetched"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubLabel": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A label.",
+            "properties": {
+              "color": {
+                "type": "string"
+              },
+              "description": {
+>>>>>>> port/github-issues
                 "type": [
                   "string",
                   "null"
                 ]
               },
+<<<<<<< HEAD
               "login": {
                 "type": "string"
               },
               "name": {
+=======
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "color"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubMilestone": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A milestone.",
+            "properties": {
+              "closed_issues": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "description": {
+>>>>>>> port/github-issues
                 "type": [
                   "string",
                   "null"
                 ]
               },
+<<<<<<< HEAD
               "public_repos": {
                 "format": "int64",
                 "type": "integer"
               },
+=======
+              "due_on": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "number": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "open_issues": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "state": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+>>>>>>> port/github-issues
               "url": {
                 "type": "string"
               }
             },
             "required": [
               "id",
+<<<<<<< HEAD
               "login",
               "avatar_url",
               "url",
@@ -629,6 +899,53 @@
               "followers",
               "following",
               "public_repos"
+=======
+              "number",
+              "title",
+              "state",
+              "open_issues",
+              "closed_issues",
+              "url"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubReaction": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A reaction to an issue or a comment.",
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "user": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "content",
+              "created_at"
+>>>>>>> port/github-issues
             ],
             "type": "object"
           }
@@ -708,6 +1025,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubRepositoryPermission": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -760,6 +1078,34 @@
             },
             "required": [
               "names"
+=======
+      "ActionResult_GithubSearchIssueResults": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "The issues and pull requests a search found, and how many there are in all.",
+            "properties": {
+              "incomplete_results": {
+                "description": "Whether GitHub stopped searching before it had looked at everything.",
+                "type": "boolean"
+              },
+              "items": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubSearchIssue"
+                },
+                "type": "array"
+              },
+              "total_count": {
+                "description": "How many items match, across every page.",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "total_count",
+              "incomplete_results",
+              "items"
+>>>>>>> port/github-issues
             ],
             "type": "object"
           }
@@ -1195,11 +1541,16 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_Vec_GithubLanguage": {
+=======
+      "ActionResult_Vec_GithubIssueComment": {
+>>>>>>> port/github-issues
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
             "items": {
+<<<<<<< HEAD
               "description": "A language a repository is written in, by bytes of code.",
               "properties": {
                 "bytes": {
@@ -1213,6 +1564,191 @@
               "required": [
                 "name",
                 "bytes"
+=======
+              "description": "A comment on an issue or a pull request.",
+              "properties": {
+                "body": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "updated_at": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "user": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "url",
+                "body",
+                "created_at",
+                "updated_at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_Vec_GithubIssueEvent": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "Something that happened to an issue (labelled, closed, referenced…).",
+              "properties": {
+                "actor": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "commit_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "created_at": {
+                  "type": "string"
+                },
+                "event": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "event",
+                "created_at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_Vec_GithubLabel": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A label.",
+              "properties": {
+                "color": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "color"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_Vec_GithubMilestone": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A milestone.",
+              "properties": {
+                "closed_issues": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "due_on": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                },
+                "number": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "open_issues": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "state": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "number",
+                "title",
+                "state",
+                "open_issues",
+                "closed_issues",
+                "url"
+>>>>>>> port/github-issues
               ],
               "type": "object"
             },
@@ -1297,11 +1833,16 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_Vec_GithubTag": {
+=======
+      "ActionResult_Vec_GithubTimelineEvent": {
+>>>>>>> port/github-issues
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
             "items": {
+<<<<<<< HEAD
               "description": "A tag.",
               "properties": {
                 "commit_sha": {
@@ -1322,6 +1863,86 @@
                 "commit_sha",
                 "zipball_url",
                 "tarball_url"
+=======
+              "description": "Something on an issue's timeline: an event, a comment, a commit or a cross-reference. Unlike an\nissue event, a timeline entry may have no id, no actor and no time (a commit or a\ncross-reference has none of its own).",
+              "properties": {
+                "actor": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "commit_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "event": {
+                  "description": "What happened (`commented`, `committed`, `labeled`, `cross-referenced`…), as GitHub names\nit. An open string.",
+                  "type": "string"
+                },
+                "id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "event"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_Vec_GithubUser": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A GitHub account, as another resource names it (an owner, an author, an assignee).",
+              "properties": {
+                "account_type": {
+                  "description": "`User`, `Organization` or `Bot` today, as GitHub names it. An open string.",
+                  "type": "string"
+                },
+                "avatar_url": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "login": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "login",
+                "avatar_url",
+                "url",
+                "account_type"
+>>>>>>> port/github-issues
               ],
               "type": "object"
             },
@@ -1402,6 +2023,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "AddRepositoryCollaborator": {
         "additionalProperties": false,
         "properties": {
@@ -1421,12 +2043,69 @@
           "username": {
             "description": "The account's login.",
             "type": "string"
+=======
+      "AddIssueAssignees": {
+        "additionalProperties": false,
+        "properties": {
+          "assignees": {
+            "description": "The logins of the people to assign it to.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+>>>>>>> port/github-issues
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "username"
+=======
+          "issue_number",
+          "assignees"
+        ],
+        "type": "object"
+      },
+      "AddIssueLabels": {
+        "additionalProperties": false,
+        "properties": {
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "labels": {
+            "description": "The names of the labels to add.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "issue_number",
+          "labels"
+>>>>>>> port/github-issues
         ],
         "type": "object"
       },
@@ -1478,16 +2157,27 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "CompareCommits": {
         "additionalProperties": false,
         "properties": {
           "basehead": {
             "description": "`base...head`, each a branch, a tag or a commit SHA; `owner:branch` names another fork's.",
             "type": "string"
+=======
+      "ClearIssueLabels": {
+        "additionalProperties": false,
+        "properties": {
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+>>>>>>> port/github-issues
           },
           "owner": {
             "type": "string"
           },
+<<<<<<< HEAD
           "page": {
             "description": "From 1.",
             "format": "int32",
@@ -1506,6 +2196,8 @@
               "null"
             ]
           },
+=======
+>>>>>>> port/github-issues
           "repo": {
             "type": "string"
           }
@@ -1513,7 +2205,11 @@
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "basehead"
+=======
+          "issue_number"
+>>>>>>> port/github-issues
         ],
         "type": "object"
       },
@@ -1987,6 +2683,278 @@
         ],
         "type": "object"
       },
+      "CreateIssue": {
+        "additionalProperties": false,
+        "properties": {
+          "assignees": {
+            "description": "The logins of the people to assign it to.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "body": {
+            "description": "The issue's text, in Markdown.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "labels": {
+            "description": "The names of the labels to put on it.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "milestone": {
+            "description": "The number of the milestone to put it in.",
+            "format": "int64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "title"
+        ],
+        "type": "object"
+      },
+      "CreateIssueComment": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "description": "The comment's text, in Markdown.",
+            "type": "string"
+          },
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "issue_number",
+          "body"
+        ],
+        "type": "object"
+      },
+      "CreateIssueCommentReaction": {
+        "additionalProperties": false,
+        "properties": {
+          "comment_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "content": {
+            "description": "The reaction: `+1`, `-1`, `laugh`, `confused`, `heart`, `hooray`, `rocket` or `eyes`.",
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "comment_id",
+          "content"
+        ],
+        "type": "object"
+      },
+      "CreateIssueReaction": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "description": "The reaction: `+1`, `-1`, `laugh`, `confused`, `heart`, `hooray`, `rocket` or `eyes`.",
+            "type": "string"
+          },
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "issue_number",
+          "content"
+        ],
+        "type": "object"
+      },
+      "CreateLabel": {
+        "additionalProperties": false,
+        "properties": {
+          "color": {
+            "description": "The label's color, as six hex digits without `#`.",
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "name",
+          "color"
+        ],
+        "type": "object"
+      },
+      "CreateMilestone": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "due_on": {
+            "description": "When it is due, as an ISO 8601 timestamp.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "state": {
+            "description": "`open` (GitHub's default) or `closed`.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "title"
+        ],
+        "type": "object"
+      },
+      "DeleteIssueComment": {
+        "additionalProperties": false,
+        "properties": {
+          "comment_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "comment_id"
+        ],
+        "type": "object"
+      },
+      "DeleteLabel": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "name"
+        ],
+        "type": "object"
+      },
+      "DeleteMilestone": {
+        "additionalProperties": false,
+        "properties": {
+          "milestone_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "milestone_number"
+        ],
+        "type": "object"
+      },
       "Deleted": {
         "properties": {
           "deleted": {
@@ -2135,6 +3103,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GetCommit": {
         "additionalProperties": false,
         "properties": {
@@ -2143,6 +3112,17 @@
           },
           "ref": {
             "description": "A commit SHA, a branch name or a tag name.",
+=======
+      "GetIssue": {
+        "additionalProperties": false,
+        "properties": {
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+>>>>>>> port/github-issues
             "type": "string"
           },
           "repo": {
@@ -2152,6 +3132,7 @@
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "ref"
         ],
         "type": "object"
@@ -2194,6 +3175,23 @@
             "description": "The reference without `refs/`, such as `heads/main` or `tags/v1.0.0`.",
             "type": "string"
           },
+=======
+          "issue_number"
+        ],
+        "type": "object"
+      },
+      "GetIssueComment": {
+        "additionalProperties": false,
+        "properties": {
+          "comment_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+>>>>>>> port/github-issues
           "repo": {
             "type": "string"
           }
@@ -2201,7 +3199,53 @@
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "ref"
+=======
+          "comment_id"
+        ],
+        "type": "object"
+      },
+      "GetLabel": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "name"
+        ],
+        "type": "object"
+      },
+      "GetMilestone": {
+        "additionalProperties": false,
+        "properties": {
+          "milestone_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "milestone_number"
+>>>>>>> port/github-issues
         ],
         "type": "object"
       },
@@ -2222,6 +3266,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GetRepositoryPermissionForUser": {
         "additionalProperties": false,
         "properties": {
@@ -2279,6 +3324,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-issues
       "GithubAcknowledgement": {
         "description": "An action that answers nothing of its own: `ok` once GitHub has done it.",
         "properties": {
@@ -2929,6 +3976,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubLanguage": {
         "description": "A language a repository is written in, by bytes of code.",
         "properties": {
@@ -3030,35 +4078,296 @@
           "following": {
             "format": "int64",
             "type": "integer"
+=======
+      "GithubIssue": {
+        "description": "An issue (GitHub also answers pull requests as issues; `is_pull_request` says which).",
+        "properties": {
+          "assignees": {
+            "items": {
+              "$ref": "#/components/schemas/GithubUser"
+            },
+            "type": "array"
+          },
+          "body": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "closed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "comments": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string"
+>>>>>>> port/github-issues
           },
           "id": {
             "type": "string"
           },
+<<<<<<< HEAD
           "location": {
+=======
+          "is_pull_request": {
+            "type": "boolean"
+          },
+          "labels": {
+            "items": {
+              "$ref": "#/components/schemas/GithubLabel"
+            },
+            "type": "array"
+          },
+          "milestone": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubMilestone"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "number": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "state": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "title",
+          "state",
+          "url",
+          "comments",
+          "assignees",
+          "labels",
+          "is_pull_request",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "GithubIssueComment": {
+        "description": "A comment on an issue or a pull request.",
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "body",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "GithubIssueEvent": {
+        "description": "Something that happened to an issue (labelled, closed, referenced…).",
+        "properties": {
+          "actor": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "commit_id": {
+>>>>>>> port/github-issues
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "login": {
             "type": "string"
           },
           "name": {
+=======
+          "created_at": {
+            "type": "string"
+          },
+          "event": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "event",
+          "created_at"
+        ],
+        "type": "object"
+      },
+      "GithubIssueLock": {
+        "description": "Whether an issue's conversation is locked, once GitHub has locked or unlocked it.",
+        "properties": {
+          "locked": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "locked"
+        ],
+        "type": "object"
+      },
+      "GithubIssuePage": {
+        "description": "A page of a repository's issues, with the pull requests GitHub mixes in left out.",
+        "properties": {
+          "fetched": {
+            "description": "How many items GitHub answered on this page before the pull requests were left out. A\ncaller reading page after page goes on while this equals the page size asked for (30 when\nnone was asked), even when `issues` comes back short or empty.",
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "issues": {
+            "description": "The page's issues, without its pull requests.",
+            "items": {
+              "$ref": "#/components/schemas/GithubIssue"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "issues",
+          "fetched"
+        ],
+        "type": "object"
+      },
+      "GithubLabel": {
+        "description": "A label.",
+        "properties": {
+          "color": {
+            "type": "string"
+          },
+          "description": {
             "type": [
               "string",
               "null"
             ]
           },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "color"
+        ],
+        "type": "object"
+      },
+      "GithubMilestone": {
+        "description": "A milestone.",
+        "properties": {
+          "closed_issues": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "description": {
+>>>>>>> port/github-issues
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+<<<<<<< HEAD
           "public_repos": {
             "format": "int64",
             "type": "integer"
           },
+=======
+          "due_on": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "number": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "open_issues": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "state": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+>>>>>>> port/github-issues
           "url": {
             "type": "string"
           }
         },
         "required": [
           "id",
+<<<<<<< HEAD
           "login",
           "avatar_url",
           "url",
@@ -3066,6 +4375,44 @@
           "followers",
           "following",
           "public_repos"
+=======
+          "number",
+          "title",
+          "state",
+          "open_issues",
+          "closed_issues",
+          "url"
+        ],
+        "type": "object"
+      },
+      "GithubReaction": {
+        "description": "A reaction to an issue or a comment.",
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "content",
+          "created_at"
+>>>>>>> port/github-issues
         ],
         "type": "object"
       },
@@ -3130,6 +4477,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubRepositoryInvitation": {
         "description": "An invitation to collaborate on a repository, waiting for the invited account to accept it.",
         "properties": {
@@ -3187,11 +4535,46 @@
             "type": "string"
           },
           "role_name": {
+=======
+      "GithubSearchIssue": {
+        "description": "An issue or a pull request a search found.",
+        "properties": {
+          "body": {
+>>>>>>> port/github-issues
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
+=======
+          "id": {
+            "type": "string"
+          },
+          "is_pull_request": {
+            "type": "boolean"
+          },
+          "number": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "repository_url": {
+            "type": "string"
+          },
+          "score": {
+            "format": "double",
+            "type": "number"
+          },
+          "state": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+>>>>>>> port/github-issues
           "user": {
             "oneOf": [
               {
@@ -3204,6 +4587,7 @@
           }
         },
         "required": [
+<<<<<<< HEAD
           "permission"
         ],
         "type": "object"
@@ -3244,6 +4628,83 @@
         },
         "required": [
           "names"
+=======
+          "id",
+          "number",
+          "title",
+          "url",
+          "state",
+          "repository_url",
+          "is_pull_request",
+          "score"
+        ],
+        "type": "object"
+      },
+      "GithubSearchIssueResults": {
+        "description": "The issues and pull requests a search found, and how many there are in all.",
+        "properties": {
+          "incomplete_results": {
+            "description": "Whether GitHub stopped searching before it had looked at everything.",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GithubSearchIssue"
+            },
+            "type": "array"
+          },
+          "total_count": {
+            "description": "How many items match, across every page.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_count",
+          "incomplete_results",
+          "items"
+        ],
+        "type": "object"
+      },
+      "GithubTimelineEvent": {
+        "description": "Something on an issue's timeline: an event, a comment, a commit or a cross-reference. Unlike an\nissue event, a timeline entry may have no id, no actor and no time (a commit or a\ncross-reference has none of its own).",
+        "properties": {
+          "actor": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "commit_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event": {
+            "description": "What happened (`commented`, `committed`, `labeled`, `cross-referenced`…), as GitHub names\nit. An open string.",
+            "type": "string"
+          },
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "event"
+>>>>>>> port/github-issues
         ],
         "type": "object"
       },
@@ -3292,6 +4753,40 @@
         ],
         "type": "object"
       },
+      "ListAssignees": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo"
+        ],
+        "type": "object"
+      },
       "ListBranches": {
         "additionalProperties": false,
         "properties": {
@@ -3333,11 +4828,21 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ListCommitComments": {
         "additionalProperties": false,
         "properties": {
           "commit_sha": {
             "type": "string"
+=======
+      "ListIssueComments": {
+        "additionalProperties": false,
+        "properties": {
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+>>>>>>> port/github-issues
           },
           "owner": {
             "type": "string"
@@ -3367,6 +4872,7 @@
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "commit_sha"
         ],
         "type": "object"
@@ -3383,6 +4889,137 @@
           },
           "committer": {
             "description": "Only commits committed by this login or email.",
+=======
+          "issue_number"
+        ],
+        "type": "object"
+      },
+      "ListIssueEvents": {
+        "additionalProperties": false,
+        "properties": {
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "issue_number"
+        ],
+        "type": "object"
+      },
+      "ListIssueLabels": {
+        "additionalProperties": false,
+        "properties": {
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "issue_number"
+        ],
+        "type": "object"
+      },
+      "ListIssueTimelineEvents": {
+        "additionalProperties": false,
+        "properties": {
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "issue_number"
+        ],
+        "type": "object"
+      },
+      "ListMilestones": {
+        "additionalProperties": false,
+        "properties": {
+          "direction": {
+            "description": "`asc` (GitHub's default) or `desc`.",
+>>>>>>> port/github-issues
             "type": [
               "string",
               "null"
@@ -3400,13 +5037,10 @@
               "null"
             ]
           },
+<<<<<<< HEAD
           "path": {
             "description": "Only commits that changed this file or directory.",
-            "type": [
-              "string",
-              "null"
-            ]
-          },
+=======
           "per_page": {
             "description": "At most 100.",
             "format": "int32",
@@ -3419,20 +5053,128 @@
           "repo": {
             "type": "string"
           },
+          "sort": {
+            "description": "`due_on` (GitHub's default) or `completeness`.",
+>>>>>>> port/github-issues
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+<<<<<<< HEAD
+=======
+          "state": {
+            "description": "`open` (GitHub's default), `closed` or `all`.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "owner",
+          "repo"
+        ],
+        "type": "object"
+      },
+      "ListRepositoryIssueEvents": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+>>>>>>> port/github-issues
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "repo": {
+            "type": "string"
+<<<<<<< HEAD
+          },
           "sha": {
             "description": "A branch name or a commit SHA to list from; the default branch when left out.",
+=======
+          }
+        },
+        "required": [
+          "owner",
+          "repo"
+        ],
+        "type": "object"
+      },
+      "ListRepositoryIssues": {
+        "additionalProperties": false,
+        "properties": {
+          "direction": {
+            "description": "`asc` or `desc` (GitHub's default).",
+>>>>>>> port/github-issues
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "since": {
             "description": "Only commits from this time on, in ISO 8601.",
+=======
+          "labels": {
+            "description": "Only issues carrying every one of these labels.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100; 30 when left out.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "repo": {
+            "type": "string"
+          },
+          "since": {
+            "description": "Only issues updated at or after this time, as an ISO 8601 timestamp.",
+>>>>>>> port/github-issues
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "until": {
             "description": "Only commits before this time, in ISO 8601.",
             "type": [
@@ -3528,11 +5270,16 @@
           },
           "sort": {
             "description": "`created`, `updated`, `pushed` or `full_name`.",
+=======
+          "sort": {
+            "description": "`created` (GitHub's default), `updated` or `comments`.",
+>>>>>>> port/github-issues
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "visibility": {
             "description": "`all`, `public` or `private`.",
             "type": [
@@ -3713,6 +5460,10 @@
           },
           "sort": {
             "description": "`newest`, `oldest`, `stargazers` or `watchers`.",
+=======
+          "state": {
+            "description": "`open` (GitHub's default), `closed` or `all`.",
+>>>>>>> port/github-issues
             "type": [
               "string",
               "null"
@@ -3725,6 +5476,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ListRepositoryLanguages": {
         "additionalProperties": false,
         "properties": {
@@ -3742,6 +5494,9 @@
         "type": "object"
       },
       "ListRepositoryTags": {
+=======
+      "ListRepositoryLabels": {
+>>>>>>> port/github-issues
         "additionalProperties": false,
         "properties": {
           "owner": {
@@ -3775,6 +5530,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ListRepositoryTopics": {
         "additionalProperties": false,
         "properties": {
@@ -3861,6 +5617,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-issues
       "List_AuthConfig": {
         "properties": {
           "data": {
@@ -4058,6 +5816,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "MergeBranch": {
         "additionalProperties": false,
         "properties": {
@@ -4067,13 +5826,82 @@
           },
           "commit_message": {
             "description": "The merge commit's message; GitHub writes one when left out.",
+=======
+      "LockIssue": {
+        "additionalProperties": false,
+        "properties": {
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "lock_reason": {
+            "description": "Why: `off-topic`, `too heated`, `resolved` or `spam`.",
+>>>>>>> port/github-issues
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "head": {
             "description": "The branch or commit SHA merged.",
+=======
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "issue_number"
+        ],
+        "type": "object"
+      },
+      "RemoveIssueAssignees": {
+        "additionalProperties": false,
+        "properties": {
+          "assignees": {
+            "description": "The logins of the people to unassign.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "issue_number",
+          "assignees"
+        ],
+        "type": "object"
+      },
+      "RemoveIssueLabel": {
+        "additionalProperties": false,
+        "properties": {
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "label": {
+            "description": "The name of the label to take off.",
+>>>>>>> port/github-issues
             "type": "string"
           },
           "owner": {
@@ -4086,6 +5914,7 @@
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "base",
           "head"
         ],
@@ -4142,6 +5971,160 @@
         "properties": {
           "names": {
             "description": "Every topic the repository has from now on, in lowercase; an empty list removes them all.",
+=======
+          "issue_number",
+          "label"
+        ],
+        "type": "object"
+      },
+      "SearchIssuesAndPullRequests": {
+        "additionalProperties": false,
+        "description": "The search text and the filters are combined: every filter given narrows the search text.",
+        "properties": {
+          "assignee": {
+            "description": "Only items assigned to this login.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "author": {
+            "description": "Only items opened by this login.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "base_branch": {
+            "description": "Only pull requests into this branch.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "head_branch": {
+            "description": "Only pull requests from this branch.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_merged": {
+            "description": "Only merged pull requests (`true`) or only unmerged ones (`false`).",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "label": {
+            "description": "Only items carrying this label.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "language": {
+            "description": "Only items in repositories written mainly in this language.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mentions": {
+            "description": "Only items that mention this login.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "order": {
+            "description": "`asc` or `desc` (GitHub's default).",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "owner": {
+            "description": "With `repo`, only that repository; alone, only that account's repositories.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "q": {
+            "description": "The same as `query`, used only when `query` is left out or empty.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "query": {
+            "description": "Search text in GitHub's search syntax, such as `is:open label:bug crash`.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "repo": {
+            "description": "A repository name with `owner`, or `owner/name` alone.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sort": {
+            "description": "`comments`, `reactions`, `reactions-+1`, `reactions--1`, `reactions-smile`,\n`reactions-thinking_face`, `reactions-heart`, `reactions-tada`, `interactions`, `created`\nor `updated`; best match when left out.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "description": "`open`, `closed` or `all` (no filter).",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "description": "Only issues (`issue`) or only pull requests (`pr`).",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "SetIssueLabels": {
+        "additionalProperties": false,
+        "properties": {
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "labels": {
+            "description": "The names of the labels the issue keeps; every other label is taken off.",
+>>>>>>> port/github-issues
             "items": {
               "type": "string"
             },
@@ -4157,7 +6140,12 @@
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "names"
+=======
+          "issue_number",
+          "labels"
+>>>>>>> port/github-issues
         ],
         "type": "object"
       },
@@ -4249,6 +6237,28 @@
         ],
         "type": "object"
       },
+      "UnlockIssue": {
+        "additionalProperties": false,
+        "properties": {
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "issue_number"
+        ],
+        "type": "object"
+      },
       "UpdateAuthConfig": {
         "properties": {
           "client_id": {
@@ -4289,6 +6299,7 @@
         },
         "type": "object"
       },
+<<<<<<< HEAD
       "UpdateRef": {
         "additionalProperties": false,
         "properties": {
@@ -4296,12 +6307,57 @@
             "description": "Whether to move it even when the new commit doesn't descend from the old one.",
             "type": [
               "boolean",
+=======
+      "UpdateIssue": {
+        "additionalProperties": false,
+        "description": "Only the fields given are changed.",
+        "properties": {
+          "assignees": {
+            "description": "The logins of the people assigned to it, in place of those assigned now.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "body": {
+            "description": "The issue's text, in Markdown.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "issue_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "labels": {
+            "description": "The names of its labels, in place of those it has now.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "milestone": {
+            "description": "The number of the milestone to put it in.",
+            "format": "int64",
+            "minimum": 0,
+            "type": [
+              "integer",
+>>>>>>> port/github-issues
               "null"
             ]
           },
           "owner": {
             "type": "string"
           },
+<<<<<<< HEAD
           "ref": {
             "description": "The reference without `refs/`, such as `heads/main` or `tags/v1.0.0`.",
             "type": "string"
@@ -4311,12 +6367,55 @@
           },
           "sha": {
             "description": "The commit it points at from now on.",
+=======
+          "repo": {
+            "type": "string"
+          },
+          "state": {
+            "description": "`open` or `closed`.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "issue_number"
+        ],
+        "type": "object"
+      },
+      "UpdateIssueComment": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "description": "The comment's new text, in Markdown.",
+            "type": "string"
+          },
+          "comment_id": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+>>>>>>> port/github-issues
             "type": "string"
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "ref",
           "sha"
         ],
@@ -4356,11 +6455,25 @@
             ]
           },
           "default_branch": {
+=======
+          "comment_id",
+          "body"
+        ],
+        "type": "object"
+      },
+      "UpdateLabel": {
+        "additionalProperties": false,
+        "description": "Only the fields given are changed.",
+        "properties": {
+          "color": {
+            "description": "The label's color, as six hex digits without `#`; anything else is refused before GitHub\nis asked.",
+>>>>>>> port/github-issues
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "delete_branch_on_merge": {
             "description": "Whether a pull request's head branch is deleted once it is merged.",
             "type": [
@@ -4368,12 +6481,15 @@
               "null"
             ]
           },
+=======
+>>>>>>> port/github-issues
           "description": {
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "has_discussions": {
             "type": [
               "boolean",
@@ -4407,6 +6523,14 @@
           },
           "name": {
             "description": "A new name for the repository.",
+=======
+          "name": {
+            "description": "The label's name now.",
+            "type": "string"
+          },
+          "new_name": {
+            "description": "The label's name from now on.",
+>>>>>>> port/github-issues
             "type": [
               "string",
               "null"
@@ -4415,6 +6539,7 @@
           "owner": {
             "type": "string"
           },
+<<<<<<< HEAD
           "private": {
             "type": [
               "boolean",
@@ -4426,6 +6551,55 @@
           },
           "visibility": {
             "description": "`public` or `private`.",
+=======
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "name"
+        ],
+        "type": "object"
+      },
+      "UpdateMilestone": {
+        "additionalProperties": false,
+        "description": "Only the fields given are changed.",
+        "properties": {
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "due_on": {
+            "description": "When it is due, as an ISO 8601 timestamp.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "milestone_number": {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "state": {
+            "description": "`open` or `closed`.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+>>>>>>> port/github-issues
             "type": [
               "string",
               "null"
@@ -4434,7 +6608,12 @@
         },
         "required": [
           "owner",
+<<<<<<< HEAD
           "repo"
+=======
+          "repo",
+          "milestone_number"
+>>>>>>> port/github-issues
         ],
         "type": "object"
       }
@@ -5455,9 +7634,15 @@
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.add_repository_collaborator": {
       "post": {
         "operationId": "github_add_repository_collaborator",
+=======
+    "/v1/connected-accounts/{id}/actions/github.add_issue_assignees": {
+      "post": {
+        "operationId": "github_add_issue_assignees",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -5484,7 +7669,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/AddRepositoryCollaborator"
+=======
+                "$ref": "#/components/schemas/AddIssueAssignees"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -5495,7 +7684,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubCollaboratorAddition"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubIssue"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -5604,15 +7797,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "An account added to a repository as a collaborator, or invited to be one.",
+=======
+        "summary": "People assigned to an issue, beside those assigned now.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.compare_commits": {
       "post": {
         "operationId": "github_compare_commits",
+=======
+    "/v1/connected-accounts/{id}/actions/github.add_issue_labels": {
+      "post": {
+        "operationId": "github_add_issue_labels",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -5639,7 +7842,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/CompareCommits"
+=======
+                "$ref": "#/components/schemas/AddIssueLabels"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -5650,7 +7857,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubCommitComparison"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -5759,15 +7970,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "Two commits compared, with the commits and files between them.",
+=======
+        "summary": "Labels added to an issue, beside those it has.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.create_commit_comment": {
       "post": {
         "operationId": "github_create_commit_comment",
+=======
+    "/v1/connected-accounts/{id}/actions/github.clear_issue_labels": {
+      "post": {
+        "operationId": "github_clear_issue_labels",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -5794,6 +8015,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/CreateCommitComment"
               }
             }
@@ -6570,6 +8792,9 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/DeleteRef"
+=======
+                "$ref": "#/components/schemas/ClearIssueLabels"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -6689,15 +8914,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A branch's or a tag's git reference deleted.",
+=======
+        "summary": "Every label taken off an issue.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.delete_repository": {
       "post": {
         "operationId": "github_delete_repository",
+=======
+    "/v1/connected-accounts/{id}/actions/github.create_issue": {
+      "post": {
+        "operationId": "github_create_issue",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -6724,7 +8959,941 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/DeleteRepository"
+=======
+                "$ref": "#/components/schemas/CreateIssue"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubIssue"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A new issue in a repository.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.create_issue_comment": {
+      "post": {
+        "operationId": "github_create_issue_comment",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIssueComment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubIssueComment"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A new comment on an issue.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.create_issue_comment_reaction": {
+      "post": {
+        "operationId": "github_create_issue_comment_reaction",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIssueCommentReaction"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubReaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A reaction to a comment on an issue.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.create_issue_reaction": {
+      "post": {
+        "operationId": "github_create_issue_reaction",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIssueReaction"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubReaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A reaction to an issue.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.create_label": {
+      "post": {
+        "operationId": "github_create_label",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLabel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubLabel"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A new label in a repository.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.create_milestone": {
+      "post": {
+        "operationId": "github_create_milestone",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMilestone"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubMilestone"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A new milestone in a repository.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.delete_issue_comment": {
+      "post": {
+        "operationId": "github_delete_issue_comment",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteIssueComment"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -6844,15 +10013,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A repository deleted, by owner and name.",
+=======
+        "summary": "A comment on an issue deleted.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.fork_repository": {
       "post": {
         "operationId": "github_fork_repository",
+=======
+    "/v1/connected-accounts/{id}/actions/github.delete_label": {
+      "post": {
+        "operationId": "github_delete_label",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -6879,7 +10058,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ForkRepository"
+=======
+                "$ref": "#/components/schemas/DeleteLabel"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -6890,7 +10073,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubRepository"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -6999,7 +10186,166 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A fork of a repository, made in the background.",
+=======
+        "summary": "A label deleted from a repository.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.delete_milestone": {
+      "post": {
+        "operationId": "github_delete_milestone",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteMilestone"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A milestone deleted from a repository.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
@@ -7460,9 +10806,15 @@
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_file_contents": {
       "post": {
         "operationId": "github_get_file_contents",
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_issue": {
+      "post": {
+        "operationId": "github_get_issue",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -7489,7 +10841,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetFileContents"
+=======
+                "$ref": "#/components/schemas/GetIssue"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -7500,7 +10856,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubFileContent"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubIssue"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -7609,15 +10969,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A file of a repository, in base64 and decoded when it is text.",
+=======
+        "summary": "An issue, by number.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_ref": {
       "post": {
         "operationId": "github_get_ref",
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_issue_comment": {
+      "post": {
+        "operationId": "github_get_issue_comment",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -7644,7 +11014,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetRef"
+=======
+                "$ref": "#/components/schemas/GetIssueComment"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -7655,7 +11029,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubGitRef"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubIssueComment"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -7764,7 +11142,321 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A branch's or a tag's git reference.",
+=======
+        "summary": "A comment on an issue, by id.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.get_label": {
+      "post": {
+        "operationId": "github_get_label",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetLabel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubLabel"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A repository's label, by name.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.get_milestone": {
+      "post": {
+        "operationId": "github_get_milestone",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetMilestone"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubMilestone"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A milestone, by number.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
@@ -7925,9 +11617,15 @@
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_repository_permission_for_user": {
       "post": {
         "operationId": "github_get_repository_permission_for_user",
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_assignees": {
+      "post": {
+        "operationId": "github_list_assignees",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -7954,7 +11652,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetRepositoryPermissionForUser"
+=======
+                "$ref": "#/components/schemas/ListAssignees"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -7965,7 +11667,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubRepositoryPermission"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubUser"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -8074,6 +11780,7 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "What an account may do in a repository.",
         "tags": [
           "actions"
@@ -8385,6 +12092,9 @@
           }
         ],
         "summary": "A user's public profile, by login.",
+=======
+        "summary": "The people issues in a repository can be assigned to, a page at a time.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
@@ -9155,9 +12865,15 @@
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_matching_refs": {
       "post": {
         "operationId": "github_list_matching_refs",
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_issue_comments": {
+      "post": {
+        "operationId": "github_list_issue_comments",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -9184,7 +12900,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListMatchingRefs"
+=======
+                "$ref": "#/components/schemas/ListIssueComments"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -9195,7 +12915,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubGitRef"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubIssueComment"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -9304,15 +13028,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "Every git reference that starts with a prefix.",
+=======
+        "summary": "The comments on an issue, a page at a time.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_my_repositories": {
       "post": {
         "operationId": "github_list_my_repositories",
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_issue_events": {
+      "post": {
+        "operationId": "github_list_issue_events",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -9339,7 +13073,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListMyRepositories"
+=======
+                "$ref": "#/components/schemas/ListIssueEvents"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -9350,7 +13088,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubIssueEvent"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -9459,15 +13201,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "The repositories the authenticated user can see, a page at a time.",
+=======
+        "summary": "What happened to an issue, a page at a time.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_organization_repositories": {
       "post": {
         "operationId": "github_list_organization_repositories",
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_issue_labels": {
+      "post": {
+        "operationId": "github_list_issue_labels",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -9494,7 +13246,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListOrganizationRepositories"
+=======
+                "$ref": "#/components/schemas/ListIssueLabels"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -9505,7 +13261,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -9614,7 +13374,321 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "An organization's repositories, a page at a time.",
+=======
+        "summary": "The labels on an issue, a page at a time.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.list_issue_timeline_events": {
+      "post": {
+        "operationId": "github_list_issue_timeline_events",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListIssueTimelineEvents"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubTimelineEvent"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Everything on an issue's timeline, a page at a time.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.list_milestones": {
+      "post": {
+        "operationId": "github_list_milestones",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListMilestones"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubMilestone"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A repository's milestones, a page at a time.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
@@ -9765,9 +13839,15 @@
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_collaborators": {
       "post": {
         "operationId": "github_list_repository_collaborators",
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_repository_issue_events": {
+      "post": {
+        "operationId": "github_list_repository_issue_events",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -9794,7 +13874,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryCollaborators"
+=======
+                "$ref": "#/components/schemas/ListRepositoryIssueEvents"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -9805,7 +13889,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubCollaborator"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubIssueEvent"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -9914,15 +14002,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A repository's collaborators, a page at a time.",
+=======
+        "summary": "What happened to every issue in a repository, a page at a time.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_contributors": {
       "post": {
         "operationId": "github_list_repository_contributors",
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_repository_issues": {
+      "post": {
+        "operationId": "github_list_repository_issues",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -9949,7 +14047,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryContributors"
+=======
+                "$ref": "#/components/schemas/ListRepositoryIssues"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -9960,7 +14062,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubContributor"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubIssuePage"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -10069,15 +14175,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "Who contributed to a repository, a page at a time.",
+=======
+        "summary": "A repository's issues, a page at a time, without the pull requests GitHub lists among them.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_forks": {
       "post": {
         "operationId": "github_list_repository_forks",
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_repository_labels": {
+      "post": {
+        "operationId": "github_list_repository_labels",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -10104,7 +14220,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryForks"
+=======
+                "$ref": "#/components/schemas/ListRepositoryLabels"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -10115,7 +14235,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -10224,15 +14348,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A repository's forks, a page at a time.",
+=======
+        "summary": "The labels a repository has, a page at a time.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_languages": {
       "post": {
         "operationId": "github_list_repository_languages",
+=======
+    "/v1/connected-accounts/{id}/actions/github.lock_issue": {
+      "post": {
+        "operationId": "github_lock_issue",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -10259,7 +14393,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryLanguages"
+=======
+                "$ref": "#/components/schemas/LockIssue"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -10270,7 +14408,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubLanguage"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubIssueLock"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -10379,15 +14521,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "The languages a repository is written in, by bytes of code.",
+=======
+        "summary": "An issue's conversation locked, so only collaborators can comment.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_tags": {
       "post": {
         "operationId": "github_list_repository_tags",
+=======
+    "/v1/connected-accounts/{id}/actions/github.remove_issue_assignees": {
+      "post": {
+        "operationId": "github_remove_issue_assignees",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -10414,7 +14566,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryTags"
+=======
+                "$ref": "#/components/schemas/RemoveIssueAssignees"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -10425,7 +14581,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubTag"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubIssue"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -10534,15 +14694,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A repository's tags, a page at a time.",
+=======
+        "summary": "People no longer assigned to an issue.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_topics": {
       "post": {
         "operationId": "github_list_repository_topics",
+=======
+    "/v1/connected-accounts/{id}/actions/github.remove_issue_label": {
+      "post": {
+        "operationId": "github_remove_issue_label",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -10569,7 +14739,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryTopics"
+=======
+                "$ref": "#/components/schemas/RemoveIssueLabel"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -10580,7 +14754,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubTopics"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -10689,15 +14867,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A repository's topics.",
+=======
+        "summary": "One label taken off an issue.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_user_repositories": {
       "post": {
         "operationId": "github_list_user_repositories",
+=======
+    "/v1/connected-accounts/{id}/actions/github.search_issues_and_pull_requests": {
+      "post": {
+        "operationId": "github_search_issues_and_pull_requests",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -10724,7 +14912,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListUserRepositories"
+=======
+                "$ref": "#/components/schemas/SearchIssuesAndPullRequests"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -10735,7 +14927,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubSearchIssueResults"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -10844,15 +15040,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A user's public repositories, a page at a time.",
+=======
+        "summary": "Issues and pull requests found with GitHub's search syntax, structured filters, or both.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.merge_branch": {
       "post": {
         "operationId": "github_merge_branch",
+=======
+    "/v1/connected-accounts/{id}/actions/github.set_issue_labels": {
+      "post": {
+        "operationId": "github_set_issue_labels",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -10879,7 +15085,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/MergeBranch"
+=======
+                "$ref": "#/components/schemas/SetIssueLabels"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -10890,7 +15100,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubMergeResult"
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -10999,15 +15213,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "One branch merged into another.",
+=======
+        "summary": "An issue's labels replaced with those given.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.remove_repository_collaborator": {
       "post": {
         "operationId": "github_remove_repository_collaborator",
+=======
+    "/v1/connected-accounts/{id}/actions/github.unlock_issue": {
+      "post": {
+        "operationId": "github_unlock_issue",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -11034,7 +15258,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/RemoveRepositoryCollaborator"
+=======
+                "$ref": "#/components/schemas/UnlockIssue"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -11045,7 +15273,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubIssueLock"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -11154,15 +15386,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A collaborator removed from a repository.",
+=======
+        "summary": "An issue's conversation unlocked.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.rename_branch": {
       "post": {
         "operationId": "github_rename_branch",
+=======
+    "/v1/connected-accounts/{id}/actions/github.update_issue": {
+      "post": {
+        "operationId": "github_update_issue",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -11189,7 +15431,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/RenameBranch"
+=======
+                "$ref": "#/components/schemas/UpdateIssue"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -11200,7 +15446,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubBranch"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubIssue"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -11309,15 +15559,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A branch given a new name.",
+=======
+        "summary": "An issue's title, text, state, assignees, labels or milestone changed.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.replace_repository_topics": {
       "post": {
         "operationId": "github_replace_repository_topics",
+=======
+    "/v1/connected-accounts/{id}/actions/github.update_issue_comment": {
+      "post": {
+        "operationId": "github_update_issue_comment",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -11344,7 +15604,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ReplaceRepositoryTopics"
+=======
+                "$ref": "#/components/schemas/UpdateIssueComment"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -11355,7 +15619,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubTopics"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubIssueComment"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -11464,15 +15732,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A repository's topics replaced by a new set.",
+=======
+        "summary": "A comment on an issue, its text replaced.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.sync_fork_branch_with_upstream": {
       "post": {
         "operationId": "github_sync_fork_branch_with_upstream",
+=======
+    "/v1/connected-accounts/{id}/actions/github.update_label": {
+      "post": {
+        "operationId": "github_update_label",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -11499,7 +15777,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/SyncForkBranchWithUpstream"
+=======
+                "$ref": "#/components/schemas/UpdateLabel"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -11510,7 +15792,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubForkSync"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubLabel"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -11619,15 +15905,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A fork's branch brought up to date with its upstream.",
+=======
+        "summary": "A label renamed, recolored or described anew.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.update_ref": {
       "post": {
         "operationId": "github_update_ref",
+=======
+    "/v1/connected-accounts/{id}/actions/github.update_milestone": {
+      "post": {
+        "operationId": "github_update_milestone",
+>>>>>>> port/github-issues
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -11654,7 +15950,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/UpdateRef"
+=======
+                "$ref": "#/components/schemas/UpdateMilestone"
+>>>>>>> port/github-issues
               }
             }
           },
@@ -11665,7 +15965,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubGitRef"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubMilestone"
+>>>>>>> port/github-issues
                 }
               }
             }
@@ -11774,6 +16078,7 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A branch's or a tag's git reference pointed at another commit.",
         "tags": [
           "actions"
@@ -11930,6 +16235,9 @@
           }
         ],
         "summary": "A repository's settings and metadata changed.",
+=======
+        "summary": "A milestone's title, state, description or due date changed.",
+>>>>>>> port/github-issues
         "tags": [
           "actions"
         ]
