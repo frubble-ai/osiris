@@ -48,7 +48,12 @@ pub mod review;
 pub mod review_comment;
 pub mod review_request;
 pub mod search;
+<<<<<<< HEAD
 pub mod search_issue_results;
+=======
+pub mod search_results;
+pub mod starred_check;
+>>>>>>> port/github-releases_activity_search
 pub mod tag;
 pub mod team;
 <<<<<<< HEAD
@@ -113,7 +118,15 @@ pub use search::{
     GithubSearchIssue, GithubSearchLabel, GithubSearchRepository, GithubSearchTopic,
     GithubSearchUser,
 };
+<<<<<<< HEAD
 pub use search_issue_results::GithubSearchIssueResults;
+=======
+pub use search_results::{
+    GithubCodeSearchResults, GithubCommitSearchResults, GithubLabelSearchResults,
+    GithubRepositorySearchResults, GithubTopicSearchResults, GithubUserSearchResults,
+};
+pub use starred_check::GithubStarredCheck;
+>>>>>>> port/github-releases_activity_search
 pub use tag::GithubTag;
 pub use team::GithubTeam;
 <<<<<<< HEAD

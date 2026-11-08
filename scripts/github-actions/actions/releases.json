@@ -1,0 +1,81 @@
+[
+ {
+  "group": "releases",
+  "name": "list_releases",
+  "input": "ListReleases",
+  "output": "GithubRelease",
+  "list": true,
+  "summary": "a repository's releases, a page at a time."
+ },
+ {
+  "group": "releases",
+  "name": "create_release",
+  "input": "CreateRelease",
+  "output": "GithubRelease",
+  "summary": "a new release of a repository, from a tag."
+ },
+ {
+  "group": "releases",
+  "name": "get_release",
+  "input": "GetRelease",
+  "output": "GithubRelease",
+  "summary": "a release, by its id."
+ },
+ {
+  "group": "releases",
+  "name": "get_latest_release",
+  "input": "GetLatestRelease",
+  "output": "GithubRelease",
+  "summary": "a repository's latest published release."
+ },
+ {
+  "group": "releases",
+  "name": "get_release_by_tag",
+  "input": "GetReleaseByTag",
+  "output": "GithubRelease",
+  "summary": "a release, by its tag's name."
+ },
+ {
+  "group": "releases",
+  "name": "list_release_assets",
+  "input": "ListReleaseAssets",
+  "output": "GithubReleaseAsset",
+  "list": true,
+  "summary": "the files attached to a release, a page at a time."
+ },
+ {
+  "group": "releases",
+  "name": "update_release",
+  "input": "UpdateRelease",
+  "output": "GithubRelease",
+  "summary": "a release changed, by its id."
+ },
+ {
+  "group": "releases",
+  "name": "delete_release",
+  "input": "DeleteRelease",
+  "output": "GithubAcknowledgement",
+  "summary": "a release deleted, by its id. Its tag stays."
+ },
+ {
+  "group": "releases",
+  "name": "generate_release_notes",
+  "input": "GenerateReleaseNotes",
+  "output": "GithubReleaseNotes",
+  "summary": "the name and body GitHub writes for a release of a tag. Nothing is saved."
+ },
+ {
+  "group": "releases",
+  "name": "get_release_asset",
+  "input": "GetReleaseAsset",
+  "output": "GithubReleaseAsset",
+  "summary": "a file attached to a release, by its id."
+ },
+ {
+  "group": "releases",
+  "name": "delete_release_asset",
+  "input": "DeleteReleaseAsset",
+  "output": "GithubAcknowledgement",
+  "summary": "a file attached to a release deleted, by its id."
+ }
+]

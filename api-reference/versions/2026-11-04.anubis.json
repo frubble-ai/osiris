@@ -23,6 +23,7 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
       "ActionResult_GithubArtifactDownload": {
         "description": "An action's answer: what it read, as `data`.",
@@ -47,6 +48,8 @@
         "type": "object"
       },
 >>>>>>> port/github-checks_workflows
+=======
+>>>>>>> port/github-releases_activity_search
       "ActionResult_GithubBranch": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -76,6 +79,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
       "ActionResult_GithubCollaboratorAddition": {
         "description": "An action's answer: what it read, as `data`.",
@@ -350,6 +354,34 @@
               "url",
               "commits",
               "files"
+=======
+      "ActionResult_GithubCodeSearchResults": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "The files a code search found.",
+            "properties": {
+              "incomplete_results": {
+                "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+                "type": "boolean"
+              },
+              "items": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubSearchCode"
+                },
+                "type": "array"
+              },
+              "total_count": {
+                "description": "Every match GitHub counted, across all pages.",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "total_count",
+              "incomplete_results",
+              "items"
+>>>>>>> port/github-releases_activity_search
             ],
             "type": "object"
           }
@@ -359,6 +391,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubContentChange": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -381,6 +414,34 @@
             },
             "required": [
               "commit"
+=======
+      "ActionResult_GithubCommitSearchResults": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "The commits a search found.",
+            "properties": {
+              "incomplete_results": {
+                "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+                "type": "boolean"
+              },
+              "items": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubSearchCommit"
+                },
+                "type": "array"
+              },
+              "total_count": {
+                "description": "Every match GitHub counted, across all pages.",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "total_count",
+              "incomplete_results",
+              "items"
+>>>>>>> port/github-releases_activity_search
             ],
             "type": "object"
           }
@@ -390,8 +451,11 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 =======
 >>>>>>> port/github-checks_workflows
+=======
+>>>>>>> port/github-releases_activity_search
       "ActionResult_GithubCurrentUser": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -463,6 +527,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ActionResult_GithubFileContent": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -490,11 +555,69 @@
               },
               "body": {
 >>>>>>> port/github-issues
+=======
+      "ActionResult_GithubLabelSearchResults": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "The labels a search found.",
+            "properties": {
+              "incomplete_results": {
+                "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+                "type": "boolean"
+              },
+              "items": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubSearchLabel"
+                },
+                "type": "array"
+              },
+              "total_count": {
+                "description": "Every match GitHub counted, across all pages.",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "total_count",
+              "incomplete_results",
+              "items"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubRelease": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A release.",
+            "properties": {
+              "assets_url": {
+                "type": "string"
+              },
+              "author": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "body": {
+>>>>>>> port/github-releases_activity_search
                 "type": [
                   "string",
                   "null"
                 ]
               },
+<<<<<<< HEAD
 <<<<<<< HEAD
               "download_url": {
 =======
@@ -516,13 +639,47 @@
                 "type": "string"
               },
               "sha": {
+=======
+              "created_at": {
                 "type": "string"
               },
-              "size": {
-                "format": "int64",
-                "type": "integer"
+              "draft": {
+                "type": "boolean"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prerelease": {
+                "type": "boolean"
+              },
+              "published_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "tag_name": {
+                "type": "string"
+              },
+              "tarball_url": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "target_commitish": {
+                "type": "string"
               },
               "url": {
+                "type": "string"
+              },
+              "zipball_url": {
                 "type": [
                   "string",
                   "null"
@@ -530,6 +687,85 @@
               }
             },
             "required": [
+              "id",
+              "tag_name",
+              "draft",
+              "prerelease",
+              "url",
+              "assets_url",
+              "target_commitish",
+              "created_at"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubReleaseAsset": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "A file attached to a release.",
+            "properties": {
+              "content_type": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "download_count": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "download_url": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+>>>>>>> port/github-releases_activity_search
+                "type": "string"
+              },
+              "size": {
+                "format": "int64",
+                "type": "integer"
+              },
+<<<<<<< HEAD
+              "url": {
+                "type": [
+                  "string",
+                  "null"
+=======
+              "state": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "uploader": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  {
+                    "type": "null"
+                  }
+>>>>>>> port/github-releases_activity_search
+                ]
+              }
+            },
+            "required": [
+<<<<<<< HEAD
               "name",
               "path",
               "sha",
@@ -894,6 +1130,15 @@
               "head",
               "base",
 >>>>>>> port/github-pull_requests
+=======
+              "id",
+              "name",
+              "state",
+              "content_type",
+              "size",
+              "download_count",
+              "download_url",
+>>>>>>> port/github-releases_activity_search
               "created_at",
               "updated_at"
             ],
@@ -905,6 +1150,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
       "ActionResult_GithubIssueLock": {
         "description": "An action's answer: what it read, as `data`.",
@@ -982,6 +1228,15 @@
               "name": {
 =======
               "id": {
+=======
+      "ActionResult_GithubReleaseNotes": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "Release notes GitHub wrote for a tag.",
+            "properties": {
+              "body": {
+>>>>>>> port/github-releases_activity_search
                 "type": "string"
               },
               "name": {
@@ -989,9 +1244,14 @@
               }
             },
             "required": [
+<<<<<<< HEAD
               "id",
               "name",
               "color"
+=======
+              "name",
+              "body"
+>>>>>>> port/github-releases_activity_search
             ],
             "type": "object"
           }
@@ -1001,6 +1261,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ActionResult_GithubMilestone": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1141,6 +1402,8 @@
 >>>>>>> port/github-pull_requests
 =======
 >>>>>>> port/github-checks_workflows
+=======
+>>>>>>> port/github-releases_activity_search
       "ActionResult_GithubRepository": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1211,6 +1474,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1351,11 +1615,86 @@
               "items": {
                 "items": {
                   "$ref": "#/components/schemas/GithubSearchIssue"
+=======
+      "ActionResult_GithubRepositorySearchResults": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "The repositories a search found.",
+            "properties": {
+              "incomplete_results": {
+                "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+                "type": "boolean"
+              },
+              "repositories": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubSearchRepository"
+>>>>>>> port/github-releases_activity_search
                 },
                 "type": "array"
               },
               "total_count": {
+<<<<<<< HEAD
                 "description": "How many items match, across every page.",
+=======
+                "description": "Every match GitHub counted, across all pages.",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "total_count",
+              "incomplete_results",
+              "repositories"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubStarredCheck": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "Whether the authenticated user has starred a repository.",
+            "properties": {
+              "starred": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "starred"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_GithubTopicSearchResults": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "The topics a search found.",
+            "properties": {
+              "incomplete_results": {
+                "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+                "type": "boolean"
+              },
+              "items": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubSearchTopic"
+                },
+                "type": "array"
+              },
+              "total_count": {
+                "description": "Every match GitHub counted, across all pages.",
+>>>>>>> port/github-releases_activity_search
                 "format": "int64",
                 "type": "integer"
               }
@@ -1364,6 +1703,7 @@
               "total_count",
               "incomplete_results",
               "items"
+<<<<<<< HEAD
 >>>>>>> port/github-issues
 =======
       "ActionResult_GithubReviewComment": {
@@ -1470,6 +1810,8 @@
               "state",
 >>>>>>> port/github-checks_workflows
               "url"
+=======
+>>>>>>> port/github-releases_activity_search
             ],
             "type": "object"
           }
@@ -1479,6 +1821,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
       "ActionResult_GithubReviewRequest": {
         "description": "An action's answer: what it read, as `data`.",
@@ -1578,6 +1921,34 @@
               "created_at",
               "updated_at"
 >>>>>>> port/github-checks_workflows
+=======
+      "ActionResult_GithubUserSearchResults": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "description": "The users a search found.",
+            "properties": {
+              "incomplete_results": {
+                "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+                "type": "boolean"
+              },
+              "items": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubSearchUser"
+                },
+                "type": "array"
+              },
+              "total_count": {
+                "description": "Every match GitHub counted, across all pages.",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "total_count",
+              "incomplete_results",
+              "items"
+>>>>>>> port/github-releases_activity_search
             ],
             "type": "object"
           }
@@ -1587,6 +1958,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
       "ActionResult_Vec_GithubArtifact": {
@@ -1643,6 +2015,8 @@
         "type": "object"
       },
 >>>>>>> port/github-checks_workflows
+=======
+>>>>>>> port/github-releases_activity_search
       "ActionResult_Vec_GithubBranch": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -1677,14 +2051,19 @@
       },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ActionResult_Vec_GithubCollaborator": {
 =======
       "ActionResult_Vec_GithubCheckRun": {
 >>>>>>> port/github-checks_workflows
+=======
+      "ActionResult_Vec_GithubEvent": {
+>>>>>>> port/github-releases_activity_search
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
             "items": {
+<<<<<<< HEAD
 <<<<<<< HEAD
               "description": "A repository's collaborator.",
               "properties": {
@@ -1799,6 +2178,11 @@
               "description": "A commit.",
               "properties": {
                 "author": {
+=======
+              "description": "An event on GitHub's activity feed. `payload` is GitHub's own, whose shape depends on `event_type`.",
+              "properties": {
+                "actor": {
+>>>>>>> port/github-releases_activity_search
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/GithubUser"
@@ -1808,6 +2192,7 @@
                     }
                   ]
                 },
+<<<<<<< HEAD
                 "author_email": {
                   "type": [
                     "string",
@@ -1959,17 +2344,42 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/GithubUser"
+=======
+                "created_at": {
+                  "type": "string"
+                },
+                "event_type": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "payload": {
+                  "type": "object"
+                },
+                "public": {
+                  "type": "boolean"
+                },
+                "repository": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubEventRepository"
+>>>>>>> port/github-releases_activity_search
                     },
                     {
                       "type": "null"
                     }
                   ]
+<<<<<<< HEAD
 =======
 >>>>>>> port/github-checks_workflows
+=======
+>>>>>>> port/github-releases_activity_search
                 }
               },
               "required": [
                 "id",
+<<<<<<< HEAD
 <<<<<<< HEAD
                 "body",
                 "url",
@@ -1979,6 +2389,12 @@
 >>>>>>> port/github-checks_workflows
                 "created_at",
                 "updated_at"
+=======
+                "event_type",
+                "public",
+                "created_at",
+                "payload"
+>>>>>>> port/github-releases_activity_search
               ],
               "type": "object"
             },
@@ -1990,6 +2406,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
       "ActionResult_Vec_GithubContentEntry": {
         "description": "An action's answer: what it read, as `data`.",
@@ -2125,6 +2542,8 @@
 >>>>>>> port/github-pull_requests
 =======
 >>>>>>> port/github-checks_workflows
+=======
+>>>>>>> port/github-releases_activity_search
       "ActionResult_Vec_GithubInstallation": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -2166,6 +2585,7 @@
       },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ActionResult_Vec_GithubLanguage": {
 =======
       "ActionResult_Vec_GithubIssueComment": {
@@ -2173,10 +2593,14 @@
 =======
       "ActionResult_Vec_GithubPullRequest": {
 >>>>>>> port/github-pull_requests
+=======
+      "ActionResult_Vec_GithubRelease": {
+>>>>>>> port/github-releases_activity_search
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
             "items": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
               "description": "A language a repository is written in, by bytes of code.",
@@ -2202,6 +2626,22 @@
               "properties": {
                 "base": {
                   "$ref": "#/components/schemas/GithubPullRequestBranch"
+=======
+              "description": "A release.",
+              "properties": {
+                "assets_url": {
+                  "type": "string"
+                },
+                "author": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+>>>>>>> port/github-releases_activity_search
                 },
                 "body": {
                   "type": [
@@ -2209,6 +2649,7 @@
                     "null"
                   ]
                 },
+<<<<<<< HEAD
                 "closed_at": {
                   "type": [
                     "string",
@@ -2237,18 +2678,118 @@
                   "type": "boolean"
                 },
                 "merged_at": {
+=======
+                "created_at": {
+                  "type": "string"
+                },
+                "draft": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+>>>>>>> port/github-releases_activity_search
                   "type": [
                     "string",
                     "null"
                   ]
                 },
+<<<<<<< HEAD
                 "number": {
+=======
+                "prerelease": {
+                  "type": "boolean"
+                },
+                "published_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "tag_name": {
+                  "type": "string"
+                },
+                "tarball_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "target_commitish": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "zipball_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "tag_name",
+                "draft",
+                "prerelease",
+                "url",
+                "assets_url",
+                "target_commitish",
+                "created_at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "ActionResult_Vec_GithubReleaseAsset": {
+        "description": "An action's answer: what it read, as `data`.",
+        "properties": {
+          "data": {
+            "items": {
+              "description": "A file attached to a release.",
+              "properties": {
+                "content_type": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "string"
+                },
+                "download_count": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "download_url": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "size": {
+>>>>>>> port/github-releases_activity_search
                   "format": "int64",
                   "type": "integer"
                 },
                 "state": {
                   "type": "string"
                 },
+<<<<<<< HEAD
                 "title": {
                   "type": "string"
                 },
@@ -2260,6 +2801,12 @@
                   "type": "string"
                 },
                 "user": {
+=======
+                "updated_at": {
+                  "type": "string"
+                },
+                "uploader": {
+>>>>>>> port/github-releases_activity_search
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/GithubUser"
@@ -2273,6 +2820,7 @@
               "required": [
                 "id",
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "url",
                 "body",
 =======
@@ -2285,6 +2833,14 @@
                 "head",
                 "base",
 >>>>>>> port/github-pull_requests
+=======
+                "name",
+                "state",
+                "content_type",
+                "size",
+                "download_count",
+                "download_url",
+>>>>>>> port/github-releases_activity_search
                 "created_at",
                 "updated_at"
               ],
@@ -2298,6 +2854,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
       "ActionResult_Vec_GithubIssueEvent": {
 =======
@@ -2495,6 +3052,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-releases_activity_search
       "ActionResult_Vec_GithubRepository": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -2568,6 +3127,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -2686,6 +3246,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-releases_activity_search
       "ActionResult_Vec_GithubUser": {
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
@@ -2708,6 +3270,7 @@
                 },
                 "url": {
                   "type": "string"
+<<<<<<< HEAD
 =======
                 "url": {
                   "type": "string"
@@ -2726,16 +3289,22 @@
                 "url": {
                   "type": "string"
 >>>>>>> port/github-checks_workflows
+=======
+>>>>>>> port/github-releases_activity_search
                 }
               },
               "required": [
                 "id",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> port/github-releases_activity_search
                 "login",
                 "avatar_url",
                 "url",
                 "account_type"
+<<<<<<< HEAD
 >>>>>>> port/github-issues
 =======
 =======
@@ -2969,6 +3538,8 @@
                 "created_at",
                 "updated_at"
 >>>>>>> port/github-checks_workflows
+=======
+>>>>>>> port/github-releases_activity_search
               ],
               "type": "object"
             },
@@ -3186,6 +3757,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "CompareCommits": {
         "additionalProperties": false,
         "properties": {
@@ -3254,10 +3826,22 @@
             "minimum": 0,
             "type": "integer"
 >>>>>>> port/github-checks_workflows
+=======
+      "CheckRepositoryStarred": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+>>>>>>> port/github-releases_activity_search
           }
         },
         "required": [
           "owner",
+<<<<<<< HEAD
           "repo",
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3272,6 +3856,9 @@
 =======
           "run_id"
 >>>>>>> port/github-checks_workflows
+=======
+          "repo"
+>>>>>>> port/github-releases_activity_search
         ],
         "type": "object"
       },
@@ -4292,6 +4879,124 @@
         ],
         "type": "object"
       },
+      "CreateRelease": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "description": "The release's description, in Markdown.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "draft": {
+            "description": "A draft is not published.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "generate_release_notes": {
+            "description": "GitHub writes the release's name and body from the changes since the previous release,\nafter any `name` and `body` given.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "make_latest": {
+            "description": "Whether it becomes the repository's latest release: `true`, `false` or `legacy` (the\nlatest by creation date and version).",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+            "type": "string"
+          },
+          "prerelease": {
+            "description": "Marks the release as not ready for production.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "repo": {
+            "type": "string"
+          },
+          "tag_name": {
+            "description": "The tag the release is made from. GitHub creates it when it doesn't exist yet.",
+            "type": "string"
+          },
+          "target_commitish": {
+            "description": "The branch or commit SHA a new tag is created from. The repository's default branch when\nleft out.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "tag_name"
+        ],
+        "type": "object"
+      },
+      "DeleteRelease": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+            "type": "string"
+          },
+          "release_id": {
+            "description": "GitHub's numeric id of the release.",
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "release_id"
+        ],
+        "type": "object"
+      },
+      "DeleteReleaseAsset": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "description": "GitHub's numeric id of the asset.",
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "asset_id"
+        ],
+        "type": "object"
+      },
       "Deleted": {
         "properties": {
           "deleted": {
@@ -4525,6 +5230,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ForkRepository": {
         "additionalProperties": false,
         "properties": {
@@ -4544,21 +5250,59 @@
           },
           "organization": {
             "description": "The organization to fork into; the authenticated user's account when left out.",
+=======
+      "GenerateReleaseNotes": {
+        "additionalProperties": false,
+        "properties": {
+          "configuration_file_path": {
+            "description": "The path in the repository of a configuration file for the notes. GitHub reads\n`.github/release.yml` when left out.",
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
             ]
           },
           "owner": {
+<<<<<<< HEAD
             "type": "string"
           },
           "repo": {
             "type": "string"
+=======
+            "description": "The account or organization that owns the repository.",
+            "type": "string"
+          },
+          "previous_tag_name": {
+            "description": "The tag the notes start from. GitHub picks the previous release's when left out.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "repo": {
+            "type": "string"
+          },
+          "tag_name": {
+            "description": "The tag the notes are for. It need not exist yet.",
+            "type": "string"
+          },
+          "target_commitish": {
+            "description": "The branch or commit SHA the tag would be created from, when it doesn't exist yet.",
+            "type": [
+              "string",
+              "null"
+            ]
+>>>>>>> port/github-releases_activity_search
           }
         },
         "required": [
           "owner",
+<<<<<<< HEAD
           "repo"
+=======
+          "repo",
+          "tag_name"
+>>>>>>> port/github-releases_activity_search
         ],
         "type": "object"
       },
@@ -4582,6 +5326,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4609,10 +5354,39 @@
 =======
           "pull_number": {
 >>>>>>> port/github-pull_requests
+=======
+      "GetLatestRelease": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo"
+        ],
+        "type": "object"
+      },
+      "GetRelease": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+            "type": "string"
+          },
+          "release_id": {
+            "description": "GitHub's numeric id of the release.",
+>>>>>>> port/github-releases_activity_search
             "format": "int64",
             "minimum": 0,
             "type": "integer"
           },
+<<<<<<< HEAD
 <<<<<<< HEAD
           "owner": {
 >>>>>>> port/github-issues
@@ -4620,6 +5394,8 @@
           },
 =======
 >>>>>>> port/github-pull_requests
+=======
+>>>>>>> port/github-releases_activity_search
           "repo": {
             "type": "string"
           }
@@ -4627,6 +5403,7 @@
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
           "ref"
@@ -4763,15 +5540,31 @@
         "additionalProperties": false,
         "properties": {
           "milestone_number": {
+=======
+          "release_id"
+        ],
+        "type": "object"
+      },
+      "GetReleaseAsset": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "description": "GitHub's numeric id of the asset.",
+>>>>>>> port/github-releases_activity_search
             "format": "int64",
             "minimum": 0,
             "type": "integer"
           },
           "owner": {
+<<<<<<< HEAD
+=======
+            "description": "The account or organization that owns the repository.",
+>>>>>>> port/github-releases_activity_search
             "type": "string"
           },
           "repo": {
             "type": "string"
+<<<<<<< HEAD
 =======
           "repo": {
             "type": "string"
@@ -4781,11 +5574,14 @@
             "minimum": 0,
             "type": "integer"
 >>>>>>> port/github-pull_requests
+=======
+>>>>>>> port/github-releases_activity_search
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
 <<<<<<< HEAD
           "milestone_number"
 >>>>>>> port/github-issues
@@ -4796,6 +5592,31 @@
 =======
           "ref"
 >>>>>>> port/github-checks_workflows
+=======
+          "asset_id"
+        ],
+        "type": "object"
+      },
+      "GetReleaseByTag": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "tag": {
+            "description": "The tag's name, such as `v1.0.0`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "tag"
+>>>>>>> port/github-releases_activity_search
         ],
         "type": "object"
       },
@@ -4816,6 +5637,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4936,6 +5758,8 @@
         "type": "object"
       },
 >>>>>>> port/github-checks_workflows
+=======
+>>>>>>> port/github-releases_activity_search
       "GithubAcknowledgement": {
         "description": "An action that answers nothing of its own: `ok` once GitHub has done it.",
         "properties": {
@@ -4948,6 +5772,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
       "GithubArtifact": {
@@ -5005,6 +5830,8 @@
         "type": "object"
       },
 >>>>>>> port/github-checks_workflows
+=======
+>>>>>>> port/github-releases_activity_search
       "GithubBranch": {
         "description": "A branch: its name, the commit it points at, and whether it is protected.",
         "properties": {
@@ -5025,6 +5852,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
       "GithubCollaborator": {
@@ -5362,11 +6190,55 @@
             "type": "integer"
           },
           "total": {
+=======
+      "GithubCodeSearchResults": {
+        "description": "The files a code search found.",
+        "properties": {
+          "incomplete_results": {
+            "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GithubSearchCode"
+            },
+            "type": "array"
+          },
+          "total_count": {
+            "description": "Every match GitHub counted, across all pages.",
             "format": "int64",
             "type": "integer"
           }
         },
         "required": [
+          "total_count",
+          "incomplete_results",
+          "items"
+        ],
+        "type": "object"
+      },
+      "GithubCommitSearchResults": {
+        "description": "The commits a search found.",
+        "properties": {
+          "incomplete_results": {
+            "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GithubSearchCommit"
+            },
+            "type": "array"
+          },
+          "total_count": {
+            "description": "Every match GitHub counted, across all pages.",
+>>>>>>> port/github-releases_activity_search
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+<<<<<<< HEAD
           "additions",
           "deletions",
           "total"
@@ -5553,6 +6425,14 @@
         "type": "object"
       },
 >>>>>>> port/github-checks_workflows
+=======
+          "total_count",
+          "incomplete_results",
+          "items"
+        ],
+        "type": "object"
+      },
+>>>>>>> port/github-releases_activity_search
       "GithubCurrentUser": {
         "description": "The authenticated user, with their profile.",
         "properties": {
@@ -5612,6 +6492,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubFileContent": {
         "description": "A file and its content.",
         "properties": {
@@ -5633,10 +6514,65 @@
             ]
           },
           "encoding": {
+=======
+      "GithubEvent": {
+        "description": "An event on GitHub's activity feed. `payload` is GitHub's own, whose shape depends on `event_type`.",
+        "properties": {
+          "actor": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "event_type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "object"
+          },
+          "public": {
+            "type": "boolean"
+          },
+          "repository": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubEventRepository"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "event_type",
+          "public",
+          "created_at",
+          "payload"
+        ],
+        "type": "object"
+      },
+      "GithubEventRepository": {
+        "description": "The repository an event happened in.",
+        "properties": {
+          "id": {
+>>>>>>> port/github-releases_activity_search
             "type": "string"
           },
           "name": {
             "type": "string"
+<<<<<<< HEAD
           },
           "path": {
             "type": "string"
@@ -5709,6 +6645,13 @@
           "ref_name",
           "sha",
           "object_type"
+=======
+          }
+        },
+        "required": [
+          "id",
+          "name"
+>>>>>>> port/github-releases_activity_search
         ],
         "type": "object"
       },
@@ -5739,6 +6682,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5881,6 +6825,49 @@
           "base": {
             "$ref": "#/components/schemas/GithubPullRequestBranch"
 >>>>>>> port/github-pull_requests
+=======
+      "GithubLabelSearchResults": {
+        "description": "The labels a search found.",
+        "properties": {
+          "incomplete_results": {
+            "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GithubSearchLabel"
+            },
+            "type": "array"
+          },
+          "total_count": {
+            "description": "Every match GitHub counted, across all pages.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_count",
+          "incomplete_results",
+          "items"
+        ],
+        "type": "object"
+      },
+      "GithubRelease": {
+        "description": "A release.",
+        "properties": {
+          "assets_url": {
+            "type": "string"
+          },
+          "author": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+>>>>>>> port/github-releases_activity_search
           },
           "body": {
             "type": [
@@ -5888,6 +6875,7 @@
               "null"
             ]
           },
+<<<<<<< HEAD
           "closed_at": {
             "type": [
               "string",
@@ -5903,19 +6891,92 @@
             "type": "string"
 >>>>>>> port/github-issues
 =======
+=======
+>>>>>>> port/github-releases_activity_search
           "created_at": {
             "type": "string"
           },
           "draft": {
             "type": "boolean"
           },
+<<<<<<< HEAD
           "head": {
             "$ref": "#/components/schemas/GithubPullRequestBranch"
 >>>>>>> port/github-pull_requests
+=======
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prerelease": {
+            "type": "boolean"
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tag_name": {
+            "type": "string"
+          },
+          "tarball_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target_commitish": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "zipball_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "tag_name",
+          "draft",
+          "prerelease",
+          "url",
+          "assets_url",
+          "target_commitish",
+          "created_at"
+        ],
+        "type": "object"
+      },
+      "GithubReleaseAsset": {
+        "description": "A file attached to a release.",
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "download_count": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "download_url": {
+            "type": "string"
+>>>>>>> port/github-releases_activity_search
           },
           "id": {
             "type": "string"
           },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
           "location": {
@@ -5949,12 +7010,25 @@
             ]
           },
           "number": {
+=======
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "size": {
+>>>>>>> port/github-releases_activity_search
             "format": "int64",
             "type": "integer"
           },
           "state": {
             "type": "string"
           },
+<<<<<<< HEAD
           "title": {
             "type": "string"
           },
@@ -5965,6 +7039,12 @@
             "type": "string"
           },
           "user": {
+=======
+          "updated_at": {
+            "type": "string"
+          },
+          "uploader": {
+>>>>>>> port/github-releases_activity_search
             "oneOf": [
               {
                 "$ref": "#/components/schemas/GithubUser"
@@ -5977,6 +7057,7 @@
         },
         "required": [
           "id",
+<<<<<<< HEAD
           "number",
 <<<<<<< HEAD
           "title",
@@ -6316,10 +7397,31 @@
             "type": "string"
           },
           "status": {
+=======
+          "name",
+          "state",
+          "content_type",
+          "size",
+          "download_count",
+          "download_url",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "GithubReleaseNotes": {
+        "description": "Release notes GitHub wrote for a tag.",
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "name": {
+>>>>>>> port/github-releases_activity_search
             "type": "string"
           }
         },
         "required": [
+<<<<<<< HEAD
           "sha",
           "filename",
           "status",
@@ -6330,6 +7432,10 @@
 =======
           "logs"
 >>>>>>> port/github-checks_workflows
+=======
+          "name",
+          "body"
+>>>>>>> port/github-releases_activity_search
         ],
         "type": "object"
       },
@@ -6396,6 +7502,7 @@
       },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       "GithubRepositoryInvitation": {
         "description": "An invitation to collaborate on a repository, waiting for the invited account to accept it.",
         "properties": {
@@ -6404,11 +7511,80 @@
           },
           "expired": {
             "type": "boolean"
+=======
+      "GithubRepositorySearchResults": {
+        "description": "The repositories a search found.",
+        "properties": {
+          "incomplete_results": {
+            "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+            "type": "boolean"
+          },
+          "repositories": {
+            "items": {
+              "$ref": "#/components/schemas/GithubSearchRepository"
+            },
+            "type": "array"
+          },
+          "total_count": {
+            "description": "Every match GitHub counted, across all pages.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_count",
+          "incomplete_results",
+          "repositories"
+        ],
+        "type": "object"
+      },
+      "GithubSearchCode": {
+        "description": "A file a code search found.",
+        "properties": {
+          "git_url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "repository": {
+            "$ref": "#/components/schemas/GithubSearchCodeRepository"
+          },
+          "sha": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "path",
+          "sha",
+          "url",
+          "git_url",
+          "repository"
+        ],
+        "type": "object"
+      },
+      "GithubSearchCodeRepository": {
+        "description": "The repository found code is in.",
+        "properties": {
+          "full_name": {
+            "type": "string"
+>>>>>>> port/github-releases_activity_search
           },
           "id": {
             "type": "string"
           },
+<<<<<<< HEAD
           "invitee": {
+=======
+          "owner": {
+>>>>>>> port/github-releases_activity_search
             "oneOf": [
               {
                 "$ref": "#/components/schemas/GithubUser"
@@ -6418,6 +7594,7 @@
               }
             ]
           },
+<<<<<<< HEAD
           "inviter": {
             "oneOf": [
               {
@@ -6434,11 +7611,15 @@
           },
           "url": {
             "description": "Its page on GitHub.",
+=======
+          "url": {
+>>>>>>> port/github-releases_activity_search
             "type": "string"
           }
         },
         "required": [
           "id",
+<<<<<<< HEAD
           "permissions",
           "url",
           "created_at",
@@ -6487,11 +7668,95 @@
         "properties": {
           "body": {
 >>>>>>> port/github-pull_requests
+=======
+          "full_name",
+          "url"
+        ],
+        "type": "object"
+      },
+      "GithubSearchCommit": {
+        "description": "A commit a search found.",
+        "properties": {
+          "author": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "committer": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "repository": {
+            "$ref": "#/components/schemas/GithubSearchCommitRepository"
+          },
+          "score": {
+            "format": "double",
+            "type": "number"
+          },
+          "sha": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sha",
+          "url",
+          "message",
+          "repository",
+          "score"
+        ],
+        "type": "object"
+      },
+      "GithubSearchCommitRepository": {
+        "description": "The repository a found commit is in.",
+        "properties": {
+          "full_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "full_name",
+          "url"
+        ],
+        "type": "object"
+      },
+      "GithubSearchLabel": {
+        "description": "A label a search found.",
+        "properties": {
+          "color": {
+            "type": "string"
+          },
+          "description": {
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -6506,12 +7771,116 @@
             "type": "integer"
           },
           "repository_url": {
+=======
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "score": {
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "color",
+          "score"
+        ],
+        "type": "object"
+      },
+      "GithubSearchRepository": {
+        "description": "A repository a search found.",
+        "properties": {
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "owner": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "score": {
+            "format": "double",
+            "type": "number"
+          },
+          "stargazers_count": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "full_name",
+          "url",
+          "private",
+          "stargazers_count",
+          "score"
+        ],
+        "type": "object"
+      },
+      "GithubSearchTopic": {
+        "description": "A topic a search found.",
+        "properties": {
+          "curated": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "display_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "featured": {
+            "type": "boolean"
+          },
+          "name": {
+>>>>>>> port/github-releases_activity_search
             "type": "string"
           },
           "score": {
             "format": "double",
             "type": "number"
           },
+<<<<<<< HEAD
           "state": {
             "type": "string"
           },
@@ -6519,10 +7888,14 @@
             "type": "string"
 =======
           "commit_id": {
+=======
+          "short_description": {
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
             ]
+<<<<<<< HEAD
           },
           "id": {
             "type": "string"
@@ -6576,10 +7949,13 @@
           },
           "zipball_url": {
             "type": "string"
+=======
+>>>>>>> port/github-releases_activity_search
           }
         },
         "required": [
           "name",
+<<<<<<< HEAD
           "commit_sha",
           "zipball_url",
           "tarball_url"
@@ -6606,25 +7982,90 @@
           "state",
           "repository_url",
           "is_pull_request",
+=======
+          "featured",
+          "curated",
+>>>>>>> port/github-releases_activity_search
           "score"
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubSearchIssueResults": {
         "description": "The issues and pull requests a search found, and how many there are in all.",
         "properties": {
           "incomplete_results": {
             "description": "Whether GitHub stopped searching before it had looked at everything.",
+=======
+      "GithubSearchUser": {
+        "description": "A user a search found.",
+        "properties": {
+          "account_type": {
+            "type": "string"
+          },
+          "avatar_url": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "score": {
+            "format": "double",
+            "type": "number"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "login",
+          "account_type",
+          "url",
+          "avatar_url",
+          "score"
+        ],
+        "type": "object"
+      },
+      "GithubStarredCheck": {
+        "description": "Whether the authenticated user has starred a repository.",
+        "properties": {
+          "starred": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "starred"
+        ],
+        "type": "object"
+      },
+      "GithubTopicSearchResults": {
+        "description": "The topics a search found.",
+        "properties": {
+          "incomplete_results": {
+            "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+>>>>>>> port/github-releases_activity_search
             "type": "boolean"
           },
           "items": {
             "items": {
+<<<<<<< HEAD
               "$ref": "#/components/schemas/GithubSearchIssue"
+=======
+              "$ref": "#/components/schemas/GithubSearchTopic"
+>>>>>>> port/github-releases_activity_search
             },
             "type": "array"
           },
           "total_count": {
+<<<<<<< HEAD
             "description": "How many items match, across every page.",
+=======
+            "description": "Every match GitHub counted, across all pages.",
+>>>>>>> port/github-releases_activity_search
             "format": "int64",
             "type": "integer"
           }
@@ -6636,6 +8077,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubTimelineEvent": {
         "description": "Something on an issue's timeline: an event, a comment, a commit or a cross-reference. Unlike an\nissue event, a timeline entry may have no id, no actor and no time (a commit or a\ncross-reference has none of its own).",
         "properties": {
@@ -6802,6 +8244,8 @@
         ],
         "type": "object"
       },
+=======
+>>>>>>> port/github-releases_activity_search
       "GithubUser": {
         "description": "A GitHub account, as another resource names it (an owner, an author, an assignee).",
         "properties": {
@@ -6831,6 +8275,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "GithubWorkflow": {
         "description": "A GitHub Actions workflow.",
         "properties": {
@@ -7019,6 +8464,31 @@
           "number",
           "name",
           "status"
+=======
+      "GithubUserSearchResults": {
+        "description": "The users a search found.",
+        "properties": {
+          "incomplete_results": {
+            "description": "GitHub stopped searching before it had looked at everything, so matches may be missing.",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GithubSearchUser"
+            },
+            "type": "array"
+          },
+          "total_count": {
+            "description": "Every match GitHub counted, across all pages.",
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_count",
+          "incomplete_results",
+          "items"
+>>>>>>> port/github-releases_activity_search
         ],
         "type": "object"
       },
@@ -7038,12 +8508,18 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ListAssignees": {
         "additionalProperties": false,
         "properties": {
           "owner": {
             "type": "string"
           },
+=======
+      "ListAuthenticatedUserEvents": {
+        "additionalProperties": false,
+        "properties": {
+>>>>>>> port/github-releases_activity_search
           "page": {
             "description": "From 1.",
             "format": "int32",
@@ -7062,13 +8538,53 @@
               "null"
             ]
           },
+<<<<<<< HEAD
           "repo": {
+=======
+          "username": {
+            "description": "The user's login.",
+>>>>>>> port/github-releases_activity_search
             "type": "string"
           }
         },
         "required": [
+<<<<<<< HEAD
           "owner",
           "repo"
+=======
+          "username"
+        ],
+        "type": "object"
+      },
+      "ListAuthenticatedUserReceivedEvents": {
+        "additionalProperties": false,
+        "properties": {
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "username": {
+            "description": "The user's login.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username"
+>>>>>>> port/github-releases_activity_search
         ],
         "type": "object"
       },
@@ -7113,6 +8629,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -7723,10 +9240,14 @@
         "type": "object"
       },
       "ListRepositoryIssues": {
+=======
+      "ListMyStarredRepositories": {
+>>>>>>> port/github-releases_activity_search
         "additionalProperties": false,
         "properties": {
           "direction": {
             "description": "`asc` or `desc` (GitHub's default).",
+<<<<<<< HEAD
 >>>>>>> port/github-issues
             "type": [
               "string",
@@ -7865,6 +9386,8 @@
         "properties": {
           "direction": {
             "description": "`asc` or `desc`.",
+=======
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
@@ -7889,6 +9412,7 @@
             ]
           },
           "sort": {
+<<<<<<< HEAD
             "description": "`created`, `updated`, `pushed` or `full_name`.",
 =======
           "sort": {
@@ -7902,6 +9426,9 @@
 <<<<<<< HEAD
           "visibility": {
             "description": "`all`, `public` or `private`.",
+=======
+            "description": "`created` (when the star was given, GitHub's default) or `updated` (when the repository was\nlast pushed to).",
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
@@ -7910,6 +9437,7 @@
         },
         "type": "object"
       },
+<<<<<<< HEAD
       "ListOrganizationRepositories": {
         "additionalProperties": false,
         "properties": {
@@ -7928,6 +9456,37 @@
         "properties": {
           "owner": {
 >>>>>>> port/github-checks_workflows
+=======
+      "ListPublicEvents": {
+        "additionalProperties": false,
+        "properties": {
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "ListReleaseAssets": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+>>>>>>> port/github-releases_activity_search
             "type": "string"
           },
           "page": {
@@ -7948,6 +9507,7 @@
               "null"
             ]
           },
+<<<<<<< HEAD
 <<<<<<< HEAD
           "sort": {
             "description": "`created`, `updated`, `pushed` or `full_name`.",
@@ -8028,11 +9588,22 @@
             "format": "int64",
             "minimum": 0,
             "type": "integer"
+=======
+          "release_id": {
+            "description": "GitHub's numeric id of the release.",
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "repo": {
+            "type": "string"
+>>>>>>> port/github-releases_activity_search
           }
         },
         "required": [
           "owner",
           "repo",
+<<<<<<< HEAD
           "run_id"
         ],
         "type": "object"
@@ -8151,6 +9722,17 @@
           },
 <<<<<<< HEAD
           "owner": {
+=======
+          "release_id"
+        ],
+        "type": "object"
+      },
+      "ListReleases": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+>>>>>>> port/github-releases_activity_search
             "type": "string"
           },
           "page": {
@@ -8181,6 +9763,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ListRepositoryForks": {
         "additionalProperties": false,
         "properties": {
@@ -8265,6 +9848,13 @@
         "additionalProperties": false,
         "properties": {
           "owner": {
+=======
+      "ListRepositoryEvents": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+>>>>>>> port/github-releases_activity_search
             "type": "string"
           },
           "page": {
@@ -8296,10 +9886,18 @@
         "type": "object"
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "ListRepositoryTopics": {
         "additionalProperties": false,
         "properties": {
           "owner": {
+=======
+      "ListRepositoryStargazers": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+>>>>>>> port/github-releases_activity_search
             "type": "string"
           },
           "page": {
@@ -8330,6 +9928,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "ListUserRepositories": {
         "additionalProperties": false,
         "properties": {
@@ -8339,6 +9938,14 @@
               "string",
               "null"
             ]
+=======
+      "ListRepositoryWatchers": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+            "type": "string"
+>>>>>>> port/github-releases_activity_search
           },
           "page": {
             "description": "From 1.",
@@ -8358,6 +9965,7 @@
               "null"
             ]
           },
+<<<<<<< HEAD
           "sort": {
             "description": "`created`, `updated`, `pushed` or `full_name`.",
             "type": [
@@ -8369,6 +9977,35 @@
             "description": "`all`, `owner` or `member`.",
             "type": [
               "string",
+=======
+          "repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "repo"
+        ],
+        "type": "object"
+      },
+      "ListUserPublicEvents": {
+        "additionalProperties": false,
+        "properties": {
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
               "null"
             ]
           },
@@ -8382,12 +10019,47 @@
         ],
         "type": "object"
       },
+      "ListUserReceivedPublicEvents": {
+        "additionalProperties": false,
+        "properties": {
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+>>>>>>> port/github-releases_activity_search
+              "null"
+            ]
+          },
+          "username": {
+            "description": "The user's login.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username"
+        ],
+        "type": "object"
+      },
+<<<<<<< HEAD
 =======
 >>>>>>> port/github-issues
 =======
 >>>>>>> port/github-pull_requests
 =======
 >>>>>>> port/github-checks_workflows
+=======
+>>>>>>> port/github-releases_activity_search
       "List_AuthConfig": {
         "properties": {
           "data": {
@@ -8585,6 +10257,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -9047,6 +10720,13 @@
           },
           "owner": {
             "description": "With `repo`, only that repository; alone, only that account's repositories.",
+=======
+      "SearchCode": {
+        "additionalProperties": false,
+        "properties": {
+          "order": {
+            "description": "`asc` or `desc` (GitHub's default), when `sort` is given.",
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
@@ -9055,6 +10735,7 @@
           "page": {
             "description": "From 1.",
             "format": "int32",
+<<<<<<< HEAD
 =======
           "pull_number"
         ],
@@ -9071,12 +10752,15 @@
             "description": "The line the comment is on, or the last line of a range of lines.",
             "format": "int64",
 >>>>>>> port/github-pull_requests
+=======
+>>>>>>> port/github-releases_activity_search
             "minimum": 0,
             "type": [
               "integer",
               "null"
             ]
           },
+<<<<<<< HEAD
 <<<<<<< HEAD
           "per_page": {
             "description": "At most 100.",
@@ -9101,12 +10785,18 @@
             "description": "The first line of a range of lines the comment is on.",
             "format": "int64",
 >>>>>>> port/github-pull_requests
+=======
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+>>>>>>> port/github-releases_activity_search
             "minimum": 0,
             "type": [
               "integer",
               "null"
             ]
           },
+<<<<<<< HEAD
 <<<<<<< HEAD
           "q": {
             "description": "The same as `query`, used only when `query` is left out or empty.",
@@ -9145,12 +10835,21 @@
           },
           "type": {
             "description": "Only issues (`issue`) or only pull requests (`pr`).",
+=======
+          "query": {
+            "description": "What to look for, in GitHub's search syntax: words and qualifiers such as `language:rust`.",
+            "type": "string"
+          },
+          "sort": {
+            "description": "`indexed` (when GitHub last indexed the file) or `updated`. Best match when left out.",
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
             ]
           }
         },
+<<<<<<< HEAD
         "type": "object"
       },
       "SetIssueLabels": {
@@ -9273,6 +10972,231 @@
         "type": "object"
       },
 >>>>>>> port/github-checks_workflows
+=======
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "SearchCommits": {
+        "additionalProperties": false,
+        "properties": {
+          "order": {
+            "description": "`asc` or `desc` (GitHub's default), when `sort` is given.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "query": {
+            "description": "What to look for, in GitHub's search syntax: words and qualifiers such as `repo:octo/hello`.",
+            "type": "string"
+          },
+          "sort": {
+            "description": "`author-date` or `committer-date`. Best match when left out.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "SearchLabels": {
+        "additionalProperties": false,
+        "properties": {
+          "order": {
+            "description": "`asc` or `desc` (GitHub's default), when `sort` is given.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "query": {
+            "description": "The words to look for in the labels' names and descriptions.",
+            "type": "string"
+          },
+          "repository_id": {
+            "description": "GitHub's numeric id of the repository whose labels are searched.",
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "sort": {
+            "description": "`created` or `updated`. Best match when left out.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "repository_id",
+          "query"
+        ],
+        "type": "object"
+      },
+      "SearchRepositories": {
+        "additionalProperties": false,
+        "properties": {
+          "order": {
+            "description": "`asc` or `desc` (GitHub's default), when `sort` is given.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "query": {
+            "description": "What to look for, in GitHub's search syntax: words and qualifiers such as `language:rust`.",
+            "type": "string"
+          },
+          "sort": {
+            "description": "`stars`, `forks`, `help-wanted-issues` or `updated`. Best match when left out.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "SearchTopics": {
+        "additionalProperties": false,
+        "properties": {
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "query": {
+            "description": "What to look for, in GitHub's search syntax: words and qualifiers such as `is:featured`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "SearchUsers": {
+        "additionalProperties": false,
+        "properties": {
+          "order": {
+            "description": "`asc` or `desc` (GitHub's default), when `sort` is given.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "page": {
+            "description": "From 1.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "per_page": {
+            "description": "At most 100.",
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "query": {
+            "description": "What to look for, in GitHub's search syntax: words and qualifiers such as `location:berlin`.",
+            "type": "string"
+          },
+          "sort": {
+            "description": "`followers`, `repositories` or `joined`. Best match when left out.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+>>>>>>> port/github-releases_activity_search
       "SlackChannel": {
         "description": "A channel the connected user can see.",
         "properties": {
@@ -9302,6 +11226,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
       "SyncForkBranchWithUpstream": {
         "additionalProperties": false,
@@ -9355,10 +11280,22 @@
             "minimum": 0,
             "type": "integer"
 >>>>>>> port/github-pull_requests
+=======
+      "StarRepository": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+>>>>>>> port/github-releases_activity_search
           }
         },
         "required": [
           "owner",
+<<<<<<< HEAD
           "repo",
 <<<<<<< HEAD
           "branch"
@@ -9367,6 +11304,9 @@
           "review_id",
           "event"
 >>>>>>> port/github-pull_requests
+=======
+          "repo"
+>>>>>>> port/github-releases_activity_search
         ],
         "type": "object"
       },
@@ -9406,6 +11346,7 @@
         ],
         "type": "object"
       },
+<<<<<<< HEAD
       "UnlockIssue": {
         "additionalProperties": false,
         "properties": {
@@ -9415,6 +11356,13 @@
             "type": "integer"
           },
           "owner": {
+=======
+      "UnstarRepository": {
+        "additionalProperties": false,
+        "properties": {
+          "owner": {
+            "description": "The account or organization that owns the repository.",
+>>>>>>> port/github-releases_activity_search
             "type": "string"
           },
           "repo": {
@@ -9423,8 +11371,12 @@
         },
         "required": [
           "owner",
+<<<<<<< HEAD
           "repo",
           "issue_number"
+=======
+          "repo"
+>>>>>>> port/github-releases_activity_search
         ],
         "type": "object"
       },
@@ -9468,6 +11420,7 @@
         },
         "type": "object"
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
       "UpdateRef": {
@@ -9616,11 +11569,20 @@
         "properties": {
           "expected_head_sha": {
             "description": "The head commit the branch is expected to be at. GitHub refuses the update when the\nbranch has moved on since.",
+=======
+      "UpdateRelease": {
+        "additionalProperties": false,
+        "description": "Only the fields given change.",
+        "properties": {
+          "body": {
+            "description": "The release's description, in Markdown.",
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "owner": {
             "type": "string"
           },
@@ -9678,11 +11640,16 @@
         "additionalProperties": false,
         "properties": {
           "allow_auto_merge": {
+=======
+          "draft": {
+            "description": "A draft is not published; `false` publishes it.",
+>>>>>>> port/github-releases_activity_search
             "type": [
               "boolean",
               "null"
             ]
           },
+<<<<<<< HEAD
           "allow_merge_commit": {
             "type": [
               "boolean",
@@ -9772,12 +11739,17 @@
           },
           "homepage": {
             "description": "A URL with more about the repository.",
+=======
+          "make_latest": {
+            "description": "Whether it becomes the repository's latest release: `true`, `false` or `legacy` (the\nlatest by creation date and version).",
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
             ]
           },
           "name": {
+<<<<<<< HEAD
             "description": "A new name for the repository.",
 =======
           "name": {
@@ -9787,21 +11759,32 @@
           "new_name": {
             "description": "The label's name from now on.",
 >>>>>>> port/github-issues
+=======
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
             ]
           },
           "owner": {
+<<<<<<< HEAD
             "type": "string"
           },
 <<<<<<< HEAD
           "private": {
+=======
+            "description": "The account or organization that owns the repository.",
+            "type": "string"
+          },
+          "prerelease": {
+            "description": "Marks the release as not ready for production.",
+>>>>>>> port/github-releases_activity_search
             "type": [
               "boolean",
               "null"
             ]
           },
+<<<<<<< HEAD
           "repo": {
             "type": "string"
           },
@@ -9837,10 +11820,15 @@
             ]
           },
           "milestone_number": {
+=======
+          "release_id": {
+            "description": "GitHub's numeric id of the release.",
+>>>>>>> port/github-releases_activity_search
             "format": "int64",
             "minimum": 0,
             "type": "integer"
           },
+<<<<<<< HEAD
           "owner": {
             "type": "string"
           },
@@ -9849,13 +11837,24 @@
           },
           "state": {
             "description": "`open` or `closed`.",
+=======
+          "repo": {
+            "type": "string"
+          },
+          "tag_name": {
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
             ]
           },
+<<<<<<< HEAD
           "title": {
 >>>>>>> port/github-issues
+=======
+          "target_commitish": {
+            "description": "The branch or commit SHA a new tag is created from.",
+>>>>>>> port/github-releases_activity_search
             "type": [
               "string",
               "null"
@@ -9864,6 +11863,7 @@
         },
         "required": [
           "owner",
+<<<<<<< HEAD
 <<<<<<< HEAD
           "repo"
 =======
@@ -9874,6 +11874,12 @@
         "type": "object"
 =======
 >>>>>>> port/github-pull_requests
+=======
+          "repo",
+          "release_id"
+        ],
+        "type": "object"
+>>>>>>> port/github-releases_activity_search
       }
     },
     "securitySchemes": {
@@ -10895,6 +12901,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.add_repository_collaborator": {
       "post": {
         "operationId": "github_add_repository_collaborator",
@@ -10913,6 +12920,11 @@
       "post": {
         "operationId": "github_cancel_workflow_run",
 >>>>>>> port/github-checks_workflows
+=======
+    "/v1/connected-accounts/{id}/actions/github.check_repository_starred": {
+      "post": {
+        "operationId": "github_check_repository_starred",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -10942,6 +12954,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/AddRepositoryCollaborator"
 =======
                 "$ref": "#/components/schemas/AddIssueAssignees"
@@ -10949,6 +12962,9 @@
 =======
                 "$ref": "#/components/schemas/CheckPullRequestMerged"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/CheckRepositoryStarred"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -10961,6 +12977,7 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubCollaboratorAddition"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssue"
@@ -10968,6 +12985,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubMergedCheck"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubStarredCheck"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -11078,6 +13098,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "An account added to a repository as a collaborator, or invited to be one.",
 =======
         "summary": "People assigned to an issue, beside those assigned now.",
@@ -11085,11 +13106,15 @@
 =======
         "summary": "Whether a pull request has been merged.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "Whether the authenticated user has starred a repository.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.compare_commits": {
@@ -11105,6 +13130,11 @@
       "post": {
         "operationId": "github_create_pull_request",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.create_release": {
+      "post": {
+        "operationId": "github_create_release",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -11133,6 +13163,7 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/CompareCommits"
 =======
                 "$ref": "#/components/schemas/AddIssueLabels"
@@ -11140,6 +13171,9 @@
 =======
                 "$ref": "#/components/schemas/CreatePullRequest"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/CreateRelease"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -11152,6 +13186,7 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubCommitComparison"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
@@ -11159,6 +13194,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubPullRequest"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubRelease"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -11269,6 +13307,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "Two commits compared, with the commits and files between them.",
 =======
         "summary": "Labels added to an issue, beside those it has.",
@@ -11276,11 +13315,15 @@
 =======
         "summary": "A new pull request, from one branch into another.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "A new release of a repository, from a tag.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.create_commit_comment": {
@@ -11296,6 +13339,11 @@
       "post": {
         "operationId": "github_create_pull_request_review",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.delete_release": {
+      "post": {
+        "operationId": "github_delete_release",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -11322,6 +13370,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 "$ref": "#/components/schemas/CreateCommitComment"
@@ -12163,6 +14212,9 @@
 =======
                 "$ref": "#/components/schemas/CancelWorkflowRun"
 >>>>>>> port/github-checks_workflows
+=======
+                "$ref": "#/components/schemas/DeleteRelease"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -12285,6 +14337,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A branch's or a tag's git reference deleted.",
 =======
         "summary": "Every label taken off an issue.",
@@ -12295,11 +14348,15 @@
 =======
         "summary": "Stops a workflow run that is queued or in progress.",
 >>>>>>> port/github-checks_workflows
+=======
+        "summary": "A release deleted, by its id. Its tag stays.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -12321,6 +14378,11 @@
       "post": {
         "operationId": "github_create_commit_status",
 >>>>>>> port/github-checks_workflows
+=======
+    "/v1/connected-accounts/{id}/actions/github.delete_release_asset": {
+      "post": {
+        "operationId": "github_delete_release_asset",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -12347,6 +14409,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -13313,6 +15376,9 @@
 =======
                 "$ref": "#/components/schemas/DisableWorkflow"
 >>>>>>> port/github-checks_workflows
+=======
+                "$ref": "#/components/schemas/DeleteReleaseAsset"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -13434,6 +15500,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A repository deleted, by owner and name.",
 =======
         "summary": "A comment on an issue deleted.",
@@ -13441,11 +15508,15 @@
 =======
         "summary": "Turns a workflow off, so nothing starts it until it is enabled again.",
 >>>>>>> port/github-checks_workflows
+=======
+        "summary": "A file attached to a release deleted, by its id.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.fork_repository": {
@@ -13461,6 +15532,11 @@
       "post": {
         "operationId": "github_dispatch_workflow",
 >>>>>>> port/github-checks_workflows
+=======
+    "/v1/connected-accounts/{id}/actions/github.generate_release_notes": {
+      "post": {
+        "operationId": "github_generate_release_notes",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -13489,10 +15565,14 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ForkRepository"
 =======
                 "$ref": "#/components/schemas/DeleteLabel"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/GenerateReleaseNotes"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -13504,10 +15584,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubRepository"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubReleaseNotes"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -13616,6 +15700,7 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
 <<<<<<< HEAD
         "summary": "A fork of a repository, made in the background.",
 =======
@@ -14096,6 +16181,9 @@
         ],
         "summary": "Turns a disabled workflow back on.",
 >>>>>>> port/github-checks_workflows
+=======
+        "summary": "The name and body GitHub writes for a release of a tag. Nothing is saved.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
@@ -14576,6 +16664,7 @@
     },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_file_contents": {
       "post": {
         "operationId": "github_get_file_contents",
@@ -14589,6 +16678,11 @@
       "post": {
         "operationId": "github_get_pull_request",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_latest_release": {
+      "post": {
+        "operationId": "github_get_latest_release",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -14617,6 +16711,7 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetFileContents"
 =======
                 "$ref": "#/components/schemas/GetIssue"
@@ -14624,6 +16719,9 @@
 =======
                 "$ref": "#/components/schemas/GetPullRequest"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/GetLatestRelease"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -14636,6 +16734,7 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubFileContent"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssue"
@@ -14643,6 +16742,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubPullRequest"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubRelease"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -14753,6 +16855,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A file of a repository, in base64 and decoded when it is text.",
 =======
         "summary": "An issue, by number.",
@@ -14760,11 +16863,15 @@
 =======
         "summary": "A pull request, by number.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "A repository's latest published release.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_ref": {
@@ -14780,6 +16887,11 @@
       "post": {
         "operationId": "github_get_pull_request_review",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_release": {
+      "post": {
+        "operationId": "github_get_release",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -14806,6 +16918,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 "$ref": "#/components/schemas/GetRef"
@@ -14815,6 +16928,9 @@
 =======
                 "$ref": "#/components/schemas/GetPullRequestReview"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/GetRelease"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -14825,6 +16941,7 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubGitRef"
@@ -14834,6 +16951,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubReview"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubRelease"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -14942,19 +17062,29 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         "summary": "A branch's or a tag's git reference.",
 =======
         "summary": "A comment on an issue, by id.",
+=======
+        "summary": "A release, by its id.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_label": {
       "post": {
         "operationId": "github_get_label",
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_release_asset": {
+      "post": {
+        "operationId": "github_get_release_asset",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -14981,7 +17111,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetLabel"
+=======
+                "$ref": "#/components/schemas/GetReleaseAsset"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -14992,7 +17126,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubLabel"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubReleaseAsset"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -15101,15 +17239,25 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A repository's label, by name.",
+=======
+        "summary": "A file attached to a release, by its id.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_milestone": {
       "post": {
         "operationId": "github_get_milestone",
+=======
+    "/v1/connected-accounts/{id}/actions/github.get_release_by_tag": {
+      "post": {
+        "operationId": "github_get_release_by_tag",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -15136,7 +17284,11 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetMilestone"
+=======
+                "$ref": "#/components/schemas/GetReleaseByTag"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -15147,7 +17299,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubMilestone"
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubRelease"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -15256,11 +17412,15 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
         "summary": "A milestone, by number.",
 >>>>>>> port/github-issues
 =======
         "summary": "A review of a pull request, by id.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "A release, by its tag's name.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
@@ -15423,6 +17583,7 @@
     },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_repository_permission_for_user": {
       "post": {
         "operationId": "github_get_repository_permission_for_user",
@@ -15436,6 +17597,11 @@
       "post": {
         "operationId": "github_get_workflow",
 >>>>>>> port/github-checks_workflows
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_authenticated_user_events": {
+      "post": {
+        "operationId": "github_list_authenticated_user_events",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -15462,6 +17628,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 "$ref": "#/components/schemas/GetRepositoryPermissionForUser"
@@ -15471,6 +17638,9 @@
 =======
                 "$ref": "#/components/schemas/GetWorkflow"
 >>>>>>> port/github-checks_workflows
+=======
+                "$ref": "#/components/schemas/ListAuthenticatedUserEvents"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -15483,6 +17653,7 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubRepositoryPermission"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubUser"
@@ -15490,6 +17661,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubWorkflow"
 >>>>>>> port/github-checks_workflows
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubEvent"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -15600,15 +17774,20 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "What an account may do in a repository.",
 =======
         "summary": "A workflow, by id or file name.",
 >>>>>>> port/github-checks_workflows
+=======
+        "summary": "The events a user performed, private ones too when the user is the connection's, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.get_repository_readme": {
       "post": {
@@ -15618,6 +17797,11 @@
       "post": {
         "operationId": "github_get_workflow_job_logs",
 >>>>>>> port/github-checks_workflows
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_authenticated_user_received_events": {
+      "post": {
+        "operationId": "github_list_authenticated_user_received_events",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -15645,10 +17829,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/GetRepositoryReadme"
 =======
                 "$ref": "#/components/schemas/GetWorkflowJobLogs"
 >>>>>>> port/github-checks_workflows
+=======
+                "$ref": "#/components/schemas/ListAuthenticatedUserReceivedEvents"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -15660,10 +17848,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubFileContent"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubJobLogs"
 >>>>>>> port/github-checks_workflows
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubEvent"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -15772,6 +17964,7 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
 <<<<<<< HEAD
         "summary": "A repository's README, in base64 and decoded when it is text.",
 =======
@@ -15953,6 +18146,9 @@
 =======
         "summary": "A workflow run, by id.",
 >>>>>>> port/github-checks_workflows
+=======
+        "summary": "The events a user received, private ones too when the user is the connection's, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
@@ -16743,6 +18939,7 @@
     },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_matching_refs": {
       "post": {
         "operationId": "github_list_matching_refs",
@@ -16756,6 +18953,11 @@
       "post": {
         "operationId": "github_list_pull_request_commits",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_my_starred_repositories": {
+      "post": {
+        "operationId": "github_list_my_starred_repositories",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -16784,6 +18986,7 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListMatchingRefs"
 =======
                 "$ref": "#/components/schemas/ListIssueComments"
@@ -16791,6 +18994,9 @@
 =======
                 "$ref": "#/components/schemas/ListPullRequestCommits"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/ListMyStarredRepositories"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -16801,6 +19007,7 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubGitRef"
@@ -17001,6 +19208,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubPullRequestFile"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -17111,6 +19321,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "The repositories the authenticated user can see, a page at a time.",
 =======
         "summary": "What happened to an issue, a page at a time.",
@@ -17118,11 +19329,15 @@
 =======
         "summary": "The files a pull request changes, a page at a time.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "The repositories the authenticated user starred, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_organization_repositories": {
@@ -17138,6 +19353,11 @@
       "post": {
         "operationId": "github_list_pull_request_requested_reviewers",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_public_events": {
+      "post": {
+        "operationId": "github_list_public_events",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -17164,6 +19384,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 "$ref": "#/components/schemas/ListOrganizationRepositories"
@@ -17173,6 +19394,9 @@
 =======
                 "$ref": "#/components/schemas/ListPullRequestRequestedReviewers"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/ListPublicEvents"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -17183,6 +19407,7 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
@@ -17192,6 +19417,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubRequestedReviewers"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubEvent"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -17302,17 +19530,22 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "An organization's repositories, a page at a time.",
 =======
         "summary": "The labels on an issue, a page at a time.",
 =======
         "summary": "The users and teams a pull request's review is requested from.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "GitHub's global feed of public events, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_issue_timeline_events": {
       "post": {
@@ -17322,6 +19555,11 @@
       "post": {
         "operationId": "github_list_pull_request_review_comments",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_release_assets": {
+      "post": {
+        "operationId": "github_list_release_assets",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -17349,10 +19587,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListIssueTimelineEvents"
 =======
                 "$ref": "#/components/schemas/ListPullRequestReviewComments"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/ListReleaseAssets"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -17364,10 +19606,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubTimelineEvent"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubReviewComment"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubReleaseAsset"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -17477,15 +19723,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "Everything on an issue's timeline, a page at a time.",
 =======
         "summary": "The comments on a pull request's diff, a page at a time.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "The files attached to a release, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_milestones": {
       "post": {
@@ -17495,6 +19746,11 @@
       "post": {
         "operationId": "github_list_pull_request_reviews",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_releases": {
+      "post": {
+        "operationId": "github_list_releases",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -17522,10 +19778,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListMilestones"
 =======
                 "$ref": "#/components/schemas/ListPullRequestReviews"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/ListReleases"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -17537,10 +19797,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubMilestone"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubReview"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubRelease"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -17649,6 +19913,7 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
 <<<<<<< HEAD
         "summary": "A repository's milestones, a page at a time.",
 >>>>>>> port/github-issues
@@ -17965,6 +20230,9 @@
         ],
         "summary": "The pull requests a commit belongs to, a page at a time.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "A repository's releases, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
@@ -18118,6 +20386,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_collaborators": {
       "post": {
         "operationId": "github_list_repository_collaborators",
@@ -18136,6 +20405,11 @@
       "post": {
         "operationId": "github_list_repository_workflows",
 >>>>>>> port/github-checks_workflows
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_repository_events": {
+      "post": {
+        "operationId": "github_list_repository_events",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -18165,6 +20439,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryCollaborators"
 =======
                 "$ref": "#/components/schemas/ListRepositoryIssueEvents"
@@ -18175,6 +20450,9 @@
 =======
                 "$ref": "#/components/schemas/ListRepositoryWorkflows"
 >>>>>>> port/github-checks_workflows
+=======
+                "$ref": "#/components/schemas/ListRepositoryEvents"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -18188,6 +20466,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubCollaborator"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubIssueEvent"
@@ -18195,6 +20474,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubWorkflow"
 >>>>>>> port/github-checks_workflows
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubEvent"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -18305,6 +20587,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A repository's collaborators, a page at a time.",
 =======
         "summary": "What happened to every issue in a repository, a page at a time.",
@@ -18312,11 +20595,15 @@
 =======
         "summary": "The workflows a repository has, a page at a time.",
 >>>>>>> port/github-checks_workflows
+=======
+        "summary": "A repository's recent events, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_contributors": {
@@ -18332,6 +20619,11 @@
       "post": {
         "operationId": "github_list_workflow_run_artifacts",
 >>>>>>> port/github-checks_workflows
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_repository_stargazers": {
+      "post": {
+        "operationId": "github_list_repository_stargazers",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -18360,6 +20652,7 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryContributors"
 =======
                 "$ref": "#/components/schemas/ListRepositoryIssues"
@@ -18367,6 +20660,9 @@
 =======
                 "$ref": "#/components/schemas/ListWorkflowRunArtifacts"
 >>>>>>> port/github-checks_workflows
+=======
+                "$ref": "#/components/schemas/ListRepositoryStargazers"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -18379,6 +20675,7 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubContributor"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssuePage"
@@ -18386,6 +20683,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubArtifact"
 >>>>>>> port/github-checks_workflows
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubUser"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -18496,6 +20796,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "Who contributed to a repository, a page at a time.",
 =======
         "summary": "A repository's issues, a page at a time, without the pull requests GitHub lists among them.",
@@ -18503,11 +20804,15 @@
 =======
         "summary": "The artifacts a workflow run kept, a page at a time.",
 >>>>>>> port/github-checks_workflows
+=======
+        "summary": "The users who starred a repository, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_forks": {
@@ -18523,6 +20828,11 @@
       "post": {
         "operationId": "github_list_workflow_run_jobs",
 >>>>>>> port/github-checks_workflows
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_repository_watchers": {
+      "post": {
+        "operationId": "github_list_repository_watchers",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -18551,6 +20861,7 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryForks"
 =======
                 "$ref": "#/components/schemas/ListRepositoryLabels"
@@ -18558,6 +20869,9 @@
 =======
                 "$ref": "#/components/schemas/ListWorkflowRunJobs"
 >>>>>>> port/github-checks_workflows
+=======
+                "$ref": "#/components/schemas/ListRepositoryWatchers"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -18570,6 +20884,7 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
@@ -18577,6 +20892,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubWorkflowJob"
 >>>>>>> port/github-checks_workflows
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubUser"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -18687,6 +21005,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A repository's forks, a page at a time.",
 =======
         "summary": "The labels a repository has, a page at a time.",
@@ -18694,11 +21013,15 @@
 =======
         "summary": "The jobs of a workflow run, a page at a time.",
 >>>>>>> port/github-checks_workflows
+=======
+        "summary": "The users watching a repository, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_languages": {
@@ -18714,6 +21037,11 @@
       "post": {
         "operationId": "github_list_workflow_runs",
 >>>>>>> port/github-checks_workflows
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_user_public_events": {
+      "post": {
+        "operationId": "github_list_user_public_events",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -18742,6 +21070,7 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryLanguages"
 =======
                 "$ref": "#/components/schemas/LockIssue"
@@ -18749,6 +21078,9 @@
 =======
                 "$ref": "#/components/schemas/ListWorkflowRuns"
 >>>>>>> port/github-checks_workflows
+=======
+                "$ref": "#/components/schemas/ListUserPublicEvents"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -18761,6 +21093,7 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubLanguage"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssueLock"
@@ -18768,6 +21101,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubWorkflowRun"
 >>>>>>> port/github-checks_workflows
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubEvent"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -18878,6 +21214,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "The languages a repository is written in, by bytes of code.",
 =======
         "summary": "An issue's conversation locked, so only collaborators can comment.",
@@ -18885,11 +21222,15 @@
 =======
         "summary": "A repository's workflow runs, newest first, a page at a time.",
 >>>>>>> port/github-checks_workflows
+=======
+        "summary": "The public events a user performed, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_tags": {
@@ -18905,6 +21246,11 @@
       "post": {
         "operationId": "github_rerequest_check_run",
 >>>>>>> port/github-checks_workflows
+=======
+    "/v1/connected-accounts/{id}/actions/github.list_user_received_public_events": {
+      "post": {
+        "operationId": "github_list_user_received_public_events",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -18931,6 +21277,7 @@
           "content": {
             "application/json": {
               "schema": {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryTags"
@@ -18940,6 +21287,9 @@
 =======
                 "$ref": "#/components/schemas/RerequestCheckRun"
 >>>>>>> port/github-checks_workflows
+=======
+                "$ref": "#/components/schemas/ListUserReceivedPublicEvents"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -18952,10 +21302,14 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubTag"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssue"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_Vec_GithubEvent"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -19065,15 +21419,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A repository's tags, a page at a time.",
 =======
         "summary": "People no longer assigned to an issue.",
 >>>>>>> port/github-issues
+=======
+        "summary": "The public events a user received from the accounts and repositories they follow and watch, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_repository_topics": {
       "post": {
@@ -19083,6 +21442,11 @@
       "post": {
         "operationId": "github_remove_issue_label",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.search_code": {
+      "post": {
+        "operationId": "github_search_code",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -19110,10 +21474,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListRepositoryTopics"
 =======
                 "$ref": "#/components/schemas/RemoveIssueLabel"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/SearchCode"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -19125,10 +21493,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubTopics"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubCodeSearchResults"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -19238,15 +21610,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A repository's topics.",
 =======
         "summary": "One label taken off an issue.",
 >>>>>>> port/github-issues
+=======
+        "summary": "Files whose code matches a search, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.list_user_repositories": {
       "post": {
@@ -19256,6 +21633,11 @@
       "post": {
         "operationId": "github_search_issues_and_pull_requests",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.search_commits": {
+      "post": {
+        "operationId": "github_search_commits",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -19283,10 +21665,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/ListUserRepositories"
 =======
                 "$ref": "#/components/schemas/SearchIssuesAndPullRequests"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/SearchCommits"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -19298,10 +21684,14 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubRepository"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubSearchIssueResults"
 >>>>>>> port/github-issues
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubCommitSearchResults"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -19411,15 +21801,20 @@
           }
         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A user's public repositories, a page at a time.",
 =======
         "summary": "Issues and pull requests found with GitHub's search syntax, structured filters, or both.",
 >>>>>>> port/github-issues
+=======
+        "summary": "Commits whose message and details match a search, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.merge_branch": {
       "post": {
@@ -19429,6 +21824,11 @@
       "post": {
         "operationId": "github_set_issue_labels",
 >>>>>>> port/github-issues
+=======
+    "/v1/connected-accounts/{id}/actions/github.search_labels": {
+      "post": {
+        "operationId": "github_search_labels",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -19456,10 +21856,14 @@
             "application/json": {
               "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/MergeBranch"
 =======
                 "$ref": "#/components/schemas/SetIssueLabels"
 >>>>>>> port/github-issues
+=======
+                "$ref": "#/components/schemas/SearchLabels"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -19471,6 +21875,7 @@
               "application/json": {
                 "schema": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubMergeResult"
 =======
                   "$ref": "#/components/schemas/ActionResult_Vec_GithubLabel"
@@ -19478,6 +21883,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubMergeResult"
 >>>>>>> port/github-pull_requests
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubLabelSearchResults"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -19588,6 +21996,7 @@
         ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "One branch merged into another.",
 =======
         "summary": "An issue's labels replaced with those given.",
@@ -19595,11 +22004,15 @@
 =======
         "summary": "A pull request merged into its base branch.",
 >>>>>>> port/github-pull_requests
+=======
+        "summary": "A repository's labels whose name or description match a search, a page at a time.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "/v1/connected-accounts/{id}/actions/github.remove_repository_collaborator": {
@@ -19615,6 +22028,11 @@
       "post": {
         "operationId": "github_remove_pull_request_reviewers",
 >>>>>>> port/github-pull_requests
+=======
+    "/v1/connected-accounts/{id}/actions/github.search_repositories": {
+      "post": {
+        "operationId": "github_search_repositories",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -19643,6 +22061,7 @@
               "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/RemoveRepositoryCollaborator"
 =======
                 "$ref": "#/components/schemas/UnlockIssue"
@@ -19650,6 +22069,474 @@
 =======
                 "$ref": "#/components/schemas/RemovePullRequestReviewers"
 >>>>>>> port/github-pull_requests
+=======
+                "$ref": "#/components/schemas/SearchRepositories"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubRepositorySearchResults"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Repositories that match a search, a page at a time.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.search_topics": {
+      "post": {
+        "operationId": "github_search_topics",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchTopics"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubTopicSearchResults"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Topics that match a search, a page at a time.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.search_users": {
+      "post": {
+        "operationId": "github_search_users",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchUsers"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubUserSearchResults"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "Users that match a search, a page at a time.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.star_repository": {
+      "post": {
+        "operationId": "github_star_repository",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StarRepository"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -19662,6 +22549,7 @@
                 "schema": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssueLock"
@@ -19672,6 +22560,164 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
 >>>>>>> port/github-checks_workflows
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An unknown `Osiris-Version`, or a request that isn't valid"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "A missing or wrong key"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "The request took longer than the server waits"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "The body is larger than the server reads (`OS_10`)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This `Idempotency-Key` was used for another request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "An internal error; the request may be retried"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "A repository starred by the authenticated user.",
+        "tags": [
+          "actions"
+        ]
+      }
+    },
+    "/v1/connected-accounts/{id}/actions/github.unstar_repository": {
+      "post": {
+        "operationId": "github_unstar_repository",
+        "parameters": [
+          {
+            "description": "Runs the request once; a retry gets the first answer",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnstarRepository"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -19783,6 +22829,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         "summary": "A collaborator removed from a repository.",
 =======
         "summary": "An issue's conversation unlocked.",
@@ -19793,11 +22840,15 @@
 =======
         "summary": "Asks the app that made a check run to run it again.",
 >>>>>>> port/github-checks_workflows
+=======
+        "summary": "A repository's star taken back by the authenticated user.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -19819,6 +22870,11 @@
       "post": {
         "operationId": "github_rerequest_check_suite",
 >>>>>>> port/github-checks_workflows
+=======
+    "/v1/connected-accounts/{id}/actions/github.update_release": {
+      "post": {
+        "operationId": "github_update_release",
+>>>>>>> port/github-releases_activity_search
         "parameters": [
           {
             "description": "Runs the request once; a retry gets the first answer",
@@ -19848,6 +22904,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "$ref": "#/components/schemas/RenameBranch"
 =======
                 "$ref": "#/components/schemas/UpdateIssue"
@@ -19858,6 +22915,9 @@
 =======
                 "$ref": "#/components/schemas/RerequestCheckSuite"
 >>>>>>> port/github-checks_workflows
+=======
+                "$ref": "#/components/schemas/UpdateRelease"
+>>>>>>> port/github-releases_activity_search
               }
             }
           },
@@ -19871,6 +22931,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/ActionResult_GithubBranch"
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubIssue"
@@ -19881,6 +22942,9 @@
 =======
                   "$ref": "#/components/schemas/ActionResult_GithubAcknowledgement"
 >>>>>>> port/github-checks_workflows
+=======
+                  "$ref": "#/components/schemas/ActionResult_GithubRelease"
+>>>>>>> port/github-releases_activity_search
                 }
               }
             }
@@ -19989,6 +23053,7 @@
             "api_key": []
           }
         ],
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -20939,6 +24004,9 @@
 =======
         "summary": "Runs every job of a workflow run again.",
 >>>>>>> port/github-checks_workflows
+=======
+        "summary": "A release changed, by its id.",
+>>>>>>> port/github-releases_activity_search
         "tags": [
           "actions"
         ]
