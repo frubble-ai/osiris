@@ -1,6 +1,6 @@
 //! GitHub's action routes, every one registered.
 
-use super::{installations, repositories, users};
+use super::{installations, issues, repositories, users};
 use crate::http::state::ApiState;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -12,6 +12,71 @@ pub fn router() -> OpenApiRouter<ApiState> {
         .routes(routes!(
             installations::list_repositories::github_list_repositories
         ))
+        .routes(routes!(
+            issues::add_issue_assignees::github_add_issue_assignees
+        ))
+        .routes(routes!(issues::add_issue_labels::github_add_issue_labels))
+        .routes(routes!(
+            issues::clear_issue_labels::github_clear_issue_labels
+        ))
+        .routes(routes!(issues::create_issue::github_create_issue))
+        .routes(routes!(
+            issues::create_issue_comment::github_create_issue_comment
+        ))
+        .routes(routes!(
+            issues::create_issue_comment_reaction::github_create_issue_comment_reaction
+        ))
+        .routes(routes!(
+            issues::create_issue_reaction::github_create_issue_reaction
+        ))
+        .routes(routes!(issues::create_label::github_create_label))
+        .routes(routes!(issues::create_milestone::github_create_milestone))
+        .routes(routes!(
+            issues::delete_issue_comment::github_delete_issue_comment
+        ))
+        .routes(routes!(issues::delete_label::github_delete_label))
+        .routes(routes!(issues::delete_milestone::github_delete_milestone))
+        .routes(routes!(issues::get_issue::github_get_issue))
+        .routes(routes!(issues::get_issue_comment::github_get_issue_comment))
+        .routes(routes!(issues::get_label::github_get_label))
+        .routes(routes!(issues::get_milestone::github_get_milestone))
+        .routes(routes!(issues::list_assignees::github_list_assignees))
+        .routes(routes!(
+            issues::list_issue_comments::github_list_issue_comments
+        ))
+        .routes(routes!(issues::list_issue_events::github_list_issue_events))
+        .routes(routes!(issues::list_issue_labels::github_list_issue_labels))
+        .routes(routes!(
+            issues::list_issue_timeline_events::github_list_issue_timeline_events
+        ))
+        .routes(routes!(issues::list_milestones::github_list_milestones))
+        .routes(routes!(
+            issues::list_repository_issue_events::github_list_repository_issue_events
+        ))
+        .routes(routes!(
+            issues::list_repository_issues::github_list_repository_issues
+        ))
+        .routes(routes!(
+            issues::list_repository_labels::github_list_repository_labels
+        ))
+        .routes(routes!(issues::lock_issue::github_lock_issue))
+        .routes(routes!(
+            issues::remove_issue_assignees::github_remove_issue_assignees
+        ))
+        .routes(routes!(
+            issues::remove_issue_label::github_remove_issue_label
+        ))
+        .routes(routes!(
+            issues::search_issues_and_pull_requests::github_search_issues_and_pull_requests
+        ))
+        .routes(routes!(issues::set_issue_labels::github_set_issue_labels))
+        .routes(routes!(issues::unlock_issue::github_unlock_issue))
+        .routes(routes!(issues::update_issue::github_update_issue))
+        .routes(routes!(
+            issues::update_issue_comment::github_update_issue_comment
+        ))
+        .routes(routes!(issues::update_label::github_update_label))
+        .routes(routes!(issues::update_milestone::github_update_milestone))
         .routes(routes!(repositories::get_branch::github_get_branch))
         .routes(routes!(repositories::get_repository::github_get_repository))
         .routes(routes!(repositories::list_branches::github_list_branches))

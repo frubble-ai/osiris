@@ -1,0 +1,258 @@
+[
+ {
+  "group": "issues",
+  "name": "list_repository_issues",
+  "input": "ListRepositoryIssues",
+  "output": "GithubIssuePage",
+  "summary": "a repository's issues, a page at a time, without the pull requests GitHub lists among them."
+ },
+ {
+  "group": "issues",
+  "name": "create_issue",
+  "input": "CreateIssue",
+  "output": "GithubIssue",
+  "summary": "a new issue in a repository."
+ },
+ {
+  "group": "issues",
+  "name": "get_issue",
+  "input": "GetIssue",
+  "output": "GithubIssue",
+  "summary": "an issue, by number."
+ },
+ {
+  "group": "issues",
+  "name": "update_issue",
+  "input": "UpdateIssue",
+  "output": "GithubIssue",
+  "summary": "an issue's title, text, state, assignees, labels or milestone changed."
+ },
+ {
+  "group": "issues",
+  "name": "list_repository_labels",
+  "input": "ListRepositoryLabels",
+  "output": "GithubLabel",
+  "list": true,
+  "summary": "the labels a repository has, a page at a time."
+ },
+ {
+  "group": "issues",
+  "name": "create_label",
+  "input": "CreateLabel",
+  "output": "GithubLabel",
+  "summary": "a new label in a repository."
+ },
+ {
+  "group": "issues",
+  "name": "list_issue_labels",
+  "input": "ListIssueLabels",
+  "output": "GithubLabel",
+  "list": true,
+  "summary": "the labels on an issue, a page at a time."
+ },
+ {
+  "group": "issues",
+  "name": "add_issue_labels",
+  "input": "AddIssueLabels",
+  "output": "GithubLabel",
+  "list": true,
+  "summary": "labels added to an issue, beside those it has."
+ },
+ {
+  "group": "issues",
+  "name": "set_issue_labels",
+  "input": "SetIssueLabels",
+  "output": "GithubLabel",
+  "list": true,
+  "summary": "an issue's labels replaced with those given."
+ },
+ {
+  "group": "issues",
+  "name": "remove_issue_label",
+  "input": "RemoveIssueLabel",
+  "output": "GithubLabel",
+  "list": true,
+  "summary": "one label taken off an issue."
+ },
+ {
+  "group": "issues",
+  "name": "clear_issue_labels",
+  "input": "ClearIssueLabels",
+  "output": "GithubAcknowledgement",
+  "summary": "every label taken off an issue."
+ },
+ {
+  "group": "issues",
+  "name": "add_issue_assignees",
+  "input": "AddIssueAssignees",
+  "output": "GithubIssue",
+  "summary": "people assigned to an issue, beside those assigned now."
+ },
+ {
+  "group": "issues",
+  "name": "remove_issue_assignees",
+  "input": "RemoveIssueAssignees",
+  "output": "GithubIssue",
+  "summary": "people no longer assigned to an issue."
+ },
+ {
+  "group": "issues",
+  "name": "lock_issue",
+  "input": "LockIssue",
+  "output": "GithubIssueLock",
+  "summary": "an issue's conversation locked, so only collaborators can comment."
+ },
+ {
+  "group": "issues",
+  "name": "unlock_issue",
+  "input": "UnlockIssue",
+  "output": "GithubIssueLock",
+  "summary": "an issue's conversation unlocked."
+ },
+ {
+  "group": "issues",
+  "name": "list_issue_comments",
+  "input": "ListIssueComments",
+  "output": "GithubIssueComment",
+  "list": true,
+  "summary": "the comments on an issue, a page at a time."
+ },
+ {
+  "group": "issues",
+  "name": "create_issue_comment",
+  "input": "CreateIssueComment",
+  "output": "GithubIssueComment",
+  "summary": "a new comment on an issue."
+ },
+ {
+  "group": "issues",
+  "name": "search_issues_and_pull_requests",
+  "input": "SearchIssuesAndPullRequests",
+  "output": "GithubSearchIssueResults",
+  "summary": "issues and pull requests found with GitHub's search syntax, structured filters, or both."
+ },
+ {
+  "group": "issues",
+  "name": "list_issue_timeline_events",
+  "input": "ListIssueTimelineEvents",
+  "output": "GithubTimelineEvent",
+  "list": true,
+  "summary": "everything on an issue's timeline, a page at a time."
+ },
+ {
+  "group": "issues",
+  "name": "list_issue_events",
+  "input": "ListIssueEvents",
+  "output": "GithubIssueEvent",
+  "list": true,
+  "summary": "what happened to an issue, a page at a time."
+ },
+ {
+  "group": "issues",
+  "name": "list_repository_issue_events",
+  "input": "ListRepositoryIssueEvents",
+  "output": "GithubIssueEvent",
+  "list": true,
+  "summary": "what happened to every issue in a repository, a page at a time."
+ },
+ {
+  "group": "issues",
+  "name": "list_milestones",
+  "input": "ListMilestones",
+  "output": "GithubMilestone",
+  "list": true,
+  "summary": "a repository's milestones, a page at a time."
+ },
+ {
+  "group": "issues",
+  "name": "get_milestone",
+  "input": "GetMilestone",
+  "output": "GithubMilestone",
+  "summary": "a milestone, by number."
+ },
+ {
+  "group": "issues",
+  "name": "create_milestone",
+  "input": "CreateMilestone",
+  "output": "GithubMilestone",
+  "summary": "a new milestone in a repository."
+ },
+ {
+  "group": "issues",
+  "name": "update_milestone",
+  "input": "UpdateMilestone",
+  "output": "GithubMilestone",
+  "summary": "a milestone's title, state, description or due date changed."
+ },
+ {
+  "group": "issues",
+  "name": "delete_milestone",
+  "input": "DeleteMilestone",
+  "output": "GithubAcknowledgement",
+  "summary": "a milestone deleted from a repository."
+ },
+ {
+  "group": "issues",
+  "name": "get_issue_comment",
+  "input": "GetIssueComment",
+  "output": "GithubIssueComment",
+  "summary": "a comment on an issue, by id."
+ },
+ {
+  "group": "issues",
+  "name": "update_issue_comment",
+  "input": "UpdateIssueComment",
+  "output": "GithubIssueComment",
+  "summary": "a comment on an issue, its text replaced."
+ },
+ {
+  "group": "issues",
+  "name": "delete_issue_comment",
+  "input": "DeleteIssueComment",
+  "output": "GithubAcknowledgement",
+  "summary": "a comment on an issue deleted."
+ },
+ {
+  "group": "issues",
+  "name": "get_label",
+  "input": "GetLabel",
+  "output": "GithubLabel",
+  "summary": "a repository's label, by name."
+ },
+ {
+  "group": "issues",
+  "name": "update_label",
+  "input": "UpdateLabel",
+  "output": "GithubLabel",
+  "summary": "a label renamed, recolored or described anew."
+ },
+ {
+  "group": "issues",
+  "name": "delete_label",
+  "input": "DeleteLabel",
+  "output": "GithubAcknowledgement",
+  "summary": "a label deleted from a repository."
+ },
+ {
+  "group": "issues",
+  "name": "list_assignees",
+  "input": "ListAssignees",
+  "output": "GithubUser",
+  "list": true,
+  "summary": "the people issues in a repository can be assigned to, a page at a time."
+ },
+ {
+  "group": "issues",
+  "name": "create_issue_reaction",
+  "input": "CreateIssueReaction",
+  "output": "GithubReaction",
+  "summary": "a reaction to an issue."
+ },
+ {
+  "group": "issues",
+  "name": "create_issue_comment_reaction",
+  "input": "CreateIssueCommentReaction",
+  "output": "GithubReaction",
+  "summary": "a reaction to a comment on an issue."
+ }
+]

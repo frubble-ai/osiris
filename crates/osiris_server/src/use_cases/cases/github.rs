@@ -3,5 +3,6 @@
 
 pub mod github_action_args;
 pub mod installations;
+pub mod issues;
 pub mod repositories;
 pub mod users;
