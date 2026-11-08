@@ -226,7 +226,7 @@ A trigger (`tr_…`) subscribes at a connection's provider and publishes what it
 (`subscribe_trigger`) and removes it on delete (`unsubscribe_trigger`). A provider that can't be reached fails the delete (502) and keeps the trigger, to delete again; a refusal is logged and the trigger deleted.
 
 - **Deliveries**: at most `[triggers] max_concurrent_deliveries` are read at once, each up to
-  `max_delivery_bytes`. The provider's webhook posts to `{public_url}/webhooks/triggers/{id}`,
+  `max_delivery_bytes` and within `delivery_read_seconds` (a slower body is answered 408). The provider's webhook posts to `{public_url}/webhooks/triggers/{id}`,
   signed with the trigger's own random secret (HMAC-SHA256), which is encrypted at rest. The route
   is public and trusts only the signature: a delivery not signed with the secret is answered 404,
   as a missing trigger is. A signed delivery is answered 202, whether it is published or ignored.

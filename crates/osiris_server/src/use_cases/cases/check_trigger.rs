@@ -18,7 +18,7 @@ use crate::use_cases::{
             bounded_trigger_data::bounded_trigger_data, publish::publish,
             trigger_event_id::trigger_event_id,
         },
-        installation_tokens::mint_refused::MintRefused,
+        installation_tokens::mint_failed::MintFailed,
         tasks::{next_trigger_check::next_trigger_check, schedule::schedule},
         triggers::TriggerState,
     },
@@ -197,24 +197,25 @@ impl UseCases {
         match checked {
             Ok(answer) => Ok(Checked::Answered(answer)),
             // The provider answered for good: the item is gone or the config can't work.
-            // Only the provider answering for good about what the trigger watches fails it; a
-            // refused installation token is the app's credentials, which leave it waiting below.
+            // The provider answering for good about what the trigger watches, or a config it
+            // can't take, fails it; an installation token that couldn't be minted is the app's
+            // credentials, which leave it waiting below.
             Err(report)
-                if matches!(report.current_context(), DomainError::ProviderRefused(_))
-                    && !report.contains::<MintRefused>() =>
+                if matches!(
+                    report.current_context(),
+                    DomainError::ProviderRefused(_) | DomainError::Invalid(_)
+                ) && !report.contains::<MintFailed>() =>
             {
                 tracing::warn!(error = ?report, trigger_id = %trigger.id, "the provider refuses the trigger's check; the trigger fails");
                 Ok(Checked::Refused)
             }
-            // A connection that can't be used now, or credentials that can't mint its token yet
-            // (an auth config the operator can fix), leave the trigger waiting.
+            // A connection that can't be used now, or app credentials that can't mint its token
+            // yet (an auth config the operator can fix), leave the trigger waiting.
             Err(report)
-                if report.contains::<MintRefused>()
+                if report.contains::<MintFailed>()
                     || matches!(
                         report.current_context(),
-                        DomainError::NotActive(_)
-                            | DomainError::MissingScopes(_)
-                            | DomainError::Invalid(_)
+                        DomainError::NotActive(_) | DomainError::MissingScopes(_)
                     ) =>
             {
                 tracing::info!(error = ?report, trigger_id = %trigger.id, "the trigger's connection can't be used now");

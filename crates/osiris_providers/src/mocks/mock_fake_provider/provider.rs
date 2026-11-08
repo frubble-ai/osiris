@@ -1,8 +1,11 @@
 //! The fake provider: its OAuth definition, its URLs, and how it ends a grant.
 
-use crate::{ListLimits, OAuthClient, Provider, ProviderCommon, ProviderError, ProviderUrls};
+use crate::{
+    ListLimits, OAuthClient, Provider, ProviderCommon, ProviderError, ProviderUrls, TriggerCheck,
+};
 use async_trait::async_trait;
 use osiris_interfaces::oauth::{ClientAuth, OAuth2Definition};
+use serde_json::{Value, json};
 use url::Url;
 
 /// Its id: a row the tests add to the `provider` table.
@@ -54,5 +57,31 @@ impl Provider for FakeProvider {
         access_token: &str,
     ) -> Result<(), ProviderError> {
         super::revoke::revoke(self, http, access_token).await
+    }
+
+    /// Its triggers check on a schedule and see nothing new, unless their config holds
+    /// `"unreadable": true`, which it refuses as a config it can't take.
+    fn trigger_checks_on_schedule(&self, _kind: &str) -> bool {
+        true
+    }
+
+    async fn check_trigger(
+        &self,
+        _http: &reqwest::Client,
+        _token: &str,
+        _kind: &str,
+        config: &Value,
+        checkpoint: Option<&Value>,
+    ) -> Result<TriggerCheck, ProviderError> {
+        if config.get("unreadable").is_some() {
+            return Err(ProviderError::invalid(
+                FAKE_ID,
+                "the trigger's config doesn't read",
+            ));
+        }
+        Ok(TriggerCheck {
+            checkpoint: checkpoint.cloned().unwrap_or_else(|| json!({})),
+            fired: None,
+        })
     }
 }

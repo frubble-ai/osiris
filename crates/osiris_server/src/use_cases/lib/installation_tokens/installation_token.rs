@@ -2,9 +2,10 @@
 //! the app's credentials and kept until shortly before it expires.
 
 use super::InstallationTokenCache;
-use super::mint_refused::MintRefused;
+use super::mint_failed::MintFailed;
 use crate::use_cases::UseCaseResult;
 use crate::use_cases::lib::shared::domain_errors::provider;
+use error_stack::Report;
 use osiris_common::secret::{ExposeSecret, Secret};
 use osiris_domain::{AuthConfig, DomainError};
 use osiris_interfaces::{Provider, ProviderError};
@@ -64,21 +65,20 @@ async fn mint_once(
         .transpose()
         .map_err(|_| DomainError::Internal)?
         .ok_or_else(|| {
-            DomainError::Invalid(
+            Report::new(DomainError::Invalid(
                 "the auth config holds no app credentials (secret_settings) to act as an installation".into(),
-            )
+            ))
+            .attach(MintFailed)
         })?;
     let minted = implementation
         .installation_token(http, &config.settings, &secret_settings, installation_id)
         .await
         .map_err(|error| {
-            let refused = matches!(
-                error,
-                ProviderError::Refused { .. } | ProviderError::Unauthorized { .. }
-            );
+            // An outage is tried again as any is; anything else is the app's credentials.
+            let credentials = !matches!(error, ProviderError::Unavailable { .. });
             let report = provider(error);
-            if refused {
-                report.attach(MintRefused)
+            if credentials {
+                report.attach(MintFailed)
             } else {
                 report
             }

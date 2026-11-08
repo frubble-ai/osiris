@@ -16,11 +16,17 @@ pub struct TriggersSettings {
     pub max_concurrent_deliveries: usize,
     /// The largest data a `trigger.fired` event carries; larger data is omitted, noting its size.
     pub max_event_data_bytes: u64,
+    /// How long a delivery's body may take to arrive; a slower one is answered 408.
+    pub delivery_read_seconds: u64,
 }
 
 impl TriggersSettings {
     pub fn check_interval(&self) -> time::Duration {
         seconds(self.check_seconds)
+    }
+
+    pub fn delivery_read(&self) -> std::time::Duration {
+        std::time::Duration::from_secs(self.delivery_read_seconds)
     }
 
     pub fn max_event_data(&self) -> usize {
@@ -32,8 +38,9 @@ impl TriggersSettings {
     }
 
     /// Its settings that must be greater than zero, by name.
-    pub fn positive_values(&self) -> [(&'static str, u64); 4] {
+    pub fn positive_values(&self) -> [(&'static str, u64); 5] {
         [
+            ("triggers.delivery_read_seconds", self.delivery_read_seconds),
             ("triggers.max_event_data_bytes", self.max_event_data_bytes),
             ("triggers.check_seconds", self.check_seconds),
             ("triggers.max_delivery_bytes", self.max_delivery_bytes),
@@ -69,6 +76,9 @@ impl Default for TriggersSettings {
             // Under Cloud Tasks' 1 MB task, which carries an event whose publish failed, with room
             // for the rest of the event.
             max_event_data_bytes: 900_000,
+            // A provider sends a delivery whole and at once, and gives up on its own after about
+            // ten seconds.
+            delivery_read_seconds: 10,
         }
     }
 }

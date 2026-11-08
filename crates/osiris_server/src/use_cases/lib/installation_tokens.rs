@@ -4,7 +4,7 @@
 pub mod connection_token;
 pub mod installation_token;
 pub mod installation_token_cache;
-pub mod mint_refused;
+pub mod mint_failed;
 
 pub use installation_token_cache::InstallationTokenCache;
 

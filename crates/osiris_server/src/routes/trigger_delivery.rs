@@ -7,7 +7,7 @@ use crate::{
     http::state::ApiState, use_cases::cases::receive_trigger_delivery::ReceiveTriggerDeliveryArgs,
 };
 use axum::{
-    body::Bytes,
+    body::Body,
     extract::{Path, State},
     http::{HeaderMap, StatusCode},
 };
@@ -19,8 +19,21 @@ pub async fn trigger_delivery(
     State(state): State<ApiState>,
     Path(id): Path<String>,
     headers: HeaderMap,
-    body: Bytes,
+    body: Body,
 ) -> StatusCode {
+    // The body is read here, under its own short time, so a client that sends it slowly gives
+    // its place among the deliveries read at once back soon.
+    let triggers = &state.config.settings.triggers;
+    let read = tokio::time::timeout(
+        triggers.delivery_read(),
+        axum::body::to_bytes(body, triggers.max_delivery()),
+    )
+    .await;
+    let body = match read {
+        Ok(Ok(body)) => body,
+        Ok(Err(_)) => return StatusCode::PAYLOAD_TOO_LARGE,
+        Err(_) => return StatusCode::REQUEST_TIMEOUT,
+    };
     let received = state
         .use_cases
         .receive_trigger_delivery(ReceiveTriggerDeliveryArgs {

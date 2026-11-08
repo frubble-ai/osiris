@@ -123,3 +123,5 @@ max_concurrent_deliveries = 32
 # The largest data a trigger.fired event carries; larger data is replaced by
 # {"omitted": true, "bytes": <length>}. Under a Cloud Tasks task's 1 MB, which carries a retry.
 max_event_data_bytes = 900000
+# How long a delivery's body may take to arrive; a slower one is answered 408.
+delivery_read_seconds = 10
