@@ -2,11 +2,12 @@
 //! v1.9.4 (Apache-2.0), `src/providers/linear/definition.ts`.
 
 pub mod graphql;
-pub mod list_teams;
 #[cfg(any(test, feature = "testing"))]
 pub mod mocks;
 pub mod provider;
+pub mod registration;
 pub mod revoke;
+pub mod teams;
 pub mod transformers;
 pub mod types;
 

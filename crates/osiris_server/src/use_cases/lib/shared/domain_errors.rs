@@ -14,6 +14,7 @@ pub fn provider(error: ProviderError) -> Report<DomainError> {
         ProviderError::Unauthorized { message, .. } | ProviderError::Refused { message, .. } => {
             DomainError::ProviderRefused(message.clone())
         }
+        ProviderError::Invalid { message, .. } => DomainError::Invalid(message.clone()),
         ProviderError::Unavailable { message, .. } => {
             DomainError::ProviderUnavailable(message.clone())
         }

@@ -9,20 +9,20 @@ use utoipa::ToSchema;
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct CreateAuthConfig {
-    /// A provider osiris implements: `github`, `linear` or `slack`.
+    /// A provider osiris implements, by its id.
     pub provider: String,
     pub client_id: String,
     #[schema(value_type = String)]
     pub client_secret: Secret,
     #[serde(default)]
     pub scopes: Vec<String>,
-    /// The provider's own settings for the app, which it validates; answered back. A GitHub app
-    /// that acts as its installations names its App id here: `{"app_id": "12345"}`.
+    /// The provider's own settings for the app, which it validates; answered back. An app that
+    /// acts as its installations names itself here, as its provider's documentation says.
     #[serde(default)]
     #[schema(value_type = Object)]
     pub settings: Map<String, Value>,
-    /// The provider's own secret settings for the app, never answered. A GitHub app that acts as
-    /// its installations puts its App's private key here: `{"private_key": "-----BEGIN …"}`.
+    /// The provider's own secret settings for the app, never answered. An app that acts as its
+    /// installations puts the key it signs with here, as its provider's documentation says.
     #[schema(value_type = Option<Object>)]
     pub secret_settings: Option<SecretSettings>,
 }

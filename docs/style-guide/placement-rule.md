@@ -28,7 +28,13 @@ An operation, a route, a use case, a type group or an adapter is one file.
 A domain has the same name in each layer it reaches. `connected_accounts` is
 `routes/connected_accounts/`, `use_cases/cases/*_connected_account*.rs`,
 `use_cases/lib/connected_accounts/` (its database operations) and
-`osiris_api_models/src/connected_accounts.rs`. Each provider is a domain in every layer:
-`osiris_providers/src/github/`, `osiris_api_models/src/actions/github.rs`,
-`routes/actions/github/`. Beyond those folders, only the lists that register providers name one
-([add a provider](../add_provider.md)).
+`osiris_api_models/src/connected_accounts.rs`.
+
+Each provider is a domain in every layer, under its own id: `osiris_providers/src/<id>/`,
+`osiris_api_models/src/actions/<id>.rs`, `use_cases/cases/<id>/`, `routes/actions/<id>/`,
+`services/api/tests/<id>/`, `testing/<id>.rs`, `scripts/actions/<id>/` and
+`docs/providers/<id>.md`. **A file outside a provider's folders never names a provider**, in its
+path, its code, its comments or its tests; the only line that may is a module declaration
+(`pub mod <id>;`). Lists of providers are written by `build.rs` from the folders, shared code finds
+a provider through `Providers`, and shared tests use the fake provider. `just placement-check`
+fails a build that breaks this ([add a provider](../add_provider.md)).

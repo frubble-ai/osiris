@@ -11,14 +11,14 @@ pub struct Trigger {
     pub id: String,
     pub connected_account_id: String,
     pub provider: String,
-    /// What it watches, such as `github.on_repo_event`.
+    /// What it watches: one of its provider's kinds, `<provider>.<kind>`.
     pub kind: String,
     /// The provider's own configuration for it, which the provider validated.
     pub config: serde_json::Value,
     /// What the provider signs deliveries with; never answered.
     pub secret: Secret,
     pub status: TriggerStatus,
-    /// The provider's id of what osiris created there (a GitHub repository webhook).
+    /// The provider's id of what osiris created there, such as a webhook's id.
     pub subscription_id: Option<String>,
     /// What a trigger that checks on a schedule saw last.
     pub checkpoint: Option<serde_json::Value>,

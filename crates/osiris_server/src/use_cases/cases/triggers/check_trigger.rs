@@ -15,6 +15,7 @@ use crate::use_cases::{
 };
 use osiris_common::secret::{ExposeSecret, Secret};
 use osiris_domain::{DomainError, Event, TaskOutcome, TriggerFired, TriggerStatus};
+use osiris_interfaces::ActingAs;
 
 /// What a trigger whose check the provider refuses for good says, for the client.
 const REFUSED: &str = "the provider refused the trigger's check; create it again";
@@ -70,7 +71,8 @@ impl UseCases {
                     provider: &trigger.provider,
                     action: kind,
                     required_scopes: &[],
-                    call: |token: Secret| async move {
+                    user_only: false,
+                    call: |token: Secret, _acting: ActingAs| async move {
                         implementation
                             .check_trigger(http, token.expose_secret(), kind, config, checkpoint)
                             .await

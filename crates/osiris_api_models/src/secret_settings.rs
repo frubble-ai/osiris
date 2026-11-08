@@ -1,4 +1,4 @@
-//! An app's secret settings as a client sends them: a JSON object (a GitHub App's private key)
+//! An app's secret settings as a client sends them: a JSON object (the key an app signs with)
 //! held as a secret from the moment it is read, so it is never logged or answered.
 
 use osiris_common::secret::{Secret, secret};

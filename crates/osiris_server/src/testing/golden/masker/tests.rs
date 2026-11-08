@@ -42,7 +42,7 @@ fn replaces_what_changes_from_run_to_run(#[case] text: &str, #[case] masked: &st
 #[case::a_word("connection.active")]
 #[case::a_code("OS_02")]
 #[case::a_short_prefixed_word("ac_short")]
-#[case::an_unprefixed_word("golden-github-app")]
+#[case::an_unprefixed_word("golden-fake-app")]
 #[case::a_number("28800")]
 #[case::a_word_with_an_upper_case_prefix("AC_0123456789abcdefABCD")]
 fn leaves_every_other_word_as_it_is(#[case] text: &str) {

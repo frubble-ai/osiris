@@ -37,3 +37,5 @@ pub async fn run(app: &TestContext, session: &mut GoldenSession<'_>) {
         )
         .await;
 }
+
+golden!("events", run);

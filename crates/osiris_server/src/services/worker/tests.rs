@@ -8,8 +8,9 @@
 
 use crate::testing::{WORKER_TOKEN, setup_test_context};
 use axum::http::StatusCode;
-use osiris_providers::github::mocks::MockGithubNetwork;
-use osiris_providers::mocks::generate_token_answer::generate_token_answer;
+use osiris_providers::mocks::{
+    fake::MockFakeNetwork, generate_token_answer::generate_token_answer,
+};
 use osiris_tasks::names;
 use sqlx::PgPool;
 
@@ -52,7 +53,7 @@ async fn answers_the_worker_s_health_with_503_once_it_is_draining(pool: PgPool) 
 async fn answers_204_for_a_task_that_ran(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
-    MockGithubNetwork::on(&app.provider)
+    MockFakeNetwork::on(&app.provider)
         .answer_refresh(200, generate_token_answer(Some(28800)))
         .await;
 
@@ -66,7 +67,7 @@ async fn answers_204_for_a_task_that_ran(pool: PgPool) {
 async fn answers_500_for_a_task_that_failed_so_the_scheduler_runs_it_again(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
-    MockGithubNetwork::on(&app.provider)
+    MockFakeNetwork::on(&app.provider)
         .answer_refresh_text(503, "Service Unavailable")
         .await;
 

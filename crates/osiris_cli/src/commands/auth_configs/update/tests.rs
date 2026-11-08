@@ -37,10 +37,10 @@ fn sends_each_value_given() {
     let client_id: String = Password(8..16).fake();
     let client_secret: String = Password(32..40).fake();
 
-    let body = update(Some(&client_id), Some(&client_secret), &["repo", "user"]).body();
+    let body = update(Some(&client_id), Some(&client_secret), &["read", "write"]).body();
 
     assert_eq!(
         body,
-        json!({ "client_id": client_id, "client_secret": client_secret, "scopes": ["repo", "user"] })
+        json!({ "client_id": client_id, "client_secret": client_secret, "scopes": ["read", "write"] })
     );
 }

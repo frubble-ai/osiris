@@ -2,14 +2,13 @@
 
 use crate::use_cases::{
     UseCaseResult, UseCases,
-    cases::{
-        github::github_action_args::GithubActionArgs,
-        run_connected_account_action::RunConnectedAccountActionArgs,
-    },
+    cases::run_connected_account_action::RunConnectedAccountActionArgs,
+    lib::shared::{action_args::ActionArgs, provider_of::provider_of},
 };
 use osiris_common::secret::{ExposeSecret, Secret};
+use osiris_interfaces::ActingAs;
 use osiris_providers::github::{
-    pull_requests::ListPullRequestRequestedReviewers, types::GithubRequestedReviewers,
+    Github, pull_requests::ListPullRequestRequestedReviewers, types::GithubRequestedReviewers,
 };
 
 impl UseCases {
@@ -17,18 +16,20 @@ impl UseCases {
     /// [`ListPullRequestRequestedReviewers::SCOPES`].
     pub async fn github_list_pull_request_requested_reviewers(
         &self,
-        args: GithubActionArgs<'_, ListPullRequestRequestedReviewers>,
+        args: ActionArgs<'_, ListPullRequestRequestedReviewers>,
     ) -> UseCaseResult<GithubRequestedReviewers> {
         self.run("github_list_pull_request_requested_reviewers", async {
             let ctx = self.context();
-            let (github, http, input) = (&ctx.providers.github, &ctx.http, args.input);
+            let provider = provider_of::<Github>(&ctx.providers)?;
+            let (http, input) = (&ctx.http, args.input);
             self.run_connected_account_action(RunConnectedAccountActionArgs {
                 id: args.id,
                 provider: "github",
                 action: "github.list_pull_request_requested_reviewers",
                 required_scopes: ListPullRequestRequestedReviewers::SCOPES,
-                call: move |token: Secret| async move {
-                    github
+                user_only: false,
+                call: move |token: Secret, _acting: ActingAs| async move {
+                    provider
                         .list_pull_request_requested_reviewers(http, token.expose_secret(), input)
                         .await
                 },

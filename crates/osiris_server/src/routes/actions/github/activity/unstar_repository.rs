@@ -2,7 +2,7 @@
 
 use crate::{
     http::{auth::Auth, error::ApiResult, json_body::JsonBody, server_wrap, state::ApiState},
-    use_cases::cases::github::github_action_args::GithubActionArgs,
+    use_cases::lib::shared::action_args::ActionArgs,
 };
 use axum::{
     Json,
@@ -37,7 +37,7 @@ pub async fn github_unstar_repository(
         StatusCode::OK,
         |use_cases| async move {
             use_cases
-                .github_unstar_repository(GithubActionArgs {
+                .github_unstar_repository(ActionArgs {
                     id: &id,
                     input: &input,
                 })

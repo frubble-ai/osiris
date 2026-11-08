@@ -48,7 +48,7 @@ async fn names_the_only_auth_config_of_the_provider_and_answers_the_consent_url(
         "/v1/auth-configs",
         &keys.admin,
         200,
-        r#"{"data":[{"id":"ac_slack","provider":"slack"},{"id":"ac_github","provider":"github"}]}"#,
+        r#"{"data":[{"id":"ac_other","provider":"other"},{"id":"ac_acme","provider":"acme"}]}"#,
     )
     .await;
     api.answer(
@@ -56,14 +56,14 @@ async fn names_the_only_auth_config_of_the_provider_and_answers_the_consent_url(
         "/v1/connected-accounts",
         &keys.api,
         201,
-        r#"{"id":"ca_1","redirect_url":"https://github.com/login/oauth/authorize?state=s"}"#,
+        r#"{"id":"ca_1","redirect_url":"https://acme.example/oauth/authorize?state=s"}"#,
     )
     .await;
 
     let user: String = Username().fake();
     let started = start_consent(
         &client_of(&server, &keys),
-        "github",
+        "acme",
         &user,
         None,
         "https://app.example/back",
@@ -74,12 +74,12 @@ async fn names_the_only_auth_config_of_the_provider_and_answers_the_consent_url(
     assert_eq!(started.id, "ca_1");
     assert_eq!(
         started.consent_url,
-        "https://github.com/login/oauth/authorize?state=s"
+        "https://acme.example/oauth/authorize?state=s"
     );
     assert_eq!(
         sent_bodies(&server).await,
         [json!({
-            "auth_config_id": "ac_github",
+            "auth_config_id": "ac_acme",
             "user_id": user,
             "callback_url": "https://app.example/back"
         })]
@@ -103,7 +103,7 @@ async fn uses_the_named_auth_config_without_listing() {
     let user: String = Username().fake();
     start_consent(
         &client_of(&server, &keys),
-        "github",
+        "acme",
         &user,
         Some("ac_named".into()),
         "https://app.example/back",
@@ -133,7 +133,7 @@ async fn fails_when_osiris_answers_no_consent_url() {
     let user: String = Username().fake();
     let error = start_consent(
         &client_of(&server, &keys),
-        "github",
+        "acme",
         &user,
         Some("ac_named".into()),
         "https://app.example/back",

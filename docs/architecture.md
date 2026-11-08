@@ -1,7 +1,7 @@
 # Architecture
 
-Osiris holds users' OAuth connections to providers (GitHub, Linear, Slack), keeps their tokens
-fresh, and runs typed actions with them. It runs as two request-driven Cloud Run services and a
+Osiris holds users' OAuth connections to providers, keeps their tokens fresh, and runs typed
+actions with them. Each provider's own page is in [providers](providers.md). It runs as two request-driven Cloud Run services and a
 migration job. All state is in Postgres.
 
 ## Crates
@@ -12,7 +12,7 @@ migration job. All state is in Postgres.
 | `osiris_env` | logging, request ids, the build's commit, and the `Flow` every operation is logged under |
 | `osiris_domain` | auth configs, connections, tokens, events, task outcomes, pagination, `DomainError` |
 | `osiris_interfaces` | `ProviderCommon` and `Provider`, the OAuth2 flow a provider's definition drives, `call` |
-| `osiris_providers` | GitHub, Linear and Slack: each one's definition, revoke, transformers, actions, and faked network |
+| `osiris_providers` | each provider in its own folder (its definition, revoke, transformers, actions and faked network), registered by `build.rs`, and a fake provider for the tests they share |
 | `osiris_events` | the event catalog, the envelope, the bus (which writes each event in the pinned release, through `osiris_versioning`), the `Transport` trait, the in-memory transport |
 | `osiris_pubsub` | `Transport` on Google Pub/Sub |
 | `osiris_tasks` | task payloads and names, the `TaskScheduler` and `TaskAuthenticator` traits, the local and in-memory schedulers |
@@ -127,7 +127,7 @@ A connection stores its tokens and the name of its pending refresh task in separ
 provider declares whether it issues refresh tokens (`issues_refresh_tokens` in its OAuth
 definition):
 
-- **Issues refresh tokens** (GitHub, Linear, Slack): the connection is complete when it holds a
+- **Issues refresh tokens** (every provider osiris implements today): the connection is complete when it holds a
   refresh token and its refresh task. A consent that returns no refresh token, or whose first task
   cannot be scheduled, keeps no tokens and leaves the connection `disabled`.
 - **Issues none** (its tokens never expire): the connection is complete with its access token, and
@@ -179,21 +179,41 @@ logged. Clients ignore an event they have already received, by its `event_id`. A
 in the instance's pinned release (`osiris_version`), taken back through the same version changes as
 answers ([API versioning](api-versioning.md)).
 
+## Providers
+
+Each provider is a folder of its own in every layer it reaches, and nothing outside its folders
+names it except module declarations:
+
+- `osiris_providers/src/<id>/`, with `registration.rs` (its id, default URLs and constructor).
+  `build.rs` lists every folder that has one, so `Providers` finds a provider by id, or by type
+  for its own actions, and `[providers.<id>]` can move its URLs.
+- Its actions: `osiris_api_models/src/actions/<id>.rs`, `use_cases/cases/<id>/` and
+  `routes/actions/<id>/`, generated from `scripts/actions/<id>/`. The server's `build.rs` merges
+  every provider's router.
+- Its tests: `services/api/tests/<id>/`, `testing/<id>.rs` and its faked network in its own
+  `mocks/`. The tests every provider shares run against a fake provider
+  (`osiris_providers::mocks::fake`), which only tests register.
+- Its `provider` row is written from the registrations whenever the migrations run.
+
 ## Installation connections
 
-A GitHub App's auth config can hold the app's id in `settings` and its private key in
-`secret_settings`, encrypted like a client secret. The provider validates both when the auth
-config is saved. A connection made with an `installation_id` is `app_installation`: it holds no
-tokens. When an action runs, osiris signs a short JWT with the app's key (RS256) and asks GitHub
-for the installation's token. The token is kept in memory (`InstallationTokenCache`) until
-`[providers.installation_tokens] margin_seconds` before it expires. A token GitHub refuses is
-minted again and the call runs once more; a second refusal makes the connection `expired`.
+An app's auth config can hold the app's own `settings` and `secret_settings` (encrypted like a
+client secret), which its provider validates when the auth config is saved. A connection made with
+an `installation_id` is `app_installation`: it holds no tokens. When an action runs, the provider
+mints the installation's token from the app's credentials (`Provider::installation_token`). The
+token is kept in memory (`InstallationTokenCache`) until `[providers.installation_tokens]
+margin_seconds` before it expires. A token the provider refuses is minted again and the call runs
+once more; a second refusal makes the connection `expired`.
+
+An action that only works as a user declares it (`user_only` in its generator entry) and is
+refused on an installation connection before the provider is called. An action that reads
+differently as an installation (`acting`) is told what the token acts as (`ActingAs`).
 
 ## Scopes
 
 Each action declares the OAuth scopes it needs. Before the provider is called, the connection's
 granted scopes are compared with them (`missing_scopes`, using the provider's `scope_covers` for
-nested scopes such as GitHub's `repo` covering `public_repo`). A connection without them is refused
+scopes that nest). A connection without them is refused
 as `OS_11` (403). A token that reports no scopes is not checked.
 
 ## Triggers
@@ -202,13 +222,13 @@ A trigger (`tr_…`) subscribes at a connection's provider and publishes what it
 `trigger.fired` events. The provider validates its kind and config, creates its subscription
 (`subscribe_trigger`) and removes it on delete (`unsubscribe_trigger`).
 
-- **Deliveries**: a GitHub repository webhook posts to `{public_url}/webhooks/triggers/{id}`,
+- **Deliveries**: the provider's webhook posts to `{public_url}/webhooks/triggers/{id}`,
   signed with the trigger's own random secret (HMAC-SHA256), which is encrypted at rest. The route
   is public and trusts only the signature: a delivery not signed with the secret is answered 404,
   as a missing trigger is. A signed delivery is answered 202, whether it is published or ignored.
 - **Event ids**: a fired event's id is derived from the trigger and the provider's delivery id, so
   a delivery sent twice is published with the same `event_id`.
-- **Checks on a schedule**: a kind like `github.watch_pull_request` records the state it starts
+- **Checks on a schedule**: a kind that checks on a schedule records the state it starts
   from when it is created, then checks again on its own deliveries and on its `trigger.poll` task,
   every `[triggers] check_seconds`. Each check keeps a checkpoint and publishes only a change it
   has not seen. Each scheduled check is numbered and schedules the next. A check the provider

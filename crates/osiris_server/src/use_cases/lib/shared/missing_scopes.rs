@@ -1,5 +1,5 @@
 //! The scopes an action needs that a connection wasn't granted, checked before the provider is
-//! called. A connection whose token carries no scopes at all (a GitHub App's user token, whose
+//! called. A connection whose token carries no scopes at all (an app's user token, whose
 //! reach is the app's installation permissions) is not checked here: the provider refuses what it
 //! may not do.
 

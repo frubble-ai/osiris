@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 pub struct TriggerFired {
     /// `tr_…`.
     pub trigger_id: String,
-    /// The trigger's kind, such as `github.on_repo_event`.
+    /// The trigger's kind, `<provider>.<kind>`.
     pub trigger: String,
     /// What happened, in the provider's words and the trigger kind's shape.
     pub data: serde_json::Value,

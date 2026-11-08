@@ -134,7 +134,8 @@ impl UseCases {
                     )
                     .await
                 }
-                Err(error @ ProviderError::Unavailable { .. }) => {
+                // An exchange sends no input of the caller's, so only an outage is left: tried again.
+                Err(error @ (ProviderError::Unavailable { .. } | ProviderError::Invalid { .. })) => {
                     tracing::warn!(connected_account_id = id, %error, "the provider failed the refresh for now; it will be tried again");
                     lock.failed("the provider could not be reached; retrying")
                         .await?;

@@ -2,7 +2,7 @@
 
 use crate::{
     http::{auth::Auth, error::ApiResult, server_wrap, state::ApiState},
-    use_cases::cases::github::github_action_args::GithubActionArgs,
+    use_cases::lib::shared::action_args::ActionArgs,
 };
 use axum::{
     Json,
@@ -36,7 +36,7 @@ pub async fn github_get_current_user(
         StatusCode::OK,
         |use_cases| async move {
             use_cases
-                .github_get_current_user(GithubActionArgs {
+                .github_get_current_user(ActionArgs {
                     id: &id,
                     input: &GetCurrentUser::default(),
                 })

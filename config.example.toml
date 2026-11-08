@@ -93,32 +93,23 @@ retention_seconds = 86400
 purge_batch = 100
 
 [providers.listing]
-# A list that fans out over a provider's resources (GitHub's installations): how many it reads at
+# A list that fans out over a provider's resources (an app's installations): how many it reads at
 # once, and how many items it answers at most.
 concurrency = 4
 max_items = 5000
-# How much of a downloaded text (a GitHub workflow job's logs) is answered: its last bytes.
+# How much of a downloaded text (a job's logs) is answered: its last bytes.
 max_log_bytes = 262144
 
 [providers.installation_tokens]
-# An app installation's token (a GitHub App's, which lives an hour) is minted again this long
+# An app installation's token (one that lives an hour, for example) is minted again this long
 # before the provider stops accepting it.
 margin_seconds = 300
 
-[providers.github]
-oauth_base_url = "https://github.com"
-api_base_url = "https://api.github.com"
-
-[providers.linear]
-oauth_base_url = "https://linear.app"
-api_base_url = "https://api.linear.app"
-
-[providers.slack]
-oauth_base_url = "https://slack.com"
-# Ends with `/`: Slack's methods join onto it.
-api_base_url = "https://slack.com/api/"
+# [providers.<id>] moves one provider: `oauth_base_url` (its consent page) and `api_base_url`
+# (its API). Each provider's own folder has where it is by default; tests and a local fake point
+# it elsewhere.
 
 [triggers]
-# Between two scheduled checks of a trigger that checks on a schedule (a watched GitHub pull
-# request); its webhook deliveries also check it as they come.
+# Between two scheduled checks of a trigger that checks on a schedule; its deliveries also check
+# it as they come.
 check_seconds = 300

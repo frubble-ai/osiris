@@ -2,6 +2,7 @@
 //! is called and how it fails), [`Provider`] (its `OAuth2` and how it ends a grant), the `OAuth2` flow
 //! driven by a provider's definition, and [`call`], the one way a provider's API is called.
 
+pub mod acting_as;
 pub mod call;
 pub mod error;
 pub mod installation_token;
@@ -13,6 +14,7 @@ pub mod tokens;
 pub mod trigger_check;
 pub mod trigger_receipt;
 
+pub use acting_as::ActingAs;
 pub use call::call;
 pub use error::ProviderError;
 pub use installation_token::InstallationToken;

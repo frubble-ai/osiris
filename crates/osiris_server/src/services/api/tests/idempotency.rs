@@ -3,14 +3,14 @@
 use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
-use osiris_providers::github::mocks::MockGithubNetwork;
+use osiris_providers::mocks::fake::MockFakeNetwork;
 use sqlx::PgPool;
 use std::time::Duration;
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn never_replays_a_stored_answer_to_a_caller_without_a_key(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let body = generate_connect_attempt(&config);
     let first = app
         .send(
@@ -57,7 +57,7 @@ async fn never_replays_a_stored_answer_to_a_caller_without_a_key(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn lets_an_unauthenticated_attempt_leave_the_key_free(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let body = generate_connect_attempt(&config);
 
     let refused = app
@@ -90,7 +90,7 @@ async fn lets_an_unauthenticated_attempt_leave_the_key_free(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_a_key_reused_for_another_request(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let connect = |_: &str| generate_connect_attempt(&config);
     let first = app
         .send(
@@ -123,7 +123,7 @@ async fn refuses_a_key_reused_for_another_request(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn runs_a_retry_again_after_the_first_answer_was_a_server_error(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let body = generate_connect_attempt(&config);
     app.tasks.fail(true);
     let failed = app
@@ -214,8 +214,8 @@ async fn never_replays_an_answer_that_is_not_json(pool: PgPool) {
 async fn finishes_a_keyed_request_its_caller_gave_up_on(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
-    MockGithubNetwork::on(&app.provider)
-        .answer_revoke_after(Duration::from_millis(400), 204)
+    MockFakeNetwork::on(&app.provider)
+        .answer_revoke_after(Duration::from_millis(400), 200)
         .await;
     let path = format!("/v1/connected-accounts/{id}");
     let key = [("idempotency-key", "k1")];
@@ -228,7 +228,7 @@ async fn finishes_a_keyed_request_its_caller_gave_up_on(pool: PgPool) {
             .await
             .unwrap()
             .iter()
-            .any(|request| request.method == wiremock::http::Method::DELETE)
+            .any(|request| request.url.path().ends_with("/revoke"))
         {
             tokio::task::yield_now().await;
         }

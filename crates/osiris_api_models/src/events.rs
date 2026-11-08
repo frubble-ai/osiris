@@ -11,11 +11,10 @@ pub struct TriggerEvent {
     pub connected_account_id: String,
     /// `tr_…`: the trigger that fired, on a `trigger.fired` event.
     pub trigger_id: Option<String>,
-    /// The trigger's kind, such as `github.on_repo_event`, on a `trigger.fired` event.
+    /// The trigger's kind, `<provider>.<kind>`, on a `trigger.fired` event.
     pub trigger: Option<String>,
-    /// What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape:
-    /// `github.on_repo_event` carries `event` (GitHub's event name), `delivery_id` and `payload`
-    /// (GitHub's own); `github.watch_pull_request` carries `pull_request` and `version`.
+    /// What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape,
+    /// which its provider's documentation describes.
     #[schema(value_type = Option<Object>)]
     pub data: Option<serde_json::Value>,
 }

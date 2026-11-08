@@ -1,6 +1,7 @@
 //! The settings checked at boot: a value that can't work stops it, naming the setting.
 
 use super::Settings;
+use osiris_providers::REGISTRATIONS;
 
 impl Settings {
     /// Refuse values that can't work, naming the setting.
@@ -24,13 +25,18 @@ impl Settings {
             "api.pinned_version {:?} is not a version osiris serves",
             self.api.pinned_version
         );
-        for (name, urls) in [
-            ("github", &self.providers.github),
-            ("linear", &self.providers.linear),
-            ("slack", &self.providers.slack),
-        ] {
-            urls.urls()
-                .map_err(|error| anyhow::anyhow!("providers.{name}: {error}"))?;
+        for id in self.providers.at.keys() {
+            anyhow::ensure!(
+                REGISTRATIONS
+                    .iter()
+                    .any(|registration| registration.id == id),
+                "providers.{id} is not a setting or a provider osiris implements"
+            );
+        }
+        for registration in REGISTRATIONS {
+            self.providers
+                .urls(registration)
+                .map_err(|error| anyhow::anyhow!("providers.{}: {error}", registration.id))?;
         }
         anyhow::ensure!(
             self.consent.state_length >= 32,

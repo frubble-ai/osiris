@@ -1,5 +1,5 @@
-//! `POST /webhooks/triggers/{id}`: where a provider sends a trigger's deliveries (a GitHub
-//! repository webhook). Public; the delivery's signature, with the trigger's own secret, is the
+//! `POST /webhooks/triggers/{id}`: where a provider sends a trigger's deliveries (a webhook it
+//! was asked to create). Public; the delivery's signature, with the trigger's own secret, is the
 //! only thing trusted. A delivery not signed with it is answered 404, as a trigger that doesn't
 //! exist is, so a guess learns nothing. A signed one is answered 202, published or ignored.
 

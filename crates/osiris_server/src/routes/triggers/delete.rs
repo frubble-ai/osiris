@@ -12,7 +12,7 @@ use axum::{
 use osiris_api_models::{auth_configs::Deleted, errors::ErrorBody};
 use osiris_env::Flow;
 
-/// Delete a trigger: its subscription is removed at the provider (a GitHub repository webhook)
+/// Delete a trigger: its subscription is removed at the provider (a webhook, for example)
 /// when its connection still reaches it, and it is deleted either way.
 #[utoipa::path(delete, path = "/v1/triggers/{id}", tag = "triggers", params(("id" = String, Path)),
     params(("Idempotency-Key" = Option<String>, Header, description = "Runs the request once; a retry gets the first answer")),

@@ -1,5 +1,5 @@
 //! Creates a trigger on a connection: the provider validates its config, the subscription is
-//! created at the provider (a GitHub repository webhook, delivering to osiris and signed with the
+//! created at the provider (a webhook, for example, delivering to osiris and signed with the
 //! trigger's own secret), and, for a kind that checks on a schedule, its first check records the
 //! state it starts from and its next check is scheduled.
 
@@ -20,13 +20,14 @@ use osiris_common::{
     secret::{ExposeSecret, Secret, secret},
 };
 use osiris_domain::{DomainError, Trigger, TriggerStatus};
+use osiris_interfaces::ActingAs;
 
 /// How long a trigger's secret is, in characters: as long as a consent's state at its longest.
 const SECRET_LENGTH: usize = 48;
 
 pub struct CreateTriggerArgs {
     pub connected_account_id: String,
-    /// Its kind, such as `github.on_repo_event`.
+    /// Its kind, `<provider>.<kind>`.
     pub kind: String,
     pub config: serde_json::Value,
 }
@@ -58,7 +59,8 @@ impl UseCases {
                     provider: &account.provider,
                     action: kind,
                     required_scopes: &[],
-                    call: |token: Secret| {
+                    user_only: false,
+                    call: |token: Secret, _acting: ActingAs| {
                         let (callback_url, trigger_secret) = (&callback_url, &trigger_secret);
                         async move {
                             implementation
@@ -84,7 +86,8 @@ impl UseCases {
                         provider: &account.provider,
                         action: kind,
                         required_scopes: &[],
-                        call: |token: Secret| async move {
+                        user_only: false,
+                        call: |token: Secret, _acting: ActingAs| async move {
                             implementation
                                 .check_trigger(http, token.expose_secret(), kind, config, None)
                                 .await

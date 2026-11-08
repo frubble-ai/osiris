@@ -88,7 +88,7 @@ async fn token_request(
 }
 
 /// Error codes that mean "try again", not "this grant is dead": the standard ones (RFC 6749,
-/// section 4.1.2.1) and the ones Slack answers with `ok: false`.
+/// section 4.1.2.1) and the ones a provider answering `ok: false` beside a 200 uses.
 const TRANSIENT_ERRORS: &[&str] = &[
     "temporarily_unavailable",
     "server_error",
@@ -99,8 +99,8 @@ const TRANSIENT_ERRORS: &[&str] = &[
     "request_timeout",
 ];
 
-/// A token answer. Some providers refuse with a 200 and an `error` (GitHub), or `ok: false`
-/// (Slack); a token endpoint may echo credentials, so an unreadable body is never repeated.
+/// A token answer. Some providers refuse with a 200 and an `error`, or with `ok: false`; a token
+/// endpoint may echo credentials, so an unreadable body is never repeated.
 fn parse_token_answer(
     provider: &'static str,
     status: reqwest::StatusCode,

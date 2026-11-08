@@ -1,13 +1,14 @@
-//! `github.list_repositories`: every repository our GitHub App's installations give the user.
+//! `github.list_repositories`: every repository our GitHub App's installations give the user, or,
+//! on an installation connection, every repository that installation was given.
 
 use super::list_installations::ListInstallations;
-use crate::ProviderError;
 use crate::github::{
     Github,
     get_page::{PER_PAGE, get_page},
     transformers::repository::RepositoriesPage,
     types::GithubRepository,
 };
+use crate::{ActingAs, ProviderError};
 use futures::{StreamExt, TryStreamExt, stream};
 use serde::Deserialize;
 use std::collections::BTreeMap;
@@ -25,13 +26,20 @@ impl ListRepositories {
 
 impl Github {
     /// Every repository of every installation, each once, ordered by id: installations read a few
-    /// at once, and at most `max_items` repositories.
+    /// at once, and at most `max_items` repositories. An installation's own token reads its
+    /// repositories directly (`GET /installation/repositories`).
     pub async fn list_repositories(
         &self,
         http: &reqwest::Client,
         token: &str,
         _input: &ListRepositories,
+        acting: ActingAs,
     ) -> Result<Vec<GithubRepository>, ProviderError> {
+        if acting == ActingAs::Installation {
+            return self
+                .repositories_at(http, token, "/installation/repositories")
+                .await;
+        }
         let installations = self
             .list_installations(http, token, &ListInstallations {})
             .await?;
@@ -50,7 +58,7 @@ impl Github {
         Ok(by_id.into_values().take(self.limits.max_items).collect())
     }
 
-    /// One installation's repositories, page after page, up to `max_items`.
+    /// One installation's repositories, as its user sees them.
     async fn installation_repositories(
         &self,
         http: &reqwest::Client,
@@ -58,10 +66,20 @@ impl Github {
         installation: String,
     ) -> Result<Vec<GithubRepository>, ProviderError> {
         let path = format!("/user/installations/{installation}/repositories");
+        self.repositories_at(http, token, &path).await
+    }
+
+    /// The repositories GitHub pages at `path`, page after page, up to `max_items`.
+    pub(crate) async fn repositories_at(
+        &self,
+        http: &reqwest::Client,
+        token: &str,
+        path: &str,
+    ) -> Result<Vec<GithubRepository>, ProviderError> {
         let mut repositories = Vec::new();
         let mut page = 1;
         loop {
-            let next: RepositoriesPage = get_page(self, http, token, &path, page).await?;
+            let next: RepositoriesPage = get_page(self, http, token, path, page).await?;
             let short = next.repositories.len() < PER_PAGE;
             repositories.extend(next.repositories.into_iter().map(GithubRepository::from));
             let seen = u64::try_from(repositories.len()).unwrap_or(u64::MAX);

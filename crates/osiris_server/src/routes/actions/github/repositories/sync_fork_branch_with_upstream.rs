@@ -2,7 +2,7 @@
 
 use crate::{
     http::{auth::Auth, error::ApiResult, json_body::JsonBody, server_wrap, state::ApiState},
-    use_cases::cases::github::github_action_args::GithubActionArgs,
+    use_cases::lib::shared::action_args::ActionArgs,
 };
 use axum::{
     Json,
@@ -37,7 +37,7 @@ pub async fn github_sync_fork_branch_with_upstream(
         StatusCode::OK,
         |use_cases| async move {
             use_cases
-                .github_sync_fork_branch_with_upstream(GithubActionArgs {
+                .github_sync_fork_branch_with_upstream(ActionArgs {
                     id: &id,
                     input: &input,
                 })

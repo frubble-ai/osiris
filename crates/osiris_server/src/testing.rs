@@ -1,5 +1,6 @@
 //! What the server's tests share: a configuration fixture, and a test context with the real use
-//! cases, the API and worker routers, the test's own database, the providers' faked network, an
+//! cases, the API and worker routers, the test's own database, the providers' faked network (every
+//! registered provider, and a fake one for the tests they share), an
 //! in-memory event bus and an in-memory task scheduler. Tests arrange state through the use cases
 //! and the routes, never by writing rows.
 
@@ -15,11 +16,14 @@ pub mod arrange;
 pub mod conformance;
 pub mod db_fixtures;
 pub mod generate_connect_attempt;
+pub mod github;
 pub mod golden;
+pub mod linear;
 pub mod mock_releases;
 pub mod observe;
 pub mod requests;
 pub mod run_tasks;
+pub mod slack;
 pub mod test_config;
 pub mod test_context;
 

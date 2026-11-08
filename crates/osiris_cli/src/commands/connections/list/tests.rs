@@ -8,7 +8,7 @@ fn filters_by_what_it_was_given_naming_the_user_as_osiris_does() {
     let user: String = Username().fake();
     let list = List {
         user: Some(user.clone()),
-        provider: Some("github".into()),
+        provider: Some("acme".into()),
         status: Some("active".into()),
         after: None,
         limit: Some(5),
@@ -18,7 +18,7 @@ fn filters_by_what_it_was_given_naming_the_user_as_osiris_does() {
         list.query(),
         [
             ("user_id", user),
-            ("provider", "github".to_owned()),
+            ("provider", "acme".to_owned()),
             ("status", "active".to_owned()),
             ("limit", "5".to_owned()),
         ]

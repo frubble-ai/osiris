@@ -15,7 +15,7 @@ pub struct EventMessage {
     /// `tr_…`: the trigger that fired, for `trigger.fired`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub trigger_id: Option<String>,
-    /// The trigger's kind, such as `github.on_repo_event`, for `trigger.fired`.
+    /// The trigger's kind, `<provider>.<kind>`, for `trigger.fired`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub trigger: Option<String>,
     /// What happened at the provider, for `trigger.fired`.

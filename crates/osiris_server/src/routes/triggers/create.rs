@@ -15,7 +15,7 @@ use osiris_api_models::{
 };
 use osiris_env::Flow;
 
-/// Create a trigger: osiris subscribes at the connection's provider (a GitHub repository webhook)
+/// Create a trigger: osiris subscribes at the connection's provider (a webhook, for example)
 /// and publishes each delivery as a `trigger.fired` event.
 #[utoipa::path(post, path = "/v1/triggers", tag = "triggers", request_body = CreateTrigger,
     params(("Idempotency-Key" = Option<String>, Header, description = "Runs the request once; a retry gets the first answer")),

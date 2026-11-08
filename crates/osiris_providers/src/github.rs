@@ -14,6 +14,7 @@ pub mod paging;
 pub mod path_segment;
 pub mod provider;
 pub mod pull_requests;
+pub mod registration;
 pub mod releases;
 pub mod repositories;
 pub mod request;

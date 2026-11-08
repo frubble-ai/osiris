@@ -35,7 +35,7 @@ use super::{
     },
 };
 use crate::{
-    ProviderError,
+    ActingAs, ProviderError,
     github::{
         mocks::github_on::github_on,
         mocks::{
@@ -169,13 +169,64 @@ async fn lists_the_users_repositories_sorted_and_filtered() {
     };
 
     let listed = github_on(&server)
-        .list_my_repositories(&http(), "token", &input)
+        .list_my_repositories(&http(), "token", &input, ActingAs::User)
         .await
         .unwrap();
 
     assert_eq!(listed.len(), 2);
     assert_eq!(listed[1].id, "2");
     assert_eq!(listed[0].url, repositories[0]["html_url"].as_str().unwrap());
+}
+
+#[tokio::test]
+async fn lists_an_installation_s_repositories_on_an_installation_connection() {
+    let server = MockServer::start().await;
+    let repositories = [generate_github_repository(3)];
+    MockGithubNetwork::on(&server)
+        .answer(
+            "GET",
+            "/installation/repositories",
+            &[("per_page", "2"), ("page", "1")],
+            200,
+            json!({ "total_count": 1, "repositories": repositories }),
+        )
+        .await;
+    let input = ListMyRepositories {
+        per_page: Some(2),
+        page: Some(1),
+        ..ListMyRepositories::default()
+    };
+
+    let listed = github_on(&server)
+        .list_my_repositories(&http(), "token", &input, ActingAs::Installation)
+        .await
+        .unwrap();
+
+    assert_eq!(listed.len(), 1);
+    assert_eq!(listed[0].id, "3");
+}
+
+#[rstest]
+#[case::visibility(ListMyRepositories { visibility: Some("private".into()), ..ListMyRepositories::default() }, "visibility")]
+#[case::sort(ListMyRepositories { sort: Some("pushed".into()), ..ListMyRepositories::default() }, "sort")]
+#[case::direction(ListMyRepositories { direction: Some("asc".into()), ..ListMyRepositories::default() }, "direction")]
+#[tokio::test]
+async fn refuses_a_user_s_filter_on_an_installation_connection_without_asking_github(
+    #[case] input: ListMyRepositories,
+    #[case] named: &str,
+) {
+    // No answer is arranged: a request to GitHub would fail the call another way.
+    let server = MockServer::start().await;
+
+    let refused = github_on(&server)
+        .list_my_repositories(&http(), "token", &input, ActingAs::Installation)
+        .await
+        .unwrap_err();
+
+    let ProviderError::Invalid { message, .. } = refused else {
+        panic!("{refused}");
+    };
+    assert!(message.contains(named), "{message}");
 }
 
 #[tokio::test]

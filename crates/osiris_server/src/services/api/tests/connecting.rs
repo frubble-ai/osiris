@@ -5,9 +5,9 @@ use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{API_KEY, setup_test_context, setup_test_context_with};
 use axum::http::StatusCode;
 use osiris_domain::EventType;
-use osiris_providers::{
-    github::mocks::MockGithubNetwork,
-    mocks::generate_token_answer::{generate_token_answer, generate_token_answer_without_refresh},
+use osiris_providers::mocks::{
+    fake::MockFakeNetwork,
+    generate_token_answer::{generate_token_answer, generate_token_answer_without_refresh},
 };
 use osiris_tasks::{RefreshReason, TaskPayload, names};
 use sqlx::PgPool;
@@ -17,10 +17,10 @@ use url::Url;
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn connects_through_the_consent_and_sends_the_browser_back_once(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    MockGithubNetwork::on(&app.provider)
+    MockFakeNetwork::on(&app.provider)
         .answer_code_exchange(generate_token_answer(Some(28800)))
         .await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let attempt = generate_connect_attempt(&config);
     let (id, state) = app.start_connect_with(&attempt).await;
     let callback_url = Url::parse(attempt["callback_url"].as_str().unwrap()).unwrap();
@@ -101,7 +101,7 @@ async fn connects_through_the_consent_and_sends_the_browser_back_once(pool: PgPo
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn fails_a_refused_consent_and_says_so_on_the_way_back(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (id, state) = app.start_connect(&config).await;
 
     let callback = app
@@ -134,7 +134,7 @@ async fn fails_a_refused_consent_and_says_so_on_the_way_back(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn replays_a_connect_retried_with_the_same_idempotency_key(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let body = generate_connect_attempt(&config);
     let first = app
         .send(
@@ -166,7 +166,7 @@ async fn replays_a_connect_retried_with_the_same_idempotency_key(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn schedules_the_consent_s_expiry_when_it_opens(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (id, _) = app.start_connect(&config).await;
     let task = app
         .tasks
@@ -182,7 +182,7 @@ async fn schedules_the_consent_s_expiry_when_it_opens(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_to_open_a_consent_whose_expiry_cannot_be_scheduled(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     app.tasks.fail(true);
     let answer = app
         .send(
@@ -205,10 +205,10 @@ async fn keeps_no_tokens_and_disables_the_connection_when_the_first_refresh_cann
     pool: PgPool,
 ) {
     let app = setup_test_context(pool).await;
-    MockGithubNetwork::on(&app.provider)
+    MockFakeNetwork::on(&app.provider)
         .answer_code_exchange(generate_token_answer(Some(28800)))
         .await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (id, state) = app.start_connect(&config).await;
     app.tasks.fail(true);
 
@@ -246,18 +246,6 @@ async fn keeps_no_tokens_and_disables_the_connection_when_the_first_refresh_cann
         app.events().is_empty(),
         "an incomplete connection is not announced"
     );
-
-    // Actions refuse it: the user must connect again.
-    let action = app
-        .send(
-            "POST",
-            &format!("/v1/connected-accounts/{id}/actions/github.list_installations"),
-            Some(API_KEY),
-            None,
-            &[],
-        )
-        .await;
-    assert_eq!(action.status, StatusCode::CONFLICT);
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
@@ -285,11 +273,11 @@ async fn reports_an_active_row_missing_its_refresh_task_as_disabled(pool: PgPool
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn disables_a_connection_whose_provider_should_have_sent_a_refresh_token(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    // GitHub issues refresh tokens; an app with expiring tokens turned off sends none.
-    MockGithubNetwork::on(&app.provider)
+    // The fake provider issues refresh tokens, so an answer without one leaves nothing to refresh.
+    MockFakeNetwork::on(&app.provider)
         .answer_code_exchange(generate_token_answer_without_refresh(None))
         .await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (id, state) = app.start_connect(&config).await;
 
     let callback = app
@@ -332,7 +320,7 @@ async fn disables_a_connection_whose_provider_should_have_sent_a_refresh_token(p
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn stores_a_fixed_reason_when_the_consent_comes_back_with_an_unknown_error(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (id, state) = app.start_connect(&config).await;
     app.send(
         "GET",
@@ -386,7 +374,7 @@ async fn refuses_a_callback_without_a_state_or_with_one_never_issued(pool: PgPoo
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn fails_a_callback_that_carries_no_code(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (id, state) = app.start_connect(&config).await;
 
     let back = finishes_with(&app, &format!("state={state}")).await;
@@ -401,7 +389,7 @@ async fn fails_a_callback_that_came_after_the_consent_expired(pool: PgPool) {
         config.settings.consent.ttl_seconds = 0;
     })
     .await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (id, state) = app.start_connect(&config).await;
 
     let back = finishes_with(&app, &format!("state={state}&code=c")).await;
@@ -413,10 +401,10 @@ async fn fails_a_callback_that_came_after_the_consent_expired(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn fails_a_consent_whose_code_the_provider_refuses(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    MockGithubNetwork::on(&app.provider)
+    MockFakeNetwork::on(&app.provider)
         .answer_code_exchange_status(400, serde_json::json!({ "error": "bad_verification_code" }))
         .await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (id, state) = app.start_connect(&config).await;
 
     let back = finishes_with(&app, &format!("state={state}&code=c")).await;
@@ -428,10 +416,10 @@ async fn fails_a_consent_whose_code_the_provider_refuses(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn fails_a_consent_when_the_provider_cannot_be_reached(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    MockGithubNetwork::on(&app.provider)
+    MockFakeNetwork::on(&app.provider)
         .answer_code_exchange_status(503, serde_json::json!({}))
         .await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (id, state) = app.start_connect(&config).await;
 
     let back = finishes_with(&app, &format!("state={state}&code=c")).await;

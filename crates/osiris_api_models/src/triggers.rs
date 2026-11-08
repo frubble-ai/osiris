@@ -12,13 +12,11 @@ use utoipa::{IntoParams, ToSchema};
 pub struct CreateTrigger {
     /// `ca_…`: the connection the trigger watches through.
     pub connected_account_id: String,
-    /// What it watches: `github.on_repo_event` (a repository's webhook events) or
-    /// `github.watch_pull_request` (one pull request's changes). An open string: more kinds may
-    /// come.
+    /// What it watches: one of the connection's provider's trigger kinds, `<provider>.<kind>`,
+    /// which its provider's documentation lists. An open string: more kinds may come.
     pub trigger: String,
-    /// The kind's own configuration, which its provider validates. `github.on_repo_event`:
-    /// `{"owner", "repo", "events": ["push", …] or ["*"], "insecure_ssl"?}`.
-    /// `github.watch_pull_request`: `{"owner", "repo", "number"}`.
+    /// The kind's own configuration, which its provider validates and its documentation
+    /// describes.
     #[schema(value_type = Object)]
     pub config: Map<String, Value>,
 }
@@ -30,7 +28,7 @@ pub struct Trigger {
     pub id: String,
     pub connected_account_id: String,
     pub provider: String,
-    /// Its kind, such as `github.on_repo_event`.
+    /// Its kind, `<provider>.<kind>`.
     pub trigger: String,
     #[schema(value_type = Object)]
     pub config: Value,
@@ -38,7 +36,7 @@ pub struct Trigger {
     /// again). An open string.
     #[schema(value_type = String, example = "active")]
     pub status: TriggerStatus,
-    /// The provider's id of what osiris created there: a GitHub repository webhook's id.
+    /// The provider's id of what osiris created there, such as a webhook's id.
     pub subscription_id: Option<String>,
     /// Why it failed.
     pub last_error: Option<String>,

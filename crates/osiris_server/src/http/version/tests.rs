@@ -19,6 +19,7 @@ use osiris_events::{
     Message, MessageBus, adapters::memory::MemoryTransport,
     testing::generate_event_message::generate_event_message,
 };
+use osiris_providers::mocks::fake::FAKE_ID;
 use osiris_versioning::translate::event_down;
 use serde_json::json;
 use sqlx::PgPool;
@@ -38,7 +39,7 @@ async fn serves_an_older_release_its_own_shape_beside_the_current_one(pool: PgPo
             "POST",
             "/v1/auth-configs",
             Some(ADMIN_KEY),
-            Some(json!({ "provider": "github", "app_id": "the-app", "client_secret": "s" })),
+            Some(json!({ "provider": FAKE_ID, "app_id": "the-app", "client_secret": "s" })),
             &[("osiris-version", AMUN)],
         )
         .await;
@@ -78,7 +79,7 @@ async fn serves_a_request_naming_no_version_at_the_pinned_release_even_an_older_
     let app = setup_test_context(pool)
         .await
         .serving_pinned(MOCK_RELEASES, AMUN);
-    app.github_config().await;
+    app.fake_config().await;
 
     // No Osiris-Version: served at amun, the pin, in amun's shape and marked as superseded.
     let pinned = app
@@ -171,7 +172,7 @@ fn takes_the_spec_and_events_back_to_the_older_release() {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn brings_an_older_release_s_query_up_to_the_current_one(pool: PgPool) {
     let app = setup_test_context(pool).await.serving(MOCK_RELEASES);
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let attempt = generate_connect_attempt(&config);
     let (id, _) = app.start_connect_with(&attempt).await;
     let alias = attempt["alias"].as_str().expect("an alias");
@@ -203,8 +204,8 @@ async fn brings_an_older_release_s_query_up_to_the_current_one(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn applies_an_older_release_s_default_to_a_request_without_a_query(pool: PgPool) {
     let app = setup_test_context(pool).await.serving(MOCK_RELEASES);
-    app.github_config().await;
-    app.auth_config("linear").await;
+    app.fake_config().await;
+    app.fake_config().await;
 
     let old = app
         .send(

@@ -1,3 +1,6 @@
-//! Linear's action routes.
+//! Linear's action routes, one per action, grouped as its API is.
 
-pub mod list_teams;
+pub mod router;
+pub mod teams;
+
+pub use router::router;

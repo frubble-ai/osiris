@@ -1,10 +1,11 @@
 //! What a client is refused, and with which code: no key, a wrong key, the API key on an admin
 //! route, an unknown version, an unknown provider, a missing field, and an id that isn't there.
 
+use crate::testing::TestContext;
 use crate::testing::golden::{GoldenSession, Key};
 use serde_json::json;
 
-pub async fn run(session: &mut GoldenSession<'_>) {
+pub async fn run(_app: &TestContext, session: &mut GoldenSession<'_>) {
     session
         .send("GET", "/v1/connected-accounts", Key::None, None, &[])
         .await;
@@ -51,3 +52,5 @@ pub async fn run(session: &mut GoldenSession<'_>) {
         )
         .await;
 }
+
+golden!("refusals", run);

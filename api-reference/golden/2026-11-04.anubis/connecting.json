@@ -3,11 +3,13 @@
     {
       "answer": {
         "body": {
-          "client_id": "golden-github-app",
+          "client_id": "golden-app",
           "created_at": "<time>",
+          "has_secret_settings": false,
           "id": "<ac_1>",
-          "provider": "github",
+          "provider": "fake",
           "scopes": [],
+          "settings": {},
           "updated_at": "<time>"
         },
         "headers": {
@@ -19,9 +21,9 @@
       "events": [],
       "request": {
         "body": {
-          "client_id": "golden-github-app",
-          "client_secret": "golden-github-secret",
-          "provider": "github"
+          "client_id": "golden-app",
+          "client_secret": "golden-secret",
+          "provider": "fake"
         },
         "headers": [],
         "key": "admin",
@@ -33,7 +35,7 @@
       "answer": {
         "body": {
           "id": "<ca_1>",
-          "redirect_url": "<provider>/login/oauth/authorize?response_type=code&client_id=golden-github-app&redirect_uri=http%3A%2F%2Fosiris.test%2Foauth%2Fcallback&state=<random>",
+          "redirect_url": "<provider>/fake/oauth/authorize?response_type=code&client_id=golden-app&redirect_uri=http%3A%2F%2Fosiris.test%2Foauth%2Fcallback&state=<random>",
           "status": "pending"
         },
         "headers": {
@@ -90,12 +92,14 @@
           "alias": "golden",
           "auth_config_id": "<ac_1>",
           "created_at": "<time>",
+          "credential_kind": "oauth",
           "id": "<ca_1>",
+          "installation_id": null,
           "last_error": null,
-          "provider": "github",
+          "provider": "fake",
           "refresh_task": "<random>",
           "refresh_task_at": "<time>",
-          "scope": "repo",
+          "scope": "read",
           "setup_complete": true,
           "status": "active",
           "updated_at": "<time>",
@@ -125,12 +129,14 @@
               "alias": "golden",
               "auth_config_id": "<ac_1>",
               "created_at": "<time>",
+              "credential_kind": "oauth",
               "id": "<ca_1>",
+              "installation_id": null,
               "last_error": null,
-              "provider": "github",
+              "provider": "fake",
               "refresh_task": "<random>",
               "refresh_task_at": "<time>",
-              "scope": "repo",
+              "scope": "read",
               "setup_complete": true,
               "status": "active",
               "updated_at": "<time>",
@@ -162,12 +168,14 @@
           "alias": "golden",
           "auth_config_id": "<ac_1>",
           "created_at": "<time>",
+          "credential_kind": "oauth",
           "id": "<ca_1>",
+          "installation_id": null,
           "last_error": null,
-          "provider": "github",
+          "provider": "fake",
           "refresh_task": "<random>",
           "refresh_task_at": "<time>",
-          "scope": "repo",
+          "scope": "read",
           "setup_complete": true,
           "status": "active",
           "updated_at": "<time>",

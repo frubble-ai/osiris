@@ -1,4 +1,4 @@
-//! GitHub's action routes, one per action, grouped as GitHub's API is.
+//! GitHub's action routes, one per action, grouped as its API is.
 
 pub mod activity;
 pub mod checks;

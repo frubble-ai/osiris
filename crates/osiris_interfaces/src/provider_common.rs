@@ -16,7 +16,7 @@ pub trait ProviderCommon: Send + Sync {
     fn base_url(&self) -> &Url;
 
     /// Whether a granted scope covers a `required` one: the same scope by default. A provider whose
-    /// scopes nest (GitHub's `repo` covers `repo:status`) overrides it.
+    /// scopes nest (one covering narrower ones) overrides it.
     fn scope_covers(&self, granted: &str, required: &str) -> bool {
         granted == required
     }

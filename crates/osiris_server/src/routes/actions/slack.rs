@@ -1,3 +1,6 @@
-//! Slack's action routes.
+//! Slack's action routes, one per action, grouped as its API is.
 
-pub mod list_channels;
+pub mod conversations;
+pub mod router;
+
+pub use router::router;

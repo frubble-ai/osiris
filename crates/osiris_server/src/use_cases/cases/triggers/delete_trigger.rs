@@ -12,6 +12,7 @@ use crate::use_cases::{
 };
 use osiris_common::secret::{ExposeSecret, Secret};
 use osiris_domain::DomainError;
+use osiris_interfaces::ActingAs;
 
 pub struct DeleteTriggerArgs<'a> {
     pub id: &'a str,
@@ -39,7 +40,8 @@ impl UseCases {
                         provider: &account.provider,
                         action: kind,
                         required_scopes: &[],
-                        call: |token: Secret| async move {
+                        user_only: false,
+                        call: |token: Secret, _acting: ActingAs| async move {
                             implementation
                                 .unsubscribe_trigger(
                                     http,

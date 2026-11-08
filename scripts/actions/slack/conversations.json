@@ -1,0 +1,11 @@
+[
+ {
+  "group": "conversations",
+  "name": "list_channels",
+  "input": "ListChannels",
+  "output": "SlackChannel",
+  "list": true,
+  "no_input": true,
+  "summary": "every public and private channel the connected user can see, archived ones left out."
+ }
+]

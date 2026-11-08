@@ -8,9 +8,8 @@
 
 use crate::testing::{ADMIN_KEY, setup_test_context};
 use axum::http::StatusCode;
-use osiris_providers::{
-    github::mocks::MockGithubNetwork,
-    mocks::generate_token_answer::generate_token_answer_without_refresh,
+use osiris_providers::mocks::{
+    fake::MockFakeNetwork, generate_token_answer::generate_token_answer_without_refresh,
 };
 use sqlx::PgPool;
 
@@ -35,7 +34,7 @@ async fn refuses_to_refresh_an_unknown_connection(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_to_refresh_a_connection_that_is_not_complete(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (pending, _) = app.start_connect(&config).await;
 
     let answer = app
@@ -57,10 +56,10 @@ async fn refuses_to_refresh_a_disabled_connection_whose_provider_sent_no_refresh
     pool: PgPool,
 ) {
     let app = setup_test_context(pool).await;
-    MockGithubNetwork::on(&app.provider)
+    MockFakeNetwork::on(&app.provider)
         .answer_code_exchange(generate_token_answer_without_refresh(None))
         .await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (id, state) = app.start_connect(&config).await;
     let back = app.come_back(&format!("state={state}&code=c")).await;
     assert!(back.contains("status=disabled"), "{back}");

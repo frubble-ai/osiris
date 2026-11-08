@@ -3775,7 +3775,7 @@ export const githubUpdateRepository = <ThrowOnError extends boolean = false>(opt
 });
 
 /**
- * The Linear teams the connected user can see.
+ * Every team the connected user can see, archived ones left out.
  */
 export const linearListTeams = <ThrowOnError extends boolean = false>(options: Options<LinearListTeamsData, ThrowOnError>): RequestResult<LinearListTeamsResponses, LinearListTeamsErrors, ThrowOnError> => (options.client ?? client).post<LinearListTeamsResponses, LinearListTeamsErrors, ThrowOnError>({
     requestValidator: async (data) => await z.object({
@@ -3795,7 +3795,7 @@ export const linearListTeams = <ThrowOnError extends boolean = false>(options: O
 });
 
 /**
- * The Slack channels the connected user can see, archived ones left out.
+ * Every public and private channel the connected user can see, archived ones left out.
  */
 export const slackListChannels = <ThrowOnError extends boolean = false>(options: Options<SlackListChannelsData, ThrowOnError>): RequestResult<SlackListChannelsResponses, SlackListChannelsErrors, ThrowOnError> => (options.client ?? client).post<SlackListChannelsResponses, SlackListChannelsErrors, ThrowOnError>({
     requestValidator: async (data) => await z.object({
@@ -3879,7 +3879,7 @@ export const listTriggers = <ThrowOnError extends boolean = false>(options?: Opt
 });
 
 /**
- * Create a trigger: osiris subscribes at the connection's provider (a GitHub repository webhook)
+ * Create a trigger: osiris subscribes at the connection's provider (a webhook, for example)
  * and publishes each delivery as a `trigger.fired` event.
  */
 export const createTrigger = <ThrowOnError extends boolean = false>(options: Options<CreateTriggerData, ThrowOnError>): RequestResult<CreateTriggerResponses, CreateTriggerErrors, ThrowOnError> => (options.client ?? client).post<CreateTriggerResponses, CreateTriggerErrors, ThrowOnError>({
@@ -3904,7 +3904,7 @@ export const createTrigger = <ThrowOnError extends boolean = false>(options: Opt
 });
 
 /**
- * Delete a trigger: its subscription is removed at the provider (a GitHub repository webhook)
+ * Delete a trigger: its subscription is removed at the provider (a webhook, for example)
  * when its connection still reaches it, and it is deleted either way.
  */
 export const deleteTrigger = <ThrowOnError extends boolean = false>(options: Options<DeleteTriggerData, ThrowOnError>): RequestResult<DeleteTriggerResponses, DeleteTriggerErrors, ThrowOnError> => (options.client ?? client).delete<DeleteTriggerResponses, DeleteTriggerErrors, ThrowOnError>({

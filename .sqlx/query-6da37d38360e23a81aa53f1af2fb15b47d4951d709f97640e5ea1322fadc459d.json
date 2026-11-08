@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO provider (key) SELECT unnest($1::text[]) ON CONFLICT (key) DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "TextArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6da37d38360e23a81aa53f1af2fb15b47d4951d709f97640e5ea1322fadc459d"
+}

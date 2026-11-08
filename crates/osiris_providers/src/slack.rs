@@ -2,10 +2,11 @@
 //! user's), and reads with it. Endpoints as in `OpenConnector` v1.9.4 (Apache-2.0),
 //! `src/providers/slack/definition.ts`. Slack's Web API answers `ok: false` beside a 200.
 
-pub mod list_channels;
+pub mod conversations;
 #[cfg(any(test, feature = "testing"))]
 pub mod mocks;
 pub mod provider;
+pub mod registration;
 pub mod revoke;
 pub mod transformers;
 pub mod types;

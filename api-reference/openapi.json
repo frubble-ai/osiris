@@ -4319,7 +4319,7 @@
             "type": "string"
           },
           "provider": {
-            "description": "A provider osiris implements: `github`, `linear` or `slack`.",
+            "description": "A provider osiris implements, by its id.",
             "type": "string"
           },
           "scopes": {
@@ -4329,14 +4329,14 @@
             "type": "array"
           },
           "secret_settings": {
-            "description": "The provider's own secret settings for the app, never answered. A GitHub app that acts as\nits installations puts its App's private key here: `{\"private_key\": \"-----BEGIN …\"}`.",
+            "description": "The provider's own secret settings for the app, never answered. An app that acts as its\ninstallations puts the key it signs with here, as its provider's documentation says.",
             "type": [
               "object",
               "null"
             ]
           },
           "settings": {
-            "description": "The provider's own settings for the app, which it validates; answered back. A GitHub app\nthat acts as its installations names its App id here: `{\"app_id\": \"12345\"}`.",
+            "description": "The provider's own settings for the app, which it validates; answered back. An app that\nacts as its installations names itself here, as its provider's documentation says.",
             "type": "object"
           }
         },
@@ -4455,7 +4455,7 @@
             ]
           },
           "installation_id": {
-            "description": "Connect as this installation of the auth config's app instead of through a user's\nconsent (a GitHub App's installation id): no browser, active at once. The auth config\nmust hold the app's credentials in its settings.",
+            "description": "Connect as this installation of the auth config's app instead of through a user's\nconsent (the provider's id for the installation): no browser, active at once. The auth config\nmust hold the app's credentials in its settings.",
             "type": [
               "string",
               "null"
@@ -5092,7 +5092,7 @@
         "additionalProperties": false,
         "properties": {
           "config": {
-            "description": "The kind's own configuration, which its provider validates. `github.on_repo_event`:\n`{\"owner\", \"repo\", \"events\": [\"push\", …] or [\"*\"], \"insecure_ssl\"?}`.\n`github.watch_pull_request`: `{\"owner\", \"repo\", \"number\"}`.",
+            "description": "The kind's own configuration, which its provider validates and its documentation\ndescribes.",
             "type": "object"
           },
           "connected_account_id": {
@@ -5100,7 +5100,7 @@
             "type": "string"
           },
           "trigger": {
-            "description": "What it watches: `github.on_repo_event` (a repository's webhook events) or\n`github.watch_pull_request` (one pull request's changes). An open string: more kinds may\ncome.",
+            "description": "What it watches: one of the connection's provider's trigger kinds, `<provider>.<kind>`,\nwhich its provider's documentation lists. An open string: more kinds may come.",
             "type": "string"
           }
         },
@@ -11206,14 +11206,14 @@
                   "type": "string"
                 },
                 "subscription_id": {
-                  "description": "The provider's id of what osiris created there: a GitHub repository webhook's id.",
+                  "description": "The provider's id of what osiris created there, such as a webhook's id.",
                   "type": [
                     "string",
                     "null"
                   ]
                 },
                 "trigger": {
-                  "description": "Its kind, such as `github.on_repo_event`.",
+                  "description": "Its kind, `<provider>.<kind>`.",
                   "type": "string"
                 },
                 "updated_at": {
@@ -12415,14 +12415,14 @@
             "type": "string"
           },
           "subscription_id": {
-            "description": "The provider's id of what osiris created there: a GitHub repository webhook's id.",
+            "description": "The provider's id of what osiris created there, such as a webhook's id.",
             "type": [
               "string",
               "null"
             ]
           },
           "trigger": {
-            "description": "Its kind, such as `github.on_repo_event`.",
+            "description": "Its kind, `<provider>.<kind>`.",
             "type": "string"
           },
           "updated_at": {
@@ -12448,14 +12448,14 @@
             "type": "string"
           },
           "data": {
-            "description": "What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape:\n`github.on_repo_event` carries `event` (GitHub's event name), `delivery_id` and `payload`\n(GitHub's own); `github.watch_pull_request` carries `pull_request` and `version`.",
+            "description": "What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape,\nwhich its provider's documentation describes.",
             "type": [
               "object",
               "null"
             ]
           },
           "trigger": {
-            "description": "The trigger's kind, such as `github.on_repo_event`, on a `trigger.fired` event.",
+            "description": "The trigger's kind, `<provider>.<kind>`, on a `trigger.fired` event.",
             "type": [
               "string",
               "null"
@@ -37240,6 +37240,15 @@
             },
             "description": "A missing or wrong key"
           },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
           "404": {
             "content": {
               "application/json": {
@@ -37315,7 +37324,7 @@
             "api_key": []
           }
         ],
-        "summary": "The Linear teams the connected user can see.",
+        "summary": "Every team the connected user can see, archived ones left out.",
         "tags": [
           "actions"
         ]
@@ -37376,6 +37385,15 @@
             },
             "description": "A missing or wrong key"
           },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
           "404": {
             "content": {
               "application/json": {
@@ -37451,7 +37469,7 @@
             "api_key": []
           }
         ],
-        "summary": "The Slack channels the connected user can see, archived ones left out.",
+        "summary": "Every public and private channel the connected user can see, archived ones left out.",
         "tags": [
           "actions"
         ]
@@ -37941,7 +37959,7 @@
             "api_key": []
           }
         ],
-        "summary": "Create a trigger: osiris subscribes at the connection's provider (a GitHub repository webhook)\nand publishes each delivery as a `trigger.fired` event.",
+        "summary": "Create a trigger: osiris subscribes at the connection's provider (a webhook, for example)\nand publishes each delivery as a `trigger.fired` event.",
         "tags": [
           "triggers"
         ]
@@ -38060,7 +38078,7 @@
             "api_key": []
           }
         ],
-        "summary": "Delete a trigger: its subscription is removed at the provider (a GitHub repository webhook)\nwhen its connection still reaches it, and it is deleted either way.",
+        "summary": "Delete a trigger: its subscription is removed at the provider (a webhook, for example)\nwhen its connection still reaches it, and it is deleted either way.",
         "tags": [
           "triggers"
         ]

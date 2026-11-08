@@ -2,31 +2,34 @@
 
 use crate::use_cases::{
     UseCaseResult, UseCases,
-    cases::{
-        github::github_action_args::GithubActionArgs,
-        run_connected_account_action::RunConnectedAccountActionArgs,
-    },
+    cases::run_connected_account_action::RunConnectedAccountActionArgs,
+    lib::shared::{action_args::ActionArgs, provider_of::provider_of},
 };
 use osiris_common::secret::{ExposeSecret, Secret};
-use osiris_providers::github::{activity::ListAuthenticatedUserReceivedEvents, types::GithubEvent};
+use osiris_interfaces::ActingAs;
+use osiris_providers::github::{
+    Github, activity::ListAuthenticatedUserReceivedEvents, types::GithubEvent,
+};
 
 impl UseCases {
     /// Runs `github.list_authenticated_user_received_events` through the connection, refused first when it lacks
     /// [`ListAuthenticatedUserReceivedEvents::SCOPES`].
     pub async fn github_list_authenticated_user_received_events(
         &self,
-        args: GithubActionArgs<'_, ListAuthenticatedUserReceivedEvents>,
+        args: ActionArgs<'_, ListAuthenticatedUserReceivedEvents>,
     ) -> UseCaseResult<Vec<GithubEvent>> {
         self.run("github_list_authenticated_user_received_events", async {
             let ctx = self.context();
-            let (github, http, input) = (&ctx.providers.github, &ctx.http, args.input);
+            let provider = provider_of::<Github>(&ctx.providers)?;
+            let (http, input) = (&ctx.http, args.input);
             self.run_connected_account_action(RunConnectedAccountActionArgs {
                 id: args.id,
                 provider: "github",
                 action: "github.list_authenticated_user_received_events",
                 required_scopes: ListAuthenticatedUserReceivedEvents::SCOPES,
-                call: move |token: Secret| async move {
-                    github
+                user_only: false,
+                call: move |token: Secret, _acting: ActingAs| async move {
+                    provider
                         .list_authenticated_user_received_events(http, token.expose_secret(), input)
                         .await
                 },

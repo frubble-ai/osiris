@@ -2,14 +2,13 @@
 
 use crate::use_cases::{
     UseCaseResult, UseCases,
-    cases::{
-        github::github_action_args::GithubActionArgs,
-        run_connected_account_action::RunConnectedAccountActionArgs,
-    },
+    cases::run_connected_account_action::RunConnectedAccountActionArgs,
+    lib::shared::{action_args::ActionArgs, provider_of::provider_of},
 };
 use osiris_common::secret::{ExposeSecret, Secret};
+use osiris_interfaces::ActingAs;
 use osiris_providers::github::{
-    pull_requests::RequestPullRequestReviewers, types::GithubReviewRequest,
+    Github, pull_requests::RequestPullRequestReviewers, types::GithubReviewRequest,
 };
 
 impl UseCases {
@@ -17,18 +16,20 @@ impl UseCases {
     /// [`RequestPullRequestReviewers::SCOPES`].
     pub async fn github_request_pull_request_reviewers(
         &self,
-        args: GithubActionArgs<'_, RequestPullRequestReviewers>,
+        args: ActionArgs<'_, RequestPullRequestReviewers>,
     ) -> UseCaseResult<GithubReviewRequest> {
         self.run("github_request_pull_request_reviewers", async {
             let ctx = self.context();
-            let (github, http, input) = (&ctx.providers.github, &ctx.http, args.input);
+            let provider = provider_of::<Github>(&ctx.providers)?;
+            let (http, input) = (&ctx.http, args.input);
             self.run_connected_account_action(RunConnectedAccountActionArgs {
                 id: args.id,
                 provider: "github",
                 action: "github.request_pull_request_reviewers",
                 required_scopes: RequestPullRequestReviewers::SCOPES,
-                call: move |token: Secret| async move {
-                    github
+                user_only: false,
+                call: move |token: Secret, _acting: ActingAs| async move {
+                    provider
                         .request_pull_request_reviewers(http, token.expose_secret(), input)
                         .await
                 },

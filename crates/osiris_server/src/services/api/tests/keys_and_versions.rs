@@ -2,6 +2,7 @@
 
 use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
+use osiris_providers::mocks::fake::FAKE_ID;
 use serde_json::{Value, json};
 use sqlx::PgPool;
 
@@ -65,7 +66,7 @@ async fn keeps_an_auth_config_change_behind_the_admin_key(
     body: Option<Value>,
 ) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let path = path.replace("{config}", &config);
     let before = app
         .send(
@@ -101,7 +102,7 @@ async fn keeps_creating_an_auth_config_behind_the_admin_key(pool: PgPool) {
         pool,
         "POST",
         "/v1/auth-configs",
-        Some(json!({ "provider": "github", "client_id": "c", "client_secret": "s" })),
+        Some(json!({ "provider": FAKE_ID, "client_id": "c", "client_secret": "s" })),
     )
     .await;
 }

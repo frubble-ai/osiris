@@ -2,6 +2,7 @@
 //! adapters, and the API and worker routers over those use cases.
 
 use super::test_config::build_test_config;
+use crate::db::register_providers::register_providers;
 use crate::use_cases::{build_message_bus::build_message_bus, lib::database::Db};
 use crate::{
     config::Config,
@@ -15,7 +16,9 @@ use osiris_common::{
     secret::{ExposeSecret, secret},
 };
 use osiris_events::adapters::memory::MemoryTransport;
-use osiris_providers::{ProviderUrls, Providers};
+use osiris_providers::{
+    ProviderUrls, Providers, REGISTRATIONS, Registration, mocks::fake::FAKE_REGISTRATION,
+};
 use osiris_tasks::adapters::{bearer::BearerAuthenticator, memory::MemoryScheduler};
 use osiris_versioning::Release;
 use sqlx::PgPool;
@@ -86,14 +89,19 @@ pub async fn setup_test_context_with(
 ) -> TestContext {
     let provider = MockServer::start().await;
     let base = Url::parse(&provider.uri()).expect("the fake's URL");
-    let urls = ProviderUrls {
-        oauth_base: base.clone(),
-        api_base: base.clone(),
-    };
-    let slack = ProviderUrls {
-        oauth_base: base.clone(),
-        api_base: base.join("/api/").expect("Slack's API path"),
-    };
+    // Every registered provider, and the fake one the shared tests run against.
+    let registrations: Vec<&Registration> = REGISTRATIONS
+        .iter()
+        .copied()
+        .chain([&FAKE_REGISTRATION])
+        .collect();
+    let ids: Vec<&str> = registrations
+        .iter()
+        .map(|registration| registration.id)
+        .collect();
+    register_providers(&mut pool.acquire().await.expect("a connection"), &ids)
+        .await
+        .expect("the providers' rows");
     let mut config = build_test_config();
     configure(&mut config);
     let config = Arc::new(config);
@@ -114,8 +122,12 @@ pub async fn setup_test_context_with(
         .expect("the fixture's pin is a release osiris serves"),
         tasks: tasks.clone(),
         providers: Arc::new(
-            Providers::new(&urls, &urls, &slack, settings.providers.listing.limits())
-                .expect("the fake's URLs"),
+            Providers::of(
+                &registrations,
+                |registration| at_the_fake(&base, registration),
+                settings.providers.listing.limits(),
+            )
+            .expect("the fake's URLs"),
         ),
         http: reqwest::Client::new(),
         installation_tokens: Arc::default(),
@@ -142,4 +154,14 @@ pub async fn setup_test_context_with(
         draining,
         releases: osiris_versioning::RELEASES,
     }
+}
+
+/// `registration`'s provider at the fake network, its API at the same path as by default (an API
+/// whose methods join onto a path keeps it).
+fn at_the_fake(base: &Url, registration: &Registration) -> Result<ProviderUrls, url::ParseError> {
+    let api_path = Url::parse(registration.api_base_url)?;
+    Ok(ProviderUrls {
+        oauth_base: base.clone(),
+        api_base: base.join(api_path.path())?,
+    })
 }

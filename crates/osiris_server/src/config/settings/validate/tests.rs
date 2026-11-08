@@ -1,6 +1,7 @@
 //! `validate` refuses each setting that can't work, naming it.
 
-use super::super::Settings;
+use super::super::{Settings, providers::ProviderUrlSettings};
+use osiris_providers::REGISTRATIONS;
 use rstest::rstest;
 
 fn broken(change: impl FnOnce(&mut Settings)) -> String {
@@ -44,10 +45,6 @@ fn accepts_more_concurrent_tasks_than_connections() {
     |settings: &mut Settings| settings.api.support_days = 999_999_999_999_999
 )]
 #[case::an_unknown_api_version("api.pinned_version", |settings: &mut Settings| settings.api.pinned_version = "1999-01-01.nope".into())]
-#[case::a_provider_url_that_is_not_a_url(
-    "providers.github",
-    |settings: &mut Settings| settings.providers.github.api_base_url = "not a url".into()
-)]
 fn refuses_a_setting_that_cannot_work_naming_it(
     #[case] name: &str,
     #[case] change: fn(&mut Settings),
@@ -63,4 +60,32 @@ fn saturates_a_support_window_too_long_to_compute_instead_of_overflowing() {
     settings.api.support_days = u64::MAX;
 
     assert_eq!(settings.api.support(), time::Duration::MAX);
+}
+
+#[test]
+fn refuses_a_provider_url_that_is_not_a_url_naming_its_provider() {
+    let id = REGISTRATIONS[0].id;
+    let error = broken(|settings| {
+        settings.providers.at.insert(
+            id.to_owned(),
+            ProviderUrlSettings {
+                oauth_base_url: None,
+                api_base_url: Some("not a url".into()),
+            },
+        );
+    });
+
+    assert!(error.contains(&format!("providers.{id}")), "{error}");
+}
+
+#[test]
+fn refuses_a_section_that_is_no_provider() {
+    let error = broken(|settings| {
+        settings
+            .providers
+            .at
+            .insert("listng".into(), ProviderUrlSettings::default());
+    });
+
+    assert!(error.contains("providers.listng"), "{error}");
 }

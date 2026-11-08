@@ -151,7 +151,7 @@ def check_transcripts(base, release, failures, removed):
 
 
 def summary(text):
-    """Prints `text`, and adds it to the job's summary on GitHub."""
+    """Prints `text`, and adds it to the CI job's summary."""
     print(text)
     target = os.environ.get("GITHUB_STEP_SUMMARY")
     if target:

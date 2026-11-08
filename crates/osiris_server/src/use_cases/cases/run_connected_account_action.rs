@@ -14,7 +14,7 @@ use crate::use_cases::{
 };
 use osiris_common::secret::Secret;
 use osiris_domain::{ConnectionStatus, CredentialKind, DomainError};
-use osiris_interfaces::ProviderError;
+use osiris_interfaces::{ActingAs, ProviderError};
 
 pub struct RunConnectedAccountActionArgs<'a, F> {
     pub id: &'a str,
@@ -22,7 +22,9 @@ pub struct RunConnectedAccountActionArgs<'a, F> {
     pub action: &'a str,
     /// The scopes the action needs, checked before the call.
     pub required_scopes: &'a [&'a str],
-    /// The provider call, given the token.
+    /// The action only works as a user: refused on an installation connection before the call.
+    pub user_only: bool,
+    /// The provider call, given the token and what it acts as.
     pub call: F,
 }
 
@@ -32,7 +34,7 @@ impl UseCases {
         args: RunConnectedAccountActionArgs<'_, F>,
     ) -> UseCaseResult<T>
     where
-        F: Fn(Secret) -> Fut,
+        F: Fn(Secret, ActingAs) -> Fut,
         Fut: Future<Output = Result<T, ProviderError>>,
     {
         self.run("run_connected_account_action", async {
@@ -41,17 +43,19 @@ impl UseCases {
                 provider: provider_id,
                 action,
                 required_scopes,
+                user_only,
                 call,
             } = args;
-            let token = self
+            let (token, acting) = self
                 .connected_account_token(ConnectedAccountTokenArgs {
                     id,
                     provider: provider_id,
                     action,
                     required_scopes,
+                    user_only,
                 })
                 .await?;
-            let first = match call(token).await {
+            let first = match call(token, acting).await {
                 Ok(answer) => return Ok(answer),
                 Err(ProviderError::Unauthorized { message, .. }) => message,
                 Err(error) => return Err(provider(error)),
@@ -67,15 +71,16 @@ impl UseCases {
                         .installation_tokens
                         .forget(&current.auth_config_id, installation_id);
                 }
-                let token = self
+                let (token, acting) = self
                     .connected_account_token(ConnectedAccountTokenArgs {
                         id,
                         provider: provider_id,
                         action,
                         required_scopes,
+                        user_only,
                     })
                     .await?;
-                return match call(token).await {
+                return match call(token, acting).await {
                     Ok(answer) => Ok(answer),
                     Err(ProviderError::Unauthorized { message, .. }) => {
                         self.revoke_connected_account(RevokeConnectedAccountArgs {
@@ -108,7 +113,7 @@ impl UseCases {
                     .await?;
                 return Err(DomainError::NotActive("expired").into());
             };
-            match call(tokens.access_token).await {
+            match call(tokens.access_token, ActingAs::User).await {
                 Ok(answer) => Ok(answer),
                 Err(ProviderError::Unauthorized { message, .. }) => {
                     self.revoke_connected_account(RevokeConnectedAccountArgs {

@@ -1552,20 +1552,20 @@ export type CreateAuthConfig = {
     client_id: string;
     client_secret: string;
     /**
-     * A provider osiris implements: `github`, `linear` or `slack`.
+     * A provider osiris implements, by its id.
      */
     provider: string;
     scopes?: Array<string>;
     /**
-     * The provider's own secret settings for the app, never answered. A GitHub app that acts as
-     * its installations puts its App's private key here: `{"private_key": "-----BEGIN …"}`.
+     * The provider's own secret settings for the app, never answered. An app that acts as its
+     * installations puts the key it signs with here, as its provider's documentation says.
      */
     secret_settings?: {
         [key: string]: unknown;
     } | null;
     /**
-     * The provider's own settings for the app, which it validates; answered back. A GitHub app
-     * that acts as its installations names its App id here: `{"app_id": "12345"}`.
+     * The provider's own settings for the app, which it validates; answered back. An app that
+     * acts as its installations names itself here, as its provider's documentation says.
      */
     settings?: {
         [key: string]: unknown;
@@ -1629,7 +1629,7 @@ export type CreateConnectedAccount = {
     callback_url?: string | null;
     /**
      * Connect as this installation of the auth config's app instead of through a user's
-     * consent (a GitHub App's installation id): no browser, active at once. The auth config
+     * consent (the provider's id for the installation): no browser, active at once. The auth config
      * must hold the app's credentials in its settings.
      */
     installation_id?: string | null;
@@ -1893,9 +1893,8 @@ export type CreateRepository = {
 
 export type CreateTrigger = {
     /**
-     * The kind's own configuration, which its provider validates. `github.on_repo_event`:
-     * `{"owner", "repo", "events": ["push", …] or ["*"], "insecure_ssl"?}`.
-     * `github.watch_pull_request`: `{"owner", "repo", "number"}`.
+     * The kind's own configuration, which its provider validates and its documentation
+     * describes.
      */
     config: {
         [key: string]: unknown;
@@ -1905,9 +1904,8 @@ export type CreateTrigger = {
      */
     connected_account_id: string;
     /**
-     * What it watches: `github.on_repo_event` (a repository's webhook events) or
-     * `github.watch_pull_request` (one pull request's changes). An open string: more kinds may
-     * come.
+     * What it watches: one of the connection's provider's trigger kinds, `<provider>.<kind>`,
+     * which its provider's documentation lists. An open string: more kinds may come.
      */
     trigger: string;
 };
@@ -4321,11 +4319,11 @@ export type ListTrigger = {
          */
         status: string;
         /**
-         * The provider's id of what osiris created there: a GitHub repository webhook's id.
+         * The provider's id of what osiris created there, such as a webhook's id.
          */
         subscription_id?: string | null;
         /**
-         * Its kind, such as `github.on_repo_event`.
+         * Its kind, `<provider>.<kind>`.
          */
         trigger: string;
         updated_at: string;
@@ -4863,11 +4861,11 @@ export type Trigger = {
      */
     status: string;
     /**
-     * The provider's id of what osiris created there: a GitHub repository webhook's id.
+     * The provider's id of what osiris created there, such as a webhook's id.
      */
     subscription_id?: string | null;
     /**
-     * Its kind, such as `github.on_repo_event`.
+     * Its kind, `<provider>.<kind>`.
      */
     trigger: string;
     updated_at: string;
@@ -4876,15 +4874,14 @@ export type Trigger = {
 export type TriggerEvent = {
     connected_account_id: string;
     /**
-     * What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape:
-     * `github.on_repo_event` carries `event` (GitHub's event name), `delivery_id` and `payload`
-     * (GitHub's own); `github.watch_pull_request` carries `pull_request` and `version`.
+     * What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape,
+     * which its provider's documentation describes.
      */
     data?: {
         [key: string]: unknown;
     } | null;
     /**
-     * The trigger's kind, such as `github.on_repo_event`, on a `trigger.fired` event.
+     * The trigger's kind, `<provider>.<kind>`, on a `trigger.fired` event.
      */
     trigger?: string | null;
     /**
@@ -13803,6 +13800,7 @@ export type LinearListTeamsErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    403: ErrorBody;
     404: ErrorBody;
     /**
      * The request took longer than the server waits
@@ -13857,6 +13855,7 @@ export type SlackListChannelsErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    403: ErrorBody;
     404: ErrorBody;
     /**
      * The request took longer than the server waits

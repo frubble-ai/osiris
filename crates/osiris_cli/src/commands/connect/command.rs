@@ -7,7 +7,7 @@ use clap::Args;
 
 #[derive(Args)]
 pub struct Connect {
-    /// `github`, `linear` or `slack`.
+    /// The provider's id, as its auth configs name it.
     provider: String,
     /// Who the connection is for (your own id for them).
     #[arg(long)]

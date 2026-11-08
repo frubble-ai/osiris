@@ -17,7 +17,7 @@ pub struct CreateConnectedAccount {
     /// `status` added to its query. Required for a consent; left out with `installation_id`.
     pub callback_url: Option<String>,
     /// Connect as this installation of the auth config's app instead of through a user's
-    /// consent (a GitHub App's installation id): no browser, active at once. The auth config
+    /// consent (the provider's id for the installation): no browser, active at once. The auth config
     /// must hold the app's credentials in its settings.
     pub installation_id: Option<String>,
 }

@@ -16,6 +16,13 @@ pub enum ProviderError {
         /// The HTTP status it answered, when the refusal came as one.
         status: Option<u16>,
     },
+    /// The input can't be sent as given, such as a field the connection's kind of token can't
+    /// use. Nothing was sent.
+    #[error("{provider} can't take the input: {message}")]
+    Invalid {
+        provider: &'static str,
+        message: String,
+    },
     /// The provider could not be reached, or answered something we could not read.
     #[error("{provider} failed: {message}")]
     Unavailable {
@@ -58,6 +65,13 @@ impl ProviderError {
         match self {
             Self::Refused { status, .. } => *status,
             _ => None,
+        }
+    }
+
+    pub fn invalid(provider: &'static str, message: impl Into<String>) -> Self {
+        Self::Invalid {
+            provider,
+            message: message.into(),
         }
     }
 

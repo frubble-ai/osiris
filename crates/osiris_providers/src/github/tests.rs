@@ -14,7 +14,7 @@ use super::{
         generate_github_repository::generate_github_repository,
     },
 };
-use crate::{ListLimits, OAuthClient, Provider, ProviderError, ProviderUrls};
+use crate::{ActingAs, ListLimits, OAuthClient, Provider, ProviderError, ProviderUrls};
 use rstest::rstest;
 use url::Url;
 use wiremock::MockServer;
@@ -121,7 +121,12 @@ async fn lists_every_repository_once_across_installations_and_pages() {
         .await;
 
     let repositories = github(&server, LIMITS)
-        .list_repositories(&reqwest::Client::new(), "token", &ListRepositories {})
+        .list_repositories(
+            &reqwest::Client::new(),
+            "token",
+            &ListRepositories {},
+            ActingAs::User,
+        )
         .await
         .unwrap();
 
@@ -133,6 +138,33 @@ async fn lists_every_repository_once_across_installations_and_pages() {
             .count(),
         1
     );
+}
+
+#[tokio::test]
+async fn reads_an_installation_s_own_repositories_on_an_installation_connection() {
+    let server = MockServer::start().await;
+    MockGithubNetwork::on(&server)
+        .answer(
+            "GET",
+            "/installation/repositories",
+            &[("per_page", "100"), ("page", "1")],
+            200,
+            serde_json::json!({ "total_count": 1, "repositories": [generate_github_repository(8)] }),
+        )
+        .await;
+
+    let repositories = github(&server, LIMITS)
+        .list_repositories(
+            &reqwest::Client::new(),
+            "token",
+            &ListRepositories {},
+            ActingAs::Installation,
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(repositories.len(), 1);
+    assert_eq!(repositories[0].id, "8");
 }
 
 #[tokio::test]
@@ -156,7 +188,12 @@ async fn stops_reading_repositories_at_the_cap() {
             max_log_bytes: 262_144,
         },
     )
-    .list_repositories(&reqwest::Client::new(), "token", &ListRepositories {})
+    .list_repositories(
+        &reqwest::Client::new(),
+        "token",
+        &ListRepositories {},
+        ActingAs::User,
+    )
     .await
     .unwrap();
 

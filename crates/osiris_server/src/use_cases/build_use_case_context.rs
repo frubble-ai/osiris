@@ -23,12 +23,9 @@ use std::{sync::Arc, time::Duration};
 pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCaseContext> {
     let settings = &config.settings;
     let master = MasterKey::from_secret(config.encryption_key.expose_secret())?;
-    let providers = &settings.providers;
     let providers = Providers::new(
-        &providers.github.urls()?,
-        &providers.linear.urls()?,
-        &providers.slack.urls()?,
-        providers.listing.limits(),
+        |registration| settings.providers.urls(registration),
+        settings.providers.listing.limits(),
     )?;
     // The three connections are independent, so a cold start opens them at once.
     // Boxed: the three connections' futures together are large.

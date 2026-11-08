@@ -1,6 +1,6 @@
 -- A provider's app may carry settings of its own, which the provider validates: `settings` it may
--- answer (a GitHub App's id), and `secret_settings`, encrypted like the client secret and never
--- answered (a GitHub App's private key).
+-- answer (the app's id at the provider), and `secret_settings`, encrypted like the client secret
+-- and never answered (the key the app signs with).
 ALTER TABLE auth_config
     ADD COLUMN settings jsonb NOT NULL DEFAULT '{}'::jsonb,
     ADD COLUMN secret_settings bytea;

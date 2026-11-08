@@ -2,18 +2,19 @@
 //! refresh locking, and the completeness rule.
 
 use crate::testing::db_fixtures::{
-    active, active_with, db, generate_secret, generate_state, generate_tokens, generate_user_id,
-    github_config, no_expiry, pending, pending_with, refresh_task,
+    active, active_with, db, fake_config, generate_secret, generate_state, generate_tokens,
+    generate_user_id, no_expiry, pending, pending_with, refresh_task,
 };
 use osiris_common::secret::ExposeSecret;
 use osiris_domain::{AccountFilter, Cursor};
 use osiris_domain::{ConnectionStatus, EventType};
+use osiris_providers::mocks::fake::FAKE_ID;
 use sqlx::PgPool;
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn lets_a_consent_be_claimed_once(pool: PgPool) {
     let db = db(pool);
-    let config = github_config(&db).await;
+    let config = fake_config(&db).await;
     let user = generate_user_id();
     let state = generate_state();
     let verifier = generate_secret("verifier");
@@ -53,7 +54,7 @@ async fn saves_the_tokens_with_their_refresh_task_as_generation_one(pool: PgPool
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_to_save_a_refreshable_token_without_its_refresh_task(pool: PgPool) {
     let db = db(pool);
-    let config = github_config(&db).await;
+    let config = fake_config(&db).await;
     let id = pending(&db, &config, &generate_user_id(), &generate_state()).await;
     let account = db.connected_account(&id).await.unwrap();
 
@@ -77,7 +78,7 @@ async fn refuses_to_save_a_refreshable_token_without_its_refresh_task(pool: PgPo
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn counts_a_token_without_a_refresh_token_as_complete_without_a_task(pool: PgPool) {
     let db = db(pool);
-    let config = github_config(&db).await;
+    let config = fake_config(&db).await;
     let id = pending(&db, &config, &generate_user_id(), &generate_state()).await;
     let account = db.connected_account(&id).await.unwrap();
 
@@ -92,7 +93,7 @@ async fn counts_a_token_without_a_refresh_token_as_complete_without_a_task(pool:
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn disables_a_consent_without_keeping_tokens(pool: PgPool) {
     let db = db(pool);
-    let config = github_config(&db).await;
+    let config = fake_config(&db).await;
     let id = pending(&db, &config, &generate_user_id(), &generate_state()).await;
 
     db.disable_consent(&id, "no refresh task").await.unwrap();
@@ -253,7 +254,7 @@ async fn answers_the_pending_refresh_task_when_deleting(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn fails_a_consent_only_while_it_is_open(pool: PgPool) {
     let db = db(pool);
-    let config = github_config(&db).await;
+    let config = fake_config(&db).await;
     let open = pending(&db, &config, &generate_user_id(), &generate_state()).await;
     assert!(db.fail_open_consent(&open).await.unwrap());
     assert_eq!(
@@ -267,14 +268,14 @@ async fn fails_a_consent_only_while_it_is_open(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn lists_connections_by_attempt_a_page_at_a_time(pool: PgPool) {
     let db = db(pool);
-    let config = github_config(&db).await;
+    let config = fake_config(&db).await;
     let user = generate_user_id();
     for _ in 0..3 {
         pending(&db, &config, &user, &generate_state()).await;
     }
     let filter = AccountFilter {
         alias: Some("attempt-1".into()),
-        provider: Some("github".into()),
+        provider: Some(FAKE_ID.into()),
         ..Default::default()
     };
     let first = db

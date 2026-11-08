@@ -1,26 +1,26 @@
-//! A GitHub connection from consent to deletion: opened, the browser sent back, read, listed,
-//! refreshed now, deleted with its grant ended at GitHub, and gone.
+//! A connection from consent to deletion: opened, the browser sent back, read, listed, refreshed
+//! now, deleted with its grant ended at the provider, and gone.
 
 use crate::testing::TestContext;
 use crate::testing::golden::{GoldenSession, Key};
-use osiris_providers::github::mocks::MockGithubNetwork;
+use osiris_providers::mocks::fake::{FAKE_ID, MockFakeNetwork};
 use serde_json::{Value, json};
 use url::Url;
 
 pub async fn run(app: &TestContext, session: &mut GoldenSession<'_>) {
-    let github = MockGithubNetwork::on(&app.provider);
-    github.answer_code_exchange(token_answer("first")).await;
-    github.answer_refresh(200, token_answer("refreshed")).await;
-    github.answer_revoke(204, None).await;
+    let fake = MockFakeNetwork::on(&app.provider);
+    fake.answer_code_exchange(token_answer("first")).await;
+    fake.answer_refresh(200, token_answer("refreshed")).await;
+    fake.answer_revoke(200, None).await;
     let config = session
         .send(
             "POST",
             "/v1/auth-configs",
             Key::Admin,
             Some(json!({
-                "provider": "github",
-                "client_id": "golden-github-app",
-                "client_secret": "golden-github-secret",
+                "provider": FAKE_ID,
+                "client_id": "golden-app",
+                "client_secret": "golden-secret",
             })),
             &[],
         )
@@ -75,13 +75,15 @@ pub async fn run(app: &TestContext, session: &mut GoldenSession<'_>) {
     session.send("GET", &one, Key::Api, None, &[]).await;
 }
 
-/// GitHub's token answer, fixed so the transcript is the same every run (tokens are never
+/// The provider's token answer, fixed so the transcript is the same every run (tokens are never
 /// answered, but the scope is).
 fn token_answer(which: &str) -> Value {
     json!({
         "access_token": format!("golden-access-{which}"),
         "refresh_token": format!("golden-refresh-{which}"),
-        "scope": "repo",
+        "scope": "read",
         "expires_in": 28800,
     })
 }
+
+golden!("connecting", run);

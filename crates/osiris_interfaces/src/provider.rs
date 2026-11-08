@@ -1,5 +1,5 @@
 //! A provider osiris connects: what every provider is, its `OAuth2` definition, how it ends a
-//! grant, the settings its apps may carry, for a provider whose apps are installed (GitHub) how an
+//! grant, the settings its apps may carry, for a provider whose apps are installed how an
 //! installation's token is minted, and for a provider with triggers how one is subscribed to, how
 //! its deliveries are read, and how it is checked on a schedule. A provider without them refuses.
 
