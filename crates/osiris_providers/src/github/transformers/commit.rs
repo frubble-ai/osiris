@@ -33,8 +33,11 @@ impl From<CommitStatsAnswer> for GithubCommitStats {
 
 #[derive(Deserialize)]
 pub struct CommitFileAnswer {
+    pub sha: Option<String>,
     #[serde(default)]
     pub filename: String,
+    pub previous_filename: Option<String>,
+    pub blob_url: Option<String>,
     #[serde(default)]
     pub status: String,
     #[serde(default)]
@@ -50,7 +53,10 @@ impl From<CommitFileAnswer> for GithubCommitFile {
     /// A file a commit changed, in our terms.
     fn from(answer: CommitFileAnswer) -> Self {
         Self {
+            sha: answer.sha,
             filename: answer.filename,
+            previous_filename: answer.previous_filename,
+            blob_url: answer.blob_url,
             status: answer.status,
             additions: answer.additions,
             deletions: answer.deletions,
@@ -102,6 +108,8 @@ pub struct CommitCommitAuthorAnswer {
 pub struct CommitCommitCommitterAnswer {
     #[serde(rename = "name", default)]
     pub committer_name: Option<String>,
+    #[serde(rename = "email", default)]
+    pub committer_email: Option<String>,
     #[serde(rename = "date", default)]
     pub committed_at: Option<String>,
 }
@@ -141,6 +149,10 @@ impl From<CommitAnswer> for GithubCommit {
                 .committer
                 .as_ref()
                 .and_then(|part| part.committer_name.clone()),
+            committer_email: commit
+                .committer
+                .as_ref()
+                .and_then(|part| part.committer_email.clone()),
             committed_at: commit
                 .committer
                 .as_ref()

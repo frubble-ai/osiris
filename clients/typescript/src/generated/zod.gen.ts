@@ -1006,10 +1006,13 @@ export const zGithubCheckRun = z.object({
  */
 export const zGithubCommitFile = z.object({
     additions: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    blob_url: z.string().nullish(),
     changes: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     deletions: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     filename: z.string(),
     patch: z.string().nullish(),
+    previous_filename: z.string().nullish(),
+    sha: z.string().nullish(),
     status: z.string()
 });
 
@@ -1527,6 +1530,7 @@ export const zGithubSearchCommitRepository = z.object({
  */
 export const zGithubSearchLabel = z.object({
     color: z.string(),
+    default: z.boolean(),
     description: z.string().nullish(),
     id: z.string(),
     name: z.string(),
@@ -1557,13 +1561,17 @@ export const zGithubLabelSearchResults = z.object({
  * A topic a search found.
  */
 export const zGithubSearchTopic = z.object({
+    created_at: z.string().nullish(),
+    created_by: z.string().nullish(),
     curated: z.boolean(),
     description: z.string().nullish(),
     display_name: z.string().nullish(),
     featured: z.boolean(),
     name: z.string(),
+    released: z.string().nullish(),
     score: z.number(),
-    short_description: z.string().nullish()
+    short_description: z.string().nullish(),
+    updated_at: z.string().nullish()
 });
 
 /**
@@ -1664,6 +1672,7 @@ export const zActionResultGithubCommit = z.object({
         authored_at: z.string().nullish(),
         committed_at: z.string().nullish(),
         committer: zGithubUser.nullish(),
+        committer_email: z.string().nullish(),
         committer_name: z.string().nullish(),
         files: z.array(zGithubCommitFile).nullish(),
         message: z.string(),
@@ -1950,6 +1959,7 @@ export const zActionResultVecGithubCommit = z.object({
         authored_at: z.string().nullish(),
         committed_at: z.string().nullish(),
         committer: zGithubUser.nullish(),
+        committer_email: z.string().nullish(),
         committer_name: z.string().nullish(),
         files: z.array(zGithubCommitFile).nullish(),
         message: z.string(),
@@ -2166,8 +2176,14 @@ export const zActionResultVecGithubTimelineEvent = z.object({
     data: z.array(z.object({
         actor: zGithubUser.nullish(),
         assignee: zGithubUser.nullish(),
+        author_email: z.string().nullish(),
+        author_name: z.string().nullish(),
+        authored_at: z.string().nullish(),
         body: z.string().nullish(),
         commit_id: z.string().nullish(),
+        committed_at: z.string().nullish(),
+        committer_email: z.string().nullish(),
+        committer_name: z.string().nullish(),
         created_at: z.string().nullish(),
         event: z.string(),
         id: z.string().nullish(),
@@ -2177,7 +2193,9 @@ export const zActionResultVecGithubTimelineEvent = z.object({
         rename: zGithubEventRename.nullish(),
         sha: z.string().nullish(),
         source_issue_number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+        state: z.string().nullish(),
         state_reason: z.string().nullish(),
+        submitted_at: z.string().nullish(),
         url: z.string().nullish(),
         user: zGithubUser.nullish()
     }))
@@ -2221,6 +2239,7 @@ export const zGithubCommit = z.object({
     authored_at: z.string().nullish(),
     committed_at: z.string().nullish(),
     committer: zGithubUser.nullish(),
+    committer_email: z.string().nullish(),
     committer_name: z.string().nullish(),
     files: z.array(zGithubCommitFile).nullish(),
     message: z.string(),
@@ -2656,6 +2675,7 @@ export const zGithubSearchCode = z.object({
     name: z.string(),
     path: z.string(),
     repository: zGithubSearchCodeRepository,
+    score: z.number(),
     sha: z.string(),
     url: z.string()
 });
@@ -2683,15 +2703,10 @@ export const zGithubCodeSearchResults = z.object({
 /**
  * A commit a search found.
  */
-export const zGithubSearchCommit = z.object({
-    author: zGithubUser.nullish(),
-    committer: zGithubUser.nullish(),
-    message: z.string(),
+export const zGithubSearchCommit = zGithubCommit.and(z.object({
     repository: zGithubSearchCommitRepository,
-    score: z.number(),
-    sha: z.string(),
-    url: z.string()
-});
+    score: z.number()
+}));
 
 /**
  * An action's answer: what it read, as `data`.
@@ -2716,18 +2731,10 @@ export const zGithubCommitSearchResults = z.object({
 /**
  * An issue or a pull request a search found.
  */
-export const zGithubSearchIssue = z.object({
-    body: z.string().nullish(),
-    id: z.string(),
-    is_pull_request: z.boolean(),
-    number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+export const zGithubSearchIssue = zGithubIssue.and(z.object({
     repository_url: z.string(),
-    score: z.number(),
-    state: z.string(),
-    title: z.string(),
-    url: z.string(),
-    user: zGithubUser.nullish()
-});
+    score: z.number()
+}));
 
 /**
  * An action's answer: what it read, as `data`.
@@ -2785,8 +2792,14 @@ export const zGithubRepositorySearchResults = z.object({
 export const zGithubTimelineEvent = z.object({
     actor: zGithubUser.nullish(),
     assignee: zGithubUser.nullish(),
+    author_email: z.string().nullish(),
+    author_name: z.string().nullish(),
+    authored_at: z.string().nullish(),
     body: z.string().nullish(),
     commit_id: z.string().nullish(),
+    committed_at: z.string().nullish(),
+    committer_email: z.string().nullish(),
+    committer_name: z.string().nullish(),
     created_at: z.string().nullish(),
     event: z.string(),
     id: z.string().nullish(),
@@ -2796,7 +2809,9 @@ export const zGithubTimelineEvent = z.object({
     rename: zGithubEventRename.nullish(),
     sha: z.string().nullish(),
     source_issue_number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+    state: z.string().nullish(),
     state_reason: z.string().nullish(),
+    submitted_at: z.string().nullish(),
     url: z.string().nullish(),
     user: zGithubUser.nullish()
 });

@@ -21,9 +21,18 @@ pub struct GithubTimelineEvent {
     pub body: Option<String>,
     pub user: Option<GithubUser>,
     pub url: Option<String>,
-    /// `committed`: the commit and its message.
+    /// `committed`: the commit, its message and who wrote and committed it, and when.
     pub sha: Option<String>,
     pub message: Option<String>,
+    pub author_name: Option<String>,
+    pub author_email: Option<String>,
+    pub authored_at: Option<String>,
+    pub committer_name: Option<String>,
+    pub committer_email: Option<String>,
+    pub committed_at: Option<String>,
+    /// `reviewed`: how the review ended (`approved`, `changes_requested`, `commented`), and when.
+    pub state: Option<String>,
+    pub submitted_at: Option<String>,
     /// `cross-referenced`: the issue or pull request that mentions this one.
     pub source_issue_number: Option<i64>,
     /// `labeled` and `unlabeled`.

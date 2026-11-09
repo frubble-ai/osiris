@@ -9,6 +9,14 @@ use crate::github::types::{
 };
 use serde::Deserialize;
 
+/// Who wrote or committed a commit on the timeline, and when.
+#[derive(Deserialize)]
+pub struct TimelineCommitterAnswer {
+    pub name: Option<String>,
+    pub email: Option<String>,
+    pub date: Option<String>,
+}
+
 /// What a cross-reference points from.
 #[derive(Deserialize)]
 pub struct TimelineSourceAnswer {
@@ -28,6 +36,10 @@ pub struct TimelineEventAnswer {
     pub html_url: Option<String>,
     pub sha: Option<String>,
     pub message: Option<String>,
+    pub author: Option<TimelineCommitterAnswer>,
+    pub committer: Option<TimelineCommitterAnswer>,
+    pub state: Option<String>,
+    pub submitted_at: Option<String>,
     pub source: Option<TimelineSourceAnswer>,
     pub label: Option<EventLabelAnswer>,
     pub assignee: Option<UserAnswer>,
@@ -50,6 +62,26 @@ impl From<TimelineEventAnswer> for GithubTimelineEvent {
             url: answer.html_url,
             sha: answer.sha,
             message: answer.message,
+            author_name: answer
+                .author
+                .as_ref()
+                .and_then(|author| author.name.clone()),
+            author_email: answer
+                .author
+                .as_ref()
+                .and_then(|author| author.email.clone()),
+            authored_at: answer.author.and_then(|author| author.date),
+            committer_name: answer
+                .committer
+                .as_ref()
+                .and_then(|committer| committer.name.clone()),
+            committer_email: answer
+                .committer
+                .as_ref()
+                .and_then(|committer| committer.email.clone()),
+            committed_at: answer.committer.and_then(|committer| committer.date),
+            state: answer.state,
+            submitted_at: answer.submitted_at,
             source_issue_number: answer
                 .source
                 .and_then(|source| source.issue)

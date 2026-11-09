@@ -156,14 +156,29 @@ async fn searches_commits() {
         .await
         .unwrap();
 
-    let commit = &found.items[0];
-    assert_eq!(commit.sha, items[0]["sha"].as_str().unwrap());
+    let hit = &found.items[0];
+    assert_eq!(hit.commit.sha, items[0]["sha"].as_str().unwrap());
     assert_eq!(
-        commit.message,
+        hit.commit.message,
         items[0]["commit"]["message"].as_str().unwrap()
     );
-    assert_eq!(commit.url, items[0]["html_url"].as_str().unwrap());
-    assert_eq!(commit.repository.id, "4");
+    assert_eq!(hit.commit.url, items[0]["html_url"].as_str().unwrap());
+    assert_eq!(
+        hit.commit.author_name.as_deref(),
+        items[0]["commit"]["author"]["name"].as_str()
+    );
+    assert_eq!(
+        hit.commit.committer_email.as_deref(),
+        items[0]["commit"]["committer"]["email"].as_str()
+    );
+    assert_eq!(
+        hit.commit.parents,
+        [items[0]["parents"][0]["sha"].as_str().unwrap()]
+    );
+    assert_eq!(hit.repository.id, "4");
+    let answered = serde_json::to_value(hit).unwrap();
+    assert_eq!(answered["sha"], items[0]["sha"]);
+    assert_eq!(answered["repository"]["id"], "4");
 }
 
 #[tokio::test]
@@ -198,6 +213,7 @@ async fn searches_code() {
     assert_eq!(file.url, items[0]["html_url"].as_str().unwrap());
     assert_eq!(file.repository.id, "5");
     assert_eq!(file.repository.owner.as_ref().unwrap().id, "6");
+    assert!((file.score - 1.0).abs() < f64::EPSILON);
 }
 
 #[tokio::test]
@@ -235,6 +251,7 @@ async fn searches_the_labels_of_a_repository_by_its_id() {
     assert_eq!(found.items[0].id, "7");
     assert_eq!(found.items[0].color, items[0]["color"].as_str().unwrap());
     assert_eq!(found.items[0].description, None);
+    assert!(found.items[0].default);
 }
 
 #[tokio::test]
@@ -264,6 +281,16 @@ async fn searches_topics() {
 
     assert_eq!(found.items[0].name, items[0]["name"].as_str().unwrap());
     assert!(found.items[0].featured);
+    assert_eq!(found.items[0].created_by.as_deref(), Some("Graydon Hoare"));
+    assert_eq!(found.items[0].released.as_deref(), Some("2010"));
+    assert_eq!(
+        found.items[0].created_at.as_deref(),
+        Some("2016-12-17T03:10:00Z")
+    );
+    assert_eq!(
+        found.items[0].updated_at.as_deref(),
+        Some("2026-01-01T00:00:00Z")
+    );
 }
 
 #[tokio::test]

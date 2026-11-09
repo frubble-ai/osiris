@@ -1,6 +1,6 @@
 //! A topic a search found, and its parts.
 
-use super::{GithubRepository, GithubUser};
+use super::{GithubCommit, GithubIssue, GithubRepository, GithubUser};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -16,15 +16,11 @@ pub struct GithubSearchRepository {
 /// An issue or a pull request a search found.
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct GithubSearchIssue {
-    pub id: String,
-    pub number: i64,
-    pub title: String,
-    pub url: String,
-    pub state: String,
-    pub body: Option<String>,
+    #[serde(flatten)]
+    pub issue: GithubIssue,
+    /// The repository it is in, as GitHub's API names it.
     pub repository_url: String,
-    pub is_pull_request: bool,
-    pub user: Option<GithubUser>,
+    /// How well it matched, as GitHub ranks it.
     pub score: f64,
 }
 
@@ -50,12 +46,10 @@ pub struct GithubSearchCommitRepository {
 /// A commit a search found.
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct GithubSearchCommit {
-    pub sha: String,
-    pub url: String,
-    pub message: String,
-    pub author: Option<GithubUser>,
-    pub committer: Option<GithubUser>,
+    #[serde(flatten)]
+    pub commit: GithubCommit,
     pub repository: GithubSearchCommitRepository,
+    /// How well it matched, as GitHub ranks it.
     pub score: f64,
 }
 
@@ -77,6 +71,8 @@ pub struct GithubSearchCode {
     pub url: String,
     pub git_url: String,
     pub repository: GithubSearchCodeRepository,
+    /// How well it matched, as GitHub ranks it.
+    pub score: f64,
 }
 
 /// A label a search found.
@@ -86,6 +82,8 @@ pub struct GithubSearchLabel {
     pub name: String,
     pub color: String,
     pub description: Option<String>,
+    /// Whether it is one of the labels GitHub gives every new repository.
+    pub default: bool,
     pub score: f64,
 }
 
@@ -98,5 +96,9 @@ pub struct GithubSearchTopic {
     pub description: Option<String>,
     pub featured: bool,
     pub curated: bool,
+    pub created_by: Option<String>,
+    pub released: Option<String>,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
     pub score: f64,
 }

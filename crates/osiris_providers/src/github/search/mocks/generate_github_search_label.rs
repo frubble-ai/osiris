@@ -10,6 +10,7 @@ pub fn generate_github_search_label(id: u64) -> Value {
         "name": Word().fake::<String>(),
         "color": format!("{:06x}", (0..0x00ff_ffff).fake::<u32>()),
         "description": null,
+        "default": true,
         "score": 1.0,
     })
 }

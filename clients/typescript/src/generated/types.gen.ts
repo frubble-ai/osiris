@@ -95,6 +95,7 @@ export type ActionResultGithubCommit = {
         authored_at?: string | null;
         committed_at?: string | null;
         committer?: GithubUser | null;
+        committer_email?: string | null;
         committer_name?: string | null;
         files?: Array<GithubCommitFile> | null;
         message: string;
@@ -1054,6 +1055,7 @@ export type ActionResultVecGithubCommit = {
         authored_at?: string | null;
         committed_at?: string | null;
         committer?: GithubUser | null;
+        committer_email?: string | null;
         committer_name?: string | null;
         files?: Array<GithubCommitFile> | null;
         message: string;
@@ -1514,11 +1516,17 @@ export type ActionResultVecGithubTimelineEvent = {
     data: Array<{
         actor?: GithubUser | null;
         assignee?: GithubUser | null;
+        author_email?: string | null;
+        author_name?: string | null;
+        authored_at?: string | null;
         /**
          * `commented`: the comment, its author and its page.
          */
         body?: string | null;
         commit_id?: string | null;
+        committed_at?: string | null;
+        committer_email?: string | null;
+        committer_name?: string | null;
         created_at?: string | null;
         /**
          * What happened (`commented`, `committed`, `labeled`, `cross-referenced`…), as GitHub names
@@ -1531,7 +1539,7 @@ export type ActionResultVecGithubTimelineEvent = {
         milestone?: GithubEventMilestone | null;
         rename?: GithubEventRename | null;
         /**
-         * `committed`: the commit and its message.
+         * `committed`: the commit, its message and who wrote and committed it, and when.
          */
         sha?: string | null;
         /**
@@ -1539,9 +1547,14 @@ export type ActionResultVecGithubTimelineEvent = {
          */
         source_issue_number?: number | null;
         /**
+         * `reviewed`: how the review ended (`approved`, `changes_requested`, `commented`), and when.
+         */
+        state?: string | null;
+        /**
          * `closed` and `reopened`: why.
          */
         state_reason?: string | null;
+        submitted_at?: string | null;
         url?: string | null;
         user?: GithubUser | null;
     }>;
@@ -2756,6 +2769,7 @@ export type GithubCommit = {
     authored_at?: string | null;
     committed_at?: string | null;
     committer?: GithubUser | null;
+    committer_email?: string | null;
     committer_name?: string | null;
     files?: Array<GithubCommitFile> | null;
     message: string;
@@ -2797,10 +2811,13 @@ export type GithubCommitComparison = {
  */
 export type GithubCommitFile = {
     additions: number;
+    blob_url?: string | null;
     changes: number;
     deletions: number;
     filename: string;
     patch?: string | null;
+    previous_filename?: string | null;
+    sha?: string | null;
     status: string;
 };
 
@@ -3597,6 +3614,10 @@ export type GithubSearchCode = {
     name: string;
     path: string;
     repository: GithubSearchCodeRepository;
+    /**
+     * How well it matched, as GitHub ranks it.
+     */
+    score: number;
     sha: string;
     url: string;
 };
@@ -3614,14 +3635,12 @@ export type GithubSearchCodeRepository = {
 /**
  * A commit a search found.
  */
-export type GithubSearchCommit = {
-    author?: GithubUser | null;
-    committer?: GithubUser | null;
-    message: string;
+export type GithubSearchCommit = GithubCommit & {
     repository: GithubSearchCommitRepository;
+    /**
+     * How well it matched, as GitHub ranks it.
+     */
     score: number;
-    sha: string;
-    url: string;
 };
 
 /**
@@ -3636,17 +3655,15 @@ export type GithubSearchCommitRepository = {
 /**
  * An issue or a pull request a search found.
  */
-export type GithubSearchIssue = {
-    body?: string | null;
-    id: string;
-    is_pull_request: boolean;
-    number: number;
+export type GithubSearchIssue = GithubIssue & {
+    /**
+     * The repository it is in, as GitHub's API names it.
+     */
     repository_url: string;
+    /**
+     * How well it matched, as GitHub ranks it.
+     */
     score: number;
-    state: string;
-    title: string;
-    url: string;
-    user?: GithubUser | null;
 };
 
 /**
@@ -3669,6 +3686,10 @@ export type GithubSearchIssueResults = {
  */
 export type GithubSearchLabel = {
     color: string;
+    /**
+     * Whether it is one of the labels GitHub gives every new repository.
+     */
+    default: boolean;
     description?: string | null;
     id: string;
     name: string;
@@ -3689,13 +3710,17 @@ export type GithubSearchRepository = GithubRepository & {
  * A topic a search found.
  */
 export type GithubSearchTopic = {
+    created_at?: string | null;
+    created_by?: string | null;
     curated: boolean;
     description?: string | null;
     display_name?: string | null;
     featured: boolean;
     name: string;
+    released?: string | null;
     score: number;
     short_description?: string | null;
+    updated_at?: string | null;
 };
 
 /**
@@ -3745,11 +3770,17 @@ export type GithubTeam = {
 export type GithubTimelineEvent = {
     actor?: GithubUser | null;
     assignee?: GithubUser | null;
+    author_email?: string | null;
+    author_name?: string | null;
+    authored_at?: string | null;
     /**
      * `commented`: the comment, its author and its page.
      */
     body?: string | null;
     commit_id?: string | null;
+    committed_at?: string | null;
+    committer_email?: string | null;
+    committer_name?: string | null;
     created_at?: string | null;
     /**
      * What happened (`commented`, `committed`, `labeled`, `cross-referenced`…), as GitHub names
@@ -3762,7 +3793,7 @@ export type GithubTimelineEvent = {
     milestone?: GithubEventMilestone | null;
     rename?: GithubEventRename | null;
     /**
-     * `committed`: the commit and its message.
+     * `committed`: the commit, its message and who wrote and committed it, and when.
      */
     sha?: string | null;
     /**
@@ -3770,9 +3801,14 @@ export type GithubTimelineEvent = {
      */
     source_issue_number?: number | null;
     /**
+     * `reviewed`: how the review ended (`approved`, `changes_requested`, `commented`), and when.
+     */
+    state?: string | null;
+    /**
      * `closed` and `reopened`: why.
      */
     state_reason?: string | null;
+    submitted_at?: string | null;
     url?: string | null;
     user?: GithubUser | null;
 };

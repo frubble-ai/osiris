@@ -189,6 +189,12 @@
                   }
                 ]
               },
+              "committer_email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "committer_name": {
                 "type": [
                   "string",
@@ -2874,6 +2880,12 @@
                     }
                   ]
                 },
+                "committer_email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "committer_name": {
                   "type": [
                     "string",
@@ -4559,6 +4571,24 @@
                     }
                   ]
                 },
+                "author_email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "author_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "authored_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "body": {
                   "description": "`commented`: the comment, its author and its page.",
                   "type": [
@@ -4567,6 +4597,24 @@
                   ]
                 },
                 "commit_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "committed_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "committer_email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "committer_name": {
                   "type": [
                     "string",
                     "null"
@@ -4628,7 +4676,7 @@
                   ]
                 },
                 "sha": {
-                  "description": "`committed`: the commit and its message.",
+                  "description": "`committed`: the commit, its message and who wrote and committed it, and when.",
                   "type": [
                     "string",
                     "null"
@@ -4642,8 +4690,21 @@
                     "null"
                   ]
                 },
+                "state": {
+                  "description": "`reviewed`: how the review ended (`approved`, `changes_requested`, `commented`), and when.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "state_reason": {
                   "description": "`closed` and `reopened`: why.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "submitted_at": {
                   "type": [
                     "string",
                     "null"
@@ -7645,6 +7706,12 @@
               }
             ]
           },
+          "committer_email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "committer_name": {
             "type": [
               "string",
@@ -7798,6 +7865,12 @@
             "format": "int64",
             "type": "integer"
           },
+          "blob_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "changes": {
             "format": "int64",
             "type": "integer"
@@ -7810,6 +7883,18 @@
             "type": "string"
           },
           "patch": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "previous_filename": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sha": {
             "type": [
               "string",
               "null"
@@ -10109,6 +10194,11 @@
           "repository": {
             "$ref": "#/components/schemas/GithubSearchCodeRepository"
           },
+          "score": {
+            "description": "How well it matched, as GitHub ranks it.",
+            "format": "double",
+            "type": "number"
+          },
           "sha": {
             "type": "string"
           },
@@ -10122,7 +10212,8 @@
           "sha",
           "url",
           "git_url",
-          "repository"
+          "repository",
+          "score"
         ],
         "type": "object"
       },
@@ -10157,53 +10248,29 @@
         "type": "object"
       },
       "GithubSearchCommit": {
-        "description": "A commit a search found.",
-        "properties": {
-          "author": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/GithubUser"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GithubCommit"
+          },
+          {
+            "properties": {
+              "repository": {
+                "$ref": "#/components/schemas/GithubSearchCommitRepository"
               },
-              {
-                "type": "null"
+              "score": {
+                "description": "How well it matched, as GitHub ranks it.",
+                "format": "double",
+                "type": "number"
               }
-            ]
-          },
-          "committer": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/GithubUser"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "message": {
-            "type": "string"
-          },
-          "repository": {
-            "$ref": "#/components/schemas/GithubSearchCommitRepository"
-          },
-          "score": {
-            "format": "double",
-            "type": "number"
-          },
-          "sha": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
+            },
+            "required": [
+              "repository",
+              "score"
+            ],
+            "type": "object"
           }
-        },
-        "required": [
-          "sha",
-          "url",
-          "message",
-          "repository",
-          "score"
         ],
-        "type": "object"
+        "description": "A commit a search found."
       },
       "GithubSearchCommitRepository": {
         "description": "The repository a found commit is in.",
@@ -10226,62 +10293,30 @@
         "type": "object"
       },
       "GithubSearchIssue": {
-        "description": "An issue or a pull request a search found.",
-        "properties": {
-          "body": {
-            "type": [
-              "string",
-              "null"
-            ]
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GithubIssue"
           },
-          "id": {
-            "type": "string"
-          },
-          "is_pull_request": {
-            "type": "boolean"
-          },
-          "number": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "repository_url": {
-            "type": "string"
-          },
-          "score": {
-            "format": "double",
-            "type": "number"
-          },
-          "state": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          },
-          "user": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/GithubUser"
+          {
+            "properties": {
+              "repository_url": {
+                "description": "The repository it is in, as GitHub's API names it.",
+                "type": "string"
               },
-              {
-                "type": "null"
+              "score": {
+                "description": "How well it matched, as GitHub ranks it.",
+                "format": "double",
+                "type": "number"
               }
-            ]
+            },
+            "required": [
+              "repository_url",
+              "score"
+            ],
+            "type": "object"
           }
-        },
-        "required": [
-          "id",
-          "number",
-          "title",
-          "url",
-          "state",
-          "repository_url",
-          "is_pull_request",
-          "score"
         ],
-        "type": "object"
+        "description": "An issue or a pull request a search found."
       },
       "GithubSearchIssueResults": {
         "description": "The issues and pull requests a search found, and how many there are in all.",
@@ -10315,6 +10350,10 @@
           "color": {
             "type": "string"
           },
+          "default": {
+            "description": "Whether it is one of the labels GitHub gives every new repository.",
+            "type": "boolean"
+          },
           "description": {
             "type": [
               "string",
@@ -10336,6 +10375,7 @@
           "id",
           "name",
           "color",
+          "default",
           "score"
         ],
         "type": "object"
@@ -10364,6 +10404,18 @@
       "GithubSearchTopic": {
         "description": "A topic a search found.",
         "properties": {
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_by": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "curated": {
             "type": "boolean"
           },
@@ -10385,11 +10437,23 @@
           "name": {
             "type": "string"
           },
+          "released": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "score": {
             "format": "double",
             "type": "number"
           },
           "short_description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
             "type": [
               "string",
               "null"
@@ -10517,6 +10581,24 @@
               }
             ]
           },
+          "author_email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "author_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "authored_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "body": {
             "description": "`commented`: the comment, its author and its page.",
             "type": [
@@ -10525,6 +10607,24 @@
             ]
           },
           "commit_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "committed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "committer_email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "committer_name": {
             "type": [
               "string",
               "null"
@@ -10586,7 +10686,7 @@
             ]
           },
           "sha": {
-            "description": "`committed`: the commit and its message.",
+            "description": "`committed`: the commit, its message and who wrote and committed it, and when.",
             "type": [
               "string",
               "null"
@@ -10600,8 +10700,21 @@
               "null"
             ]
           },
+          "state": {
+            "description": "`reviewed`: how the review ended (`approved`, `changes_requested`, `commented`), and when.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "state_reason": {
             "description": "`closed` and `reopened`: why.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "submitted_at": {
             "type": [
               "string",
               "null"

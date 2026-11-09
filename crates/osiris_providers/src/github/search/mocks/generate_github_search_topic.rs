@@ -16,6 +16,10 @@ pub fn generate_github_search_topic(featured: bool) -> Value {
         "description": null,
         "featured": featured,
         "curated": false,
+        "created_by": "Graydon Hoare",
+        "released": "2010",
+        "created_at": "2016-12-17T03:10:00Z",
+        "updated_at": "2026-01-01T00:00:00Z",
         "score": 1.0,
     })
 }

@@ -13,7 +13,12 @@ pub fn generate_github_search_commit(repository_id: u64) -> Value {
         "sha": sha,
         "url": format!("https://api.github.com/repos/octo/hello/commits/{sha}"),
         "html_url": format!("https://github.com/octo/hello/commit/{sha}"),
-        "commit": { "message": Sentence(3..8).fake::<String>() },
+        "commit": {
+            "message": Sentence(3..8).fake::<String>(),
+            "author": { "name": "Mona", "email": "mona@example.com", "date": "2026-01-02T03:04:05Z" },
+            "committer": { "name": "GitHub", "email": "noreply@github.com", "date": "2026-01-02T03:04:06Z" },
+        },
+        "parents": [{ "sha": generate_sha() }],
         "author": generate_github_user(repository_id + 1),
         "committer": generate_github_user(repository_id + 2),
         "repository": {

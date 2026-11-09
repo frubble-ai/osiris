@@ -15,7 +15,10 @@ pub struct GithubCommitStats {
 /// A file a commit changed.
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct GithubCommitFile {
+    pub sha: Option<String>,
     pub filename: String,
+    pub previous_filename: Option<String>,
+    pub blob_url: Option<String>,
     pub status: String,
     pub additions: i64,
     pub deletions: i64,
@@ -33,6 +36,7 @@ pub struct GithubCommit {
     pub author_email: Option<String>,
     pub authored_at: Option<String>,
     pub committer_name: Option<String>,
+    pub committer_email: Option<String>,
     pub committed_at: Option<String>,
     pub author: Option<GithubUser>,
     pub committer: Option<GithubUser>,

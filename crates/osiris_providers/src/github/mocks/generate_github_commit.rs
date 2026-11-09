@@ -36,7 +36,10 @@ pub fn generate_github_commit(author_id: u64) -> Value {
         "parents": [{ "sha": generate_sha() }],
         "stats": { "additions": additions, "deletions": deletions, "total": additions + deletions },
         "files": [{
+            "sha": generate_sha(),
             "filename": "src/lib.rs",
+            "previous_filename": "src/old.rs",
+            "blob_url": format!("https://github.com/octo/hello/blob/{sha}/src/lib.rs"),
             "status": "modified",
             "additions": additions,
             "deletions": deletions,

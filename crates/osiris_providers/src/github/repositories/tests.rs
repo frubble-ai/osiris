@@ -619,7 +619,12 @@ async fn reads_a_commit_with_its_stats_and_files() {
         commit.stats.unwrap().total,
         answer["stats"]["total"].as_i64().unwrap()
     );
-    assert_eq!(commit.files.as_ref().unwrap()[0].filename, "src/lib.rs");
+    let file = &commit.files.as_ref().unwrap()[0];
+    assert_eq!(file.filename, "src/lib.rs");
+    assert_eq!(file.previous_filename.as_deref(), Some("src/old.rs"));
+    assert_eq!(file.sha.as_ref().map(String::len), Some(40));
+    assert!(file.blob_url.as_deref().unwrap().ends_with("/src/lib.rs"));
+    assert!(commit.committer_email.is_some());
     assert_eq!(
         commit.author_email.as_deref(),
         answer["commit"]["author"]["email"].as_str()

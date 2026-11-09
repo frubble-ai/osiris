@@ -28,6 +28,7 @@ use super::{
         generate_github_search_issue::generate_github_search_issue,
         generate_github_timeline_event::{
             generate_github_timeline_comment, generate_github_timeline_commit,
+            generate_github_timeline_review,
         },
     },
 };
@@ -1039,13 +1040,14 @@ async fn lists_an_issue_s_timeline_including_entries_with_no_id_of_their_own() {
         generate_github_timeline_commit(),
     );
     let reference = json!({ "event": "cross-referenced", "source": { "issue": { "number": 12 } } });
+    let review = generate_github_timeline_review(241);
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
             &format!("/repos/{owner}/{repo}/issues/2/timeline"),
             &[("per_page", "2")],
             200,
-            json!([comment, commit, reference]),
+            json!([comment, commit, reference, review]),
         )
         .await;
     let input = ListIssueTimelineEvents {
@@ -1073,6 +1075,36 @@ async fn lists_an_issue_s_timeline_including_entries_with_no_id_of_their_own() {
     assert_eq!(timeline[1].message.as_deref(), commit["message"].as_str());
     assert_eq!(timeline[2].event, "cross-referenced");
     assert_eq!(timeline[2].source_issue_number, Some(12));
+    assert_eq!(
+        timeline[1].author_name.as_deref(),
+        commit["author"]["name"].as_str()
+    );
+    assert_eq!(
+        timeline[1].author_email.as_deref(),
+        commit["author"]["email"].as_str()
+    );
+    assert_eq!(
+        timeline[1].authored_at.as_deref(),
+        Some("2026-01-01T00:00:00Z")
+    );
+    assert_eq!(timeline[1].committer_name.as_deref(), Some("GitHub"));
+    assert_eq!(
+        timeline[1].committer_email.as_deref(),
+        Some("noreply@github.com")
+    );
+    assert_eq!(
+        timeline[1].committed_at.as_deref(),
+        Some("2026-01-01T00:05:00Z")
+    );
+    assert_eq!(timeline[3].event, "reviewed");
+    assert_eq!(timeline[3].id.as_deref(), Some("241"));
+    assert_eq!(timeline[3].state.as_deref(), Some("approved"));
+    assert_eq!(
+        timeline[3].submitted_at.as_deref(),
+        Some("2026-01-01T00:10:00Z")
+    );
+    assert_eq!(timeline[3].user.as_ref().unwrap().id, "242");
+    assert_eq!(timeline[3].body.as_deref(), review["body"].as_str());
 }
 
 #[tokio::test]
@@ -1482,14 +1514,26 @@ async fn searches_issues_and_pull_requests_with_the_filters_as_qualifiers() {
     assert_eq!(found.total_count, 40);
     assert!(found.incomplete_results);
     assert_eq!(found.items.len(), 2);
-    assert_eq!(found.items[0].id, "311");
-    assert_eq!(found.items[0].url, text(&items[0], "html_url"));
+    assert_eq!(found.items[0].issue.id, "311");
+    assert_eq!(found.items[0].issue.url, text(&items[0], "html_url"));
     assert_eq!(
         found.items[0].repository_url,
         text(&items[0], "repository_url")
     );
-    assert!(!found.items[0].is_pull_request);
-    assert!(found.items[1].is_pull_request);
+    assert!(!found.items[0].issue.is_pull_request);
+    assert!(found.items[1].issue.is_pull_request);
+    assert_eq!(
+        found.items[0].issue.labels.len(),
+        items[0]["labels"].as_array().unwrap().len()
+    );
+    assert_eq!(
+        found.items[0].issue.created_at,
+        text(&items[0], "created_at")
+    );
+    assert!((found.items[0].score - items[0]["score"].as_f64().unwrap()).abs() < f64::EPSILON);
+    let answered = serde_json::to_value(&found.items[0]).unwrap();
+    assert_eq!(answered["number"], items[0]["number"]);
+    assert_eq!(answered["repository_url"], items[0]["repository_url"]);
 }
 
 #[tokio::test]

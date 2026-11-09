@@ -31,5 +31,24 @@ pub fn generate_github_timeline_commit() -> Value {
             "email": SafeEmail().fake::<String>(),
             "date": "2026-01-01T00:00:00Z",
         },
+        "committer": {
+            "name": "GitHub",
+            "email": "noreply@github.com",
+            "date": "2026-01-01T00:05:00Z",
+        },
+    })
+}
+
+/// A review on a pull request's timeline: its id, author, state and when it was submitted.
+pub fn generate_github_timeline_review(id: u64) -> Value {
+    json!({
+        "id": id,
+        "event": "reviewed",
+        "user": generate_github_user(id + 1),
+        "body": Paragraph(1..2).fake::<String>(),
+        "state": "approved",
+        "html_url": format!("https://github.com/octo/hello/pull/2#pullrequestreview-{id}"),
+        "submitted_at": "2026-01-01T00:10:00Z",
+        "commit_id": generate_sha(),
     })
 }

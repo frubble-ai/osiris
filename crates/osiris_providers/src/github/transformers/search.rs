@@ -1,10 +1,12 @@
 //! A topic a search found, as GitHub answers it.
 
-use super::{repository::RepositoryAnswer, user::UserAnswer};
+use super::{
+    commit::CommitAnswer, issue::IssueAnswer, repository::RepositoryAnswer, user::UserAnswer,
+};
 use crate::github::types::{
-    GithubRepository, GithubSearchCode, GithubSearchCodeRepository, GithubSearchCommit,
-    GithubSearchCommitRepository, GithubSearchIssue, GithubSearchLabel, GithubSearchRepository,
-    GithubSearchTopic, GithubSearchUser, GithubUser,
+    GithubCommit, GithubIssue, GithubRepository, GithubSearchCode, GithubSearchCodeRepository,
+    GithubSearchCommit, GithubSearchCommitRepository, GithubSearchIssue, GithubSearchLabel,
+    GithubSearchRepository, GithubSearchTopic, GithubSearchUser, GithubUser,
 };
 use serde::Deserialize;
 
@@ -28,21 +30,10 @@ impl From<SearchRepositoryAnswer> for GithubSearchRepository {
 
 #[derive(Deserialize)]
 pub struct SearchIssueAnswer {
-    pub id: u64,
-    #[serde(default)]
-    pub number: i64,
-    #[serde(default)]
-    pub title: String,
-    #[serde(rename = "html_url", default)]
-    pub url: String,
-    #[serde(default)]
-    pub state: String,
-    pub body: Option<String>,
+    #[serde(flatten)]
+    pub issue: IssueAnswer,
     #[serde(default)]
     pub repository_url: String,
-    #[serde(rename = "pull_request")]
-    pub is_pull_request: Option<serde_json::Value>,
-    pub user: Option<UserAnswer>,
     #[serde(default)]
     pub score: f64,
 }
@@ -51,15 +42,8 @@ impl From<SearchIssueAnswer> for GithubSearchIssue {
     /// An issue or a pull request a search found, in our terms.
     fn from(answer: SearchIssueAnswer) -> Self {
         Self {
-            id: answer.id.to_string(),
-            number: answer.number,
-            title: answer.title,
-            url: answer.url,
-            state: answer.state,
-            body: answer.body,
+            issue: GithubIssue::from(answer.issue),
             repository_url: answer.repository_url,
-            is_pull_request: answer.is_pull_request.is_some(),
-            user: answer.user.map(GithubUser::from),
             score: answer.score,
         }
     }
@@ -116,37 +100,20 @@ impl From<SearchCommitRepositoryAnswer> for GithubSearchCommitRepository {
 
 #[derive(Deserialize)]
 pub struct SearchCommitAnswer {
-    #[serde(default)]
-    pub sha: String,
-    #[serde(rename = "html_url", default)]
-    pub url: String,
-    pub author: Option<UserAnswer>,
-    pub committer: Option<UserAnswer>,
+    #[serde(flatten)]
+    pub commit: CommitAnswer,
     pub repository: SearchCommitRepositoryAnswer,
     #[serde(default)]
     pub score: f64,
-    #[serde(default)]
-    pub commit: Option<SearchCommitCommitAnswer>,
-}
-
-#[derive(Deserialize, Default)]
-pub struct SearchCommitCommitAnswer {
-    #[serde(default)]
-    pub message: String,
 }
 
 impl From<SearchCommitAnswer> for GithubSearchCommit {
     /// A commit a search found, in our terms.
     fn from(answer: SearchCommitAnswer) -> Self {
-        let commit = answer.commit.unwrap_or_default();
         Self {
-            sha: answer.sha,
-            url: answer.url,
-            author: answer.author.map(GithubUser::from),
-            committer: answer.committer.map(GithubUser::from),
+            commit: GithubCommit::from(answer.commit),
             repository: GithubSearchCommitRepository::from(answer.repository),
             score: answer.score,
-            message: commit.message,
         }
     }
 }
@@ -186,6 +153,8 @@ pub struct SearchCodeAnswer {
     #[serde(default)]
     pub git_url: String,
     pub repository: SearchCodeRepositoryAnswer,
+    #[serde(default)]
+    pub score: f64,
 }
 
 impl From<SearchCodeAnswer> for GithubSearchCode {
@@ -198,6 +167,7 @@ impl From<SearchCodeAnswer> for GithubSearchCode {
             url: answer.url,
             git_url: answer.git_url,
             repository: GithubSearchCodeRepository::from(answer.repository),
+            score: answer.score,
         }
     }
 }
@@ -211,6 +181,8 @@ pub struct SearchLabelAnswer {
     pub color: String,
     pub description: Option<String>,
     #[serde(default)]
+    pub default: bool,
+    #[serde(default)]
     pub score: f64,
 }
 
@@ -222,6 +194,7 @@ impl From<SearchLabelAnswer> for GithubSearchLabel {
             name: answer.name,
             color: answer.color,
             description: answer.description,
+            default: answer.default,
             score: answer.score,
         }
     }
@@ -238,6 +211,10 @@ pub struct SearchTopicAnswer {
     pub featured: bool,
     #[serde(default)]
     pub curated: bool,
+    pub created_by: Option<String>,
+    pub released: Option<String>,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
     #[serde(default)]
     pub score: f64,
 }
@@ -252,6 +229,10 @@ impl From<SearchTopicAnswer> for GithubSearchTopic {
             description: answer.description,
             featured: answer.featured,
             curated: answer.curated,
+            created_by: answer.created_by,
+            released: answer.released,
+            created_at: answer.created_at,
+            updated_at: answer.updated_at,
             score: answer.score,
         }
     }
