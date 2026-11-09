@@ -16,6 +16,7 @@ pub mod commit_status;
 pub mod content;
 pub mod contributor;
 pub mod event;
+pub mod event_details;
 pub mod fork_sync;
 pub mod git_ref;
 pub mod installation;

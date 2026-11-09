@@ -2885,9 +2885,30 @@
         "properties": {
           "data": {
             "items": {
-              "description": "Something that happened to an issue (labelled, closed, referenced…).",
+              "description": "Something that happened to an issue (labelled, closed, referenced…), with what it was about:\neach detail is set only for the events that have it, as GitHub sends them.",
               "properties": {
                 "actor": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "assignee": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser",
+                      "description": "`assigned` and `unassigned`: who was, and who did it."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "assigner": {
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/GithubUser"
@@ -2907,10 +2928,77 @@
                   "type": "string"
                 },
                 "event": {
+                  "description": "What happened (`labeled`, `assigned`, `closed`, `renamed`…), as GitHub names it. An open\nstring.",
                   "type": "string"
                 },
                 "id": {
                   "type": "string"
+                },
+                "issue_number": {
+                  "description": "The issue it happened to, in a repository's list of events.",
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "label": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubEventLabel",
+                      "description": "`labeled` and `unlabeled`."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "lock_reason": {
+                  "description": "`locked`: why.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "milestone": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubEventMilestone",
+                      "description": "`milestoned` and `demilestoned`."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "rename": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubEventRename",
+                      "description": "`renamed`."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "requested_reviewer": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser",
+                      "description": "`review_requested` and `review_request_removed`."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "state_reason": {
+                  "description": "`closed` and `reopened`: why.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 }
               },
               "required": [
@@ -3640,7 +3728,7 @@
         "properties": {
           "data": {
             "items": {
-              "description": "Something on an issue's timeline: an event, a comment, a commit or a cross-reference. Unlike an\nissue event, a timeline entry may have no id, no actor and no time (a commit or a\ncross-reference has none of its own).",
+              "description": "Something on an issue's timeline: an event, a comment, a commit or a cross-reference. Unlike an\nissue event, a timeline entry may have no id, no actor and no time (a commit or a\ncross-reference has none of its own). Each detail is set only for the entries that have it, as\nGitHub sends them.",
               "properties": {
                 "actor": {
                   "oneOf": [
@@ -3650,6 +3738,24 @@
                     {
                       "type": "null"
                     }
+                  ]
+                },
+                "assignee": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser",
+                      "description": "`assigned` and `unassigned`."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "body": {
+                  "description": "`commented`: the comment, its author and its page.",
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "commit_id": {
@@ -3672,6 +3778,83 @@
                   "type": [
                     "string",
                     "null"
+                  ]
+                },
+                "label": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubEventLabel",
+                      "description": "`labeled` and `unlabeled`."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "message": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "milestone": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubEventMilestone",
+                      "description": "`milestoned` and `demilestoned`."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "rename": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubEventRename",
+                      "description": "`renamed`."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sha": {
+                  "description": "`committed`: the commit and its message.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_issue_number": {
+                  "description": "`cross-referenced`: the issue or pull request that mentions this one.",
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "state_reason": {
+                  "description": "`closed` and `reopened`: why.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "user": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 }
               },
@@ -6986,6 +7169,50 @@
         ],
         "type": "object"
       },
+      "GithubEventLabel": {
+        "description": "The label a `labeled` or `unlabeled` event is about.",
+        "properties": {
+          "color": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "color"
+        ],
+        "type": "object"
+      },
+      "GithubEventMilestone": {
+        "description": "The milestone a `milestoned` or `demilestoned` event is about.",
+        "properties": {
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "type": "object"
+      },
+      "GithubEventRename": {
+        "description": "An issue's title before and after a `renamed` event.",
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ],
+        "type": "object"
+      },
       "GithubEventRepository": {
         "description": "The repository an event happened in.",
         "properties": {
@@ -7300,9 +7527,30 @@
         "type": "object"
       },
       "GithubIssueEvent": {
-        "description": "Something that happened to an issue (labelled, closed, referenced…).",
+        "description": "Something that happened to an issue (labelled, closed, referenced…), with what it was about:\neach detail is set only for the events that have it, as GitHub sends them.",
         "properties": {
           "actor": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "assignee": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser",
+                "description": "`assigned` and `unassigned`: who was, and who did it."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "assigner": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/GithubUser"
@@ -7322,10 +7570,77 @@
             "type": "string"
           },
           "event": {
+            "description": "What happened (`labeled`, `assigned`, `closed`, `renamed`…), as GitHub names it. An open\nstring.",
             "type": "string"
           },
           "id": {
             "type": "string"
+          },
+          "issue_number": {
+            "description": "The issue it happened to, in a repository's list of events.",
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "label": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubEventLabel",
+                "description": "`labeled` and `unlabeled`."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lock_reason": {
+            "description": "`locked`: why.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "milestone": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubEventMilestone",
+                "description": "`milestoned` and `demilestoned`."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rename": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubEventRename",
+                "description": "`renamed`."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "requested_reviewer": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser",
+                "description": "`review_requested` and `review_request_removed`."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state_reason": {
+            "description": "`closed` and `reopened`: why.",
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -8834,7 +9149,7 @@
         "type": "object"
       },
       "GithubTimelineEvent": {
-        "description": "Something on an issue's timeline: an event, a comment, a commit or a cross-reference. Unlike an\nissue event, a timeline entry may have no id, no actor and no time (a commit or a\ncross-reference has none of its own).",
+        "description": "Something on an issue's timeline: an event, a comment, a commit or a cross-reference. Unlike an\nissue event, a timeline entry may have no id, no actor and no time (a commit or a\ncross-reference has none of its own). Each detail is set only for the entries that have it, as\nGitHub sends them.",
         "properties": {
           "actor": {
             "oneOf": [
@@ -8844,6 +9159,24 @@
               {
                 "type": "null"
               }
+            ]
+          },
+          "assignee": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser",
+                "description": "`assigned` and `unassigned`."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "body": {
+            "description": "`commented`: the comment, its author and its page.",
+            "type": [
+              "string",
+              "null"
             ]
           },
           "commit_id": {
@@ -8866,6 +9199,83 @@
             "type": [
               "string",
               "null"
+            ]
+          },
+          "label": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubEventLabel",
+                "description": "`labeled` and `unlabeled`."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "milestone": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubEventMilestone",
+                "description": "`milestoned` and `demilestoned`."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rename": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubEventRename",
+                "description": "`renamed`."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sha": {
+            "description": "`committed`: the commit and its message.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_issue_number": {
+            "description": "`cross-referenced`: the issue or pull request that mentions this one.",
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "state_reason": {
+            "description": "`closed` and `reopened`: why.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },

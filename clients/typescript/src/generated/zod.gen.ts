@@ -1200,6 +1200,29 @@ export const zGithubCurrentUser = z.object({
 });
 
 /**
+ * The label a `labeled` or `unlabeled` event is about.
+ */
+export const zGithubEventLabel = z.object({
+    color: z.string(),
+    name: z.string()
+});
+
+/**
+ * The milestone a `milestoned` or `demilestoned` event is about.
+ */
+export const zGithubEventMilestone = z.object({
+    title: z.string()
+});
+
+/**
+ * An issue's title before and after a `renamed` event.
+ */
+export const zGithubEventRename = z.object({
+    from: z.string(),
+    to: z.string()
+});
+
+/**
  * The repository an event happened in.
  */
 export const zGithubEventRepository = z.object({
@@ -1874,10 +1897,19 @@ export const zActionResultVecGithubIssueComment = z.object({
 export const zActionResultVecGithubIssueEvent = z.object({
     data: z.array(z.object({
         actor: zGithubUser.nullish(),
+        assignee: zGithubUser.nullish(),
+        assigner: zGithubUser.nullish(),
         commit_id: z.string().nullish(),
         created_at: z.string(),
         event: z.string(),
-        id: z.string()
+        id: z.string(),
+        issue_number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+        label: zGithubEventLabel.nullish(),
+        lock_reason: z.string().nullish(),
+        milestone: zGithubEventMilestone.nullish(),
+        rename: zGithubEventRename.nullish(),
+        requested_reviewer: zGithubUser.nullish(),
+        state_reason: z.string().nullish()
     }))
 });
 
@@ -2007,10 +2039,21 @@ export const zActionResultVecGithubReviewComment = z.object({
 export const zActionResultVecGithubTimelineEvent = z.object({
     data: z.array(z.object({
         actor: zGithubUser.nullish(),
+        assignee: zGithubUser.nullish(),
+        body: z.string().nullish(),
         commit_id: z.string().nullish(),
         created_at: z.string().nullish(),
         event: z.string(),
-        id: z.string().nullish()
+        id: z.string().nullish(),
+        label: zGithubEventLabel.nullish(),
+        message: z.string().nullish(),
+        milestone: zGithubEventMilestone.nullish(),
+        rename: zGithubEventRename.nullish(),
+        sha: z.string().nullish(),
+        source_issue_number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+        state_reason: z.string().nullish(),
+        url: z.string().nullish(),
+        user: zGithubUser.nullish()
     }))
 });
 
@@ -2137,14 +2180,24 @@ export const zGithubIssueComment = z.object({
 });
 
 /**
- * Something that happened to an issue (labelled, closed, referenced…).
+ * Something that happened to an issue (labelled, closed, referenced…), with what it was about:
+ * each detail is set only for the events that have it, as GitHub sends them.
  */
 export const zGithubIssueEvent = z.object({
     actor: zGithubUser.nullish(),
+    assignee: zGithubUser.nullish(),
+    assigner: zGithubUser.nullish(),
     commit_id: z.string().nullish(),
     created_at: z.string(),
     event: z.string(),
-    id: z.string()
+    id: z.string(),
+    issue_number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+    label: zGithubEventLabel.nullish(),
+    lock_reason: z.string().nullish(),
+    milestone: zGithubEventMilestone.nullish(),
+    rename: zGithubEventRename.nullish(),
+    requested_reviewer: zGithubUser.nullish(),
+    state_reason: z.string().nullish()
 });
 
 /**
@@ -2493,14 +2546,26 @@ export const zGithubRepositorySearchResults = z.object({
 /**
  * Something on an issue's timeline: an event, a comment, a commit or a cross-reference. Unlike an
  * issue event, a timeline entry may have no id, no actor and no time (a commit or a
- * cross-reference has none of its own).
+ * cross-reference has none of its own). Each detail is set only for the entries that have it, as
+ * GitHub sends them.
  */
 export const zGithubTimelineEvent = z.object({
     actor: zGithubUser.nullish(),
+    assignee: zGithubUser.nullish(),
+    body: z.string().nullish(),
     commit_id: z.string().nullish(),
     created_at: z.string().nullish(),
     event: z.string(),
-    id: z.string().nullish()
+    id: z.string().nullish(),
+    label: zGithubEventLabel.nullish(),
+    message: z.string().nullish(),
+    milestone: zGithubEventMilestone.nullish(),
+    rename: zGithubEventRename.nullish(),
+    sha: z.string().nullish(),
+    source_issue_number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+    state_reason: z.string().nullish(),
+    url: z.string().nullish(),
+    user: zGithubUser.nullish()
 });
 
 /**

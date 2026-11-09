@@ -1084,10 +1084,32 @@ export type ActionResultVecGithubIssueComment = {
 export type ActionResultVecGithubIssueEvent = {
     data: Array<{
         actor?: GithubUser | null;
+        assignee?: GithubUser | null;
+        assigner?: GithubUser | null;
         commit_id?: string | null;
         created_at: string;
+        /**
+         * What happened (`labeled`, `assigned`, `closed`, `renamed`…), as GitHub names it. An open
+         * string.
+         */
         event: string;
         id: string;
+        /**
+         * The issue it happened to, in a repository's list of events.
+         */
+        issue_number?: number | null;
+        label?: GithubEventLabel | null;
+        /**
+         * `locked`: why.
+         */
+        lock_reason?: string | null;
+        milestone?: GithubEventMilestone | null;
+        rename?: GithubEventRename | null;
+        requested_reviewer?: GithubUser | null;
+        /**
+         * `closed` and `reopened`: why.
+         */
+        state_reason?: string | null;
     }>;
 };
 
@@ -1293,6 +1315,11 @@ export type ActionResultVecGithubTag = {
 export type ActionResultVecGithubTimelineEvent = {
     data: Array<{
         actor?: GithubUser | null;
+        assignee?: GithubUser | null;
+        /**
+         * `commented`: the comment, its author and its page.
+         */
+        body?: string | null;
         commit_id?: string | null;
         created_at?: string | null;
         /**
@@ -1301,6 +1328,24 @@ export type ActionResultVecGithubTimelineEvent = {
          */
         event: string;
         id?: string | null;
+        label?: GithubEventLabel | null;
+        message?: string | null;
+        milestone?: GithubEventMilestone | null;
+        rename?: GithubEventRename | null;
+        /**
+         * `committed`: the commit and its message.
+         */
+        sha?: string | null;
+        /**
+         * `cross-referenced`: the issue or pull request that mentions this one.
+         */
+        source_issue_number?: number | null;
+        /**
+         * `closed` and `reopened`: why.
+         */
+        state_reason?: string | null;
+        url?: string | null;
+        user?: GithubUser | null;
     }>;
 };
 
@@ -2630,6 +2675,29 @@ export type GithubEvent = {
 };
 
 /**
+ * The label a `labeled` or `unlabeled` event is about.
+ */
+export type GithubEventLabel = {
+    color: string;
+    name: string;
+};
+
+/**
+ * The milestone a `milestoned` or `demilestoned` event is about.
+ */
+export type GithubEventMilestone = {
+    title: string;
+};
+
+/**
+ * An issue's title before and after a `renamed` event.
+ */
+export type GithubEventRename = {
+    from: string;
+    to: string;
+};
+
+/**
  * The repository an event happened in.
  */
 export type GithubEventRepository = {
@@ -2752,14 +2820,37 @@ export type GithubIssueComment = {
 };
 
 /**
- * Something that happened to an issue (labelled, closed, referenced…).
+ * Something that happened to an issue (labelled, closed, referenced…), with what it was about:
+ * each detail is set only for the events that have it, as GitHub sends them.
  */
 export type GithubIssueEvent = {
     actor?: GithubUser | null;
+    assignee?: GithubUser | null;
+    assigner?: GithubUser | null;
     commit_id?: string | null;
     created_at: string;
+    /**
+     * What happened (`labeled`, `assigned`, `closed`, `renamed`…), as GitHub names it. An open
+     * string.
+     */
     event: string;
     id: string;
+    /**
+     * The issue it happened to, in a repository's list of events.
+     */
+    issue_number?: number | null;
+    label?: GithubEventLabel | null;
+    /**
+     * `locked`: why.
+     */
+    lock_reason?: string | null;
+    milestone?: GithubEventMilestone | null;
+    rename?: GithubEventRename | null;
+    requested_reviewer?: GithubUser | null;
+    /**
+     * `closed` and `reopened`: why.
+     */
+    state_reason?: string | null;
 };
 
 /**
@@ -3300,10 +3391,16 @@ export type GithubTeam = {
 /**
  * Something on an issue's timeline: an event, a comment, a commit or a cross-reference. Unlike an
  * issue event, a timeline entry may have no id, no actor and no time (a commit or a
- * cross-reference has none of its own).
+ * cross-reference has none of its own). Each detail is set only for the entries that have it, as
+ * GitHub sends them.
  */
 export type GithubTimelineEvent = {
     actor?: GithubUser | null;
+    assignee?: GithubUser | null;
+    /**
+     * `commented`: the comment, its author and its page.
+     */
+    body?: string | null;
     commit_id?: string | null;
     created_at?: string | null;
     /**
@@ -3312,6 +3409,24 @@ export type GithubTimelineEvent = {
      */
     event: string;
     id?: string | null;
+    label?: GithubEventLabel | null;
+    message?: string | null;
+    milestone?: GithubEventMilestone | null;
+    rename?: GithubEventRename | null;
+    /**
+     * `committed`: the commit and its message.
+     */
+    sha?: string | null;
+    /**
+     * `cross-referenced`: the issue or pull request that mentions this one.
+     */
+    source_issue_number?: number | null;
+    /**
+     * `closed` and `reopened`: why.
+     */
+    state_reason?: string | null;
+    url?: string | null;
+    user?: GithubUser | null;
 };
 
 /**

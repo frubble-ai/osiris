@@ -1033,14 +1033,18 @@ async fn lists_an_issue_s_timeline_including_entries_with_no_id_of_their_own() {
     let repo = generate_github_repo();
     let token = generate_github_token();
     let server = MockServer::start().await;
-    let commit = generate_github_timeline_commit();
+    let (comment, commit) = (
+        generate_github_timeline_comment(221),
+        generate_github_timeline_commit(),
+    );
+    let reference = json!({ "event": "cross-referenced", "source": { "issue": { "number": 12 } } });
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
             &format!("/repos/{owner}/{repo}/issues/2/timeline"),
             &[("per_page", "2")],
             200,
-            json!([generate_github_timeline_comment(221), commit]),
+            json!([comment, commit, reference]),
         )
         .await;
     let input = ListIssueTimelineEvents {
@@ -1063,6 +1067,11 @@ async fn lists_an_issue_s_timeline_including_entries_with_no_id_of_their_own() {
     assert_eq!(timeline[1].event, "committed");
     assert_eq!(timeline[1].actor, None);
     assert_eq!(timeline[1].created_at, None);
+    assert_eq!(timeline[0].body.as_deref(), comment["body"].as_str());
+    assert_eq!(timeline[1].sha.as_deref(), commit["sha"].as_str());
+    assert_eq!(timeline[1].message.as_deref(), commit["message"].as_str());
+    assert_eq!(timeline[2].event, "cross-referenced");
+    assert_eq!(timeline[2].source_issue_number, Some(12));
 }
 
 #[tokio::test]
@@ -1071,7 +1080,9 @@ async fn lists_a_page_of_what_happened_to_an_issue() {
     let repo = generate_github_repo();
     let token = generate_github_token();
     let server = MockServer::start().await;
-    let events = [generate_github_issue_event(231, "labeled")];
+    let mut labeled = generate_github_issue_event(231, "labeled");
+    labeled["label"] = json!({ "name": "bug", "color": "d73a4a" });
+    let events = [labeled];
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
@@ -1101,6 +1112,12 @@ async fn lists_a_page_of_what_happened_to_an_issue() {
         listed[0].commit_id.as_deref(),
         events[0]["commit_id"].as_str()
     );
+    let label = listed[0].label.as_ref().unwrap();
+    assert_eq!(
+        (label.name.as_str(), label.color.as_str()),
+        ("bug", "d73a4a")
+    );
+    assert_eq!(listed[0].assignee, None);
 }
 
 #[tokio::test]
@@ -1109,16 +1126,16 @@ async fn lists_a_page_of_what_happened_to_a_repository_s_issues() {
     let repo = generate_github_repo();
     let token = generate_github_token();
     let server = MockServer::start().await;
+    let mut reopened = generate_github_issue_event(242, "reopened");
+    reopened["issue"] = json!({ "number": 9 });
+    reopened["state_reason"] = json!("reopened");
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
             &format!("/repos/{owner}/{repo}/issues/events"),
             &[("per_page", "50")],
             200,
-            json!([
-                generate_github_issue_event(241, "closed"),
-                generate_github_issue_event(242, "reopened"),
-            ]),
+            json!([generate_github_issue_event(241, "closed"), reopened]),
         )
         .await;
     let input = ListRepositoryIssueEvents {
@@ -1136,6 +1153,8 @@ async fn lists_a_page_of_what_happened_to_a_repository_s_issues() {
     assert_eq!(listed.len(), 2);
     assert_eq!(listed[1].id, "242");
     assert_eq!(listed[1].event, "reopened");
+    assert_eq!(listed[1].issue_number, Some(9));
+    assert_eq!(listed[1].state_reason.as_deref(), Some("reopened"));
 }
 
 // Milestones.
