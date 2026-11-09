@@ -65,7 +65,7 @@ pub use acknowledgement::GithubAcknowledgement;
 pub use artifact::GithubArtifact;
 pub use artifact_download::GithubArtifactDownload;
 pub use branch::GithubBranch;
-pub use check_run::GithubCheckRun;
+pub use check_run::{GithubCheckRun, GithubCheckRunOutput};
 pub use collaborator::{GithubCollaborator, GithubPermissions};
 pub use collaborator_addition::{GithubCollaboratorAddition, GithubRepositoryInvitation};
 pub use combined_status::GithubCombinedStatus;
@@ -77,7 +77,7 @@ pub use content::{
     GithubContentChange, GithubContentCommit, GithubContentEntry, GithubFileContent,
 };
 pub use contributor::GithubContributor;
-pub use event::{GithubEvent, GithubEventRepository};
+pub use event::{GithubEvent, GithubEventAccount, GithubEventRepository};
 pub use event_label::GithubEventLabel;
 pub use event_milestone::GithubEventMilestone;
 pub use event_rename::GithubEventRename;

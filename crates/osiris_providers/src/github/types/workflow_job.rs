@@ -26,4 +26,11 @@ pub struct GithubWorkflowJob {
     pub started_at: Option<String>,
     pub completed_at: Option<String>,
     pub steps: Vec<GithubWorkflowStep>,
+    pub head_sha: String,
+    pub head_branch: Option<String>,
+    pub run_attempt: i64,
+    pub workflow_name: Option<String>,
+    pub runner_name: Option<String>,
+    pub labels: Vec<String>,
+    pub created_at: Option<String>,
 }

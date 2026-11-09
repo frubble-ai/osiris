@@ -59,9 +59,22 @@ async fn lists_a_page_of_the_public_feed() {
     assert_eq!(listed.len(), 2);
     assert_eq!(listed[0].id, "1");
     assert_eq!(listed[0].event_type, "WatchEvent");
+    let actor = listed[0].actor.as_ref().unwrap();
+    assert_eq!(actor.id, "1001");
+    assert_eq!(actor.login, events[0]["actor"]["login"].as_str().unwrap());
     assert_eq!(
-        listed[0].actor.as_ref().unwrap().login,
-        events[0]["actor"]["login"].as_str().unwrap()
+        actor.display_login.as_deref(),
+        events[0]["actor"]["display_login"].as_str()
+    );
+    assert_eq!(
+        actor.avatar_url,
+        events[0]["actor"]["avatar_url"].as_str().unwrap()
+    );
+    let organization = listed[0].organization.as_ref().unwrap();
+    assert_eq!(organization.id, "3001");
+    assert_eq!(
+        organization.login,
+        events[0]["org"]["login"].as_str().unwrap()
     );
     let repository = listed[0].repository.as_ref().unwrap();
     assert_eq!(repository.id, "2001");

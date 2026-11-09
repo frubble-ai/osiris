@@ -891,10 +891,13 @@ export type ActionResultGithubWorkflow = {
      * A GitHub Actions workflow.
      */
     data: {
+        badge_url: string;
+        created_at: string;
         id: string;
         name: string;
         path: string;
         state: string;
+        updated_at: string;
         url: string;
     };
 };
@@ -907,6 +910,8 @@ export type ActionResultGithubWorkflowRun = {
      * A run of a workflow.
      */
     data: {
+        actor?: GithubUser | null;
+        check_suite_id?: string | null;
         conclusion?: string | null;
         created_at: string;
         display_title: string;
@@ -915,8 +920,16 @@ export type ActionResultGithubWorkflowRun = {
         head_sha: string;
         id: string;
         name?: string | null;
+        path: string;
+        /**
+         * The numbers of the pull requests the run is for.
+         */
+        pull_request_numbers: Array<number>;
+        run_attempt: number;
         run_number: number;
+        run_started_at?: string | null;
         status?: string | null;
+        triggering_actor?: GithubUser | null;
         updated_at: string;
         url: string;
         workflow_id: string;
@@ -930,11 +943,19 @@ export type ActionResultVecGithubArtifact = {
     data: Array<{
         archive_download_url: string;
         created_at?: string | null;
+        digest?: string | null;
         expired: boolean;
         expires_at?: string | null;
+        head_branch?: string | null;
+        head_sha?: string | null;
         id: string;
         name: string;
+        /**
+         * The run that made the artifact.
+         */
+        run_id?: string | null;
         size_in_bytes: number;
+        updated_at?: string | null;
     }>;
 };
 
@@ -954,12 +975,19 @@ export type ActionResultVecGithubBranch = {
  */
 export type ActionResultVecGithubCheckRun = {
     data: Array<{
+        /**
+         * The slug of the app that made the check run.
+         */
+        app?: string | null;
+        check_suite_id?: string | null;
         completed_at?: string | null;
         conclusion?: string | null;
         details_url?: string | null;
+        external_id?: string | null;
         head_sha: string;
         id: string;
         name: string;
+        output?: GithubCheckRunOutput | null;
         started_at?: string | null;
         status: string;
         url?: string | null;
@@ -1067,10 +1095,11 @@ export type ActionResultVecGithubContributor = {
  */
 export type ActionResultVecGithubEvent = {
     data: Array<{
-        actor?: GithubUser | null;
+        actor?: GithubEventAccount | null;
         created_at: string;
         event_type: string;
         id: string;
+        organization?: GithubEventAccount | null;
         payload: {
             [key: string]: unknown;
         };
@@ -1471,10 +1500,13 @@ export type ActionResultVecGithubUser = {
  */
 export type ActionResultVecGithubWorkflow = {
     data: Array<{
+        badge_url: string;
+        created_at: string;
         id: string;
         name: string;
         path: string;
         state: string;
+        updated_at: string;
         url: string;
     }>;
 };
@@ -1486,13 +1518,20 @@ export type ActionResultVecGithubWorkflowJob = {
     data: Array<{
         completed_at?: string | null;
         conclusion?: string | null;
+        created_at?: string | null;
+        head_branch?: string | null;
+        head_sha: string;
         id: string;
+        labels: Array<string>;
         name: string;
+        run_attempt: number;
         run_id: string;
+        runner_name?: string | null;
         started_at?: string | null;
         status: string;
         steps: Array<GithubWorkflowStep>;
         url?: string | null;
+        workflow_name?: string | null;
     }>;
 };
 
@@ -1501,6 +1540,8 @@ export type ActionResultVecGithubWorkflowJob = {
  */
 export type ActionResultVecGithubWorkflowRun = {
     data: Array<{
+        actor?: GithubUser | null;
+        check_suite_id?: string | null;
         conclusion?: string | null;
         created_at: string;
         display_title: string;
@@ -1509,8 +1550,16 @@ export type ActionResultVecGithubWorkflowRun = {
         head_sha: string;
         id: string;
         name?: string | null;
+        path: string;
+        /**
+         * The numbers of the pull requests the run is for.
+         */
+        pull_request_numbers: Array<number>;
+        run_attempt: number;
         run_number: number;
+        run_started_at?: string | null;
         status?: string | null;
+        triggering_actor?: GithubUser | null;
         updated_at: string;
         url: string;
         workflow_id: string;
@@ -2526,11 +2575,19 @@ export type GithubAcknowledgement = {
 export type GithubArtifact = {
     archive_download_url: string;
     created_at?: string | null;
+    digest?: string | null;
     expired: boolean;
     expires_at?: string | null;
+    head_branch?: string | null;
+    head_sha?: string | null;
     id: string;
     name: string;
+    /**
+     * The run that made the artifact.
+     */
+    run_id?: string | null;
     size_in_bytes: number;
+    updated_at?: string | null;
 };
 
 /**
@@ -2556,15 +2613,32 @@ export type GithubBranch = {
  * A check run on a commit.
  */
 export type GithubCheckRun = {
+    /**
+     * The slug of the app that made the check run.
+     */
+    app?: string | null;
+    check_suite_id?: string | null;
     completed_at?: string | null;
     conclusion?: string | null;
     details_url?: string | null;
+    external_id?: string | null;
     head_sha: string;
     id: string;
     name: string;
+    output?: GithubCheckRunOutput | null;
     started_at?: string | null;
     status: string;
     url?: string | null;
+};
+
+/**
+ * What a check run reported.
+ */
+export type GithubCheckRunOutput = {
+    annotations_count: number;
+    summary?: string | null;
+    text?: string | null;
+    title?: string | null;
 };
 
 /**
@@ -2764,15 +2838,27 @@ export type GithubCurrentUser = {
  * An event on GitHub's activity feed. `payload` is GitHub's own, whose shape depends on `event_type`.
  */
 export type GithubEvent = {
-    actor?: GithubUser | null;
+    actor?: GithubEventAccount | null;
     created_at: string;
     event_type: string;
     id: string;
+    organization?: GithubEventAccount | null;
     payload: {
         [key: string]: unknown;
     };
     public: boolean;
     repository?: GithubEventRepository | null;
+};
+
+/**
+ * Who did an event, or the organization it happened in: GitHub names an account on its activity
+ * feeds by less than it does elsewhere, with no page link and no account type.
+ */
+export type GithubEventAccount = {
+    avatar_url: string;
+    display_login?: string | null;
+    id: string;
+    login: string;
 };
 
 /**
@@ -3641,10 +3727,13 @@ export type GithubUserSearchResults = {
  * A GitHub Actions workflow.
  */
 export type GithubWorkflow = {
+    badge_url: string;
+    created_at: string;
     id: string;
     name: string;
     path: string;
     state: string;
+    updated_at: string;
     url: string;
 };
 
@@ -3654,19 +3743,28 @@ export type GithubWorkflow = {
 export type GithubWorkflowJob = {
     completed_at?: string | null;
     conclusion?: string | null;
+    created_at?: string | null;
+    head_branch?: string | null;
+    head_sha: string;
     id: string;
+    labels: Array<string>;
     name: string;
+    run_attempt: number;
     run_id: string;
+    runner_name?: string | null;
     started_at?: string | null;
     status: string;
     steps: Array<GithubWorkflowStep>;
     url?: string | null;
+    workflow_name?: string | null;
 };
 
 /**
  * A run of a workflow.
  */
 export type GithubWorkflowRun = {
+    actor?: GithubUser | null;
+    check_suite_id?: string | null;
     conclusion?: string | null;
     created_at: string;
     display_title: string;
@@ -3675,8 +3773,16 @@ export type GithubWorkflowRun = {
     head_sha: string;
     id: string;
     name?: string | null;
+    path: string;
+    /**
+     * The numbers of the pull requests the run is for.
+     */
+    pull_request_numbers: Array<number>;
+    run_attempt: number;
     run_number: number;
+    run_started_at?: string | null;
     status?: string | null;
+    triggering_actor?: GithubUser | null;
     updated_at: string;
     url: string;
     workflow_id: string;

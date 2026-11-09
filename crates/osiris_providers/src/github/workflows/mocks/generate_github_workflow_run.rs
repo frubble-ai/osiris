@@ -1,6 +1,8 @@
 //! A workflow run, as GitHub answers it.
 
-use crate::github::mocks::generate_sha::generate_sha;
+use crate::github::mocks::{
+    generate_github_user::generate_github_user, generate_sha::generate_sha,
+};
 use fake::{
     Fake,
     faker::lorem::en::{Sentence, Word},
@@ -23,5 +25,12 @@ pub fn generate_github_workflow_run(id: u64, workflow_id: u64) -> Value {
         "run_number": (1..1000).fake::<i64>(),
         "created_at": "2024-01-02T03:04:05Z",
         "updated_at": "2024-01-02T03:09:05Z",
+        "run_attempt": 2,
+        "run_started_at": "2024-01-02T03:04:06Z",
+        "actor": generate_github_user(id + 1000),
+        "triggering_actor": generate_github_user(id + 2000),
+        "path": ".github/workflows/ci.yml",
+        "check_suite_id": id + 3000,
+        "pull_requests": [{"id": id + 4000, "number": 7, "url": "https://api.github.com/repos/octo/hello/pulls/7"}],
     })
 }

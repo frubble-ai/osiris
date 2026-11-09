@@ -45,6 +45,16 @@ pub struct WorkflowJobAnswer {
     pub completed_at: Option<String>,
     #[serde(default)]
     pub steps: Vec<WorkflowStepAnswer>,
+    #[serde(default)]
+    pub head_sha: String,
+    pub head_branch: Option<String>,
+    #[serde(default)]
+    pub run_attempt: i64,
+    pub workflow_name: Option<String>,
+    pub runner_name: Option<String>,
+    #[serde(default)]
+    pub labels: Vec<String>,
+    pub created_at: Option<String>,
 }
 
 impl From<WorkflowJobAnswer> for GithubWorkflowJob {
@@ -64,6 +74,13 @@ impl From<WorkflowJobAnswer> for GithubWorkflowJob {
                 .into_iter()
                 .map(GithubWorkflowStep::from)
                 .collect(),
+            head_sha: answer.head_sha,
+            head_branch: answer.head_branch,
+            run_attempt: answer.run_attempt,
+            workflow_name: answer.workflow_name,
+            runner_name: answer.runner_name,
+            labels: answer.labels,
+            created_at: answer.created_at,
         }
     }
 }

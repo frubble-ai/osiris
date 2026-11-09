@@ -11,4 +11,7 @@ pub struct GithubWorkflow {
     pub path: String,
     pub state: String,
     pub url: String,
+    pub badge_url: String,
+    pub created_at: String,
+    pub updated_at: String,
 }

@@ -13,4 +13,10 @@ pub struct GithubArtifact {
     pub expired: bool,
     pub created_at: Option<String>,
     pub expires_at: Option<String>,
+    pub updated_at: Option<String>,
+    pub digest: Option<String>,
+    /// The run that made the artifact.
+    pub run_id: Option<String>,
+    pub head_branch: Option<String>,
+    pub head_sha: Option<String>,
 }

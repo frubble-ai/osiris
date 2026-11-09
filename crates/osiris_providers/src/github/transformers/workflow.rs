@@ -14,6 +14,12 @@ pub struct WorkflowAnswer {
     pub state: String,
     #[serde(rename = "html_url", default)]
     pub url: String,
+    #[serde(default)]
+    pub badge_url: String,
+    #[serde(default)]
+    pub created_at: String,
+    #[serde(default)]
+    pub updated_at: String,
 }
 
 impl From<WorkflowAnswer> for GithubWorkflow {
@@ -25,6 +31,9 @@ impl From<WorkflowAnswer> for GithubWorkflow {
             path: answer.path,
             state: answer.state,
             url: answer.url,
+            badge_url: answer.badge_url,
+            created_at: answer.created_at,
+            updated_at: answer.updated_at,
         }
     }
 }

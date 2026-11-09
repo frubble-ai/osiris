@@ -2231,6 +2231,12 @@
           "data": {
             "description": "A GitHub Actions workflow.",
             "properties": {
+              "badge_url": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              },
               "id": {
                 "type": "string"
               },
@@ -2243,6 +2249,9 @@
               "state": {
                 "type": "string"
               },
+              "updated_at": {
+                "type": "string"
+              },
               "url": {
                 "type": "string"
               }
@@ -2252,7 +2261,10 @@
               "name",
               "path",
               "state",
-              "url"
+              "url",
+              "badge_url",
+              "created_at",
+              "updated_at"
             ],
             "type": "object"
           }
@@ -2268,6 +2280,22 @@
           "data": {
             "description": "A run of a workflow.",
             "properties": {
+              "actor": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "check_suite_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "conclusion": {
                 "type": [
                   "string",
@@ -2301,14 +2329,45 @@
                   "null"
                 ]
               },
+              "path": {
+                "type": "string"
+              },
+              "pull_request_numbers": {
+                "description": "The numbers of the pull requests the run is for.",
+                "items": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              "run_attempt": {
+                "format": "int64",
+                "type": "integer"
+              },
               "run_number": {
                 "format": "int64",
                 "type": "integer"
+              },
+              "run_started_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "status": {
                 "type": [
                   "string",
                   "null"
+                ]
+              },
+              "triggering_actor": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "updated_at": {
@@ -2330,7 +2389,10 @@
               "url",
               "run_number",
               "created_at",
-              "updated_at"
+              "updated_at",
+              "run_attempt",
+              "path",
+              "pull_request_numbers"
             ],
             "type": "object"
           }
@@ -2356,10 +2418,28 @@
                     "null"
                   ]
                 },
+                "digest": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "expired": {
                   "type": "boolean"
                 },
                 "expires_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "head_branch": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "head_sha": {
                   "type": [
                     "string",
                     "null"
@@ -2371,9 +2451,22 @@
                 "name": {
                   "type": "string"
                 },
+                "run_id": {
+                  "description": "The run that made the artifact.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "size_in_bytes": {
                   "format": "int64",
                   "type": "integer"
+                },
+                "updated_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 }
               },
               "required": [
@@ -2432,6 +2525,19 @@
             "items": {
               "description": "A check run on a commit.",
               "properties": {
+                "app": {
+                  "description": "The slug of the app that made the check run.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "check_suite_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "completed_at": {
                   "type": [
                     "string",
@@ -2450,6 +2556,12 @@
                     "null"
                   ]
                 },
+                "external_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "head_sha": {
                   "type": "string"
                 },
@@ -2458,6 +2570,16 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "output": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubCheckRunOutput"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "started_at": {
                   "type": [
@@ -2879,7 +3001,7 @@
                 "actor": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/GithubUser"
+                      "$ref": "#/components/schemas/GithubEventAccount"
                     },
                     {
                       "type": "null"
@@ -2894,6 +3016,16 @@
                 },
                 "id": {
                   "type": "string"
+                },
+                "organization": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubEventAccount"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "payload": {
                   "type": "object"
@@ -4287,6 +4419,12 @@
             "items": {
               "description": "A GitHub Actions workflow.",
               "properties": {
+                "badge_url": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "string"
+                },
                 "id": {
                   "type": "string"
                 },
@@ -4299,6 +4437,9 @@
                 "state": {
                   "type": "string"
                 },
+                "updated_at": {
+                  "type": "string"
+                },
                 "url": {
                   "type": "string"
                 }
@@ -4308,7 +4449,10 @@
                 "name",
                 "path",
                 "state",
-                "url"
+                "url",
+                "badge_url",
+                "created_at",
+                "updated_at"
               ],
               "type": "object"
             },
@@ -4339,14 +4483,45 @@
                     "null"
                   ]
                 },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "head_branch": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "head_sha": {
+                  "type": "string"
+                },
                 "id": {
                   "type": "string"
+                },
+                "labels": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
                 },
                 "name": {
                   "type": "string"
                 },
+                "run_attempt": {
+                  "format": "int64",
+                  "type": "integer"
+                },
                 "run_id": {
                   "type": "string"
+                },
+                "runner_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "started_at": {
                   "type": [
@@ -4368,6 +4543,12 @@
                     "string",
                     "null"
                   ]
+                },
+                "workflow_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 }
               },
               "required": [
@@ -4375,7 +4556,10 @@
                 "run_id",
                 "name",
                 "status",
-                "steps"
+                "steps",
+                "head_sha",
+                "run_attempt",
+                "labels"
               ],
               "type": "object"
             },
@@ -4394,6 +4578,22 @@
             "items": {
               "description": "A run of a workflow.",
               "properties": {
+                "actor": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "check_suite_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "conclusion": {
                   "type": [
                     "string",
@@ -4427,14 +4627,45 @@
                     "null"
                   ]
                 },
+                "path": {
+                  "type": "string"
+                },
+                "pull_request_numbers": {
+                  "description": "The numbers of the pull requests the run is for.",
+                  "items": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "run_attempt": {
+                  "format": "int64",
+                  "type": "integer"
+                },
                 "run_number": {
                   "format": "int64",
                   "type": "integer"
+                },
+                "run_started_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "status": {
                   "type": [
                     "string",
                     "null"
+                  ]
+                },
+                "triggering_actor": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 },
                 "updated_at": {
@@ -4456,7 +4687,10 @@
                 "url",
                 "run_number",
                 "created_at",
-                "updated_at"
+                "updated_at",
+                "run_attempt",
+                "path",
+                "pull_request_numbers"
               ],
               "type": "object"
             },
@@ -6757,10 +6991,28 @@
               "null"
             ]
           },
+          "digest": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "expired": {
             "type": "boolean"
           },
           "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "head_branch": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "head_sha": {
             "type": [
               "string",
               "null"
@@ -6772,9 +7024,22 @@
           "name": {
             "type": "string"
           },
+          "run_id": {
+            "description": "The run that made the artifact.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "size_in_bytes": {
             "format": "int64",
             "type": "integer"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -6822,6 +7087,19 @@
       "GithubCheckRun": {
         "description": "A check run on a commit.",
         "properties": {
+          "app": {
+            "description": "The slug of the app that made the check run.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "check_suite_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "completed_at": {
             "type": [
               "string",
@@ -6840,6 +7118,12 @@
               "null"
             ]
           },
+          "external_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "head_sha": {
             "type": "string"
           },
@@ -6848,6 +7132,16 @@
           },
           "name": {
             "type": "string"
+          },
+          "output": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubCheckRunOutput"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "started_at": {
             "type": [
@@ -6870,6 +7164,37 @@
           "name",
           "status",
           "head_sha"
+        ],
+        "type": "object"
+      },
+      "GithubCheckRunOutput": {
+        "description": "What a check run reported.",
+        "properties": {
+          "annotations_count": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "text": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "annotations_count"
         ],
         "type": "object"
       },
@@ -7465,7 +7790,7 @@
           "actor": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/GithubUser"
+                "$ref": "#/components/schemas/GithubEventAccount"
               },
               {
                 "type": "null"
@@ -7480,6 +7805,16 @@
           },
           "id": {
             "type": "string"
+          },
+          "organization": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubEventAccount"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "payload": {
             "type": "object"
@@ -7504,6 +7839,32 @@
           "public",
           "created_at",
           "payload"
+        ],
+        "type": "object"
+      },
+      "GithubEventAccount": {
+        "description": "Who did an event, or the organization it happened in: GitHub names an account on its activity\nfeeds by less than it does elsewhere, with no page link and no account type.",
+        "properties": {
+          "avatar_url": {
+            "type": "string"
+          },
+          "display_login": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "login",
+          "avatar_url"
         ],
         "type": "object"
       },
@@ -9922,6 +10283,12 @@
       "GithubWorkflow": {
         "description": "A GitHub Actions workflow.",
         "properties": {
+          "badge_url": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
           "id": {
             "type": "string"
           },
@@ -9934,6 +10301,9 @@
           "state": {
             "type": "string"
           },
+          "updated_at": {
+            "type": "string"
+          },
           "url": {
             "type": "string"
           }
@@ -9943,7 +10313,10 @@
           "name",
           "path",
           "state",
-          "url"
+          "url",
+          "badge_url",
+          "created_at",
+          "updated_at"
         ],
         "type": "object"
       },
@@ -9962,14 +10335,45 @@
               "null"
             ]
           },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "head_branch": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "head_sha": {
+            "type": "string"
+          },
           "id": {
             "type": "string"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "name": {
             "type": "string"
           },
+          "run_attempt": {
+            "format": "int64",
+            "type": "integer"
+          },
           "run_id": {
             "type": "string"
+          },
+          "runner_name": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "started_at": {
             "type": [
@@ -9991,6 +10395,12 @@
               "string",
               "null"
             ]
+          },
+          "workflow_name": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -9998,13 +10408,32 @@
           "run_id",
           "name",
           "status",
-          "steps"
+          "steps",
+          "head_sha",
+          "run_attempt",
+          "labels"
         ],
         "type": "object"
       },
       "GithubWorkflowRun": {
         "description": "A run of a workflow.",
         "properties": {
+          "actor": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "check_suite_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "conclusion": {
             "type": [
               "string",
@@ -10038,14 +10467,45 @@
               "null"
             ]
           },
+          "path": {
+            "type": "string"
+          },
+          "pull_request_numbers": {
+            "description": "The numbers of the pull requests the run is for.",
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "run_attempt": {
+            "format": "int64",
+            "type": "integer"
+          },
           "run_number": {
             "format": "int64",
             "type": "integer"
+          },
+          "run_started_at": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "status": {
             "type": [
               "string",
               "null"
+            ]
+          },
+          "triggering_actor": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "updated_at": {
@@ -10067,7 +10527,10 @@
           "url",
           "run_number",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "run_attempt",
+          "path",
+          "pull_request_numbers"
         ],
         "type": "object"
       },

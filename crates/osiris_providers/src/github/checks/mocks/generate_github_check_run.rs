@@ -16,5 +16,9 @@ pub fn generate_github_check_run(id: u64, conclusion: &str) -> Value {
         "details_url": format!("https://ci.example.com/checks/{id}"),
         "started_at": "2024-01-02T03:04:05Z",
         "completed_at": "2024-01-02T03:09:05Z",
+        "app": {"id": 15368, "slug": "github-actions", "name": "GitHub Actions"},
+        "check_suite": {"id": id + 3000},
+        "external_id": format!("external-{id}"),
+        "output": {"title": "Build", "summary": "It built", "text": null, "annotations_count": 2, "annotations_url": format!("https://api.github.com/repos/octo/hello/check-runs/{id}/annotations")},
     })
 }

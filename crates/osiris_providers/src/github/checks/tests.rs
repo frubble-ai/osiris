@@ -181,6 +181,14 @@ async fn lists_the_check_runs_of_a_ref_filtered_as_asked() {
     assert_eq!(listed[1].conclusion.as_deref(), Some("failure"));
     assert_eq!(listed[0].head_sha, runs[0]["head_sha"].as_str().unwrap());
     assert_eq!(listed[0].url.as_deref(), runs[0]["html_url"].as_str());
+    assert_eq!(listed[0].app.as_deref(), Some("github-actions"));
+    assert_eq!(listed[0].check_suite_id.as_deref(), Some("3011"));
+    assert_eq!(listed[0].external_id.as_deref(), Some("external-11"));
+    let output = listed[0].output.as_ref().unwrap();
+    assert_eq!(output.title.as_deref(), Some("Build"));
+    assert_eq!(output.summary.as_deref(), Some("It built"));
+    assert_eq!(output.text, None);
+    assert_eq!(output.annotations_count, 2);
 }
 
 #[tokio::test]

@@ -103,6 +103,12 @@ async fn reads_a_workflow_by_id_or_file_name(#[case] workflow_id: &str, #[case] 
 
     assert_eq!(workflow.id, "161335");
     assert_eq!(workflow.state, "active");
+    assert_eq!(
+        workflow.badge_url,
+        "https://github.com/octo/hello/workflows/161335/badge.svg"
+    );
+    assert_eq!(workflow.created_at, "2024-01-01T00:00:00.000-03:00");
+    assert_eq!(workflow.updated_at, "2024-01-02T00:00:00.000-03:00");
 }
 
 #[rstest]
@@ -329,6 +335,16 @@ async fn reads_a_workflow_run_by_id() {
     assert_eq!(run.id, "30");
     assert_eq!(run.display_title, answer["display_title"].as_str().unwrap());
     assert_eq!(run.url, answer["html_url"].as_str().unwrap());
+    assert_eq!(run.run_attempt, 2);
+    assert_eq!(run.run_started_at.as_deref(), Some("2024-01-02T03:04:06Z"));
+    assert_eq!(
+        run.actor.as_ref().unwrap().login,
+        answer["actor"]["login"].as_str().unwrap()
+    );
+    assert_eq!(run.triggering_actor.as_ref().unwrap().id, "2030");
+    assert_eq!(run.path, ".github/workflows/ci.yml");
+    assert_eq!(run.check_suite_id.as_deref(), Some("3030"));
+    assert_eq!(run.pull_request_numbers, [7]);
 }
 
 #[tokio::test]
@@ -367,6 +383,19 @@ async fn lists_the_jobs_of_a_run_with_their_steps() {
     assert_eq!(
         listed[0].steps[0].name,
         jobs[0]["steps"][0]["name"].as_str().unwrap()
+    );
+    assert_eq!(
+        listed[0].head_sha,
+        "6b6f6f3373bddf70d592019006ad64aec76fa8ae"
+    );
+    assert_eq!(listed[0].head_branch.as_deref(), Some("main"));
+    assert_eq!(listed[0].run_attempt, 1);
+    assert_eq!(listed[0].workflow_name.as_deref(), Some("ci"));
+    assert_eq!(listed[0].runner_name.as_deref(), Some("GitHub Actions 7"));
+    assert_eq!(listed[0].labels, ["ubuntu-latest"]);
+    assert_eq!(
+        listed[0].created_at.as_deref(),
+        Some("2024-01-02T03:04:00Z")
     );
 }
 
@@ -597,6 +626,17 @@ async fn lists_the_artifacts_of_a_run_by_name() {
         artifacts[0]["size_in_bytes"].as_i64().unwrap()
     );
     assert!(!listed[0].expired);
+    assert_eq!(
+        listed[0].updated_at.as_deref(),
+        Some("2024-01-02T03:04:06Z")
+    );
+    assert_eq!(listed[0].digest.as_deref(), artifacts[0]["digest"].as_str());
+    assert_eq!(listed[0].run_id.as_deref(), Some("600"));
+    assert_eq!(listed[0].head_branch.as_deref(), Some("main"));
+    assert_eq!(
+        listed[0].head_sha.as_deref(),
+        Some("6b6f6f3373bddf70d592019006ad64aec76fa8ae")
+    );
 }
 
 #[tokio::test]

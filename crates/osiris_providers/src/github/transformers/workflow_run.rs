@@ -1,6 +1,7 @@
 //! A run of a workflow, as GitHub answers it.
 
-use crate::github::types::GithubWorkflowRun;
+use super::user::UserAnswer;
+use crate::github::types::{GithubUser, GithubWorkflowRun};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -25,6 +26,22 @@ pub struct WorkflowRunAnswer {
     pub created_at: String,
     #[serde(default)]
     pub updated_at: String,
+    #[serde(default)]
+    pub run_attempt: i64,
+    pub run_started_at: Option<String>,
+    pub actor: Option<UserAnswer>,
+    pub triggering_actor: Option<UserAnswer>,
+    #[serde(default)]
+    pub path: String,
+    pub check_suite_id: Option<u64>,
+    #[serde(default)]
+    pub pull_requests: Vec<RunPullRequestAnswer>,
+}
+
+/// A pull request a run is for, of which we keep the number.
+#[derive(Deserialize)]
+pub struct RunPullRequestAnswer {
+    pub number: i64,
 }
 
 impl From<WorkflowRunAnswer> for GithubWorkflowRun {
@@ -44,6 +61,17 @@ impl From<WorkflowRunAnswer> for GithubWorkflowRun {
             run_number: answer.run_number,
             created_at: answer.created_at,
             updated_at: answer.updated_at,
+            run_attempt: answer.run_attempt,
+            run_started_at: answer.run_started_at,
+            actor: answer.actor.map(GithubUser::from),
+            triggering_actor: answer.triggering_actor.map(GithubUser::from),
+            path: answer.path,
+            check_suite_id: answer.check_suite_id.map(|id| id.to_string()),
+            pull_request_numbers: answer
+                .pull_requests
+                .into_iter()
+                .map(|pull_request| pull_request.number)
+                .collect(),
         }
     }
 }

@@ -238,32 +238,14 @@ export const zActionResultGithubTopics = z.object({
  */
 export const zActionResultGithubWorkflow = z.object({
     data: z.object({
+        badge_url: z.string(),
+        created_at: z.string(),
         id: z.string(),
         name: z.string(),
         path: z.string(),
         state: z.string(),
-        url: z.string()
-    })
-});
-
-/**
- * An action's answer: what it read, as `data`.
- */
-export const zActionResultGithubWorkflowRun = z.object({
-    data: z.object({
-        conclusion: z.string().nullish(),
-        created_at: z.string(),
-        display_title: z.string(),
-        event: z.string(),
-        head_branch: z.string().nullish(),
-        head_sha: z.string(),
-        id: z.string(),
-        name: z.string().nullish(),
-        run_number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-        status: z.string().nullish(),
         updated_at: z.string(),
-        url: z.string(),
-        workflow_id: z.string()
+        url: z.string()
     })
 });
 
@@ -274,11 +256,16 @@ export const zActionResultVecGithubArtifact = z.object({
     data: z.array(z.object({
         archive_download_url: z.string(),
         created_at: z.string().nullish(),
+        digest: z.string().nullish(),
         expired: z.boolean(),
         expires_at: z.string().nullish(),
+        head_branch: z.string().nullish(),
+        head_sha: z.string().nullish(),
         id: z.string(),
         name: z.string(),
-        size_in_bytes: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
+        run_id: z.string().nullish(),
+        size_in_bytes: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        updated_at: z.string().nullish()
     }))
 });
 
@@ -290,23 +277,6 @@ export const zActionResultVecGithubBranch = z.object({
         commit_sha: z.string(),
         name: z.string(),
         protected: z.boolean()
-    }))
-});
-
-/**
- * An action's answer: what it read, as `data`.
- */
-export const zActionResultVecGithubCheckRun = z.object({
-    data: z.array(z.object({
-        completed_at: z.string().nullish(),
-        conclusion: z.string().nullish(),
-        details_url: z.string().nullish(),
-        head_sha: z.string(),
-        id: z.string(),
-        name: z.string(),
-        started_at: z.string().nullish(),
-        status: z.string(),
-        url: z.string().nullish()
     }))
 });
 
@@ -466,32 +436,14 @@ export const zActionResultVecGithubUser = z.object({
  */
 export const zActionResultVecGithubWorkflow = z.object({
     data: z.array(z.object({
+        badge_url: z.string(),
+        created_at: z.string(),
         id: z.string(),
         name: z.string(),
         path: z.string(),
         state: z.string(),
-        url: z.string()
-    }))
-});
-
-/**
- * An action's answer: what it read, as `data`.
- */
-export const zActionResultVecGithubWorkflowRun = z.object({
-    data: z.array(z.object({
-        conclusion: z.string().nullish(),
-        created_at: z.string(),
-        display_title: z.string(),
-        event: z.string(),
-        head_branch: z.string().nullish(),
-        head_sha: z.string(),
-        id: z.string(),
-        name: z.string().nullish(),
-        run_number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-        status: z.string().nullish(),
         updated_at: z.string(),
-        url: z.string(),
-        workflow_id: z.string()
+        url: z.string()
     }))
 });
 
@@ -971,11 +923,16 @@ export const zGithubAcknowledgement = z.object({
 export const zGithubArtifact = z.object({
     archive_download_url: z.string(),
     created_at: z.string().nullish(),
+    digest: z.string().nullish(),
     expired: z.boolean(),
     expires_at: z.string().nullish(),
+    head_branch: z.string().nullish(),
+    head_sha: z.string().nullish(),
     id: z.string(),
     name: z.string(),
-    size_in_bytes: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
+    run_id: z.string().nullish(),
+    size_in_bytes: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    updated_at: z.string().nullish()
 });
 
 /**
@@ -995,15 +952,50 @@ export const zGithubBranch = z.object({
 });
 
 /**
+ * What a check run reported.
+ */
+export const zGithubCheckRunOutput = z.object({
+    annotations_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    summary: z.string().nullish(),
+    text: z.string().nullish(),
+    title: z.string().nullish()
+});
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export const zActionResultVecGithubCheckRun = z.object({
+    data: z.array(z.object({
+        app: z.string().nullish(),
+        check_suite_id: z.string().nullish(),
+        completed_at: z.string().nullish(),
+        conclusion: z.string().nullish(),
+        details_url: z.string().nullish(),
+        external_id: z.string().nullish(),
+        head_sha: z.string(),
+        id: z.string(),
+        name: z.string(),
+        output: zGithubCheckRunOutput.nullish(),
+        started_at: z.string().nullish(),
+        status: z.string(),
+        url: z.string().nullish()
+    }))
+});
+
+/**
  * A check run on a commit.
  */
 export const zGithubCheckRun = z.object({
+    app: z.string().nullish(),
+    check_suite_id: z.string().nullish(),
     completed_at: z.string().nullish(),
     conclusion: z.string().nullish(),
     details_url: z.string().nullish(),
+    external_id: z.string().nullish(),
     head_sha: z.string(),
     id: z.string(),
     name: z.string(),
+    output: zGithubCheckRunOutput.nullish(),
     started_at: z.string().nullish(),
     status: z.string(),
     url: z.string().nullish()
@@ -1112,6 +1104,17 @@ export const zGithubCurrentUser = z.object({
 });
 
 /**
+ * Who did an event, or the organization it happened in: GitHub names an account on its activity
+ * feeds by less than it does elsewhere, with no page link and no account type.
+ */
+export const zGithubEventAccount = z.object({
+    avatar_url: z.string(),
+    display_login: z.string().nullish(),
+    id: z.string(),
+    login: z.string()
+});
+
+/**
  * The label a `labeled` or `unlabeled` event is about.
  */
 export const zGithubEventLabel = z.object({
@@ -1140,6 +1143,36 @@ export const zGithubEventRename = z.object({
 export const zGithubEventRepository = z.object({
     id: z.string(),
     name: z.string()
+});
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export const zActionResultVecGithubEvent = z.object({
+    data: z.array(z.object({
+        actor: zGithubEventAccount.nullish(),
+        created_at: z.string(),
+        event_type: z.string(),
+        id: z.string(),
+        organization: zGithubEventAccount.nullish(),
+        payload: z.record(z.string(), z.unknown()),
+        public: z.boolean(),
+        repository: zGithubEventRepository.nullish()
+    }))
+});
+
+/**
+ * An event on GitHub's activity feed. `payload` is GitHub's own, whose shape depends on `event_type`.
+ */
+export const zGithubEvent = z.object({
+    actor: zGithubEventAccount.nullish(),
+    created_at: z.string(),
+    event_type: z.string(),
+    id: z.string(),
+    organization: zGithubEventAccount.nullish(),
+    payload: z.record(z.string(), z.unknown()),
+    public: z.boolean(),
+    repository: zGithubEventRepository.nullish()
 });
 
 /**
@@ -1845,6 +1878,34 @@ export const zActionResultGithubReviewComment = z.object({
 /**
  * An action's answer: what it read, as `data`.
  */
+export const zActionResultGithubWorkflowRun = z.object({
+    data: z.object({
+        actor: zGithubUser.nullish(),
+        check_suite_id: z.string().nullish(),
+        conclusion: z.string().nullish(),
+        created_at: z.string(),
+        display_title: z.string(),
+        event: z.string(),
+        head_branch: z.string().nullish(),
+        head_sha: z.string(),
+        id: z.string(),
+        name: z.string().nullish(),
+        path: z.string(),
+        pull_request_numbers: z.array(z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })),
+        run_attempt: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        run_number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        run_started_at: z.string().nullish(),
+        status: z.string().nullish(),
+        triggering_actor: zGithubUser.nullish(),
+        updated_at: z.string(),
+        url: z.string(),
+        workflow_id: z.string()
+    })
+});
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
 export const zActionResultVecGithubCommit = z.object({
     data: z.array(z.object({
         author: zGithubUser.nullish(),
@@ -1876,21 +1937,6 @@ export const zActionResultVecGithubCommitComment = z.object({
         updated_at: z.string(),
         url: z.string(),
         user: zGithubUser.nullish()
-    }))
-});
-
-/**
- * An action's answer: what it read, as `data`.
- */
-export const zActionResultVecGithubEvent = z.object({
-    data: z.array(z.object({
-        actor: zGithubUser.nullish(),
-        created_at: z.string(),
-        event_type: z.string(),
-        id: z.string(),
-        payload: z.record(z.string(), z.unknown()),
-        public: z.boolean(),
-        repository: zGithubEventRepository.nullish()
     }))
 });
 
@@ -2075,6 +2121,34 @@ export const zActionResultVecGithubTimelineEvent = z.object({
 });
 
 /**
+ * An action's answer: what it read, as `data`.
+ */
+export const zActionResultVecGithubWorkflowRun = z.object({
+    data: z.array(z.object({
+        actor: zGithubUser.nullish(),
+        check_suite_id: z.string().nullish(),
+        conclusion: z.string().nullish(),
+        created_at: z.string(),
+        display_title: z.string(),
+        event: z.string(),
+        head_branch: z.string().nullish(),
+        head_sha: z.string(),
+        id: z.string(),
+        name: z.string().nullish(),
+        path: z.string(),
+        pull_request_numbers: z.array(z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })),
+        run_attempt: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        run_number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        run_started_at: z.string().nullish(),
+        status: z.string().nullish(),
+        triggering_actor: zGithubUser.nullish(),
+        updated_at: z.string(),
+        url: z.string(),
+        workflow_id: z.string()
+    }))
+});
+
+/**
  * A commit.
  */
 export const zGithubCommit = z.object({
@@ -2133,19 +2207,6 @@ export const zGithubCommitComparison = z.object({
     status: z.string(),
     total_commits: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     url: z.string()
-});
-
-/**
- * An event on GitHub's activity feed. `payload` is GitHub's own, whose shape depends on `event_type`.
- */
-export const zGithubEvent = z.object({
-    actor: zGithubUser.nullish(),
-    created_at: z.string(),
-    event_type: z.string(),
-    id: z.string(),
-    payload: z.record(z.string(), z.unknown()),
-    public: z.boolean(),
-    repository: zGithubEventRepository.nullish()
 });
 
 /**
@@ -2672,10 +2733,13 @@ export const zGithubUserSearchResults = z.object({
  * A GitHub Actions workflow.
  */
 export const zGithubWorkflow = z.object({
+    badge_url: z.string(),
+    created_at: z.string(),
     id: z.string(),
     name: z.string(),
     path: z.string(),
     state: z.string(),
+    updated_at: z.string(),
     url: z.string()
 });
 
@@ -2683,6 +2747,8 @@ export const zGithubWorkflow = z.object({
  * A run of a workflow.
  */
 export const zGithubWorkflowRun = z.object({
+    actor: zGithubUser.nullish(),
+    check_suite_id: z.string().nullish(),
     conclusion: z.string().nullish(),
     created_at: z.string(),
     display_title: z.string(),
@@ -2691,8 +2757,13 @@ export const zGithubWorkflowRun = z.object({
     head_sha: z.string(),
     id: z.string(),
     name: z.string().nullish(),
+    path: z.string(),
+    pull_request_numbers: z.array(z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })),
+    run_attempt: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     run_number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    run_started_at: z.string().nullish(),
     status: z.string().nullish(),
+    triggering_actor: zGithubUser.nullish(),
     updated_at: z.string(),
     url: z.string(),
     workflow_id: z.string()
@@ -2717,13 +2788,20 @@ export const zActionResultVecGithubWorkflowJob = z.object({
     data: z.array(z.object({
         completed_at: z.string().nullish(),
         conclusion: z.string().nullish(),
+        created_at: z.string().nullish(),
+        head_branch: z.string().nullish(),
+        head_sha: z.string(),
         id: z.string(),
+        labels: z.array(z.string()),
         name: z.string(),
+        run_attempt: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         run_id: z.string(),
+        runner_name: z.string().nullish(),
         started_at: z.string().nullish(),
         status: z.string(),
         steps: z.array(zGithubWorkflowStep),
-        url: z.string().nullish()
+        url: z.string().nullish(),
+        workflow_name: z.string().nullish()
     }))
 });
 
@@ -2733,13 +2811,20 @@ export const zActionResultVecGithubWorkflowJob = z.object({
 export const zGithubWorkflowJob = z.object({
     completed_at: z.string().nullish(),
     conclusion: z.string().nullish(),
+    created_at: z.string().nullish(),
+    head_branch: z.string().nullish(),
+    head_sha: z.string(),
     id: z.string(),
+    labels: z.array(z.string()),
     name: z.string(),
+    run_attempt: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     run_id: z.string(),
+    runner_name: z.string().nullish(),
     started_at: z.string().nullish(),
     status: z.string(),
     steps: z.array(zGithubWorkflowStep),
-    url: z.string().nullish()
+    url: z.string().nullish(),
+    workflow_name: z.string().nullish()
 });
 
 /**
