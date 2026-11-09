@@ -1169,12 +1169,32 @@ export type ActionResultVecGithubInstallation = {
          * release, and a client keeps working on one it doesn't know.
          */
         account_type: string;
+        /**
+         * The app installed, by its slug.
+         */
+        app_slug: string;
+        created_at?: string | null;
+        /**
+         * The webhook events it is subscribed to.
+         */
+        events: Array<string>;
         id: string;
+        /**
+         * What the installation may do, by GitHub's permission name: `read`, `write` or `admin`.
+         */
+        permissions: {
+            [key: string]: string;
+        };
         /**
          * `all` (every repository of the account) or `selected` (only the ones chosen at install)
          * today. An open string: more values may come without a new release.
          */
         repository_selection: string;
+        /**
+         * When it was suspended, if it is.
+         */
+        suspended_at?: string | null;
+        updated_at?: string | null;
     }>;
 };
 
@@ -3043,12 +3063,32 @@ export type GithubInstallation = {
      * release, and a client keeps working on one it doesn't know.
      */
     account_type: string;
+    /**
+     * The app installed, by its slug.
+     */
+    app_slug: string;
+    created_at?: string | null;
+    /**
+     * The webhook events it is subscribed to.
+     */
+    events: Array<string>;
     id: string;
+    /**
+     * What the installation may do, by GitHub's permission name: `read`, `write` or `admin`.
+     */
+    permissions: {
+        [key: string]: string;
+    };
     /**
      * `all` (every repository of the account) or `selected` (only the ones chosen at install)
      * today. An open string: more values may come without a new release.
      */
     repository_selection: string;
+    /**
+     * When it was suspended, if it is.
+     */
+    suspended_at?: string | null;
+    updated_at?: string | null;
 };
 
 /**

@@ -3274,19 +3274,62 @@
                   "description": "`user` or `organization` today. An open string: more values may come without a new\nrelease, and a client keeps working on one it doesn't know.",
                   "type": "string"
                 },
+                "app_slug": {
+                  "description": "The app installed, by its slug.",
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "events": {
+                  "description": "The webhook events it is subscribed to.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
                 "id": {
                   "type": "string"
+                },
+                "permissions": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "What the installation may do, by GitHub's permission name: `read`, `write` or `admin`.",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
                 },
                 "repository_selection": {
                   "description": "`all` (every repository of the account) or `selected` (only the ones chosen at install)\ntoday. An open string: more values may come without a new release.",
                   "type": "string"
+                },
+                "suspended_at": {
+                  "description": "When it was suspended, if it is.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "updated_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 }
               },
               "required": [
                 "id",
                 "account",
                 "account_type",
-                "repository_selection"
+                "repository_selection",
+                "app_slug",
+                "permissions",
+                "events"
               ],
               "type": "object"
             },
@@ -8446,19 +8489,62 @@
             "description": "`user` or `organization` today. An open string: more values may come without a new\nrelease, and a client keeps working on one it doesn't know.",
             "type": "string"
           },
+          "app_slug": {
+            "description": "The app installed, by its slug.",
+            "type": "string"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "events": {
+            "description": "The webhook events it is subscribed to.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "id": {
             "type": "string"
+          },
+          "permissions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "What the installation may do, by GitHub's permission name: `read`, `write` or `admin`.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
           },
           "repository_selection": {
             "description": "`all` (every repository of the account) or `selected` (only the ones chosen at install)\ntoday. An open string: more values may come without a new release.",
             "type": "string"
+          },
+          "suspended_at": {
+            "description": "When it was suspended, if it is.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
           "id",
           "account",
           "account_type",
-          "repository_selection"
+          "repository_selection",
+          "app_slug",
+          "permissions",
+          "events"
         ],
         "type": "object"
       },

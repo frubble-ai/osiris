@@ -2,6 +2,7 @@
 
 use crate::github::types::GithubInstallation;
 use serde::Deserialize;
+use std::collections::BTreeMap;
 
 /// A page of `GET /user/installations`.
 #[derive(Deserialize)]
@@ -16,6 +17,15 @@ pub struct InstallationAnswer {
     account: AccountAnswer,
     /// `all` or `selected` today, passed on as GitHub sends it.
     repository_selection: String,
+    #[serde(default)]
+    app_slug: String,
+    #[serde(default)]
+    permissions: BTreeMap<String, String>,
+    #[serde(default)]
+    events: Vec<String>,
+    created_at: Option<String>,
+    updated_at: Option<String>,
+    suspended_at: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -33,6 +43,12 @@ impl From<InstallationAnswer> for GithubInstallation {
             account: answer.account.login,
             account_type: account_type(&answer.account.kind),
             repository_selection: answer.repository_selection,
+            app_slug: answer.app_slug,
+            permissions: answer.permissions,
+            events: answer.events,
+            created_at: answer.created_at,
+            updated_at: answer.updated_at,
+            suspended_at: answer.suspended_at,
         }
     }
 }

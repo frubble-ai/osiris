@@ -342,8 +342,14 @@ export const zActionResultVecGithubInstallation = z.object({
     data: z.array(z.object({
         account: z.string(),
         account_type: z.string(),
+        app_slug: z.string(),
+        created_at: z.string().nullish(),
+        events: z.array(z.string()),
         id: z.string(),
-        repository_selection: z.string()
+        permissions: z.record(z.string(), z.string()),
+        repository_selection: z.string(),
+        suspended_at: z.string().nullish(),
+        updated_at: z.string().nullish()
     }))
 });
 
@@ -1320,8 +1326,14 @@ export const zGetWorkflowRun = z.object({
 export const zGithubInstallation = z.object({
     account: z.string(),
     account_type: z.string(),
+    app_slug: z.string(),
+    created_at: z.string().nullish(),
+    events: z.array(z.string()),
     id: z.string(),
-    repository_selection: z.string()
+    permissions: z.record(z.string(), z.string()),
+    repository_selection: z.string(),
+    suspended_at: z.string().nullish(),
+    updated_at: z.string().nullish()
 });
 
 /**

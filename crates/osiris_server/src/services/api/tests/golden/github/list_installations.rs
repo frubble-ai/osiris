@@ -16,6 +16,12 @@ pub async fn run(app: &TestContext, session: &mut GoldenSession<'_>) {
             "id": 7,
             "account": { "login": "golden-org", "type": "Organization" },
             "repository_selection": "selected",
+            "app_slug": "golden-app",
+            "permissions": { "contents": "read", "metadata": "read" },
+            "events": ["push"],
+            "created_at": "2026-01-01T00:00:00.000Z",
+            "updated_at": "2026-01-02T00:00:00.000Z",
+            "suspended_at": null,
         })])
         .await;
     for id in [github, other] {

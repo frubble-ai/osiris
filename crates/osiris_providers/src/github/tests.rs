@@ -64,6 +64,17 @@ async fn lists_the_installations_the_user_can_see_with_their_token() {
         listed[1].account,
         installations[1]["account"]["login"].as_str().unwrap()
     );
+    assert_eq!(listed[1].app_slug, "frubble-ai-dev");
+    assert_eq!(
+        listed[1].permissions.get("issues").map(String::as_str),
+        Some("write")
+    );
+    assert_eq!(listed[1].events, ["push", "pull_request"]);
+    assert_eq!(
+        listed[1].created_at.as_deref(),
+        Some("2026-01-01T00:00:00.000Z")
+    );
+    assert_eq!(listed[1].suspended_at, None);
 }
 
 #[rstest]
