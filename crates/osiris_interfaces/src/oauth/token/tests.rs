@@ -68,8 +68,8 @@ fn treats_invalid_grant_as_permanent() {
 #[case::ok_unavailable(StatusCode::OK, "temporarily_unavailable")]
 #[case::bad_request_unavailable(StatusCode::BAD_REQUEST, "temporarily_unavailable")]
 #[case::ok_server_error(StatusCode::OK, "server_error")]
-#[case::slack_ratelimited(StatusCode::OK, "ratelimited")]
-#[case::slack_internal_error(StatusCode::OK, "internal_error")]
+#[case::ratelimited_in_a_200(StatusCode::OK, "ratelimited")]
+#[case::internal_error_in_a_200(StatusCode::OK, "internal_error")]
 fn treats_an_error_code_that_says_try_again_as_temporary_whatever_the_status(
     #[case] status: StatusCode,
     #[case] code: &str,

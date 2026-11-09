@@ -1,4 +1,4 @@
-//! `osiris actions run github.list_repositories --connection ca_…`.
+//! `osiris actions run <provider>.<action> --connection ca_…`.
 
 use crate::{
     client::{Client, Key, print},
@@ -15,7 +15,7 @@ pub enum Actions {
 
 #[derive(Args)]
 pub struct Run {
-    /// e.g. `github.list_repositories`, `linear.list_teams`, `slack.list_channels`.
+    /// The action, as `<provider>.<action>`.
     action: String,
     #[arg(long)]
     connection: String,

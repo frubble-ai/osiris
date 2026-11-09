@@ -1,6 +1,6 @@
 //! One migrate execution at a time, held by the process rather than by the workflow.
 //!
-//! GitHub kills a cancelled job's cleanup step five minutes after the cancellation, which
+//! The CI runner kills a cancelled job's cleanup step five minutes after the cancellation, which
 //! lets the next deploy or reset start while this execution is still running. A session
 //! advisory lock on a connection this process keeps open until it exits does not depend on
 //! that runner: the next execution waits here before it drops or migrates, and the lock

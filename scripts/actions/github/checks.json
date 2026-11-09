@@ -1,0 +1,39 @@
+[
+ {
+  "group": "checks",
+  "name": "create_commit_status",
+  "input": "CreateCommitStatus",
+  "output": "GithubCommitStatus",
+  "summary": "sets a status on a commit."
+ },
+ {
+  "group": "checks",
+  "name": "get_commit_statuses",
+  "input": "GetCommitStatuses",
+  "output": "GithubCommitStatus",
+  "list": true,
+  "summary": "the statuses set on a commit, newest first, a page at a time."
+ },
+ {
+  "group": "checks",
+  "name": "list_check_runs_for_ref",
+  "input": "ListCheckRunsForRef",
+  "output": "GithubCheckRun",
+  "list": true,
+  "summary": "the check runs on a commit, a branch or a tag, a page at a time."
+ },
+ {
+  "group": "checks",
+  "name": "rerequest_check_run",
+  "input": "RerequestCheckRun",
+  "output": "GithubAcknowledgement",
+  "summary": "asks the app that made a check run to run it again."
+ },
+ {
+  "group": "checks",
+  "name": "rerequest_check_suite",
+  "input": "RerequestCheckSuite",
+  "output": "GithubAcknowledgement",
+  "summary": "asks the app that made a check suite to run it again."
+ }
+]

@@ -1,15 +1,12 @@
-//! The action routes, one per action.
+//! The action routes: every provider's router, merged.
 
-use super::{github, linear, slack};
 use crate::http::state::ApiState;
-use utoipa_axum::{router::OpenApiRouter, routes};
+use utoipa_axum::router::OpenApiRouter;
+
+include!(concat!(env!("OUT_DIR"), "/provider_action_routers.rs"));
 
 pub fn router() -> OpenApiRouter<ApiState> {
-    OpenApiRouter::new()
-        .routes(routes!(
-            github::list_installations::github_list_installations
-        ))
-        .routes(routes!(github::list_repositories::github_list_repositories))
-        .routes(routes!(linear::list_teams::linear_list_teams))
-        .routes(routes!(slack::list_channels::slack_list_channels))
+    provider_routers()
+        .into_iter()
+        .fold(OpenApiRouter::new(), OpenApiRouter::merge)
 }

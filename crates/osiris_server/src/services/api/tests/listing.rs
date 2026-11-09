@@ -9,7 +9,10 @@
 use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{ADMIN_KEY, API_KEY, TestContext, setup_test_context};
 use axum::http::StatusCode;
-use osiris_providers::github::mocks::MockGithubNetwork;
+use osiris_providers::{
+    REGISTRATIONS,
+    mocks::{FAKE_ID, MockFakeNetwork},
+};
 use sqlx::PgPool;
 
 async fn ids_listed(app: &TestContext, query: &str) -> Vec<String> {
@@ -35,7 +38,7 @@ async fn ids_listed(app: &TestContext, query: &str) -> Vec<String> {
 async fn filters_connections_by_status_alias_provider_and_user(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let active = app.connected(28800).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let attempt = generate_connect_attempt(&config);
     let (pending, _) = app.start_connect_with(&attempt).await;
     let alias = attempt["alias"].as_str().unwrap();
@@ -57,8 +60,20 @@ async fn filters_connections_by_status_alias_provider_and_user(pool: PgPool) {
         ids_listed(&app, &format!("user_id={user}")).await,
         std::slice::from_ref(&pending)
     );
-    assert_eq!(ids_listed(&app, "provider=github").await.len(), 2);
-    assert!(ids_listed(&app, "provider=slack").await.is_empty());
+    assert_eq!(
+        ids_listed(&app, &format!("provider={FAKE_ID}")).await.len(),
+        2
+    );
+    let other = REGISTRATIONS
+        .iter()
+        .map(|registration| registration.id)
+        .find(|id| *id != FAKE_ID)
+        .unwrap();
+    assert!(
+        ids_listed(&app, &format!("provider={other}"))
+            .await
+            .is_empty()
+    );
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
@@ -138,8 +153,8 @@ async fn pages_connections_forwards_and_refuses_a_cursor_naming_a_deleted_one(po
         .collect();
     assert_eq!(back_ids, first_ids);
 
-    MockGithubNetwork::on(&app.provider)
-        .answer_revoke(404, None)
+    MockFakeNetwork::on(&app.provider)
+        .answer_revoke(401, None)
         .await;
     let deleted = app
         .send(
@@ -202,7 +217,7 @@ async fn refuses_a_nul_in_a_body_s_field_as_os_02(pool: PgPool) {
             "POST",
             "/v1/auth-configs",
             Some(ADMIN_KEY),
-            Some(serde_json::json!({ "provider": "github", "client_id": "a\u{0}b", "client_secret": "s" })),
+            Some(serde_json::json!({ "provider": FAKE_ID, "client_id": "a\u{0}b", "client_secret": "s" })),
             &[],
         )
         .await;

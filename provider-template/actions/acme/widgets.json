@@ -1,0 +1,11 @@
+[
+ {
+  "group": "widgets",
+  "name": "list_widgets",
+  "input": "ListWidgets",
+  "output": "AcmeWidget",
+  "list": true,
+  "no_input": true,
+  "summary": "every widget the connected user can see."
+ }
+]

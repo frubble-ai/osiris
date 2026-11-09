@@ -1,3 +1,4 @@
-//! Linear's actions' answers: the provider's own types.
+//! Linear's actions: their inputs, grouped as Linear's API is, and the types they answer with,
+//! which are the provider's own.
 
-pub use osiris_providers::linear::types::LinearTeam;
+pub use osiris_providers::linear::{teams, types::*};

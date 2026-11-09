@@ -1,14 +1,16 @@
 //! An `Idempotency-Key`: a retry answered the first answer again, and the key refused for another
 //! request.
 
+use crate::testing::TestContext;
 use crate::testing::golden::{GoldenSession, Key};
+use osiris_providers::mocks::FAKE_ID;
 use serde_json::json;
 
-pub async fn run(session: &mut GoldenSession<'_>) {
+pub async fn run(_app: &TestContext, session: &mut GoldenSession<'_>) {
     let body = json!({
-        "provider": "linear",
-        "client_id": "golden-linear-app",
-        "client_secret": "golden-linear-secret",
+        "provider": FAKE_ID,
+        "client_id": "golden-app",
+        "client_secret": "golden-secret",
     });
     let keyed = [("idempotency-key", "golden-key")];
     session
@@ -29,9 +31,9 @@ pub async fn run(session: &mut GoldenSession<'_>) {
             "/v1/auth-configs",
             Key::Admin,
             Some(json!({
-                "provider": "slack",
-                "client_id": "golden-slack-app",
-                "client_secret": "golden-slack-secret",
+                "provider": FAKE_ID,
+                "client_id": "golden-other-app",
+                "client_secret": "golden-other-secret",
             })),
             &keyed,
         )
@@ -40,3 +42,5 @@ pub async fn run(session: &mut GoldenSession<'_>) {
         .send("GET", "/v1/auth-configs", Key::Admin, None, &[])
         .await;
 }
+
+golden!("idempotency", run);

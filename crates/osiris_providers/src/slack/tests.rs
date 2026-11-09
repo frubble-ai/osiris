@@ -8,6 +8,7 @@
 
 use super::{
     Slack,
+    conversations::ListChannels,
     mocks::{MockSlackNetwork, generate_slack_channel::generate_slack_channel},
 };
 use crate::{ListLimits, OAuthClient, Provider, ProviderError, ProviderUrls};
@@ -26,6 +27,8 @@ fn slack(server: &MockServer, max_items: usize) -> Slack {
         ListLimits {
             concurrency: 1,
             max_items,
+            max_log_bytes: 262_144,
+            max_scan_pages: 10,
         },
     )
     .unwrap()
@@ -46,7 +49,7 @@ async fn lists_channels_across_cursor_pages_naming_an_unnamed_one_by_its_id() {
         .await;
 
     let channels = slack(&server, 5000)
-        .list_channels(&reqwest::Client::new(), "token")
+        .list_channels(&reqwest::Client::new(), "token", &ListChannels {})
         .await
         .unwrap();
 
@@ -67,7 +70,7 @@ async fn reads_ok_false_by_its_error(#[case] error: &str, #[case] reading: &str)
         .await;
 
     let failure = slack(&server, 5000)
-        .list_channels(&reqwest::Client::new(), "token")
+        .list_channels(&reqwest::Client::new(), "token", &ListChannels {})
         .await
         .unwrap_err();
 
@@ -109,7 +112,7 @@ async fn stops_reading_channels_at_the_cap() {
         .await;
 
     let listed = slack(&server, 2)
-        .list_channels(&reqwest::Client::new(), "token")
+        .list_channels(&reqwest::Client::new(), "token", &ListChannels {})
         .await
         .unwrap();
 

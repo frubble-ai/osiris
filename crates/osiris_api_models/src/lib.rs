@@ -7,3 +7,5 @@ pub mod connected_accounts;
 pub mod errors;
 pub mod events;
 pub mod list;
+pub mod secret_settings;
+pub mod triggers;

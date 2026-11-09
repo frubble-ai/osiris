@@ -4,7 +4,7 @@ use super::Settings;
 
 impl Settings {
     pub(crate) fn positive_values(&self) -> Vec<(&'static str, u64)> {
-        vec![
+        let mut values = vec![
             (
                 "server.request_timeout_seconds",
                 self.server.request_timeout_seconds,
@@ -32,8 +32,20 @@ impl Settings {
             ("consent.ttl_seconds", self.consent.ttl_seconds),
             ("refresh.keepalive_seconds", self.refresh.keepalive_seconds),
             (
+                "providers.installation_tokens.margin_seconds",
+                self.providers.installation_tokens.margin_seconds,
+            ),
+            (
                 "providers.listing.concurrency",
                 u64::try_from(self.providers.listing.concurrency).unwrap_or(u64::MAX),
+            ),
+            (
+                "providers.listing.max_log_bytes",
+                u64::try_from(self.providers.listing.max_log_bytes).unwrap_or(u64::MAX),
+            ),
+            (
+                "providers.listing.max_scan_pages",
+                u64::from(self.providers.listing.max_scan_pages),
             ),
             (
                 "providers.listing.max_items",
@@ -83,6 +95,8 @@ impl Settings {
                 "tasks.oidc_keys_refetch_seconds",
                 self.tasks.oidc_keys_refetch_seconds,
             ),
-        ]
+        ];
+        values.extend(self.triggers.positive_values());
+        values
     }
 }

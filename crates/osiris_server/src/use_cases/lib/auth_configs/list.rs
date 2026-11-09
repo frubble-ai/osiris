@@ -36,7 +36,7 @@ impl Db {
         let found = match cursor.before.as_deref() {
             None => sqlx::query_as!(
                 AuthConfigRow,
-                "SELECT id, provider, client_id, client_secret, scopes, created_at, updated_at FROM auth_config
+                "SELECT id, provider, client_id, client_secret, scopes, settings, secret_settings, created_at, updated_at FROM auth_config
              WHERE ($1::text IS NULL OR (created_at, id) > (SELECT created_at, id FROM auth_config WHERE id = $1))
              ORDER BY created_at ASC, id ASC
              LIMIT $2",
@@ -47,7 +47,7 @@ impl Db {
             .await,
             Some(before) => sqlx::query_as!(
                 AuthConfigRow,
-                "SELECT id, provider, client_id, client_secret, scopes, created_at, updated_at FROM auth_config
+                "SELECT id, provider, client_id, client_secret, scopes, settings, secret_settings, created_at, updated_at FROM auth_config
              WHERE (created_at, id) < (SELECT created_at, id FROM auth_config WHERE id = $1)
              ORDER BY created_at DESC, id DESC
              LIMIT $2",

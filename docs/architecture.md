@@ -1,7 +1,7 @@
 # Architecture
 
-Osiris holds users' OAuth connections to providers (GitHub, Linear, Slack), keeps their tokens
-fresh, and runs typed actions with them. It runs as two request-driven Cloud Run services and a
+Osiris holds users' OAuth connections to providers, keeps their tokens fresh, and runs typed
+actions with them. Each provider's own page is in [providers](providers.md). It runs as two request-driven Cloud Run services and a
 migration job. All state is in Postgres.
 
 ## Crates
@@ -12,7 +12,7 @@ migration job. All state is in Postgres.
 | `osiris_env` | logging, request ids, the build's commit, and the `Flow` every operation is logged under |
 | `osiris_domain` | auth configs, connections, tokens, events, task outcomes, pagination, `DomainError` |
 | `osiris_interfaces` | `ProviderCommon` and `Provider`, the OAuth2 flow a provider's definition drives, `call` |
-| `osiris_providers` | GitHub, Linear and Slack: each one's definition, revoke, transformers, actions, and faked network |
+| `osiris_providers` | each provider in its own folder (its definition, revoke, transformers, actions and faked network), registered by `build.rs`, and a fake provider for the tests they share |
 | `osiris_events` | the event catalog, the envelope, the bus (which writes each event in the pinned release, through `osiris_versioning`), the `Transport` trait, the in-memory transport |
 | `osiris_pubsub` | `Transport` on Google Pub/Sub |
 | `osiris_tasks` | task payloads and names, the `TaskScheduler` and `TaskAuthenticator` traits, the local and in-memory schedulers |
@@ -42,8 +42,9 @@ osiris_server/src/
 └── testing/                           # the test context, with its arrangers and observers
 ```
 
-- `UseCaseContext` holds `config`, `db`, `messages`, `tasks`, `providers` and `http`. It is built
-  before the process takes traffic and holds nothing about a request.
+- `UseCaseContext` holds `config`, `db`, `messages`, `tasks`, `providers`, `http` and
+  `installation_tokens` (the process's cache of app installations' tokens). It is built before the
+  process takes traffic and holds nothing about a request.
 - `ctx.db` is the pool, the master key and the data keys. Every query is a `query!` in
   `lib/<domain>/`, an operation of `Db`. Secrets go in encrypted and come out decrypted there.
   The migrate reset's `DO` block, and the test DDL that checks which objects it drops, are
@@ -91,6 +92,7 @@ that job (`osiris_tasks::names`), so scheduling the same job twice creates one t
 | `connection.refresh` | `connection-refresh-{connection}-{generation}` | when tokens are saved | tenant, connection, token generation, reason (`expiry`, `keepalive`, `retry`) |
 | `consent.expire` | `consent-expire-{connection}` | when a consent opens, due when it expires | tenant, connection |
 | `event.publish` | `event-publish-{event}` | when publishing an event fails | the whole event |
+| `trigger.poll` | `trigger-poll-{trigger}-{check}` | when a trigger that checks on a schedule is created, then by each check | trigger, connection, check number |
 
 Cloud Tasks posts a due task as JSON to the worker's `/tasks` with an OIDC token for the configured
 service account. The worker checks the token (Google's signature, issuer, `CLOUD_TASKS_AUDIENCE`,
@@ -102,7 +104,7 @@ worker answers:
 - **500**: the queue's retry policy runs the same task again.
 
 Every run's outcome is saved in `task_outcome`: `refreshed`, `rescheduled`, `skipped_stale`,
-`failed`, `consent_expired` or `published`. Rows older than `[tasks] outcome_retention` are deleted
+`failed`, `consent_expired`, `published` or `trigger_checked`. Rows older than `[tasks] outcome_retention` are deleted
 a few at a time as new ones are written.
 
 ## A connection
@@ -126,7 +128,7 @@ A connection stores its tokens and the name of its pending refresh task in separ
 provider declares whether it issues refresh tokens (`issues_refresh_tokens` in its OAuth
 definition):
 
-- **Issues refresh tokens** (GitHub, Linear, Slack): the connection is complete when it holds a
+- **Issues refresh tokens** (every provider osiris implements today): the connection is complete when it holds a
   refresh token and its refresh task. A consent that returns no refresh token, or whose first task
   cannot be scheduled, keeps no tokens and leaves the connection `disabled`.
 - **Issues none** (its tokens never expire): the connection is complete with its access token, and
@@ -177,6 +179,67 @@ event publishes it again. If that task cannot be scheduled either, the event is 
 logged. Clients ignore an event they have already received, by its `event_id`. An event is written
 in the instance's pinned release (`osiris_version`), taken back through the same version changes as
 answers ([API versioning](api-versioning.md)).
+
+## Providers
+
+Each provider is a folder of its own in every layer it reaches, and nothing outside its folders
+names it except module declarations:
+
+- `osiris_providers/src/<id>/`, with `registration.rs` (its id, default URLs and constructor).
+  `build.rs` lists every folder that has one, so `Providers` finds a provider by id, or by type
+  for its own actions, and `[providers.<id>]` can move its URLs.
+- Its actions: `osiris_api_models/src/actions/<id>.rs`, `use_cases/cases/<id>/` and
+  `routes/actions/<id>/`, generated from `scripts/actions/<id>/`. The server's `build.rs` merges
+  every provider's router.
+- Its tests: `services/api/tests/<id>/`, `testing/<id>.rs` and its faked network in its own
+  `mocks/`. The tests every provider shares run against a fake provider
+  (`osiris_providers::mocks::fake`), which only tests register.
+- Its `provider` row is written from the registrations whenever the migrations run.
+
+## Installation connections
+
+An app's auth config can hold the app's own `settings` and `secret_settings` (encrypted like a
+client secret), which its provider validates when the auth config is saved. A connection made with
+an `installation_id` is `app_installation`: it holds no tokens. No user approves it, and nothing
+ties an installation to the `user_id` it is made for, so only the admin key may make one; the API
+key may only start a consent, which the user approves. When an action runs, the provider
+mints the installation's token from the app's credentials (`Provider::installation_token`). The
+token is kept in memory (`InstallationTokenCache`) until `[providers.installation_tokens]
+margin_seconds` before it expires. A token the provider refuses is minted again and the call runs
+once more; a second refusal makes the connection `expired`.
+
+An action that only works as a user declares it (`user_only` in its generator entry) and is
+refused on an installation connection before the provider is called. An action that reads
+differently as an installation (`acting`) is told what the token acts as (`ActingAs`).
+
+## Scopes
+
+Each action declares the OAuth scopes it needs. Before the provider is called, the connection's
+granted scopes are compared with them (`missing_scopes`, using the provider's `scope_covers` for
+scopes that nest). A connection without them is refused
+as `OS_11` (403). A token that reports no scopes is not checked.
+
+## Triggers
+
+A trigger (`tr_…`) subscribes at a connection's provider and publishes what it receives as
+`trigger.fired` events. The provider validates its kind and config, creates its subscription
+(`subscribe_trigger`) and removes it on delete (`unsubscribe_trigger`). A provider that can't be reached fails the delete (502) and keeps the trigger, to delete again; a refusal is logged and the trigger deleted.
+
+- **Deliveries**: at most `[triggers] max_concurrent_deliveries` are read at once, each up to
+  `max_delivery_bytes` and within `delivery_read_seconds` (a slower body is answered 408). The provider's webhook posts to `{public_url}/webhooks/triggers/{id}`,
+  signed with the trigger's own random secret (HMAC-SHA256), which is encrypted at rest. The route
+  is public and trusts only the signature: a delivery not signed with the secret is answered 404,
+  as a missing trigger is. A signed delivery is answered 202, whether it is published or ignored.
+- **Event size**: a fired event's `data` over `[triggers] max_event_data_bytes` (under a Cloud
+  Tasks task's 1 MB, which carries an event whose publish failed) is replaced by
+  `{"omitted": true, "bytes": <length>}`.
+- **Event ids**: a fired event's id is derived from the trigger and the provider's delivery id, so
+  a delivery sent twice is published with the same `event_id`.
+- **Checks on a schedule**: a kind that checks on a schedule records the state it starts
+  from when it is created, then checks again on its own deliveries and on its `trigger.poll` task,
+  every `[triggers] check_seconds`. Each check keeps a checkpoint and publishes only a change it
+  has not seen. Each scheduled check is numbered and schedules the next. A check the provider
+  refuses for good makes the trigger `failed`; an outage is tried again.
 
 ## Idempotency keys
 

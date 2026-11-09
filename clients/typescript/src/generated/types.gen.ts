@@ -9,6 +9,1242 @@ export type Webhooks = ReceiveEventWebhookRequest;
 /**
  * An action's answer: what it read, as `data`.
  */
+export type ActionResultGithubAcknowledgement = {
+    /**
+     * An action that answers nothing of its own: `ok` once GitHub has done it.
+     */
+    data: {
+        ok: boolean;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubArtifactDownload = {
+    /**
+     * Where a workflow artifact's ZIP archive can be downloaded.
+     */
+    data: {
+        /**
+         * A signed URL that downloads the archive without a token, for one minute.
+         */
+        url: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubBranch = {
+    /**
+     * A branch: its name, the commit it points at, and whether it is protected.
+     */
+    data: {
+        commit_sha: string;
+        name: string;
+        protected: boolean;
+        protection?: GithubBranchProtection | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubCodeSearchResults = {
+    /**
+     * The files a code search found.
+     */
+    data: {
+        /**
+         * GitHub stopped searching before it had looked at everything, so matches may be missing.
+         */
+        incomplete_results: boolean;
+        items: Array<GithubSearchCode>;
+        /**
+         * Every match GitHub counted, across all pages.
+         */
+        total_count: number;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubCollaboratorAddition = {
+    /**
+     * A collaborator added to a repository: at once when `invited` is false (an organization member,
+     * or a permission changed), or through `invitation` when the account must accept it first.
+     */
+    data: {
+        invitation?: GithubRepositoryInvitation | null;
+        invited: boolean;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubCommit = {
+    /**
+     * A commit.
+     */
+    data: {
+        author?: GithubUser | null;
+        author_email?: string | null;
+        author_name?: string | null;
+        authored_at?: string | null;
+        committed_at?: string | null;
+        committer?: GithubUser | null;
+        committer_email?: string | null;
+        committer_name?: string | null;
+        files?: Array<GithubCommitFile> | null;
+        message: string;
+        parents: Array<string>;
+        sha: string;
+        stats?: GithubCommitStats | null;
+        url: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubCommitComment = {
+    /**
+     * A comment on a commit.
+     */
+    data: {
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
+        body: string;
+        commit_id: string;
+        created_at: string;
+        id: string;
+        line?: number | null;
+        path?: string | null;
+        position?: number | null;
+        reactions?: GithubReactions | null;
+        updated_at: string;
+        url: string;
+        user?: GithubUser | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubCommitComparison = {
+    /**
+     * Two commits compared: how far apart they are, and the commits and files between them.
+     */
+    data: {
+        ahead_by: number;
+        /**
+         * The commit compared from, and the latest one both sides share.
+         */
+        base_commit_sha?: string | null;
+        behind_by: number;
+        commits: Array<GithubCommit>;
+        files: Array<GithubCommitFile>;
+        merge_base_commit_sha?: string | null;
+        status: string;
+        total_commits: number;
+        url: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubCommitSearchResults = {
+    /**
+     * The commits a search found.
+     */
+    data: {
+        /**
+         * GitHub stopped searching before it had looked at everything, so matches may be missing.
+         */
+        incomplete_results: boolean;
+        items: Array<GithubSearchCommit>;
+        /**
+         * Every match GitHub counted, across all pages.
+         */
+        total_count: number;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubCommitStatus = {
+    /**
+     * A status a service set on a commit.
+     */
+    data: {
+        context: string;
+        created_at: string;
+        creator?: GithubUser | null;
+        description?: string | null;
+        id: string;
+        state: string;
+        target_url?: string | null;
+        updated_at: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubContentChange = {
+    /**
+     * A file written or deleted, and the commit that did it.
+     */
+    data: {
+        commit: GithubContentCommit;
+        content?: GithubContentEntry | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubCurrentUser = {
+    /**
+     * The authenticated user: their profile, and what GitHub shows only to the account itself, which
+     * is null where the token may not see it.
+     */
+    data: GithubPublicUser & {
+        collaborators?: number | null;
+        /**
+         * In kilobytes.
+         */
+        disk_usage?: number | null;
+        owned_private_repos?: number | null;
+        /**
+         * The name of the account's plan.
+         */
+        plan?: string | null;
+        private_gists?: number | null;
+        total_private_repos?: number | null;
+        two_factor_authentication?: boolean | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubFileContent = {
+    /**
+     * A file and its content.
+     */
+    data: {
+        /**
+         * The content, base64-encoded, without the line breaks GitHub wraps it in.
+         */
+        content_base64: string;
+        /**
+         * The content as text, when it is base64-encoded UTF-8; absent for a binary file.
+         */
+        decoded_content?: string | null;
+        download_url?: string | null;
+        encoding: string;
+        name: string;
+        path: string;
+        sha: string;
+        size: number;
+        url?: string | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubForkSync = {
+    /**
+     * A fork's branch brought up to date with its upstream.
+     */
+    data: {
+        /**
+         * The upstream branch, as `owner:branch`.
+         */
+        base_branch?: string | null;
+        /**
+         * `merge`, `fast-forward` or `none` today, as GitHub names it. An open string.
+         */
+        merge_type?: string | null;
+        /**
+         * What GitHub did, in its own words.
+         */
+        message: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubGitRef = {
+    /**
+     * A git reference (a branch or a tag) and the object it points at.
+     */
+    data: {
+        object_type: string;
+        ref_name: string;
+        sha: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubIssue = {
+    /**
+     * An issue (GitHub also answers pull requests as issues; `is_pull_request` says which).
+     */
+    data: {
+        active_lock_reason?: string | null;
+        assignees: Array<GithubUser>;
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
+        body?: string | null;
+        closed_at?: string | null;
+        closed_by?: GithubUser | null;
+        comments: number;
+        created_at: string;
+        id: string;
+        is_pull_request: boolean;
+        labels: Array<GithubLabel>;
+        /**
+         * Whether its conversation is locked, and why when it is: `off-topic`, `too heated`,
+         * `resolved` or `spam`.
+         */
+        locked: boolean;
+        milestone?: GithubMilestone | null;
+        number: number;
+        reactions?: GithubReactions | null;
+        state: string;
+        /**
+         * Why it is closed or open again: `completed`, `not_planned`, `duplicate` or `reopened`.
+         */
+        state_reason?: string | null;
+        title: string;
+        updated_at: string;
+        url: string;
+        user?: GithubUser | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubIssueComment = {
+    /**
+     * A comment on an issue or a pull request.
+     */
+    data: {
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
+        body: string;
+        created_at: string;
+        id: string;
+        reactions?: GithubReactions | null;
+        updated_at: string;
+        url: string;
+        user?: GithubUser | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubIssueLock = {
+    /**
+     * Whether an issue's conversation is locked, once GitHub has locked or unlocked it.
+     */
+    data: {
+        locked: boolean;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubIssuePage = {
+    /**
+     * A page of a repository's issues, with the pull requests GitHub mixes in left out.
+     */
+    data: {
+        /**
+         * How many items GitHub answered on this page before the pull requests were left out. A
+         * caller reading page after page goes on while this equals the page size asked for (30 when
+         * none was asked), even when `issues` comes back short or empty.
+         */
+        fetched: number;
+        /**
+         * The page's issues, without its pull requests.
+         */
+        issues: Array<GithubIssue>;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubJobLogs = {
+    /**
+     * A workflow job's logs, as plain text.
+     */
+    data: {
+        /**
+         * The log, or its last `[providers.listing] max_log_bytes` when it is longer.
+         */
+        logs: string;
+        /**
+         * Whether the log was longer, so only its end is here.
+         */
+        truncated: boolean;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubLabel = {
+    /**
+     * A label.
+     */
+    data: {
+        color: string;
+        /**
+         * Whether it is one of the labels GitHub gives every new repository.
+         */
+        default: boolean;
+        description?: string | null;
+        id: string;
+        name: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubLabelSearchResults = {
+    /**
+     * The labels a search found.
+     */
+    data: {
+        /**
+         * GitHub stopped searching before it had looked at everything, so matches may be missing.
+         */
+        incomplete_results: boolean;
+        items: Array<GithubSearchLabel>;
+        /**
+         * Every match GitHub counted, across all pages.
+         */
+        total_count: number;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubMergeResult = {
+    /**
+     * A pull request merged, or a merge refused.
+     */
+    data: {
+        merged: boolean;
+        message: string;
+        sha?: string | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubMergedCheck = {
+    /**
+     * Whether a pull request has been merged.
+     */
+    data: {
+        merged: boolean;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubMilestone = {
+    /**
+     * A milestone.
+     */
+    data: {
+        /**
+         * When it was closed; none while it is open.
+         */
+        closed_at?: string | null;
+        closed_issues: number;
+        created_at?: string | null;
+        creator?: GithubUser | null;
+        description?: string | null;
+        due_on?: string | null;
+        id: string;
+        number: number;
+        open_issues: number;
+        state: string;
+        title: string;
+        updated_at?: string | null;
+        url: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubPublicUser = {
+    /**
+     * A user's public profile.
+     */
+    data: {
+        account_type: string;
+        avatar_url: string;
+        bio?: string | null;
+        blog?: string | null;
+        company?: string | null;
+        created_at?: string | null;
+        email?: string | null;
+        followers: number;
+        following: number;
+        hireable?: boolean | null;
+        id: string;
+        location?: string | null;
+        login: string;
+        name?: string | null;
+        public_gists: number;
+        public_repos: number;
+        site_admin: boolean;
+        twitter_username?: string | null;
+        updated_at?: string | null;
+        url: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubPullRequest = {
+    /**
+     * A pull request.
+     */
+    data: {
+        active_lock_reason?: string | null;
+        additions?: number | null;
+        assignees: Array<GithubUser>;
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
+        /**
+         * Whether it merges by itself once its checks pass.
+         */
+        auto_merge: boolean;
+        base: GithubPullRequestBranch;
+        body?: string | null;
+        changed_files?: number | null;
+        closed_at?: string | null;
+        comments?: number | null;
+        /**
+         * Its size and conversation, from reading one pull request; a list leaves them null.
+         */
+        commits?: number | null;
+        created_at: string;
+        deletions?: number | null;
+        draft: boolean;
+        head: GithubPullRequestBranch;
+        id: string;
+        labels: Array<GithubLabel>;
+        /**
+         * Whether its conversation is locked, and why when it is.
+         */
+        locked: boolean;
+        maintainer_can_modify?: boolean | null;
+        /**
+         * The commit its merge made, or the test merge GitHub keeps while it is open.
+         */
+        merge_commit_sha?: string | null;
+        /**
+         * Whether it can be merged now, as GitHub has worked it out: only reading one pull request
+         * answers these (a list leaves them null), and `mergeable` is null while GitHub is still
+         * working it out.
+         */
+        mergeable?: boolean | null;
+        /**
+         * `clean`, `blocked`, `behind`, `dirty`, `unstable`, `draft` or `unknown`. An open string.
+         */
+        mergeable_state?: string | null;
+        merged: boolean;
+        merged_at?: string | null;
+        merged_by?: GithubUser | null;
+        milestone?: GithubMilestone | null;
+        number: number;
+        /**
+         * Whether it can be rebased onto its base; null while GitHub is still working it out.
+         */
+        rebaseable?: boolean | null;
+        /**
+         * Who is asked to review it: people, and teams by their slug.
+         */
+        requested_reviewers: Array<GithubUser>;
+        requested_teams: Array<string>;
+        review_comments?: number | null;
+        state: string;
+        title: string;
+        updated_at: string;
+        url: string;
+        user?: GithubUser | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubPullRequestBranchUpdate = {
+    /**
+     * A pull request's branch being brought up to date with its base branch, which GitHub does in
+     * the background.
+     */
+    data: {
+        /**
+         * What GitHub says it is doing.
+         */
+        message: string;
+        /**
+         * The pull request's address on GitHub's API.
+         */
+        url: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubReaction = {
+    /**
+     * A reaction to an issue or a comment.
+     */
+    data: {
+        content: string;
+        created_at: string;
+        id: string;
+        user?: GithubUser | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubRelease = {
+    /**
+     * A release.
+     */
+    data: {
+        assets: Array<GithubReleaseAsset>;
+        assets_url: string;
+        author?: GithubUser | null;
+        body?: string | null;
+        created_at: string;
+        draft: boolean;
+        id: string;
+        /**
+         * Whether its tag and assets can no longer change.
+         */
+        immutable: boolean;
+        name?: string | null;
+        prerelease: boolean;
+        published_at?: string | null;
+        reactions?: GithubReactions | null;
+        tag_name: string;
+        tarball_url?: string | null;
+        target_commitish: string;
+        updated_at?: string | null;
+        upload_url: string;
+        url: string;
+        zipball_url?: string | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubReleaseAsset = {
+    /**
+     * A file attached to a release.
+     */
+    data: {
+        content_type: string;
+        created_at: string;
+        digest?: string | null;
+        download_count: number;
+        download_url: string;
+        id: string;
+        label?: string | null;
+        name: string;
+        size: number;
+        state: string;
+        updated_at: string;
+        uploader?: GithubUser | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubReleaseNotes = {
+    /**
+     * Release notes GitHub wrote for a tag.
+     */
+    data: {
+        body: string;
+        name: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubRepository = {
+    /**
+     * A repository.
+     */
+    data: {
+        allow_auto_merge?: boolean | null;
+        /**
+         * The merge settings and the watcher count, which GitHub answers only when it reads one
+         * repository by itself.
+         */
+        allow_merge_commit?: boolean | null;
+        allow_rebase_merge?: boolean | null;
+        allow_squash_merge?: boolean | null;
+        archived: boolean;
+        clone_url: string;
+        created_at?: string | null;
+        default_branch: string;
+        delete_branch_on_merge?: boolean | null;
+        description?: string | null;
+        disabled: boolean;
+        fork: boolean;
+        forks_count: number;
+        /**
+         * `owner/name`.
+         */
+        full_name: string;
+        has_discussions: boolean;
+        has_issues: boolean;
+        has_pages: boolean;
+        has_projects: boolean;
+        has_wiki: boolean;
+        homepage?: string | null;
+        id: string;
+        is_template: boolean;
+        language?: string | null;
+        license?: GithubLicense | null;
+        name: string;
+        open_issues_count: number;
+        owner: GithubUser;
+        permissions?: GithubPermissions | null;
+        private: boolean;
+        pushed_at?: string | null;
+        /**
+         * Its size in kilobytes.
+         */
+        size: number;
+        ssh_url: string;
+        stargazers_count: number;
+        subscribers_count?: number | null;
+        topics: Array<string>;
+        updated_at?: string | null;
+        /**
+         * Its page on GitHub.
+         */
+        url: string;
+        /**
+         * `public`, `private` or `internal` today. An open string.
+         */
+        visibility: string;
+        watchers_count: number;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubRepositoryPermission = {
+    /**
+     * An account's permission in a repository.
+     */
+    data: {
+        permission: string;
+        role_name?: string | null;
+        user?: GithubUser | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubRepositorySearchResults = {
+    /**
+     * The repositories a search found.
+     */
+    data: {
+        /**
+         * GitHub stopped searching before it had looked at everything, so matches may be missing.
+         */
+        incomplete_results: boolean;
+        repositories: Array<GithubSearchRepository>;
+        /**
+         * Every match GitHub counted, across all pages.
+         */
+        total_count: number;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubRequestedReviewers = {
+    /**
+     * Who a pull request's review is requested from.
+     */
+    data: {
+        teams: Array<GithubTeam>;
+        users: Array<GithubUser>;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubReview = {
+    /**
+     * A review of a pull request.
+     */
+    data: {
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
+        body?: string | null;
+        commit_id?: string | null;
+        id: string;
+        state: string;
+        submitted_at?: string | null;
+        url: string;
+        user?: GithubUser | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubReviewComment = {
+    /**
+     * A comment on a line of a pull request's diff.
+     */
+    data: {
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
+        body: string;
+        commit_id: string;
+        created_at: string;
+        diff_hunk: string;
+        id: string;
+        in_reply_to_id?: string | null;
+        line?: number | null;
+        original_commit_id: string;
+        original_line?: number | null;
+        original_start_line?: number | null;
+        path: string;
+        pull_request_review_id?: string | null;
+        reactions?: GithubReactions | null;
+        side?: string | null;
+        start_line?: number | null;
+        start_side?: string | null;
+        /**
+         * What the comment is on: a `line` of the diff or the whole `file`.
+         */
+        subject_type?: string | null;
+        updated_at: string;
+        url: string;
+        user?: GithubUser | null;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubReviewRequest = {
+    /**
+     * A pull request after reviewers were requested from it or removed from it, with who its review
+     * is now requested from.
+     */
+    data: {
+        pull_request: GithubPullRequest;
+        requested_reviewers: Array<GithubUser>;
+        requested_teams: Array<GithubTeam>;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubSearchIssueResults = {
+    /**
+     * The issues and pull requests a search found, and how many there are in all.
+     */
+    data: {
+        /**
+         * Whether GitHub stopped searching before it had looked at everything.
+         */
+        incomplete_results: boolean;
+        items: Array<GithubSearchIssue>;
+        /**
+         * How many items match, across every page.
+         */
+        total_count: number;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubStarredCheck = {
+    /**
+     * Whether the authenticated user has starred a repository.
+     */
+    data: {
+        starred: boolean;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubTopicSearchResults = {
+    /**
+     * The topics a search found.
+     */
+    data: {
+        /**
+         * GitHub stopped searching before it had looked at everything, so matches may be missing.
+         */
+        incomplete_results: boolean;
+        items: Array<GithubSearchTopic>;
+        /**
+         * Every match GitHub counted, across all pages.
+         */
+        total_count: number;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubTopics = {
+    /**
+     * A repository's topics, the lowercase names it is tagged with.
+     */
+    data: {
+        names: Array<string>;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubUserSearchResults = {
+    /**
+     * The users a search found.
+     */
+    data: {
+        /**
+         * GitHub stopped searching before it had looked at everything, so matches may be missing.
+         */
+        incomplete_results: boolean;
+        items: Array<GithubSearchUser>;
+        /**
+         * Every match GitHub counted, across all pages.
+         */
+        total_count: number;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubWorkflow = {
+    /**
+     * A GitHub Actions workflow.
+     */
+    data: {
+        badge_url: string;
+        created_at: string;
+        id: string;
+        name: string;
+        path: string;
+        state: string;
+        updated_at: string;
+        url: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultGithubWorkflowRun = {
+    /**
+     * A run of a workflow.
+     */
+    data: {
+        actor?: GithubUser | null;
+        check_suite_id?: string | null;
+        conclusion?: string | null;
+        created_at: string;
+        display_title: string;
+        event: string;
+        head_branch?: string | null;
+        head_sha: string;
+        id: string;
+        name?: string | null;
+        path: string;
+        /**
+         * The numbers of the pull requests the run is for.
+         */
+        pull_request_numbers: Array<number>;
+        run_attempt: number;
+        run_number: number;
+        run_started_at?: string | null;
+        status?: string | null;
+        triggering_actor?: GithubUser | null;
+        updated_at: string;
+        url: string;
+        workflow_id: string;
+    };
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubArtifact = {
+    data: Array<{
+        archive_download_url: string;
+        created_at?: string | null;
+        digest?: string | null;
+        expired: boolean;
+        expires_at?: string | null;
+        head_branch?: string | null;
+        head_sha?: string | null;
+        id: string;
+        name: string;
+        /**
+         * The run that made the artifact.
+         */
+        run_id?: string | null;
+        size_in_bytes: number;
+        updated_at?: string | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubBranch = {
+    data: Array<{
+        commit_sha: string;
+        name: string;
+        protected: boolean;
+        protection?: GithubBranchProtection | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubCheckRun = {
+    data: Array<{
+        /**
+         * The slug of the app that made the check run.
+         */
+        app?: string | null;
+        check_suite_id?: string | null;
+        completed_at?: string | null;
+        conclusion?: string | null;
+        details_url?: string | null;
+        external_id?: string | null;
+        head_sha: string;
+        id: string;
+        name: string;
+        output?: GithubCheckRunOutput | null;
+        started_at?: string | null;
+        status: string;
+        url?: string | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubCollaborator = {
+    data: Array<{
+        account_type: string;
+        avatar_url: string;
+        id: string;
+        login: string;
+        permissions?: GithubPermissions | null;
+        role_name?: string | null;
+        site_admin: boolean;
+        url: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubCommit = {
+    data: Array<{
+        author?: GithubUser | null;
+        author_email?: string | null;
+        author_name?: string | null;
+        authored_at?: string | null;
+        committed_at?: string | null;
+        committer?: GithubUser | null;
+        committer_email?: string | null;
+        committer_name?: string | null;
+        files?: Array<GithubCommitFile> | null;
+        message: string;
+        parents: Array<string>;
+        sha: string;
+        stats?: GithubCommitStats | null;
+        url: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubCommitComment = {
+    data: Array<{
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
+        body: string;
+        commit_id: string;
+        created_at: string;
+        id: string;
+        line?: number | null;
+        path?: string | null;
+        position?: number | null;
+        reactions?: GithubReactions | null;
+        updated_at: string;
+        url: string;
+        user?: GithubUser | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubCommitStatus = {
+    data: Array<{
+        context: string;
+        created_at: string;
+        creator?: GithubUser | null;
+        description?: string | null;
+        id: string;
+        state: string;
+        target_url?: string | null;
+        updated_at: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubContentEntry = {
+    data: Array<{
+        download_url?: string | null;
+        entry_type: string;
+        name: string;
+        path: string;
+        sha: string;
+        size: number;
+        url?: string | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubContributor = {
+    data: Array<{
+        account_type: string;
+        avatar_url: string;
+        contributions: number;
+        id: string;
+        login: string;
+        site_admin: boolean;
+        url: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubEvent = {
+    data: Array<{
+        actor?: GithubEventAccount | null;
+        created_at: string;
+        event_type: string;
+        id: string;
+        organization?: GithubEventAccount | null;
+        payload: {
+            [key: string]: unknown;
+        };
+        public: boolean;
+        repository?: GithubEventRepository | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubGitRef = {
+    data: Array<{
+        object_type: string;
+        ref_name: string;
+        sha: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
 export type ActionResultVecGithubInstallation = {
     data: Array<{
         /**
@@ -20,12 +1256,278 @@ export type ActionResultVecGithubInstallation = {
          * release, and a client keeps working on one it doesn't know.
          */
         account_type: string;
+        /**
+         * The app installed, by its slug.
+         */
+        app_slug: string;
+        created_at?: string | null;
+        /**
+         * The webhook events it is subscribed to.
+         */
+        events: Array<string>;
         id: string;
+        /**
+         * What the installation may do, by GitHub's permission name: `read`, `write` or `admin`.
+         */
+        permissions: {
+            [key: string]: string;
+        };
         /**
          * `all` (every repository of the account) or `selected` (only the ones chosen at install)
          * today. An open string: more values may come without a new release.
          */
         repository_selection: string;
+        /**
+         * When it was suspended, if it is.
+         */
+        suspended_at?: string | null;
+        updated_at?: string | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubIssueComment = {
+    data: Array<{
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
+        body: string;
+        created_at: string;
+        id: string;
+        reactions?: GithubReactions | null;
+        updated_at: string;
+        url: string;
+        user?: GithubUser | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubIssueEvent = {
+    data: Array<{
+        actor?: GithubUser | null;
+        assignee?: GithubUser | null;
+        assigner?: GithubUser | null;
+        commit_id?: string | null;
+        created_at: string;
+        /**
+         * What happened (`labeled`, `assigned`, `closed`, `renamed`…), as GitHub names it. An open
+         * string.
+         */
+        event: string;
+        id: string;
+        /**
+         * The issue it happened to, in a repository's list of events.
+         */
+        issue_number?: number | null;
+        label?: GithubEventLabel | null;
+        /**
+         * `locked`: why.
+         */
+        lock_reason?: string | null;
+        milestone?: GithubEventMilestone | null;
+        rename?: GithubEventRename | null;
+        requested_reviewer?: GithubUser | null;
+        /**
+         * `closed` and `reopened`: why.
+         */
+        state_reason?: string | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubLabel = {
+    data: Array<{
+        color: string;
+        /**
+         * Whether it is one of the labels GitHub gives every new repository.
+         */
+        default: boolean;
+        description?: string | null;
+        id: string;
+        name: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubLanguage = {
+    data: Array<{
+        bytes: number;
+        name: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubMilestone = {
+    data: Array<{
+        /**
+         * When it was closed; none while it is open.
+         */
+        closed_at?: string | null;
+        closed_issues: number;
+        created_at?: string | null;
+        creator?: GithubUser | null;
+        description?: string | null;
+        due_on?: string | null;
+        id: string;
+        number: number;
+        open_issues: number;
+        state: string;
+        title: string;
+        updated_at?: string | null;
+        url: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubPullRequest = {
+    data: Array<{
+        active_lock_reason?: string | null;
+        additions?: number | null;
+        assignees: Array<GithubUser>;
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
+        /**
+         * Whether it merges by itself once its checks pass.
+         */
+        auto_merge: boolean;
+        base: GithubPullRequestBranch;
+        body?: string | null;
+        changed_files?: number | null;
+        closed_at?: string | null;
+        comments?: number | null;
+        /**
+         * Its size and conversation, from reading one pull request; a list leaves them null.
+         */
+        commits?: number | null;
+        created_at: string;
+        deletions?: number | null;
+        draft: boolean;
+        head: GithubPullRequestBranch;
+        id: string;
+        labels: Array<GithubLabel>;
+        /**
+         * Whether its conversation is locked, and why when it is.
+         */
+        locked: boolean;
+        maintainer_can_modify?: boolean | null;
+        /**
+         * The commit its merge made, or the test merge GitHub keeps while it is open.
+         */
+        merge_commit_sha?: string | null;
+        /**
+         * Whether it can be merged now, as GitHub has worked it out: only reading one pull request
+         * answers these (a list leaves them null), and `mergeable` is null while GitHub is still
+         * working it out.
+         */
+        mergeable?: boolean | null;
+        /**
+         * `clean`, `blocked`, `behind`, `dirty`, `unstable`, `draft` or `unknown`. An open string.
+         */
+        mergeable_state?: string | null;
+        merged: boolean;
+        merged_at?: string | null;
+        merged_by?: GithubUser | null;
+        milestone?: GithubMilestone | null;
+        number: number;
+        /**
+         * Whether it can be rebased onto its base; null while GitHub is still working it out.
+         */
+        rebaseable?: boolean | null;
+        /**
+         * Who is asked to review it: people, and teams by their slug.
+         */
+        requested_reviewers: Array<GithubUser>;
+        requested_teams: Array<string>;
+        review_comments?: number | null;
+        state: string;
+        title: string;
+        updated_at: string;
+        url: string;
+        user?: GithubUser | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubPullRequestFile = {
+    data: Array<{
+        additions: number;
+        blob_url?: string | null;
+        changes: number;
+        deletions: number;
+        filename: string;
+        patch?: string | null;
+        previous_filename?: string | null;
+        sha: string;
+        status: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubRelease = {
+    data: Array<{
+        assets: Array<GithubReleaseAsset>;
+        assets_url: string;
+        author?: GithubUser | null;
+        body?: string | null;
+        created_at: string;
+        draft: boolean;
+        id: string;
+        /**
+         * Whether its tag and assets can no longer change.
+         */
+        immutable: boolean;
+        name?: string | null;
+        prerelease: boolean;
+        published_at?: string | null;
+        reactions?: GithubReactions | null;
+        tag_name: string;
+        tarball_url?: string | null;
+        target_commitish: string;
+        updated_at?: string | null;
+        upload_url: string;
+        url: string;
+        zipball_url?: string | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubReleaseAsset = {
+    data: Array<{
+        content_type: string;
+        created_at: string;
+        digest?: string | null;
+        download_count: number;
+        download_url: string;
+        id: string;
+        label?: string | null;
+        name: string;
+        size: number;
+        state: string;
+        updated_at: string;
+        uploader?: GithubUser | null;
     }>;
 };
 
@@ -34,14 +1536,267 @@ export type ActionResultVecGithubInstallation = {
  */
 export type ActionResultVecGithubRepository = {
     data: Array<{
+        allow_auto_merge?: boolean | null;
+        /**
+         * The merge settings and the watcher count, which GitHub answers only when it reads one
+         * repository by itself.
+         */
+        allow_merge_commit?: boolean | null;
+        allow_rebase_merge?: boolean | null;
+        allow_squash_merge?: boolean | null;
+        archived: boolean;
+        clone_url: string;
+        created_at?: string | null;
+        default_branch: string;
+        delete_branch_on_merge?: boolean | null;
         description?: string | null;
+        disabled: boolean;
+        fork: boolean;
+        forks_count: number;
         /**
          * `owner/name`.
          */
         full_name: string;
+        has_discussions: boolean;
+        has_issues: boolean;
+        has_pages: boolean;
+        has_projects: boolean;
+        has_wiki: boolean;
+        homepage?: string | null;
         id: string;
+        is_template: boolean;
+        language?: string | null;
+        license?: GithubLicense | null;
+        name: string;
+        open_issues_count: number;
+        owner: GithubUser;
+        permissions?: GithubPermissions | null;
         private: boolean;
+        pushed_at?: string | null;
+        /**
+         * Its size in kilobytes.
+         */
+        size: number;
+        ssh_url: string;
+        stargazers_count: number;
+        subscribers_count?: number | null;
+        topics: Array<string>;
+        updated_at?: string | null;
+        /**
+         * Its page on GitHub.
+         */
         url: string;
+        /**
+         * `public`, `private` or `internal` today. An open string.
+         */
+        visibility: string;
+        watchers_count: number;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubReview = {
+    data: Array<{
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
+        body?: string | null;
+        commit_id?: string | null;
+        id: string;
+        state: string;
+        submitted_at?: string | null;
+        url: string;
+        user?: GithubUser | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubReviewComment = {
+    data: Array<{
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
+        body: string;
+        commit_id: string;
+        created_at: string;
+        diff_hunk: string;
+        id: string;
+        in_reply_to_id?: string | null;
+        line?: number | null;
+        original_commit_id: string;
+        original_line?: number | null;
+        original_start_line?: number | null;
+        path: string;
+        pull_request_review_id?: string | null;
+        reactions?: GithubReactions | null;
+        side?: string | null;
+        start_line?: number | null;
+        start_side?: string | null;
+        /**
+         * What the comment is on: a `line` of the diff or the whole `file`.
+         */
+        subject_type?: string | null;
+        updated_at: string;
+        url: string;
+        user?: GithubUser | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubTag = {
+    data: Array<{
+        commit_sha: string;
+        name: string;
+        tarball_url: string;
+        zipball_url: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubTimelineEvent = {
+    data: Array<{
+        actor?: GithubUser | null;
+        assignee?: GithubUser | null;
+        author_email?: string | null;
+        author_name?: string | null;
+        authored_at?: string | null;
+        /**
+         * `commented`: the comment, its author and its page.
+         */
+        body?: string | null;
+        commit_id?: string | null;
+        committed_at?: string | null;
+        committer_email?: string | null;
+        committer_name?: string | null;
+        created_at?: string | null;
+        /**
+         * What happened (`commented`, `committed`, `labeled`, `cross-referenced`…), as GitHub names
+         * it. An open string.
+         */
+        event: string;
+        id?: string | null;
+        label?: GithubEventLabel | null;
+        message?: string | null;
+        milestone?: GithubEventMilestone | null;
+        rename?: GithubEventRename | null;
+        /**
+         * `committed`: the commit, its message and who wrote and committed it, and when.
+         */
+        sha?: string | null;
+        /**
+         * `cross-referenced`: the issue or pull request that mentions this one.
+         */
+        source_issue_number?: number | null;
+        /**
+         * `reviewed`: how the review ended (`approved`, `changes_requested`, `commented`), and when.
+         */
+        state?: string | null;
+        /**
+         * `closed` and `reopened`: why.
+         */
+        state_reason?: string | null;
+        submitted_at?: string | null;
+        url?: string | null;
+        user?: GithubUser | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubUser = {
+    data: Array<{
+        /**
+         * `User`, `Organization` or `Bot` today, as GitHub names it. An open string.
+         */
+        account_type: string;
+        avatar_url: string;
+        id: string;
+        login: string;
+        url: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubWorkflow = {
+    data: Array<{
+        badge_url: string;
+        created_at: string;
+        id: string;
+        name: string;
+        path: string;
+        state: string;
+        updated_at: string;
+        url: string;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubWorkflowJob = {
+    data: Array<{
+        completed_at?: string | null;
+        conclusion?: string | null;
+        created_at?: string | null;
+        head_branch?: string | null;
+        head_sha: string;
+        id: string;
+        labels: Array<string>;
+        name: string;
+        run_attempt: number;
+        run_id: string;
+        runner_name?: string | null;
+        started_at?: string | null;
+        status: string;
+        steps: Array<GithubWorkflowStep>;
+        url?: string | null;
+        workflow_name?: string | null;
+    }>;
+};
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export type ActionResultVecGithubWorkflowRun = {
+    data: Array<{
+        actor?: GithubUser | null;
+        check_suite_id?: string | null;
+        conclusion?: string | null;
+        created_at: string;
+        display_title: string;
+        event: string;
+        head_branch?: string | null;
+        head_sha: string;
+        id: string;
+        name?: string | null;
+        path: string;
+        /**
+         * The numbers of the pull requests the run is for.
+         */
+        pull_request_numbers: Array<number>;
+        run_attempt: number;
+        run_number: number;
+        run_started_at?: string | null;
+        status?: string | null;
+        triggering_actor?: GithubUser | null;
+        updated_at: string;
+        url: string;
+        workflow_id: string;
     }>;
 };
 
@@ -70,6 +1825,40 @@ export type ActionResultVecSlackChannel = {
     }>;
 };
 
+export type AddIssueAssignees = {
+    /**
+     * The logins of the people to assign it to.
+     */
+    assignees: Array<string>;
+    issue_number: number;
+    owner: string;
+    repo: string;
+};
+
+export type AddIssueLabels = {
+    issue_number: number;
+    /**
+     * The names of the labels to add.
+     */
+    labels: Array<string>;
+    owner: string;
+    repo: string;
+};
+
+export type AddRepositoryCollaborator = {
+    owner: string;
+    /**
+     * `pull`, `triage`, `push`, `maintain`, `admin`, or a custom repository role's name; GitHub
+     * grants `push` when left out.
+     */
+    permission?: string | null;
+    repo: string;
+    /**
+     * The account's login.
+     */
+    username: string;
+};
+
 /**
  * An auth config, without its secret.
  */
@@ -77,12 +1866,65 @@ export type AuthConfig = {
     client_id: string;
     created_at: string;
     /**
+     * Whether the app has secret settings (which are never answered).
+     */
+    has_secret_settings: boolean;
+    /**
      * `ac_…`.
      */
     id: string;
     provider: string;
     scopes: Array<string>;
+    /**
+     * The provider's own settings for the app; an empty object when it has none.
+     */
+    settings: {
+        [key: string]: unknown;
+    };
     updated_at: string;
+};
+
+export type CancelWorkflowRun = {
+    owner: string;
+    repo: string;
+    run_id: GithubId;
+};
+
+export type CheckPullRequestMerged = {
+    owner: string;
+    pull_number: number;
+    repo: string;
+};
+
+export type CheckRepositoryStarred = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    repo: string;
+};
+
+export type ClearIssueLabels = {
+    issue_number: number;
+    owner: string;
+    repo: string;
+};
+
+export type CompareCommits = {
+    /**
+     * `base...head`, each a branch, a tag or a commit SHA; `owner:branch` names another fork's.
+     */
+    basehead: string;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100; pages the commits between them.
+     */
+    per_page?: number | null;
+    repo: string;
 };
 
 /**
@@ -93,7 +1935,17 @@ export type ConnectedAccount = {
     alias?: string | null;
     auth_config_id: string;
     created_at: string;
+    /**
+     * What the connection acts as: `oauth` (the user who consented) or `app_installation` (an
+     * installation of the auth config's app, its tokens minted when an action runs). An open
+     * string.
+     */
+    credential_kind: string;
     id: string;
+    /**
+     * The installation an `app_installation` connection acts as.
+     */
+    installation_id?: string | null;
     /**
      * Why the last refresh or the consent failed.
      */
@@ -131,9 +1983,10 @@ export type ConnectedAccountCreated = {
      */
     id: string;
     /**
-     * The provider's own consent page: send the browser here.
+     * The provider's own consent page: send the browser here. Absent for an installation
+     * connection, which needs no consent.
      */
-    redirect_url: string;
+    redirect_url?: string | null;
     status: string;
 };
 
@@ -141,10 +1994,65 @@ export type CreateAuthConfig = {
     client_id: string;
     client_secret: string;
     /**
-     * A provider osiris implements: `github`, `linear` or `slack`.
+     * A provider osiris implements, by its id.
      */
     provider: string;
     scopes?: Array<string>;
+    /**
+     * The provider's own secret settings for the app, never answered. An app that acts as its
+     * installations puts the key it signs with here, as its provider's documentation says.
+     */
+    secret_settings?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * The provider's own settings for the app, which it validates; answered back. An app that
+     * acts as its installations names itself here, as its provider's documentation says.
+     */
+    settings?: {
+        [key: string]: unknown;
+    };
+};
+
+export type CreateCommitComment = {
+    body: string;
+    commit_sha: string;
+    owner: string;
+    /**
+     * The file to comment on, relative to the repository's root.
+     */
+    path?: string | null;
+    /**
+     * The line of the file's diff to comment on, from 1.
+     */
+    position?: number | null;
+    repo: string;
+};
+
+export type CreateCommitStatus = {
+    /**
+     * The name that tells this status apart from other services' statuses on the commit.
+     * GitHub uses `default` when it is left out.
+     */
+    context?: string | null;
+    /**
+     * A short description of the status.
+     */
+    description?: string | null;
+    owner: string;
+    repo: string;
+    /**
+     * The commit's full SHA.
+     */
+    sha: string;
+    /**
+     * `error`, `failure`, `pending` or `success`.
+     */
+    state: string;
+    /**
+     * The page the status links to, such as a build's output.
+     */
+    target_url?: string | null;
 };
 
 export type CreateConnectedAccount = {
@@ -158,18 +2066,448 @@ export type CreateConnectedAccount = {
     auth_config_id: string;
     /**
      * Where the browser goes after the provider's consent, with `connected_account_id` and
-     * `status` added to its query.
+     * `status` added to its query. Required for a consent; left out with `installation_id`.
      */
-    callback_url: string;
+    callback_url?: string | null;
+    /**
+     * Connect as this installation of the auth config's app instead of through a user's
+     * consent (the provider's id for the installation): no browser, active at once. The auth config
+     * must hold the app's credentials in its settings.
+     */
+    installation_id?: string | null;
     /**
      * Yours: who the connection is for, such as an organization's id.
      */
     user_id: string;
 };
 
+export type CreateIssue = {
+    /**
+     * The logins of the people to assign it to.
+     */
+    assignees?: Array<string> | null;
+    /**
+     * The issue's text, in Markdown.
+     */
+    body?: string | null;
+    /**
+     * The names of the labels to put on it.
+     */
+    labels?: Array<string> | null;
+    /**
+     * The number of the milestone to put it in.
+     */
+    milestone?: number | null;
+    owner: string;
+    repo: string;
+    title: string;
+};
+
+export type CreateIssueComment = {
+    /**
+     * The comment's text, in Markdown.
+     */
+    body: string;
+    issue_number: number;
+    owner: string;
+    repo: string;
+};
+
+export type CreateIssueCommentReaction = {
+    comment_id: GithubId;
+    /**
+     * The reaction: `+1`, `-1`, `laugh`, `confused`, `heart`, `hooray`, `rocket` or `eyes`.
+     */
+    content: string;
+    owner: string;
+    repo: string;
+};
+
+export type CreateIssueReaction = {
+    /**
+     * The reaction: `+1`, `-1`, `laugh`, `confused`, `heart`, `hooray`, `rocket` or `eyes`.
+     */
+    content: string;
+    issue_number: number;
+    owner: string;
+    repo: string;
+};
+
+export type CreateLabel = {
+    /**
+     * The label's color, as six hex digits without `#`.
+     */
+    color: string;
+    description?: string | null;
+    name: string;
+    owner: string;
+    repo: string;
+};
+
+export type CreateMilestone = {
+    description?: string | null;
+    /**
+     * When it is due, as an ISO 8601 timestamp.
+     */
+    due_on?: string | null;
+    owner: string;
+    repo: string;
+    /**
+     * `open` (GitHub's default) or `closed`.
+     */
+    state?: string | null;
+    title: string;
+};
+
+export type CreateOrUpdateFile = {
+    /**
+     * The branch to commit to; the default branch when left out.
+     */
+    branch?: string | null;
+    /**
+     * The file's new content as text. Ignored when `content_base64` is given; an empty file when
+     * both are left out.
+     */
+    content?: string | null;
+    /**
+     * The file's new content, base64-encoded, for a binary file.
+     */
+    content_base64?: string | null;
+    /**
+     * The commit's message.
+     */
+    message: string;
+    owner: string;
+    /**
+     * The file, such as `docs/guide.md`.
+     */
+    path: string;
+    repo: string;
+    /**
+     * The SHA of the file being replaced; required to update an existing file.
+     */
+    sha?: string | null;
+};
+
+export type CreatePullRequest = {
+    /**
+     * The branch the changes go into.
+     */
+    base: string;
+    body?: string | null;
+    /**
+     * Whether the pull request is opened as a draft.
+     */
+    draft?: boolean | null;
+    /**
+     * The branch the changes come from. A branch of another account's fork is named
+     * `account:branch`.
+     */
+    head: string;
+    /**
+     * Whether the base repository's maintainers may push to the head branch.
+     */
+    maintainer_can_modify?: boolean | null;
+    owner: string;
+    repo: string;
+    title: string;
+};
+
+export type CreatePullRequestReview = {
+    body?: string | null;
+    /**
+     * Comments on lines of the diff, made with the review.
+     */
+    comments?: Array<ReviewCommentInput> | null;
+    /**
+     * The commit the review is of; the pull request's latest commit when left out.
+     */
+    commit_id?: string | null;
+    event?: ReviewEvent | null;
+    owner: string;
+    pull_number: number;
+    repo: string;
+};
+
+export type CreatePullRequestReviewComment = {
+    body: string;
+    /**
+     * The commit the comment is on, usually the pull request's latest.
+     */
+    commit_id: string;
+    /**
+     * The line the comment is on, or the last line of a range of lines.
+     */
+    line?: number | null;
+    owner: string;
+    /**
+     * The file's path in the repository.
+     */
+    path: string;
+    pull_number: number;
+    repo: string;
+    side?: DiffSide | null;
+    /**
+     * The first line of a range of lines the comment is on.
+     */
+    start_line?: number | null;
+    start_side?: DiffSide | null;
+};
+
+export type CreateRef = {
+    owner: string;
+    /**
+     * The full reference, starting with `refs/`, such as `refs/heads/feature`.
+     */
+    ref: string;
+    repo: string;
+    /**
+     * The commit it points at.
+     */
+    sha: string;
+};
+
+export type CreateRelease = {
+    /**
+     * The release's description, in Markdown.
+     */
+    body?: string | null;
+    /**
+     * A draft is not published.
+     */
+    draft?: boolean | null;
+    /**
+     * GitHub writes the release's name and body from the changes since the previous release,
+     * after any `name` and `body` given.
+     */
+    generate_release_notes?: boolean | null;
+    /**
+     * Whether it becomes the repository's latest release: `true`, `false` or `legacy` (the
+     * latest by creation date and version).
+     */
+    make_latest?: string | null;
+    name?: string | null;
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    /**
+     * Marks the release as not ready for production.
+     */
+    prerelease?: boolean | null;
+    repo: string;
+    /**
+     * The tag the release is made from. GitHub creates it when it doesn't exist yet.
+     */
+    tag_name: string;
+    /**
+     * The branch or commit SHA a new tag is created from. The repository's default branch when
+     * left out.
+     */
+    target_commitish?: string | null;
+};
+
+export type CreateRepository = {
+    /**
+     * Whether GitHub makes a first commit with an empty README.
+     */
+    auto_init?: boolean | null;
+    description?: string | null;
+    /**
+     * The name of a `.gitignore` template GitHub offers, such as `Rust`.
+     */
+    gitignore_template?: string | null;
+    has_discussions?: boolean | null;
+    has_issues?: boolean | null;
+    has_projects?: boolean | null;
+    has_wiki?: boolean | null;
+    /**
+     * A URL with more about the repository.
+     */
+    homepage?: string | null;
+    /**
+     * The keyword of a license GitHub offers, such as `mit`.
+     */
+    license_template?: string | null;
+    name: string;
+    private?: boolean | null;
+};
+
+export type CreateTrigger = {
+    /**
+     * The kind's own configuration, which its provider validates and its documentation
+     * describes.
+     */
+    config: {
+        [key: string]: unknown;
+    };
+    /**
+     * `ca_…`: the connection the trigger watches through.
+     */
+    connected_account_id: string;
+    /**
+     * What it watches: one of the connection's provider's trigger kinds, `<provider>.<kind>`,
+     * which its provider's documentation lists. An open string: more kinds may come.
+     */
+    trigger: string;
+};
+
+export type DeleteFile = {
+    /**
+     * The branch to commit to; the default branch when left out.
+     */
+    branch?: string | null;
+    /**
+     * The commit's message.
+     */
+    message: string;
+    owner: string;
+    /**
+     * The file, such as `docs/guide.md`.
+     */
+    path: string;
+    repo: string;
+    /**
+     * The SHA of the file being deleted.
+     */
+    sha: string;
+};
+
+export type DeleteIssueComment = {
+    comment_id: GithubId;
+    owner: string;
+    repo: string;
+};
+
+export type DeleteLabel = {
+    name: string;
+    owner: string;
+    repo: string;
+};
+
+export type DeleteMilestone = {
+    milestone_number: number;
+    owner: string;
+    repo: string;
+};
+
+export type DeletePendingPullRequestReview = {
+    owner: string;
+    pull_number: number;
+    repo: string;
+    review_id: GithubId;
+};
+
+export type DeletePullRequestReviewComment = {
+    comment_id: GithubId;
+    owner: string;
+    repo: string;
+};
+
+export type DeleteRef = {
+    owner: string;
+    /**
+     * The reference without `refs/`, such as `heads/feature` or `tags/v1.0.0`.
+     */
+    ref: string;
+    repo: string;
+};
+
+export type DeleteRelease = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    /**
+     * GitHub's numeric id of the release.
+     */
+    release_id: GithubId;
+    repo: string;
+};
+
+export type DeleteReleaseAsset = {
+    /**
+     * GitHub's numeric id of the asset.
+     */
+    asset_id: GithubId;
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    repo: string;
+};
+
+export type DeleteRepository = {
+    /**
+     * The account or organization that owns it.
+     */
+    owner: string;
+    repo: string;
+};
+
 export type Deleted = {
     deleted: boolean;
     id: string;
+};
+
+/**
+ * The side of a diff a review comment is placed on: `LEFT` is the old version of the file, with
+ * the lines removed, and `RIGHT` is the new version, with the lines added.
+ */
+export type DiffSide = 'LEFT' | 'RIGHT';
+
+export type DisableWorkflow = {
+    owner: string;
+    repo: string;
+    /**
+     * The workflow's id, or its file name such as `ci.yml`.
+     */
+    workflow_id: string;
+};
+
+export type DismissPullRequestReview = {
+    /**
+     * Why the review is dismissed.
+     */
+    message: string;
+    owner: string;
+    pull_number: number;
+    repo: string;
+    review_id: GithubId;
+};
+
+export type DispatchWorkflow = {
+    /**
+     * The workflow's inputs, by name. Every value is a string.
+     */
+    inputs?: {
+        [key: string]: string;
+    } | null;
+    owner: string;
+    /**
+     * The branch or tag the workflow runs on.
+     */
+    ref: string;
+    repo: string;
+    /**
+     * The workflow's id, or its file name such as `ci.yml`.
+     */
+    workflow_id: string;
+};
+
+export type DownloadWorkflowArtifact = {
+    artifact_id: GithubId;
+    owner: string;
+    repo: string;
+};
+
+export type EnableWorkflow = {
+    owner: string;
+    repo: string;
+    /**
+     * The workflow's id, or its file name such as `ci.yml`.
+     */
+    workflow_id: string;
 };
 
 export type ErrorBody = {
@@ -181,14 +2519,15 @@ export type ErrorDetail = {
      * `OS_00` unauthorized, `OS_01` not found, `OS_02` invalid request, `OS_03` conflict,
      * `OS_04` provider refused, `OS_05` provider unavailable, `OS_06` connection not active,
      * `OS_07` unknown version, `OS_08` idempotency key reused, `OS_09` request in flight,
-     * `OS_10` body too large, `OS_99` internal. An open string: codes may be added.
+     * `OS_10` body too large, `OS_11` missing scopes, `OS_99` internal. An open string: codes may
+     * be added.
      */
     code: string;
     message: string;
     /**
      * `unauthorized`, `not_found`, `invalid_request`, `conflict`, `provider_refused`,
      * `provider_unavailable`, `connection_not_active`, `unknown_version`, `idempotency_mismatch`,
-     * `in_flight`, `too_large`, `internal`.
+     * `in_flight`, `too_large`, `missing_scopes`, `internal`.
      */
     type: string;
 };
@@ -226,6 +2565,657 @@ export type EventDelivery = {
     version: number;
 };
 
+export type ForkRepository = {
+    /**
+     * Whether the fork has only the default branch.
+     */
+    default_branch_only?: boolean | null;
+    /**
+     * A name for the fork; the repository's own when left out.
+     */
+    name?: string | null;
+    /**
+     * The organization to fork into; the authenticated user's account when left out.
+     */
+    organization?: string | null;
+    owner: string;
+    repo: string;
+};
+
+export type GenerateReleaseNotes = {
+    /**
+     * The path in the repository of a configuration file for the notes. GitHub reads
+     * `.github/release.yml` when left out.
+     */
+    configuration_file_path?: string | null;
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    /**
+     * The tag the notes start from. GitHub picks the previous release's when left out.
+     */
+    previous_tag_name?: string | null;
+    repo: string;
+    /**
+     * The tag the notes are for. It need not exist yet.
+     */
+    tag_name: string;
+    /**
+     * The branch or commit SHA the tag would be created from, when it doesn't exist yet.
+     */
+    target_commitish?: string | null;
+};
+
+export type GetBranch = {
+    branch: string;
+    owner: string;
+    repo: string;
+};
+
+export type GetCommit = {
+    owner: string;
+    /**
+     * A commit SHA, a branch name or a tag name.
+     */
+    ref: string;
+    repo: string;
+};
+
+export type GetCommitStatuses = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * A commit SHA, a branch name or a tag name.
+     */
+    ref: string;
+    repo: string;
+};
+
+export type GetFileContents = {
+    owner: string;
+    /**
+     * The file, such as `src/lib.rs`.
+     */
+    path: string;
+    /**
+     * A branch, a tag or a commit SHA; the default branch when left out.
+     */
+    ref?: string | null;
+    repo: string;
+};
+
+export type GetIssue = {
+    issue_number: number;
+    owner: string;
+    repo: string;
+};
+
+export type GetIssueComment = {
+    comment_id: GithubId;
+    owner: string;
+    repo: string;
+};
+
+export type GetLabel = {
+    name: string;
+    owner: string;
+    repo: string;
+};
+
+export type GetLatestRelease = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    repo: string;
+};
+
+export type GetMilestone = {
+    milestone_number: number;
+    owner: string;
+    repo: string;
+};
+
+export type GetPullRequest = {
+    owner: string;
+    pull_number: number;
+    repo: string;
+};
+
+export type GetPullRequestReview = {
+    owner: string;
+    pull_number: number;
+    repo: string;
+    review_id: GithubId;
+};
+
+export type GetRef = {
+    owner: string;
+    /**
+     * The reference without `refs/`, such as `heads/main` or `tags/v1.0.0`.
+     */
+    ref: string;
+    repo: string;
+};
+
+export type GetRelease = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    /**
+     * GitHub's numeric id of the release.
+     */
+    release_id: GithubId;
+    repo: string;
+};
+
+export type GetReleaseAsset = {
+    /**
+     * GitHub's numeric id of the asset.
+     */
+    asset_id: GithubId;
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    repo: string;
+};
+
+export type GetReleaseByTag = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    repo: string;
+    /**
+     * The tag's name, such as `v1.0.0`.
+     */
+    tag: string;
+};
+
+export type GetRepository = {
+    /**
+     * The account or organization that owns it.
+     */
+    owner: string;
+    repo: string;
+};
+
+export type GetRepositoryPermissionForUser = {
+    owner: string;
+    repo: string;
+    /**
+     * The account's login.
+     */
+    username: string;
+};
+
+export type GetRepositoryReadme = {
+    owner: string;
+    /**
+     * A branch, a tag or a commit SHA; the default branch when left out.
+     */
+    ref?: string | null;
+    repo: string;
+};
+
+export type GetUser = {
+    /**
+     * The user's login.
+     */
+    username: string;
+};
+
+export type GetWorkflow = {
+    owner: string;
+    repo: string;
+    /**
+     * The workflow's id, or its file name such as `ci.yml`.
+     */
+    workflow_id: string;
+};
+
+export type GetWorkflowJobLogs = {
+    job_id: GithubId;
+    owner: string;
+    repo: string;
+};
+
+export type GetWorkflowRun = {
+    owner: string;
+    repo: string;
+    run_id: GithubId;
+};
+
+/**
+ * An action that answers nothing of its own: `ok` once GitHub has done it.
+ */
+export type GithubAcknowledgement = {
+    ok: boolean;
+};
+
+/**
+ * A file a workflow run kept.
+ */
+export type GithubArtifact = {
+    archive_download_url: string;
+    created_at?: string | null;
+    digest?: string | null;
+    expired: boolean;
+    expires_at?: string | null;
+    head_branch?: string | null;
+    head_sha?: string | null;
+    id: string;
+    name: string;
+    /**
+     * The run that made the artifact.
+     */
+    run_id?: string | null;
+    size_in_bytes: number;
+    updated_at?: string | null;
+};
+
+/**
+ * Where a workflow artifact's ZIP archive can be downloaded.
+ */
+export type GithubArtifactDownload = {
+    /**
+     * A signed URL that downloads the archive without a token, for one minute.
+     */
+    url: string;
+};
+
+/**
+ * A branch: its name, the commit it points at, and whether it is protected.
+ */
+export type GithubBranch = {
+    commit_sha: string;
+    name: string;
+    protected: boolean;
+    protection?: GithubBranchProtection | null;
+};
+
+/**
+ * What a branch's protection asks of a change before it lands.
+ */
+export type GithubBranchProtection = {
+    enabled: boolean;
+    /**
+     * Who the required status checks apply to: `off`, `non_admins` or `everyone`.
+     */
+    enforcement_level?: string | null;
+    /**
+     * The status checks that must pass, by context.
+     */
+    required_status_checks: Array<string>;
+};
+
+/**
+ * A check run on a commit.
+ */
+export type GithubCheckRun = {
+    /**
+     * The slug of the app that made the check run.
+     */
+    app?: string | null;
+    check_suite_id?: string | null;
+    completed_at?: string | null;
+    conclusion?: string | null;
+    details_url?: string | null;
+    external_id?: string | null;
+    head_sha: string;
+    id: string;
+    name: string;
+    output?: GithubCheckRunOutput | null;
+    started_at?: string | null;
+    status: string;
+    url?: string | null;
+};
+
+/**
+ * What a check run reported.
+ */
+export type GithubCheckRunOutput = {
+    annotations_count: number;
+    summary?: string | null;
+    text?: string | null;
+    title?: string | null;
+};
+
+/**
+ * The files a code search found.
+ */
+export type GithubCodeSearchResults = {
+    /**
+     * GitHub stopped searching before it had looked at everything, so matches may be missing.
+     */
+    incomplete_results: boolean;
+    items: Array<GithubSearchCode>;
+    /**
+     * Every match GitHub counted, across all pages.
+     */
+    total_count: number;
+};
+
+/**
+ * A repository's collaborator.
+ */
+export type GithubCollaborator = {
+    account_type: string;
+    avatar_url: string;
+    id: string;
+    login: string;
+    permissions?: GithubPermissions | null;
+    role_name?: string | null;
+    site_admin: boolean;
+    url: string;
+};
+
+/**
+ * A collaborator added to a repository: at once when `invited` is false (an organization member,
+ * or a permission changed), or through `invitation` when the account must accept it first.
+ */
+export type GithubCollaboratorAddition = {
+    invitation?: GithubRepositoryInvitation | null;
+    invited: boolean;
+};
+
+/**
+ * A commit.
+ */
+export type GithubCommit = {
+    author?: GithubUser | null;
+    author_email?: string | null;
+    author_name?: string | null;
+    authored_at?: string | null;
+    committed_at?: string | null;
+    committer?: GithubUser | null;
+    committer_email?: string | null;
+    committer_name?: string | null;
+    files?: Array<GithubCommitFile> | null;
+    message: string;
+    parents: Array<string>;
+    sha: string;
+    stats?: GithubCommitStats | null;
+    url: string;
+};
+
+/**
+ * A comment on a commit.
+ */
+export type GithubCommitComment = {
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
+    body: string;
+    commit_id: string;
+    created_at: string;
+    id: string;
+    line?: number | null;
+    path?: string | null;
+    position?: number | null;
+    reactions?: GithubReactions | null;
+    updated_at: string;
+    url: string;
+    user?: GithubUser | null;
+};
+
+/**
+ * Two commits compared: how far apart they are, and the commits and files between them.
+ */
+export type GithubCommitComparison = {
+    ahead_by: number;
+    /**
+     * The commit compared from, and the latest one both sides share.
+     */
+    base_commit_sha?: string | null;
+    behind_by: number;
+    commits: Array<GithubCommit>;
+    files: Array<GithubCommitFile>;
+    merge_base_commit_sha?: string | null;
+    status: string;
+    total_commits: number;
+    url: string;
+};
+
+/**
+ * A file a commit changed.
+ */
+export type GithubCommitFile = {
+    additions: number;
+    blob_url?: string | null;
+    changes: number;
+    deletions: number;
+    filename: string;
+    patch?: string | null;
+    previous_filename?: string | null;
+    sha?: string | null;
+    status: string;
+};
+
+/**
+ * The commits a search found.
+ */
+export type GithubCommitSearchResults = {
+    /**
+     * GitHub stopped searching before it had looked at everything, so matches may be missing.
+     */
+    incomplete_results: boolean;
+    items: Array<GithubSearchCommit>;
+    /**
+     * Every match GitHub counted, across all pages.
+     */
+    total_count: number;
+};
+
+/**
+ * How much a commit changed.
+ */
+export type GithubCommitStats = {
+    additions: number;
+    deletions: number;
+    total: number;
+};
+
+/**
+ * A status a service set on a commit.
+ */
+export type GithubCommitStatus = {
+    context: string;
+    created_at: string;
+    creator?: GithubUser | null;
+    description?: string | null;
+    id: string;
+    state: string;
+    target_url?: string | null;
+    updated_at: string;
+};
+
+/**
+ * A file written or deleted, and the commit that did it.
+ */
+export type GithubContentChange = {
+    commit: GithubContentCommit;
+    content?: GithubContentEntry | null;
+};
+
+/**
+ * The commit a contents change made.
+ */
+export type GithubContentCommit = {
+    message: string;
+    sha: string;
+    url: string;
+};
+
+/**
+ * A file, a directory, a symlink or a submodule of a repository's contents.
+ */
+export type GithubContentEntry = {
+    download_url?: string | null;
+    entry_type: string;
+    name: string;
+    path: string;
+    sha: string;
+    size: number;
+    url?: string | null;
+};
+
+/**
+ * Someone who contributed to a repository.
+ */
+export type GithubContributor = {
+    account_type: string;
+    avatar_url: string;
+    contributions: number;
+    id: string;
+    login: string;
+    site_admin: boolean;
+    url: string;
+};
+
+/**
+ * The authenticated user: their profile, and what GitHub shows only to the account itself, which
+ * is null where the token may not see it.
+ */
+export type GithubCurrentUser = GithubPublicUser & {
+    collaborators?: number | null;
+    /**
+     * In kilobytes.
+     */
+    disk_usage?: number | null;
+    owned_private_repos?: number | null;
+    /**
+     * The name of the account's plan.
+     */
+    plan?: string | null;
+    private_gists?: number | null;
+    total_private_repos?: number | null;
+    two_factor_authentication?: boolean | null;
+};
+
+/**
+ * An event on GitHub's activity feed. `payload` is GitHub's own, whose shape depends on `event_type`.
+ */
+export type GithubEvent = {
+    actor?: GithubEventAccount | null;
+    created_at: string;
+    event_type: string;
+    id: string;
+    organization?: GithubEventAccount | null;
+    payload: {
+        [key: string]: unknown;
+    };
+    public: boolean;
+    repository?: GithubEventRepository | null;
+};
+
+/**
+ * Who did an event, or the organization it happened in: GitHub names an account on its activity
+ * feeds by less than it does elsewhere, with no page link and no account type.
+ */
+export type GithubEventAccount = {
+    avatar_url: string;
+    display_login?: string | null;
+    id: string;
+    login: string;
+};
+
+/**
+ * The label a `labeled` or `unlabeled` event is about.
+ */
+export type GithubEventLabel = {
+    color: string;
+    name: string;
+};
+
+/**
+ * The milestone a `milestoned` or `demilestoned` event is about.
+ */
+export type GithubEventMilestone = {
+    title: string;
+};
+
+/**
+ * An issue's title before and after a `renamed` event.
+ */
+export type GithubEventRename = {
+    from: string;
+    to: string;
+};
+
+/**
+ * The repository an event happened in.
+ */
+export type GithubEventRepository = {
+    id: string;
+    name: string;
+};
+
+/**
+ * A file and its content.
+ */
+export type GithubFileContent = {
+    /**
+     * The content, base64-encoded, without the line breaks GitHub wraps it in.
+     */
+    content_base64: string;
+    /**
+     * The content as text, when it is base64-encoded UTF-8; absent for a binary file.
+     */
+    decoded_content?: string | null;
+    download_url?: string | null;
+    encoding: string;
+    name: string;
+    path: string;
+    sha: string;
+    size: number;
+    url?: string | null;
+};
+
+/**
+ * A fork's branch brought up to date with its upstream.
+ */
+export type GithubForkSync = {
+    /**
+     * The upstream branch, as `owner:branch`.
+     */
+    base_branch?: string | null;
+    /**
+     * `merge`, `fast-forward` or `none` today, as GitHub names it. An open string.
+     */
+    merge_type?: string | null;
+    /**
+     * What GitHub did, in its own words.
+     */
+    message: string;
+};
+
+/**
+ * A git reference (a branch or a tag) and the object it points at.
+ */
+export type GithubGitRef = {
+    object_type: string;
+    ref_name: string;
+    sha: string;
+};
+
+/**
+ * An id GitHub gave something: a whole number, or the text of one, as answers give it.
+ */
+export type GithubId = number | string;
+
 /**
  * Where our GitHub App is installed: an account or organization.
  */
@@ -239,26 +3229,981 @@ export type GithubInstallation = {
      * release, and a client keeps working on one it doesn't know.
      */
     account_type: string;
+    /**
+     * The app installed, by its slug.
+     */
+    app_slug: string;
+    created_at?: string | null;
+    /**
+     * The webhook events it is subscribed to.
+     */
+    events: Array<string>;
     id: string;
+    /**
+     * What the installation may do, by GitHub's permission name: `read`, `write` or `admin`.
+     */
+    permissions: {
+        [key: string]: string;
+    };
     /**
      * `all` (every repository of the account) or `selected` (only the ones chosen at install)
      * today. An open string: more values may come without a new release.
      */
     repository_selection: string;
+    /**
+     * When it was suspended, if it is.
+     */
+    suspended_at?: string | null;
+    updated_at?: string | null;
 };
 
 /**
- * A repository our GitHub App reads, through one of its installations.
+ * An issue (GitHub also answers pull requests as issues; `is_pull_request` says which).
+ */
+export type GithubIssue = {
+    active_lock_reason?: string | null;
+    assignees: Array<GithubUser>;
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
+    body?: string | null;
+    closed_at?: string | null;
+    closed_by?: GithubUser | null;
+    comments: number;
+    created_at: string;
+    id: string;
+    is_pull_request: boolean;
+    labels: Array<GithubLabel>;
+    /**
+     * Whether its conversation is locked, and why when it is: `off-topic`, `too heated`,
+     * `resolved` or `spam`.
+     */
+    locked: boolean;
+    milestone?: GithubMilestone | null;
+    number: number;
+    reactions?: GithubReactions | null;
+    state: string;
+    /**
+     * Why it is closed or open again: `completed`, `not_planned`, `duplicate` or `reopened`.
+     */
+    state_reason?: string | null;
+    title: string;
+    updated_at: string;
+    url: string;
+    user?: GithubUser | null;
+};
+
+/**
+ * A comment on an issue or a pull request.
+ */
+export type GithubIssueComment = {
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
+    body: string;
+    created_at: string;
+    id: string;
+    reactions?: GithubReactions | null;
+    updated_at: string;
+    url: string;
+    user?: GithubUser | null;
+};
+
+/**
+ * Something that happened to an issue (labelled, closed, referenced…), with what it was about:
+ * each detail is set only for the events that have it, as GitHub sends them.
+ */
+export type GithubIssueEvent = {
+    actor?: GithubUser | null;
+    assignee?: GithubUser | null;
+    assigner?: GithubUser | null;
+    commit_id?: string | null;
+    created_at: string;
+    /**
+     * What happened (`labeled`, `assigned`, `closed`, `renamed`…), as GitHub names it. An open
+     * string.
+     */
+    event: string;
+    id: string;
+    /**
+     * The issue it happened to, in a repository's list of events.
+     */
+    issue_number?: number | null;
+    label?: GithubEventLabel | null;
+    /**
+     * `locked`: why.
+     */
+    lock_reason?: string | null;
+    milestone?: GithubEventMilestone | null;
+    rename?: GithubEventRename | null;
+    requested_reviewer?: GithubUser | null;
+    /**
+     * `closed` and `reopened`: why.
+     */
+    state_reason?: string | null;
+};
+
+/**
+ * Whether an issue's conversation is locked, once GitHub has locked or unlocked it.
+ */
+export type GithubIssueLock = {
+    locked: boolean;
+};
+
+/**
+ * A page of a repository's issues, with the pull requests GitHub mixes in left out.
+ */
+export type GithubIssuePage = {
+    /**
+     * How many items GitHub answered on this page before the pull requests were left out. A
+     * caller reading page after page goes on while this equals the page size asked for (30 when
+     * none was asked), even when `issues` comes back short or empty.
+     */
+    fetched: number;
+    /**
+     * The page's issues, without its pull requests.
+     */
+    issues: Array<GithubIssue>;
+};
+
+/**
+ * A workflow job's logs, as plain text.
+ */
+export type GithubJobLogs = {
+    /**
+     * The log, or its last `[providers.listing] max_log_bytes` when it is longer.
+     */
+    logs: string;
+    /**
+     * Whether the log was longer, so only its end is here.
+     */
+    truncated: boolean;
+};
+
+/**
+ * A label.
+ */
+export type GithubLabel = {
+    color: string;
+    /**
+     * Whether it is one of the labels GitHub gives every new repository.
+     */
+    default: boolean;
+    description?: string | null;
+    id: string;
+    name: string;
+};
+
+/**
+ * The labels a search found.
+ */
+export type GithubLabelSearchResults = {
+    /**
+     * GitHub stopped searching before it had looked at everything, so matches may be missing.
+     */
+    incomplete_results: boolean;
+    items: Array<GithubSearchLabel>;
+    /**
+     * Every match GitHub counted, across all pages.
+     */
+    total_count: number;
+};
+
+/**
+ * A language a repository is written in, by bytes of code.
+ */
+export type GithubLanguage = {
+    bytes: number;
+    name: string;
+};
+
+/**
+ * The license GitHub found in a repository.
+ */
+export type GithubLicense = {
+    key: string;
+    name: string;
+    spdx_id?: string | null;
+};
+
+/**
+ * A pull request merged, or a merge refused.
+ */
+export type GithubMergeResult = {
+    merged: boolean;
+    message: string;
+    sha?: string | null;
+};
+
+/**
+ * Whether a pull request has been merged.
+ */
+export type GithubMergedCheck = {
+    merged: boolean;
+};
+
+/**
+ * A milestone.
+ */
+export type GithubMilestone = {
+    /**
+     * When it was closed; none while it is open.
+     */
+    closed_at?: string | null;
+    closed_issues: number;
+    created_at?: string | null;
+    creator?: GithubUser | null;
+    description?: string | null;
+    due_on?: string | null;
+    id: string;
+    number: number;
+    open_issues: number;
+    state: string;
+    title: string;
+    updated_at?: string | null;
+    url: string;
+};
+
+/**
+ * What an account may do in a repository.
+ */
+export type GithubPermissions = {
+    admin: boolean;
+    maintain: boolean;
+    pull: boolean;
+    push: boolean;
+    triage: boolean;
+};
+
+/**
+ * A user's public profile.
+ */
+export type GithubPublicUser = {
+    account_type: string;
+    avatar_url: string;
+    bio?: string | null;
+    blog?: string | null;
+    company?: string | null;
+    created_at?: string | null;
+    email?: string | null;
+    followers: number;
+    following: number;
+    hireable?: boolean | null;
+    id: string;
+    location?: string | null;
+    login: string;
+    name?: string | null;
+    public_gists: number;
+    public_repos: number;
+    site_admin: boolean;
+    twitter_username?: string | null;
+    updated_at?: string | null;
+    url: string;
+};
+
+/**
+ * A pull request.
+ */
+export type GithubPullRequest = {
+    active_lock_reason?: string | null;
+    additions?: number | null;
+    assignees: Array<GithubUser>;
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
+    /**
+     * Whether it merges by itself once its checks pass.
+     */
+    auto_merge: boolean;
+    base: GithubPullRequestBranch;
+    body?: string | null;
+    changed_files?: number | null;
+    closed_at?: string | null;
+    comments?: number | null;
+    /**
+     * Its size and conversation, from reading one pull request; a list leaves them null.
+     */
+    commits?: number | null;
+    created_at: string;
+    deletions?: number | null;
+    draft: boolean;
+    head: GithubPullRequestBranch;
+    id: string;
+    labels: Array<GithubLabel>;
+    /**
+     * Whether its conversation is locked, and why when it is.
+     */
+    locked: boolean;
+    maintainer_can_modify?: boolean | null;
+    /**
+     * The commit its merge made, or the test merge GitHub keeps while it is open.
+     */
+    merge_commit_sha?: string | null;
+    /**
+     * Whether it can be merged now, as GitHub has worked it out: only reading one pull request
+     * answers these (a list leaves them null), and `mergeable` is null while GitHub is still
+     * working it out.
+     */
+    mergeable?: boolean | null;
+    /**
+     * `clean`, `blocked`, `behind`, `dirty`, `unstable`, `draft` or `unknown`. An open string.
+     */
+    mergeable_state?: string | null;
+    merged: boolean;
+    merged_at?: string | null;
+    merged_by?: GithubUser | null;
+    milestone?: GithubMilestone | null;
+    number: number;
+    /**
+     * Whether it can be rebased onto its base; null while GitHub is still working it out.
+     */
+    rebaseable?: boolean | null;
+    /**
+     * Who is asked to review it: people, and teams by their slug.
+     */
+    requested_reviewers: Array<GithubUser>;
+    requested_teams: Array<string>;
+    review_comments?: number | null;
+    state: string;
+    title: string;
+    updated_at: string;
+    url: string;
+    user?: GithubUser | null;
+};
+
+/**
+ * The branch a pull request comes from (`head`) or goes into (`base`).
+ */
+export type GithubPullRequestBranch = {
+    label: string;
+    ref_name: string;
+    repository_full_name?: string | null;
+    sha: string;
+};
+
+/**
+ * A pull request's branch being brought up to date with its base branch, which GitHub does in
+ * the background.
+ */
+export type GithubPullRequestBranchUpdate = {
+    /**
+     * What GitHub says it is doing.
+     */
+    message: string;
+    /**
+     * The pull request's address on GitHub's API.
+     */
+    url: string;
+};
+
+/**
+ * A file a pull request changes.
+ */
+export type GithubPullRequestFile = {
+    additions: number;
+    blob_url?: string | null;
+    changes: number;
+    deletions: number;
+    filename: string;
+    patch?: string | null;
+    previous_filename?: string | null;
+    sha: string;
+    status: string;
+};
+
+/**
+ * A reaction to an issue or a comment.
+ */
+export type GithubReaction = {
+    content: string;
+    created_at: string;
+    id: string;
+    user?: GithubUser | null;
+};
+
+/**
+ * How many of each reaction an issue or a comment has: GitHub's `+1` is `plus_one`, its `-1`
+ * `minus_one`.
+ */
+export type GithubReactions = {
+    confused: number;
+    eyes: number;
+    heart: number;
+    hooray: number;
+    laugh: number;
+    minus_one: number;
+    plus_one: number;
+    rocket: number;
+    total_count: number;
+};
+
+/**
+ * A release.
+ */
+export type GithubRelease = {
+    assets: Array<GithubReleaseAsset>;
+    assets_url: string;
+    author?: GithubUser | null;
+    body?: string | null;
+    created_at: string;
+    draft: boolean;
+    id: string;
+    /**
+     * Whether its tag and assets can no longer change.
+     */
+    immutable: boolean;
+    name?: string | null;
+    prerelease: boolean;
+    published_at?: string | null;
+    reactions?: GithubReactions | null;
+    tag_name: string;
+    tarball_url?: string | null;
+    target_commitish: string;
+    updated_at?: string | null;
+    upload_url: string;
+    url: string;
+    zipball_url?: string | null;
+};
+
+/**
+ * A file attached to a release.
+ */
+export type GithubReleaseAsset = {
+    content_type: string;
+    created_at: string;
+    digest?: string | null;
+    download_count: number;
+    download_url: string;
+    id: string;
+    label?: string | null;
+    name: string;
+    size: number;
+    state: string;
+    updated_at: string;
+    uploader?: GithubUser | null;
+};
+
+/**
+ * Release notes GitHub wrote for a tag.
+ */
+export type GithubReleaseNotes = {
+    body: string;
+    name: string;
+};
+
+/**
+ * A repository.
  */
 export type GithubRepository = {
+    allow_auto_merge?: boolean | null;
+    /**
+     * The merge settings and the watcher count, which GitHub answers only when it reads one
+     * repository by itself.
+     */
+    allow_merge_commit?: boolean | null;
+    allow_rebase_merge?: boolean | null;
+    allow_squash_merge?: boolean | null;
+    archived: boolean;
+    clone_url: string;
+    created_at?: string | null;
+    default_branch: string;
+    delete_branch_on_merge?: boolean | null;
     description?: string | null;
+    disabled: boolean;
+    fork: boolean;
+    forks_count: number;
     /**
      * `owner/name`.
      */
     full_name: string;
+    has_discussions: boolean;
+    has_issues: boolean;
+    has_pages: boolean;
+    has_projects: boolean;
+    has_wiki: boolean;
+    homepage?: string | null;
     id: string;
+    is_template: boolean;
+    language?: string | null;
+    license?: GithubLicense | null;
+    name: string;
+    open_issues_count: number;
+    owner: GithubUser;
+    permissions?: GithubPermissions | null;
     private: boolean;
+    pushed_at?: string | null;
+    /**
+     * Its size in kilobytes.
+     */
+    size: number;
+    ssh_url: string;
+    stargazers_count: number;
+    subscribers_count?: number | null;
+    topics: Array<string>;
+    updated_at?: string | null;
+    /**
+     * Its page on GitHub.
+     */
     url: string;
+    /**
+     * `public`, `private` or `internal` today. An open string.
+     */
+    visibility: string;
+    watchers_count: number;
+};
+
+/**
+ * An invitation to collaborate on a repository, waiting for the invited account to accept it.
+ */
+export type GithubRepositoryInvitation = {
+    created_at: string;
+    expired: boolean;
+    id: string;
+    invitee?: GithubUser | null;
+    inviter?: GithubUser | null;
+    /**
+     * `read`, `triage`, `write`, `maintain` or `admin` today, as GitHub names it. An open string.
+     */
+    permissions: string;
+    /**
+     * Its page on GitHub.
+     */
+    url: string;
+};
+
+/**
+ * An account's permission in a repository.
+ */
+export type GithubRepositoryPermission = {
+    permission: string;
+    role_name?: string | null;
+    user?: GithubUser | null;
+};
+
+/**
+ * The repositories a search found.
+ */
+export type GithubRepositorySearchResults = {
+    /**
+     * GitHub stopped searching before it had looked at everything, so matches may be missing.
+     */
+    incomplete_results: boolean;
+    repositories: Array<GithubSearchRepository>;
+    /**
+     * Every match GitHub counted, across all pages.
+     */
+    total_count: number;
+};
+
+/**
+ * Who a pull request's review is requested from.
+ */
+export type GithubRequestedReviewers = {
+    teams: Array<GithubTeam>;
+    users: Array<GithubUser>;
+};
+
+/**
+ * A review of a pull request.
+ */
+export type GithubReview = {
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
+    body?: string | null;
+    commit_id?: string | null;
+    id: string;
+    state: string;
+    submitted_at?: string | null;
+    url: string;
+    user?: GithubUser | null;
+};
+
+/**
+ * A comment on a line of a pull request's diff.
+ */
+export type GithubReviewComment = {
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
+    body: string;
+    commit_id: string;
+    created_at: string;
+    diff_hunk: string;
+    id: string;
+    in_reply_to_id?: string | null;
+    line?: number | null;
+    original_commit_id: string;
+    original_line?: number | null;
+    original_start_line?: number | null;
+    path: string;
+    pull_request_review_id?: string | null;
+    reactions?: GithubReactions | null;
+    side?: string | null;
+    start_line?: number | null;
+    start_side?: string | null;
+    /**
+     * What the comment is on: a `line` of the diff or the whole `file`.
+     */
+    subject_type?: string | null;
+    updated_at: string;
+    url: string;
+    user?: GithubUser | null;
+};
+
+/**
+ * A pull request after reviewers were requested from it or removed from it, with who its review
+ * is now requested from.
+ */
+export type GithubReviewRequest = {
+    pull_request: GithubPullRequest;
+    requested_reviewers: Array<GithubUser>;
+    requested_teams: Array<GithubTeam>;
+};
+
+/**
+ * A file a code search found.
+ */
+export type GithubSearchCode = {
+    git_url: string;
+    name: string;
+    path: string;
+    repository: GithubSearchCodeRepository;
+    /**
+     * How well it matched, as GitHub ranks it.
+     */
+    score: number;
+    sha: string;
+    url: string;
+};
+
+/**
+ * The repository found code is in.
+ */
+export type GithubSearchCodeRepository = {
+    full_name: string;
+    id: string;
+    owner?: GithubUser | null;
+    url: string;
+};
+
+/**
+ * A commit a search found.
+ */
+export type GithubSearchCommit = GithubCommit & {
+    repository: GithubSearchCommitRepository;
+    /**
+     * How well it matched, as GitHub ranks it.
+     */
+    score: number;
+};
+
+/**
+ * The repository a found commit is in.
+ */
+export type GithubSearchCommitRepository = {
+    full_name: string;
+    id: string;
+    url: string;
+};
+
+/**
+ * An issue or a pull request a search found.
+ */
+export type GithubSearchIssue = GithubIssue & {
+    /**
+     * The repository it is in, as GitHub's API names it.
+     */
+    repository_url: string;
+    /**
+     * How well it matched, as GitHub ranks it.
+     */
+    score: number;
+};
+
+/**
+ * The issues and pull requests a search found, and how many there are in all.
+ */
+export type GithubSearchIssueResults = {
+    /**
+     * Whether GitHub stopped searching before it had looked at everything.
+     */
+    incomplete_results: boolean;
+    items: Array<GithubSearchIssue>;
+    /**
+     * How many items match, across every page.
+     */
+    total_count: number;
+};
+
+/**
+ * A label a search found.
+ */
+export type GithubSearchLabel = {
+    color: string;
+    /**
+     * Whether it is one of the labels GitHub gives every new repository.
+     */
+    default: boolean;
+    description?: string | null;
+    id: string;
+    name: string;
+    score: number;
+};
+
+/**
+ * A repository a search found.
+ */
+export type GithubSearchRepository = GithubRepository & {
+    /**
+     * How well it matched, as GitHub ranks it.
+     */
+    score: number;
+};
+
+/**
+ * A topic a search found.
+ */
+export type GithubSearchTopic = {
+    created_at?: string | null;
+    created_by?: string | null;
+    curated: boolean;
+    description?: string | null;
+    display_name?: string | null;
+    featured: boolean;
+    name: string;
+    released?: string | null;
+    score: number;
+    short_description?: string | null;
+    updated_at?: string | null;
+};
+
+/**
+ * A user a search found.
+ */
+export type GithubSearchUser = {
+    account_type: string;
+    avatar_url: string;
+    id: string;
+    login: string;
+    score: number;
+    url: string;
+};
+
+/**
+ * Whether the authenticated user has starred a repository.
+ */
+export type GithubStarredCheck = {
+    starred: boolean;
+};
+
+/**
+ * A tag.
+ */
+export type GithubTag = {
+    commit_sha: string;
+    name: string;
+    tarball_url: string;
+    zipball_url: string;
+};
+
+/**
+ * A team of an organization.
+ */
+export type GithubTeam = {
+    id: string;
+    name: string;
+    slug: string;
+};
+
+/**
+ * Something on an issue's timeline: an event, a comment, a commit or a cross-reference. Unlike an
+ * issue event, a timeline entry may have no id, no actor and no time (a commit or a
+ * cross-reference has none of its own). Each detail is set only for the entries that have it, as
+ * GitHub sends them.
+ */
+export type GithubTimelineEvent = {
+    actor?: GithubUser | null;
+    assignee?: GithubUser | null;
+    author_email?: string | null;
+    author_name?: string | null;
+    authored_at?: string | null;
+    /**
+     * `commented`: the comment, its author and its page.
+     */
+    body?: string | null;
+    commit_id?: string | null;
+    committed_at?: string | null;
+    committer_email?: string | null;
+    committer_name?: string | null;
+    created_at?: string | null;
+    /**
+     * What happened (`commented`, `committed`, `labeled`, `cross-referenced`…), as GitHub names
+     * it. An open string.
+     */
+    event: string;
+    id?: string | null;
+    label?: GithubEventLabel | null;
+    message?: string | null;
+    milestone?: GithubEventMilestone | null;
+    rename?: GithubEventRename | null;
+    /**
+     * `committed`: the commit, its message and who wrote and committed it, and when.
+     */
+    sha?: string | null;
+    /**
+     * `cross-referenced`: the issue or pull request that mentions this one.
+     */
+    source_issue_number?: number | null;
+    /**
+     * `reviewed`: how the review ended (`approved`, `changes_requested`, `commented`), and when.
+     */
+    state?: string | null;
+    /**
+     * `closed` and `reopened`: why.
+     */
+    state_reason?: string | null;
+    submitted_at?: string | null;
+    url?: string | null;
+    user?: GithubUser | null;
+};
+
+/**
+ * The topics a search found.
+ */
+export type GithubTopicSearchResults = {
+    /**
+     * GitHub stopped searching before it had looked at everything, so matches may be missing.
+     */
+    incomplete_results: boolean;
+    items: Array<GithubSearchTopic>;
+    /**
+     * Every match GitHub counted, across all pages.
+     */
+    total_count: number;
+};
+
+/**
+ * A repository's topics, the lowercase names it is tagged with.
+ */
+export type GithubTopics = {
+    names: Array<string>;
+};
+
+/**
+ * A GitHub account, as another resource names it (an owner, an author, an assignee).
+ */
+export type GithubUser = {
+    /**
+     * `User`, `Organization` or `Bot` today, as GitHub names it. An open string.
+     */
+    account_type: string;
+    avatar_url: string;
+    id: string;
+    login: string;
+    url: string;
+};
+
+/**
+ * The users a search found.
+ */
+export type GithubUserSearchResults = {
+    /**
+     * GitHub stopped searching before it had looked at everything, so matches may be missing.
+     */
+    incomplete_results: boolean;
+    items: Array<GithubSearchUser>;
+    /**
+     * Every match GitHub counted, across all pages.
+     */
+    total_count: number;
+};
+
+/**
+ * A GitHub Actions workflow.
+ */
+export type GithubWorkflow = {
+    badge_url: string;
+    created_at: string;
+    id: string;
+    name: string;
+    path: string;
+    state: string;
+    updated_at: string;
+    url: string;
+};
+
+/**
+ * A job of a workflow run.
+ */
+export type GithubWorkflowJob = {
+    completed_at?: string | null;
+    conclusion?: string | null;
+    created_at?: string | null;
+    head_branch?: string | null;
+    head_sha: string;
+    id: string;
+    labels: Array<string>;
+    name: string;
+    run_attempt: number;
+    run_id: string;
+    runner_name?: string | null;
+    started_at?: string | null;
+    status: string;
+    steps: Array<GithubWorkflowStep>;
+    url?: string | null;
+    workflow_name?: string | null;
+};
+
+/**
+ * A run of a workflow.
+ */
+export type GithubWorkflowRun = {
+    actor?: GithubUser | null;
+    check_suite_id?: string | null;
+    conclusion?: string | null;
+    created_at: string;
+    display_title: string;
+    event: string;
+    head_branch?: string | null;
+    head_sha: string;
+    id: string;
+    name?: string | null;
+    path: string;
+    /**
+     * The numbers of the pull requests the run is for.
+     */
+    pull_request_numbers: Array<number>;
+    run_attempt: number;
+    run_number: number;
+    run_started_at?: string | null;
+    status?: string | null;
+    triggering_actor?: GithubUser | null;
+    updated_at: string;
+    url: string;
+    workflow_id: string;
+};
+
+/**
+ * A step of a job.
+ */
+export type GithubWorkflowStep = {
+    completed_at?: string | null;
+    conclusion?: string | null;
+    name: string;
+    number: number;
+    started_at?: string | null;
+    status: string;
 };
 
 /**
@@ -269,16 +4214,835 @@ export type LinearTeam = {
     name: string;
 };
 
+export type ListAssignees = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListAuthenticatedUserEvents = {
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * The user's login.
+     */
+    username: string;
+};
+
+export type ListAuthenticatedUserReceivedEvents = {
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * The user's login.
+     */
+    username: string;
+};
+
+export type ListBranches = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * Only protected branches (`true`) or only unprotected ones (`false`); both when left out.
+     */
+    protected?: boolean | null;
+    repo: string;
+};
+
+export type ListCheckRunsForRef = {
+    app_id?: GithubId | null;
+    /**
+     * Only the check runs with this name.
+     */
+    check_name?: string | null;
+    /**
+     * `latest` (each check's most recent run, GitHub's default) or `all`.
+     */
+    filter?: string | null;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * A commit SHA, a branch name or a tag name.
+     */
+    ref: string;
+    repo: string;
+    /**
+     * Only the check runs in this status, such as `queued`, `in_progress` or `completed`.
+     */
+    status?: string | null;
+};
+
+export type ListCommitComments = {
+    commit_sha: string;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListCommits = {
+    /**
+     * Only commits by this login or email.
+     */
+    author?: string | null;
+    /**
+     * Only commits committed by this login or email.
+     */
+    committer?: string | null;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * Only commits that changed this file or directory.
+     */
+    path?: string | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+    /**
+     * A branch name or a commit SHA to list from; the default branch when left out.
+     */
+    sha?: string | null;
+    /**
+     * Only commits from this time on, in ISO 8601.
+     */
+    since?: string | null;
+    /**
+     * Only commits before this time, in ISO 8601.
+     */
+    until?: string | null;
+};
+
+export type ListDirectoryContents = {
+    owner: string;
+    /**
+     * The directory, such as `src/lib`; the repository's root when left out or empty.
+     */
+    path?: string | null;
+    /**
+     * A branch, a tag or a commit SHA; the default branch when left out.
+     */
+    ref?: string | null;
+    repo: string;
+};
+
+export type ListIssueComments = {
+    issue_number: number;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListIssueEvents = {
+    issue_number: number;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListIssueLabels = {
+    issue_number: number;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListIssueTimelineEvents = {
+    issue_number: number;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListMatchingRefs = {
+    owner: string;
+    /**
+     * The prefix to match, without `refs/`, such as `heads/feature`.
+     */
+    ref: string;
+    repo: string;
+};
+
+export type ListMilestones = {
+    /**
+     * `asc` (GitHub's default) or `desc`.
+     */
+    direction?: string | null;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+    /**
+     * `due_on` (GitHub's default) or `completeness`.
+     */
+    sort?: string | null;
+    /**
+     * `open` (GitHub's default), `closed` or `all`.
+     */
+    state?: string | null;
+};
+
+export type ListMyRepositories = {
+    /**
+     * `asc` or `desc`.
+     */
+    direction?: string | null;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * `created`, `updated`, `pushed` or `full_name`.
+     */
+    sort?: string | null;
+    /**
+     * `all`, `public` or `private`.
+     */
+    visibility?: string | null;
+};
+
+export type ListMyStarredRepositories = {
+    /**
+     * `asc` or `desc` (GitHub's default).
+     */
+    direction?: string | null;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * `created` (when the star was given, GitHub's default) or `updated` (when the repository was
+     * last pushed to).
+     */
+    sort?: string | null;
+};
+
+export type ListOrganizationRepositories = {
+    /**
+     * `asc` or `desc`.
+     */
+    direction?: string | null;
+    /**
+     * The organization's login.
+     */
+    org: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * `created`, `updated`, `pushed` or `full_name`.
+     */
+    sort?: string | null;
+    /**
+     * `all`, `public`, `private`, `forks`, `sources` or `member`.
+     */
+    type?: string | null;
+};
+
+export type ListPublicEvents = {
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+};
+
+export type ListPullRequestCommits = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    pull_number: number;
+    repo: string;
+};
+
+export type ListPullRequestFiles = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    pull_number: number;
+    repo: string;
+};
+
+export type ListPullRequestRequestedReviewers = {
+    owner: string;
+    pull_number: number;
+    repo: string;
+};
+
+export type ListPullRequestReviewComments = {
+    direction?: SortDirection | null;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    pull_number: number;
+    repo: string;
+    /**
+     * Only comments updated at or after this time, in ISO 8601 (`2024-01-31T12:00:00Z`).
+     */
+    since?: string | null;
+    sort?: ReviewCommentSort | null;
+};
+
+export type ListPullRequestReviews = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    pull_number: number;
+    repo: string;
+};
+
+export type ListPullRequests = {
+    /**
+     * Only pull requests into this branch.
+     */
+    base?: string | null;
+    direction?: SortDirection | null;
+    /**
+     * Only pull requests from this branch, as `user:ref-name` or `organization:ref-name`.
+     */
+    head?: string | null;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+    sort?: PullRequestSort | null;
+    state?: PullRequestStateFilter | null;
+};
+
+export type ListPullRequestsAssociatedWithCommit = {
+    commit_sha: string;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListReleaseAssets = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * GitHub's numeric id of the release.
+     */
+    release_id: GithubId;
+    repo: string;
+};
+
+export type ListReleases = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListRepositoryCollaborators = {
+    /**
+     * `outside`, `direct` or `all`.
+     */
+    affiliation?: string | null;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * Only those with this permission: `pull`, `triage`, `push`, `maintain` or `admin`.
+     */
+    permission?: string | null;
+    repo: string;
+};
+
+export type ListRepositoryContributors = {
+    /**
+     * Whether to include contributors whose commits match no GitHub account.
+     */
+    anon?: boolean | null;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListRepositoryEvents = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListRepositoryForks = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+    /**
+     * `newest`, `oldest`, `stargazers` or `watchers`.
+     */
+    sort?: string | null;
+};
+
+export type ListRepositoryIssueEvents = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListRepositoryIssues = {
+    /**
+     * `asc` or `desc` (GitHub's default).
+     */
+    direction?: string | null;
+    /**
+     * Only issues carrying every one of these labels.
+     */
+    labels?: Array<string> | null;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100; 30 when left out.
+     */
+    per_page?: number | null;
+    repo: string;
+    /**
+     * Only issues updated at or after this time, as an ISO 8601 timestamp.
+     */
+    since?: string | null;
+    /**
+     * `created` (GitHub's default), `updated` or `comments`.
+     */
+    sort?: string | null;
+    /**
+     * `open` (GitHub's default), `closed` or `all`.
+     */
+    state?: string | null;
+};
+
+export type ListRepositoryLabels = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListRepositoryLanguages = {
+    owner: string;
+    repo: string;
+};
+
+export type ListRepositoryStargazers = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListRepositoryTags = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListRepositoryTopics = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListRepositoryWatchers = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListRepositoryWorkflows = {
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+};
+
+export type ListUserPublicEvents = {
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * The user's login.
+     */
+    username: string;
+};
+
+export type ListUserReceivedPublicEvents = {
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * The user's login.
+     */
+    username: string;
+};
+
+export type ListUserRepositories = {
+    /**
+     * `asc` or `desc`.
+     */
+    direction?: string | null;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * `created`, `updated`, `pushed` or `full_name`.
+     */
+    sort?: string | null;
+    /**
+     * `all`, `owner` or `member`.
+     */
+    type?: string | null;
+    /**
+     * The user's login.
+     */
+    username: string;
+};
+
+export type ListWorkflowRunArtifacts = {
+    /**
+     * Only the artifacts with exactly this name.
+     */
+    name?: string | null;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+    run_id: GithubId;
+};
+
+export type ListWorkflowRunJobs = {
+    /**
+     * `latest` (the jobs of the run's latest attempt, GitHub's default) or `all`.
+     */
+    filter?: string | null;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+    run_id: GithubId;
+};
+
+export type ListWorkflowRuns = {
+    /**
+     * Only the runs started by this user's login.
+     */
+    actor?: string | null;
+    /**
+     * Only the runs on this branch.
+     */
+    branch?: string | null;
+    check_suite_id?: GithubId | null;
+    /**
+     * Only the runs created in this date range, in GitHub's search syntax, such as
+     * `>=2024-01-01` or `2024-01-01..2024-01-31`.
+     */
+    created?: string | null;
+    /**
+     * Only the runs started by this event, such as `push` or `pull_request`.
+     */
+    event?: string | null;
+    /**
+     * Whether to leave out the pull requests GitHub would otherwise list with each run.
+     */
+    exclude_pull_requests?: boolean | null;
+    /**
+     * Only the runs of this commit.
+     */
+    head_sha?: string | null;
+    owner: string;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    repo: string;
+    /**
+     * Only the runs in this status or with this conclusion, such as `in_progress` or `failure`.
+     */
+    status?: string | null;
+};
+
 export type ListAuthConfig = {
     data: Array<{
         client_id: string;
         created_at: string;
+        /**
+         * Whether the app has secret settings (which are never answered).
+         */
+        has_secret_settings: boolean;
         /**
          * `ac_…`.
          */
         id: string;
         provider: string;
         scopes: Array<string>;
+        /**
+         * The provider's own settings for the app; an empty object when it has none.
+         */
+        settings: {
+            [key: string]: unknown;
+        };
         updated_at: string;
     }>;
     /**
@@ -297,7 +5061,17 @@ export type ListConnectedAccount = {
         alias?: string | null;
         auth_config_id: string;
         created_at: string;
+        /**
+         * What the connection acts as: `oauth` (the user who consented) or `app_installation` (an
+         * installation of the auth config's app, its tokens minted when an action runs). An open
+         * string.
+         */
+        credential_kind: string;
         id: string;
+        /**
+         * The installation an `app_installation` connection acts as.
+         */
+        installation_id?: string | null;
         /**
          * Why the last refresh or the consent failed.
          */
@@ -338,6 +5112,493 @@ export type ListConnectedAccount = {
     previous_cursor?: string | null;
 };
 
+export type ListTrigger = {
+    data: Array<{
+        config: {
+            [key: string]: unknown;
+        };
+        connected_account_id: string;
+        created_at: string;
+        /**
+         * `tr_…`.
+         */
+        id: string;
+        /**
+         * Why it failed.
+         */
+        last_error?: string | null;
+        /**
+         * When it next checks the provider, for a kind that checks on a schedule.
+         */
+        next_check_at?: string | null;
+        provider: string;
+        /**
+         * `active` (its deliveries are published) or `failed` (the provider refused it; create it
+         * again). An open string.
+         */
+        status: string;
+        /**
+         * The provider's id of what osiris created there, such as a webhook's id.
+         */
+        subscription_id?: string | null;
+        /**
+         * Its kind, `<provider>.<kind>`.
+         */
+        trigger: string;
+        updated_at: string;
+    }>;
+    /**
+     * Pass as `after` for the next batch; null on the last.
+     */
+    next_cursor?: string | null;
+    /**
+     * Pass as `before` for the previous batch; null on the first.
+     */
+    previous_cursor?: string | null;
+};
+
+export type LockIssue = {
+    issue_number: number;
+    /**
+     * Why: `off-topic`, `too heated`, `resolved` or `spam`.
+     */
+    lock_reason?: string | null;
+    owner: string;
+    repo: string;
+};
+
+export type MergeBranch = {
+    /**
+     * The branch merged into.
+     */
+    base: string;
+    /**
+     * The merge commit's message; GitHub writes one when left out.
+     */
+    commit_message?: string | null;
+    /**
+     * The branch or commit SHA merged.
+     */
+    head: string;
+    owner: string;
+    repo: string;
+};
+
+/**
+ * How a pull request's commits reach its base branch: a merge commit, one squashed commit, or
+ * each commit rebased onto the base branch.
+ */
+export type MergeMethod = 'merge' | 'squash' | 'rebase';
+
+export type MergePullRequest = {
+    /**
+     * The text added to the merge commit's message.
+     */
+    commit_message?: string | null;
+    /**
+     * The title of the merge commit; GitHub writes one when left out.
+     */
+    commit_title?: string | null;
+    merge_method?: MergeMethod | null;
+    owner: string;
+    pull_number: number;
+    repo: string;
+    /**
+     * The head commit the pull request must be at for the merge to go ahead.
+     */
+    sha?: string | null;
+};
+
+/**
+ * What a list of pull requests is sorted by.
+ */
+export type PullRequestSort = 'created' | 'updated' | 'popularity' | 'long-running';
+
+/**
+ * The state a pull request is put in: open, or closed without merging.
+ */
+export type PullRequestState = 'open' | 'closed';
+
+/**
+ * Which pull requests a list holds, by state.
+ */
+export type PullRequestStateFilter = 'open' | 'closed' | 'all';
+
+export type RemoveIssueAssignees = {
+    /**
+     * The logins of the people to unassign.
+     */
+    assignees: Array<string>;
+    issue_number: number;
+    owner: string;
+    repo: string;
+};
+
+export type RemoveIssueLabel = {
+    issue_number: number;
+    /**
+     * The name of the label to take off.
+     */
+    label: string;
+    owner: string;
+    repo: string;
+};
+
+export type RemovePullRequestReviewers = {
+    owner: string;
+    pull_number: number;
+    repo: string;
+    /**
+     * The users, by login.
+     */
+    reviewers?: Array<string> | null;
+    /**
+     * The teams, by slug.
+     */
+    team_reviewers?: Array<string> | null;
+};
+
+export type RemoveRepositoryCollaborator = {
+    owner: string;
+    repo: string;
+    /**
+     * The collaborator's login.
+     */
+    username: string;
+};
+
+export type RenameBranch = {
+    /**
+     * The branch's current name.
+     */
+    branch: string;
+    new_name: string;
+    owner: string;
+    repo: string;
+};
+
+export type ReplaceRepositoryTopics = {
+    /**
+     * Every topic the repository has from now on, in lowercase; an empty list removes them all.
+     */
+    names: Array<string>;
+    owner: string;
+    repo: string;
+};
+
+export type ReplyPullRequestReviewComment = {
+    body: string;
+    /**
+     * The comment replied to. It must be a comment that is not itself a reply.
+     */
+    comment_id: GithubId;
+    owner: string;
+    pull_number: number;
+    repo: string;
+};
+
+export type RequestPullRequestReviewers = {
+    owner: string;
+    pull_number: number;
+    repo: string;
+    /**
+     * The users, by login.
+     */
+    reviewers?: Array<string> | null;
+    /**
+     * The teams, by slug.
+     */
+    team_reviewers?: Array<string> | null;
+};
+
+export type RerequestCheckRun = {
+    check_run_id: GithubId;
+    owner: string;
+    repo: string;
+};
+
+export type RerequestCheckSuite = {
+    check_suite_id: GithubId;
+    owner: string;
+    repo: string;
+};
+
+export type RerunFailedJobs = {
+    /**
+     * Whether the jobs run again with debug logging turned on.
+     */
+    enable_debug_logging?: boolean | null;
+    owner: string;
+    repo: string;
+    run_id: GithubId;
+};
+
+export type RerunWorkflow = {
+    /**
+     * Whether the jobs run again with debug logging turned on.
+     */
+    enable_debug_logging?: boolean | null;
+    owner: string;
+    repo: string;
+    run_id: GithubId;
+};
+
+/**
+ * A comment on a line of the diff, given with a new review.
+ */
+export type ReviewCommentInput = {
+    body: string;
+    /**
+     * The line the comment is on, or the last line of a range of lines.
+     */
+    line?: number | null;
+    /**
+     * The file's path in the repository.
+     */
+    path: string;
+    side?: DiffSide | null;
+    /**
+     * The first line of a range of lines the comment is on.
+     */
+    start_line?: number | null;
+    start_side?: DiffSide | null;
+};
+
+/**
+ * What a list of review comments is sorted by.
+ */
+export type ReviewCommentSort = 'created' | 'updated';
+
+/**
+ * What a review says of a pull request when it is submitted: it approves the changes, asks for
+ * changes, or only comments.
+ */
+export type ReviewEvent = 'APPROVE' | 'REQUEST_CHANGES' | 'COMMENT';
+
+export type SearchCode = {
+    /**
+     * `asc` or `desc` (GitHub's default), when `sort` is given.
+     */
+    order?: string | null;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * What to look for, in GitHub's search syntax: words and qualifiers such as `language:rust`.
+     */
+    query: string;
+    /**
+     * `indexed` (when GitHub last indexed the file) or `updated`. Best match when left out.
+     */
+    sort?: string | null;
+};
+
+export type SearchCommits = {
+    /**
+     * `asc` or `desc` (GitHub's default), when `sort` is given.
+     */
+    order?: string | null;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * What to look for, in GitHub's search syntax: words and qualifiers such as `repo:octo/hello`.
+     */
+    query: string;
+    /**
+     * `author-date` or `committer-date`. Best match when left out.
+     */
+    sort?: string | null;
+};
+
+/**
+ * The search text and the filters are combined: every filter given narrows the search text.
+ */
+export type SearchIssuesAndPullRequests = {
+    /**
+     * Only items assigned to this login.
+     */
+    assignee?: string | null;
+    /**
+     * Only items opened by this login.
+     */
+    author?: string | null;
+    /**
+     * Only pull requests into this branch.
+     */
+    base_branch?: string | null;
+    /**
+     * Only pull requests from this branch.
+     */
+    head_branch?: string | null;
+    /**
+     * Only merged pull requests (`true`) or only unmerged ones (`false`).
+     */
+    is_merged?: boolean | null;
+    /**
+     * Only items carrying this label.
+     */
+    label?: string | null;
+    /**
+     * Only items in repositories written mainly in this language.
+     */
+    language?: string | null;
+    /**
+     * Only items that mention this login.
+     */
+    mentions?: string | null;
+    /**
+     * `asc` or `desc` (GitHub's default).
+     */
+    order?: string | null;
+    /**
+     * With `repo`, only that repository; alone, only that account's repositories.
+     */
+    owner?: string | null;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * The same as `query`, used only when `query` is left out or empty.
+     */
+    q?: string | null;
+    /**
+     * Search text in GitHub's search syntax, such as `is:open label:bug crash`.
+     */
+    query?: string | null;
+    /**
+     * A repository name with `owner`, or `owner/name` alone.
+     */
+    repo?: string | null;
+    /**
+     * `comments`, `reactions`, `reactions-+1`, `reactions--1`, `reactions-smile`,
+     * `reactions-thinking_face`, `reactions-heart`, `reactions-tada`, `interactions`, `created`
+     * or `updated`; best match when left out.
+     */
+    sort?: string | null;
+    /**
+     * `open`, `closed` or `all` (no filter).
+     */
+    state?: string | null;
+    /**
+     * Only issues (`issue`) or only pull requests (`pr`).
+     */
+    type?: string | null;
+};
+
+export type SearchLabels = {
+    /**
+     * `asc` or `desc` (GitHub's default), when `sort` is given.
+     */
+    order?: string | null;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * The words to look for in the labels' names and descriptions.
+     */
+    query: string;
+    /**
+     * GitHub's numeric id of the repository whose labels are searched.
+     */
+    repository_id: GithubId;
+    /**
+     * `created` or `updated`. Best match when left out.
+     */
+    sort?: string | null;
+};
+
+export type SearchRepositories = {
+    /**
+     * `asc` or `desc` (GitHub's default), when `sort` is given.
+     */
+    order?: string | null;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * What to look for, in GitHub's search syntax: words and qualifiers such as `language:rust`.
+     */
+    query: string;
+    /**
+     * `stars`, `forks`, `help-wanted-issues` or `updated`. Best match when left out.
+     */
+    sort?: string | null;
+};
+
+export type SearchTopics = {
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * What to look for, in GitHub's search syntax: words and qualifiers such as `is:featured`.
+     */
+    query: string;
+};
+
+export type SearchUsers = {
+    /**
+     * `asc` or `desc` (GitHub's default), when `sort` is given.
+     */
+    order?: string | null;
+    /**
+     * From 1.
+     */
+    page?: number | null;
+    /**
+     * At most 100.
+     */
+    per_page?: number | null;
+    /**
+     * What to look for, in GitHub's search syntax: words and qualifiers such as `location:berlin`.
+     */
+    query: string;
+    /**
+     * `followers`, `repositories` or `joined`. Best match when left out.
+     */
+    sort?: string | null;
+};
+
+export type SetIssueLabels = {
+    issue_number: number;
+    /**
+     * The names of the labels the issue keeps; every other label is taken off.
+     */
+    labels: Array<string>;
+    owner: string;
+    repo: string;
+};
+
 /**
  * A channel the connected user can see.
  */
@@ -351,8 +5612,102 @@ export type SlackChannel = {
     num_members?: number | null;
 };
 
+/**
+ * The order a list is sorted in: ascending or descending.
+ */
+export type SortDirection = 'asc' | 'desc';
+
+export type StarRepository = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    repo: string;
+};
+
+export type SubmitPullRequestReview = {
+    body?: string | null;
+    /**
+     * What the review says of the pull request.
+     */
+    event: ReviewEvent;
+    owner: string;
+    pull_number: number;
+    repo: string;
+    review_id: GithubId;
+};
+
+export type SyncForkBranchWithUpstream = {
+    /**
+     * The fork's branch to bring up to date.
+     */
+    branch: string;
+    /**
+     * The fork's owner.
+     */
+    owner: string;
+    /**
+     * The fork's name.
+     */
+    repo: string;
+};
+
+/**
+ * A trigger, without its secret.
+ */
+export type Trigger = {
+    config: {
+        [key: string]: unknown;
+    };
+    connected_account_id: string;
+    created_at: string;
+    /**
+     * `tr_…`.
+     */
+    id: string;
+    /**
+     * Why it failed.
+     */
+    last_error?: string | null;
+    /**
+     * When it next checks the provider, for a kind that checks on a schedule.
+     */
+    next_check_at?: string | null;
+    provider: string;
+    /**
+     * `active` (its deliveries are published) or `failed` (the provider refused it; create it
+     * again). An open string.
+     */
+    status: string;
+    /**
+     * The provider's id of what osiris created there, such as a webhook's id.
+     */
+    subscription_id?: string | null;
+    /**
+     * Its kind, `<provider>.<kind>`.
+     */
+    trigger: string;
+    updated_at: string;
+};
+
 export type TriggerEvent = {
     connected_account_id: string;
+    /**
+     * What happened at the provider, on a `trigger.fired` event, in the trigger kind's shape,
+     * which its provider's documentation describes. Data larger than osiris carries in one event
+     * is `{"omitted": true, "bytes": <length>}` instead: read what changed from the provider.
+     */
+    data?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * The trigger's kind, `<provider>.<kind>`, on a `trigger.fired` event.
+     */
+    trigger?: string | null;
+    /**
+     * `tr_…`: the trigger that fired, on a `trigger.fired` event.
+     */
+    trigger_id?: string | null;
     /**
      * `connection.active`, `connection.expired` or `connection.revoked`.
      */
@@ -368,10 +5723,243 @@ export type TriggeredEvent = {
     type: string;
 };
 
+export type UnlockIssue = {
+    issue_number: number;
+    owner: string;
+    repo: string;
+};
+
+export type UnstarRepository = {
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    repo: string;
+};
+
 export type UpdateAuthConfig = {
     client_id?: string | null;
     client_secret?: string | null;
     scopes?: Array<string> | null;
+    /**
+     * Replaces the app's secret settings, when given.
+     */
+    secret_settings?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Replaces the app's settings, when given.
+     */
+    settings?: {
+        [key: string]: unknown;
+    } | null;
+};
+
+/**
+ * Only the fields given are changed.
+ */
+export type UpdateIssue = {
+    /**
+     * The logins of the people assigned to it, in place of those assigned now.
+     */
+    assignees?: Array<string> | null;
+    /**
+     * The issue's text, in Markdown.
+     */
+    body?: string | null;
+    issue_number: number;
+    /**
+     * The names of its labels, in place of those it has now.
+     */
+    labels?: Array<string> | null;
+    /**
+     * The number of the milestone to put it in.
+     */
+    milestone?: number | null;
+    owner: string;
+    repo: string;
+    /**
+     * `open` or `closed`.
+     */
+    state?: string | null;
+    title?: string | null;
+};
+
+export type UpdateIssueComment = {
+    /**
+     * The comment's new text, in Markdown.
+     */
+    body: string;
+    comment_id: GithubId;
+    owner: string;
+    repo: string;
+};
+
+/**
+ * Only the fields given are changed.
+ */
+export type UpdateLabel = {
+    /**
+     * The label's color, as six hex digits without `#`; anything else is refused before GitHub
+     * is asked.
+     */
+    color?: string | null;
+    description?: string | null;
+    /**
+     * The label's name now.
+     */
+    name: string;
+    /**
+     * The label's name from now on.
+     */
+    new_name?: string | null;
+    owner: string;
+    repo: string;
+};
+
+/**
+ * Only the fields given are changed.
+ */
+export type UpdateMilestone = {
+    description?: string | null;
+    /**
+     * When it is due, as an ISO 8601 timestamp.
+     */
+    due_on?: string | null;
+    milestone_number: number;
+    owner: string;
+    repo: string;
+    /**
+     * `open` or `closed`.
+     */
+    state?: string | null;
+    title?: string | null;
+};
+
+export type UpdatePullRequest = {
+    /**
+     * The branch the changes go into.
+     */
+    base?: string | null;
+    body?: string | null;
+    /**
+     * Whether the base repository's maintainers may push to the head branch.
+     */
+    maintainer_can_modify?: boolean | null;
+    owner: string;
+    pull_number: number;
+    repo: string;
+    state?: PullRequestState | null;
+    title?: string | null;
+};
+
+export type UpdatePullRequestBranch = {
+    /**
+     * The head commit the branch is expected to be at. GitHub refuses the update when the
+     * branch has moved on since.
+     */
+    expected_head_sha?: string | null;
+    owner: string;
+    pull_number: number;
+    repo: string;
+};
+
+export type UpdatePullRequestReviewComment = {
+    /**
+     * The comment's new text.
+     */
+    body: string;
+    comment_id: GithubId;
+    owner: string;
+    repo: string;
+};
+
+export type UpdateRef = {
+    /**
+     * Whether to move it even when the new commit doesn't descend from the old one.
+     */
+    force?: boolean | null;
+    owner: string;
+    /**
+     * The reference without `refs/`, such as `heads/main` or `tags/v1.0.0`.
+     */
+    ref: string;
+    repo: string;
+    /**
+     * The commit it points at from now on.
+     */
+    sha: string;
+};
+
+/**
+ * Only the fields given change.
+ */
+export type UpdateRelease = {
+    /**
+     * The release's description, in Markdown.
+     */
+    body?: string | null;
+    /**
+     * A draft is not published; `false` publishes it.
+     */
+    draft?: boolean | null;
+    /**
+     * Whether it becomes the repository's latest release: `true`, `false` or `legacy` (the
+     * latest by creation date and version).
+     */
+    make_latest?: string | null;
+    name?: string | null;
+    /**
+     * The account or organization that owns the repository.
+     */
+    owner: string;
+    /**
+     * Marks the release as not ready for production.
+     */
+    prerelease?: boolean | null;
+    /**
+     * GitHub's numeric id of the release.
+     */
+    release_id: GithubId;
+    repo: string;
+    tag_name?: string | null;
+    /**
+     * The branch or commit SHA a new tag is created from.
+     */
+    target_commitish?: string | null;
+};
+
+export type UpdateRepository = {
+    allow_auto_merge?: boolean | null;
+    allow_merge_commit?: boolean | null;
+    allow_rebase_merge?: boolean | null;
+    allow_squash_merge?: boolean | null;
+    archived?: boolean | null;
+    default_branch?: string | null;
+    /**
+     * Whether a pull request's head branch is deleted once it is merged.
+     */
+    delete_branch_on_merge?: boolean | null;
+    description?: string | null;
+    has_discussions?: boolean | null;
+    has_issues?: boolean | null;
+    has_projects?: boolean | null;
+    has_wiki?: boolean | null;
+    /**
+     * A URL with more about the repository.
+     */
+    homepage?: string | null;
+    /**
+     * A new name for the repository.
+     */
+    name?: string | null;
+    owner: string;
+    private?: boolean | null;
+    repo: string;
+    /**
+     * `public` or `private`.
+     */
+    visibility?: string | null;
 };
 
 export type ListAuthConfigsData = {
@@ -700,10 +6288,12 @@ export type CreateConnectedAccountErrors = {
      * This `Idempotency-Key` was used for another request
      */
     422: ErrorBody;
+    424: ErrorBody;
     /**
      * An internal error; the request may be retried
      */
     500: ErrorBody;
+    502: ErrorBody;
 };
 
 export type CreateConnectedAccountError = CreateConnectedAccountErrors[keyof CreateConnectedAccountErrors];
@@ -811,6 +6401,3911 @@ export type RetrieveConnectedAccountResponses = {
 
 export type RetrieveConnectedAccountResponse = RetrieveConnectedAccountResponses[keyof RetrieveConnectedAccountResponses];
 
+export type GithubAddIssueAssigneesData = {
+    body: AddIssueAssignees;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.add_issue_assignees';
+};
+
+export type GithubAddIssueAssigneesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubAddIssueAssigneesError = GithubAddIssueAssigneesErrors[keyof GithubAddIssueAssigneesErrors];
+
+export type GithubAddIssueAssigneesResponses = {
+    200: ActionResultGithubIssue;
+};
+
+export type GithubAddIssueAssigneesResponse = GithubAddIssueAssigneesResponses[keyof GithubAddIssueAssigneesResponses];
+
+export type GithubAddIssueLabelsData = {
+    body: AddIssueLabels;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.add_issue_labels';
+};
+
+export type GithubAddIssueLabelsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubAddIssueLabelsError = GithubAddIssueLabelsErrors[keyof GithubAddIssueLabelsErrors];
+
+export type GithubAddIssueLabelsResponses = {
+    200: ActionResultVecGithubLabel;
+};
+
+export type GithubAddIssueLabelsResponse = GithubAddIssueLabelsResponses[keyof GithubAddIssueLabelsResponses];
+
+export type GithubAddRepositoryCollaboratorData = {
+    body: AddRepositoryCollaborator;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.add_repository_collaborator';
+};
+
+export type GithubAddRepositoryCollaboratorErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubAddRepositoryCollaboratorError = GithubAddRepositoryCollaboratorErrors[keyof GithubAddRepositoryCollaboratorErrors];
+
+export type GithubAddRepositoryCollaboratorResponses = {
+    200: ActionResultGithubCollaboratorAddition;
+};
+
+export type GithubAddRepositoryCollaboratorResponse = GithubAddRepositoryCollaboratorResponses[keyof GithubAddRepositoryCollaboratorResponses];
+
+export type GithubCancelWorkflowRunData = {
+    body: CancelWorkflowRun;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.cancel_workflow_run';
+};
+
+export type GithubCancelWorkflowRunErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCancelWorkflowRunError = GithubCancelWorkflowRunErrors[keyof GithubCancelWorkflowRunErrors];
+
+export type GithubCancelWorkflowRunResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubCancelWorkflowRunResponse = GithubCancelWorkflowRunResponses[keyof GithubCancelWorkflowRunResponses];
+
+export type GithubCheckPullRequestMergedData = {
+    body: CheckPullRequestMerged;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.check_pull_request_merged';
+};
+
+export type GithubCheckPullRequestMergedErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCheckPullRequestMergedError = GithubCheckPullRequestMergedErrors[keyof GithubCheckPullRequestMergedErrors];
+
+export type GithubCheckPullRequestMergedResponses = {
+    200: ActionResultGithubMergedCheck;
+};
+
+export type GithubCheckPullRequestMergedResponse = GithubCheckPullRequestMergedResponses[keyof GithubCheckPullRequestMergedResponses];
+
+export type GithubCheckRepositoryStarredData = {
+    body: CheckRepositoryStarred;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.check_repository_starred';
+};
+
+export type GithubCheckRepositoryStarredErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCheckRepositoryStarredError = GithubCheckRepositoryStarredErrors[keyof GithubCheckRepositoryStarredErrors];
+
+export type GithubCheckRepositoryStarredResponses = {
+    200: ActionResultGithubStarredCheck;
+};
+
+export type GithubCheckRepositoryStarredResponse = GithubCheckRepositoryStarredResponses[keyof GithubCheckRepositoryStarredResponses];
+
+export type GithubClearIssueLabelsData = {
+    body: ClearIssueLabels;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.clear_issue_labels';
+};
+
+export type GithubClearIssueLabelsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubClearIssueLabelsError = GithubClearIssueLabelsErrors[keyof GithubClearIssueLabelsErrors];
+
+export type GithubClearIssueLabelsResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubClearIssueLabelsResponse = GithubClearIssueLabelsResponses[keyof GithubClearIssueLabelsResponses];
+
+export type GithubCompareCommitsData = {
+    body: CompareCommits;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.compare_commits';
+};
+
+export type GithubCompareCommitsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCompareCommitsError = GithubCompareCommitsErrors[keyof GithubCompareCommitsErrors];
+
+export type GithubCompareCommitsResponses = {
+    200: ActionResultGithubCommitComparison;
+};
+
+export type GithubCompareCommitsResponse = GithubCompareCommitsResponses[keyof GithubCompareCommitsResponses];
+
+export type GithubCreateCommitCommentData = {
+    body: CreateCommitComment;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_commit_comment';
+};
+
+export type GithubCreateCommitCommentErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateCommitCommentError = GithubCreateCommitCommentErrors[keyof GithubCreateCommitCommentErrors];
+
+export type GithubCreateCommitCommentResponses = {
+    200: ActionResultGithubCommitComment;
+};
+
+export type GithubCreateCommitCommentResponse = GithubCreateCommitCommentResponses[keyof GithubCreateCommitCommentResponses];
+
+export type GithubCreateCommitStatusData = {
+    body: CreateCommitStatus;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_commit_status';
+};
+
+export type GithubCreateCommitStatusErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateCommitStatusError = GithubCreateCommitStatusErrors[keyof GithubCreateCommitStatusErrors];
+
+export type GithubCreateCommitStatusResponses = {
+    200: ActionResultGithubCommitStatus;
+};
+
+export type GithubCreateCommitStatusResponse = GithubCreateCommitStatusResponses[keyof GithubCreateCommitStatusResponses];
+
+export type GithubCreateIssueData = {
+    body: CreateIssue;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_issue';
+};
+
+export type GithubCreateIssueErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateIssueError = GithubCreateIssueErrors[keyof GithubCreateIssueErrors];
+
+export type GithubCreateIssueResponses = {
+    200: ActionResultGithubIssue;
+};
+
+export type GithubCreateIssueResponse = GithubCreateIssueResponses[keyof GithubCreateIssueResponses];
+
+export type GithubCreateIssueCommentData = {
+    body: CreateIssueComment;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_issue_comment';
+};
+
+export type GithubCreateIssueCommentErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateIssueCommentError = GithubCreateIssueCommentErrors[keyof GithubCreateIssueCommentErrors];
+
+export type GithubCreateIssueCommentResponses = {
+    200: ActionResultGithubIssueComment;
+};
+
+export type GithubCreateIssueCommentResponse = GithubCreateIssueCommentResponses[keyof GithubCreateIssueCommentResponses];
+
+export type GithubCreateIssueCommentReactionData = {
+    body: CreateIssueCommentReaction;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_issue_comment_reaction';
+};
+
+export type GithubCreateIssueCommentReactionErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateIssueCommentReactionError = GithubCreateIssueCommentReactionErrors[keyof GithubCreateIssueCommentReactionErrors];
+
+export type GithubCreateIssueCommentReactionResponses = {
+    200: ActionResultGithubReaction;
+};
+
+export type GithubCreateIssueCommentReactionResponse = GithubCreateIssueCommentReactionResponses[keyof GithubCreateIssueCommentReactionResponses];
+
+export type GithubCreateIssueReactionData = {
+    body: CreateIssueReaction;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_issue_reaction';
+};
+
+export type GithubCreateIssueReactionErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateIssueReactionError = GithubCreateIssueReactionErrors[keyof GithubCreateIssueReactionErrors];
+
+export type GithubCreateIssueReactionResponses = {
+    200: ActionResultGithubReaction;
+};
+
+export type GithubCreateIssueReactionResponse = GithubCreateIssueReactionResponses[keyof GithubCreateIssueReactionResponses];
+
+export type GithubCreateLabelData = {
+    body: CreateLabel;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_label';
+};
+
+export type GithubCreateLabelErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateLabelError = GithubCreateLabelErrors[keyof GithubCreateLabelErrors];
+
+export type GithubCreateLabelResponses = {
+    200: ActionResultGithubLabel;
+};
+
+export type GithubCreateLabelResponse = GithubCreateLabelResponses[keyof GithubCreateLabelResponses];
+
+export type GithubCreateMilestoneData = {
+    body: CreateMilestone;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_milestone';
+};
+
+export type GithubCreateMilestoneErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateMilestoneError = GithubCreateMilestoneErrors[keyof GithubCreateMilestoneErrors];
+
+export type GithubCreateMilestoneResponses = {
+    200: ActionResultGithubMilestone;
+};
+
+export type GithubCreateMilestoneResponse = GithubCreateMilestoneResponses[keyof GithubCreateMilestoneResponses];
+
+export type GithubCreateOrUpdateFileData = {
+    body: CreateOrUpdateFile;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_or_update_file';
+};
+
+export type GithubCreateOrUpdateFileErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateOrUpdateFileError = GithubCreateOrUpdateFileErrors[keyof GithubCreateOrUpdateFileErrors];
+
+export type GithubCreateOrUpdateFileResponses = {
+    200: ActionResultGithubContentChange;
+};
+
+export type GithubCreateOrUpdateFileResponse = GithubCreateOrUpdateFileResponses[keyof GithubCreateOrUpdateFileResponses];
+
+export type GithubCreatePullRequestData = {
+    body: CreatePullRequest;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_pull_request';
+};
+
+export type GithubCreatePullRequestErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreatePullRequestError = GithubCreatePullRequestErrors[keyof GithubCreatePullRequestErrors];
+
+export type GithubCreatePullRequestResponses = {
+    200: ActionResultGithubPullRequest;
+};
+
+export type GithubCreatePullRequestResponse = GithubCreatePullRequestResponses[keyof GithubCreatePullRequestResponses];
+
+export type GithubCreatePullRequestReviewData = {
+    body: CreatePullRequestReview;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_pull_request_review';
+};
+
+export type GithubCreatePullRequestReviewErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreatePullRequestReviewError = GithubCreatePullRequestReviewErrors[keyof GithubCreatePullRequestReviewErrors];
+
+export type GithubCreatePullRequestReviewResponses = {
+    200: ActionResultGithubReview;
+};
+
+export type GithubCreatePullRequestReviewResponse = GithubCreatePullRequestReviewResponses[keyof GithubCreatePullRequestReviewResponses];
+
+export type GithubCreatePullRequestReviewCommentData = {
+    body: CreatePullRequestReviewComment;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_pull_request_review_comment';
+};
+
+export type GithubCreatePullRequestReviewCommentErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreatePullRequestReviewCommentError = GithubCreatePullRequestReviewCommentErrors[keyof GithubCreatePullRequestReviewCommentErrors];
+
+export type GithubCreatePullRequestReviewCommentResponses = {
+    200: ActionResultGithubReviewComment;
+};
+
+export type GithubCreatePullRequestReviewCommentResponse = GithubCreatePullRequestReviewCommentResponses[keyof GithubCreatePullRequestReviewCommentResponses];
+
+export type GithubCreateRefData = {
+    body: CreateRef;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_ref';
+};
+
+export type GithubCreateRefErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateRefError = GithubCreateRefErrors[keyof GithubCreateRefErrors];
+
+export type GithubCreateRefResponses = {
+    200: ActionResultGithubGitRef;
+};
+
+export type GithubCreateRefResponse = GithubCreateRefResponses[keyof GithubCreateRefResponses];
+
+export type GithubCreateReleaseData = {
+    body: CreateRelease;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_release';
+};
+
+export type GithubCreateReleaseErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateReleaseError = GithubCreateReleaseErrors[keyof GithubCreateReleaseErrors];
+
+export type GithubCreateReleaseResponses = {
+    200: ActionResultGithubRelease;
+};
+
+export type GithubCreateReleaseResponse = GithubCreateReleaseResponses[keyof GithubCreateReleaseResponses];
+
+export type GithubCreateRepositoryData = {
+    body: CreateRepository;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.create_repository';
+};
+
+export type GithubCreateRepositoryErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubCreateRepositoryError = GithubCreateRepositoryErrors[keyof GithubCreateRepositoryErrors];
+
+export type GithubCreateRepositoryResponses = {
+    200: ActionResultGithubRepository;
+};
+
+export type GithubCreateRepositoryResponse = GithubCreateRepositoryResponses[keyof GithubCreateRepositoryResponses];
+
+export type GithubDeleteFileData = {
+    body: DeleteFile;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.delete_file';
+};
+
+export type GithubDeleteFileErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDeleteFileError = GithubDeleteFileErrors[keyof GithubDeleteFileErrors];
+
+export type GithubDeleteFileResponses = {
+    200: ActionResultGithubContentChange;
+};
+
+export type GithubDeleteFileResponse = GithubDeleteFileResponses[keyof GithubDeleteFileResponses];
+
+export type GithubDeleteIssueCommentData = {
+    body: DeleteIssueComment;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.delete_issue_comment';
+};
+
+export type GithubDeleteIssueCommentErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDeleteIssueCommentError = GithubDeleteIssueCommentErrors[keyof GithubDeleteIssueCommentErrors];
+
+export type GithubDeleteIssueCommentResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubDeleteIssueCommentResponse = GithubDeleteIssueCommentResponses[keyof GithubDeleteIssueCommentResponses];
+
+export type GithubDeleteLabelData = {
+    body: DeleteLabel;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.delete_label';
+};
+
+export type GithubDeleteLabelErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDeleteLabelError = GithubDeleteLabelErrors[keyof GithubDeleteLabelErrors];
+
+export type GithubDeleteLabelResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubDeleteLabelResponse = GithubDeleteLabelResponses[keyof GithubDeleteLabelResponses];
+
+export type GithubDeleteMilestoneData = {
+    body: DeleteMilestone;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.delete_milestone';
+};
+
+export type GithubDeleteMilestoneErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDeleteMilestoneError = GithubDeleteMilestoneErrors[keyof GithubDeleteMilestoneErrors];
+
+export type GithubDeleteMilestoneResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubDeleteMilestoneResponse = GithubDeleteMilestoneResponses[keyof GithubDeleteMilestoneResponses];
+
+export type GithubDeletePendingPullRequestReviewData = {
+    body: DeletePendingPullRequestReview;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.delete_pending_pull_request_review';
+};
+
+export type GithubDeletePendingPullRequestReviewErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDeletePendingPullRequestReviewError = GithubDeletePendingPullRequestReviewErrors[keyof GithubDeletePendingPullRequestReviewErrors];
+
+export type GithubDeletePendingPullRequestReviewResponses = {
+    200: ActionResultGithubReview;
+};
+
+export type GithubDeletePendingPullRequestReviewResponse = GithubDeletePendingPullRequestReviewResponses[keyof GithubDeletePendingPullRequestReviewResponses];
+
+export type GithubDeletePullRequestReviewCommentData = {
+    body: DeletePullRequestReviewComment;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.delete_pull_request_review_comment';
+};
+
+export type GithubDeletePullRequestReviewCommentErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDeletePullRequestReviewCommentError = GithubDeletePullRequestReviewCommentErrors[keyof GithubDeletePullRequestReviewCommentErrors];
+
+export type GithubDeletePullRequestReviewCommentResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubDeletePullRequestReviewCommentResponse = GithubDeletePullRequestReviewCommentResponses[keyof GithubDeletePullRequestReviewCommentResponses];
+
+export type GithubDeleteRefData = {
+    body: DeleteRef;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.delete_ref';
+};
+
+export type GithubDeleteRefErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDeleteRefError = GithubDeleteRefErrors[keyof GithubDeleteRefErrors];
+
+export type GithubDeleteRefResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubDeleteRefResponse = GithubDeleteRefResponses[keyof GithubDeleteRefResponses];
+
+export type GithubDeleteReleaseData = {
+    body: DeleteRelease;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.delete_release';
+};
+
+export type GithubDeleteReleaseErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDeleteReleaseError = GithubDeleteReleaseErrors[keyof GithubDeleteReleaseErrors];
+
+export type GithubDeleteReleaseResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubDeleteReleaseResponse = GithubDeleteReleaseResponses[keyof GithubDeleteReleaseResponses];
+
+export type GithubDeleteReleaseAssetData = {
+    body: DeleteReleaseAsset;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.delete_release_asset';
+};
+
+export type GithubDeleteReleaseAssetErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDeleteReleaseAssetError = GithubDeleteReleaseAssetErrors[keyof GithubDeleteReleaseAssetErrors];
+
+export type GithubDeleteReleaseAssetResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubDeleteReleaseAssetResponse = GithubDeleteReleaseAssetResponses[keyof GithubDeleteReleaseAssetResponses];
+
+export type GithubDeleteRepositoryData = {
+    body: DeleteRepository;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.delete_repository';
+};
+
+export type GithubDeleteRepositoryErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDeleteRepositoryError = GithubDeleteRepositoryErrors[keyof GithubDeleteRepositoryErrors];
+
+export type GithubDeleteRepositoryResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubDeleteRepositoryResponse = GithubDeleteRepositoryResponses[keyof GithubDeleteRepositoryResponses];
+
+export type GithubDisableWorkflowData = {
+    body: DisableWorkflow;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.disable_workflow';
+};
+
+export type GithubDisableWorkflowErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDisableWorkflowError = GithubDisableWorkflowErrors[keyof GithubDisableWorkflowErrors];
+
+export type GithubDisableWorkflowResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubDisableWorkflowResponse = GithubDisableWorkflowResponses[keyof GithubDisableWorkflowResponses];
+
+export type GithubDismissPullRequestReviewData = {
+    body: DismissPullRequestReview;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.dismiss_pull_request_review';
+};
+
+export type GithubDismissPullRequestReviewErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDismissPullRequestReviewError = GithubDismissPullRequestReviewErrors[keyof GithubDismissPullRequestReviewErrors];
+
+export type GithubDismissPullRequestReviewResponses = {
+    200: ActionResultGithubReview;
+};
+
+export type GithubDismissPullRequestReviewResponse = GithubDismissPullRequestReviewResponses[keyof GithubDismissPullRequestReviewResponses];
+
+export type GithubDispatchWorkflowData = {
+    body: DispatchWorkflow;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.dispatch_workflow';
+};
+
+export type GithubDispatchWorkflowErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDispatchWorkflowError = GithubDispatchWorkflowErrors[keyof GithubDispatchWorkflowErrors];
+
+export type GithubDispatchWorkflowResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubDispatchWorkflowResponse = GithubDispatchWorkflowResponses[keyof GithubDispatchWorkflowResponses];
+
+export type GithubDownloadWorkflowArtifactData = {
+    body: DownloadWorkflowArtifact;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.download_workflow_artifact';
+};
+
+export type GithubDownloadWorkflowArtifactErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubDownloadWorkflowArtifactError = GithubDownloadWorkflowArtifactErrors[keyof GithubDownloadWorkflowArtifactErrors];
+
+export type GithubDownloadWorkflowArtifactResponses = {
+    200: ActionResultGithubArtifactDownload;
+};
+
+export type GithubDownloadWorkflowArtifactResponse = GithubDownloadWorkflowArtifactResponses[keyof GithubDownloadWorkflowArtifactResponses];
+
+export type GithubEnableWorkflowData = {
+    body: EnableWorkflow;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.enable_workflow';
+};
+
+export type GithubEnableWorkflowErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubEnableWorkflowError = GithubEnableWorkflowErrors[keyof GithubEnableWorkflowErrors];
+
+export type GithubEnableWorkflowResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubEnableWorkflowResponse = GithubEnableWorkflowResponses[keyof GithubEnableWorkflowResponses];
+
+export type GithubForkRepositoryData = {
+    body: ForkRepository;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.fork_repository';
+};
+
+export type GithubForkRepositoryErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubForkRepositoryError = GithubForkRepositoryErrors[keyof GithubForkRepositoryErrors];
+
+export type GithubForkRepositoryResponses = {
+    200: ActionResultGithubRepository;
+};
+
+export type GithubForkRepositoryResponse = GithubForkRepositoryResponses[keyof GithubForkRepositoryResponses];
+
+export type GithubGenerateReleaseNotesData = {
+    body: GenerateReleaseNotes;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.generate_release_notes';
+};
+
+export type GithubGenerateReleaseNotesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGenerateReleaseNotesError = GithubGenerateReleaseNotesErrors[keyof GithubGenerateReleaseNotesErrors];
+
+export type GithubGenerateReleaseNotesResponses = {
+    200: ActionResultGithubReleaseNotes;
+};
+
+export type GithubGenerateReleaseNotesResponse = GithubGenerateReleaseNotesResponses[keyof GithubGenerateReleaseNotesResponses];
+
+export type GithubGetBranchData = {
+    body: GetBranch;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_branch';
+};
+
+export type GithubGetBranchErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetBranchError = GithubGetBranchErrors[keyof GithubGetBranchErrors];
+
+export type GithubGetBranchResponses = {
+    200: ActionResultGithubBranch;
+};
+
+export type GithubGetBranchResponse = GithubGetBranchResponses[keyof GithubGetBranchResponses];
+
+export type GithubGetCommitData = {
+    body: GetCommit;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_commit';
+};
+
+export type GithubGetCommitErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetCommitError = GithubGetCommitErrors[keyof GithubGetCommitErrors];
+
+export type GithubGetCommitResponses = {
+    200: ActionResultGithubCommit;
+};
+
+export type GithubGetCommitResponse = GithubGetCommitResponses[keyof GithubGetCommitResponses];
+
+export type GithubGetCommitStatusesData = {
+    body: GetCommitStatuses;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_commit_statuses';
+};
+
+export type GithubGetCommitStatusesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetCommitStatusesError = GithubGetCommitStatusesErrors[keyof GithubGetCommitStatusesErrors];
+
+export type GithubGetCommitStatusesResponses = {
+    200: ActionResultVecGithubCommitStatus;
+};
+
+export type GithubGetCommitStatusesResponse = GithubGetCommitStatusesResponses[keyof GithubGetCommitStatusesResponses];
+
+export type GithubGetCurrentUserData = {
+    body?: never;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_current_user';
+};
+
+export type GithubGetCurrentUserErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetCurrentUserError = GithubGetCurrentUserErrors[keyof GithubGetCurrentUserErrors];
+
+export type GithubGetCurrentUserResponses = {
+    200: ActionResultGithubCurrentUser;
+};
+
+export type GithubGetCurrentUserResponse = GithubGetCurrentUserResponses[keyof GithubGetCurrentUserResponses];
+
+export type GithubGetFileContentsData = {
+    body: GetFileContents;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_file_contents';
+};
+
+export type GithubGetFileContentsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetFileContentsError = GithubGetFileContentsErrors[keyof GithubGetFileContentsErrors];
+
+export type GithubGetFileContentsResponses = {
+    200: ActionResultGithubFileContent;
+};
+
+export type GithubGetFileContentsResponse = GithubGetFileContentsResponses[keyof GithubGetFileContentsResponses];
+
+export type GithubGetIssueData = {
+    body: GetIssue;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_issue';
+};
+
+export type GithubGetIssueErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetIssueError = GithubGetIssueErrors[keyof GithubGetIssueErrors];
+
+export type GithubGetIssueResponses = {
+    200: ActionResultGithubIssue;
+};
+
+export type GithubGetIssueResponse = GithubGetIssueResponses[keyof GithubGetIssueResponses];
+
+export type GithubGetIssueCommentData = {
+    body: GetIssueComment;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_issue_comment';
+};
+
+export type GithubGetIssueCommentErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetIssueCommentError = GithubGetIssueCommentErrors[keyof GithubGetIssueCommentErrors];
+
+export type GithubGetIssueCommentResponses = {
+    200: ActionResultGithubIssueComment;
+};
+
+export type GithubGetIssueCommentResponse = GithubGetIssueCommentResponses[keyof GithubGetIssueCommentResponses];
+
+export type GithubGetLabelData = {
+    body: GetLabel;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_label';
+};
+
+export type GithubGetLabelErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetLabelError = GithubGetLabelErrors[keyof GithubGetLabelErrors];
+
+export type GithubGetLabelResponses = {
+    200: ActionResultGithubLabel;
+};
+
+export type GithubGetLabelResponse = GithubGetLabelResponses[keyof GithubGetLabelResponses];
+
+export type GithubGetLatestReleaseData = {
+    body: GetLatestRelease;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_latest_release';
+};
+
+export type GithubGetLatestReleaseErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetLatestReleaseError = GithubGetLatestReleaseErrors[keyof GithubGetLatestReleaseErrors];
+
+export type GithubGetLatestReleaseResponses = {
+    200: ActionResultGithubRelease;
+};
+
+export type GithubGetLatestReleaseResponse = GithubGetLatestReleaseResponses[keyof GithubGetLatestReleaseResponses];
+
+export type GithubGetMilestoneData = {
+    body: GetMilestone;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_milestone';
+};
+
+export type GithubGetMilestoneErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetMilestoneError = GithubGetMilestoneErrors[keyof GithubGetMilestoneErrors];
+
+export type GithubGetMilestoneResponses = {
+    200: ActionResultGithubMilestone;
+};
+
+export type GithubGetMilestoneResponse = GithubGetMilestoneResponses[keyof GithubGetMilestoneResponses];
+
+export type GithubGetPullRequestData = {
+    body: GetPullRequest;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_pull_request';
+};
+
+export type GithubGetPullRequestErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetPullRequestError = GithubGetPullRequestErrors[keyof GithubGetPullRequestErrors];
+
+export type GithubGetPullRequestResponses = {
+    200: ActionResultGithubPullRequest;
+};
+
+export type GithubGetPullRequestResponse = GithubGetPullRequestResponses[keyof GithubGetPullRequestResponses];
+
+export type GithubGetPullRequestReviewData = {
+    body: GetPullRequestReview;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_pull_request_review';
+};
+
+export type GithubGetPullRequestReviewErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetPullRequestReviewError = GithubGetPullRequestReviewErrors[keyof GithubGetPullRequestReviewErrors];
+
+export type GithubGetPullRequestReviewResponses = {
+    200: ActionResultGithubReview;
+};
+
+export type GithubGetPullRequestReviewResponse = GithubGetPullRequestReviewResponses[keyof GithubGetPullRequestReviewResponses];
+
+export type GithubGetRefData = {
+    body: GetRef;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_ref';
+};
+
+export type GithubGetRefErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetRefError = GithubGetRefErrors[keyof GithubGetRefErrors];
+
+export type GithubGetRefResponses = {
+    200: ActionResultGithubGitRef;
+};
+
+export type GithubGetRefResponse = GithubGetRefResponses[keyof GithubGetRefResponses];
+
+export type GithubGetReleaseData = {
+    body: GetRelease;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_release';
+};
+
+export type GithubGetReleaseErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetReleaseError = GithubGetReleaseErrors[keyof GithubGetReleaseErrors];
+
+export type GithubGetReleaseResponses = {
+    200: ActionResultGithubRelease;
+};
+
+export type GithubGetReleaseResponse = GithubGetReleaseResponses[keyof GithubGetReleaseResponses];
+
+export type GithubGetReleaseAssetData = {
+    body: GetReleaseAsset;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_release_asset';
+};
+
+export type GithubGetReleaseAssetErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetReleaseAssetError = GithubGetReleaseAssetErrors[keyof GithubGetReleaseAssetErrors];
+
+export type GithubGetReleaseAssetResponses = {
+    200: ActionResultGithubReleaseAsset;
+};
+
+export type GithubGetReleaseAssetResponse = GithubGetReleaseAssetResponses[keyof GithubGetReleaseAssetResponses];
+
+export type GithubGetReleaseByTagData = {
+    body: GetReleaseByTag;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_release_by_tag';
+};
+
+export type GithubGetReleaseByTagErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetReleaseByTagError = GithubGetReleaseByTagErrors[keyof GithubGetReleaseByTagErrors];
+
+export type GithubGetReleaseByTagResponses = {
+    200: ActionResultGithubRelease;
+};
+
+export type GithubGetReleaseByTagResponse = GithubGetReleaseByTagResponses[keyof GithubGetReleaseByTagResponses];
+
+export type GithubGetRepositoryData = {
+    body: GetRepository;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_repository';
+};
+
+export type GithubGetRepositoryErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetRepositoryError = GithubGetRepositoryErrors[keyof GithubGetRepositoryErrors];
+
+export type GithubGetRepositoryResponses = {
+    200: ActionResultGithubRepository;
+};
+
+export type GithubGetRepositoryResponse = GithubGetRepositoryResponses[keyof GithubGetRepositoryResponses];
+
+export type GithubGetRepositoryPermissionForUserData = {
+    body: GetRepositoryPermissionForUser;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_repository_permission_for_user';
+};
+
+export type GithubGetRepositoryPermissionForUserErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetRepositoryPermissionForUserError = GithubGetRepositoryPermissionForUserErrors[keyof GithubGetRepositoryPermissionForUserErrors];
+
+export type GithubGetRepositoryPermissionForUserResponses = {
+    200: ActionResultGithubRepositoryPermission;
+};
+
+export type GithubGetRepositoryPermissionForUserResponse = GithubGetRepositoryPermissionForUserResponses[keyof GithubGetRepositoryPermissionForUserResponses];
+
+export type GithubGetRepositoryReadmeData = {
+    body: GetRepositoryReadme;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_repository_readme';
+};
+
+export type GithubGetRepositoryReadmeErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetRepositoryReadmeError = GithubGetRepositoryReadmeErrors[keyof GithubGetRepositoryReadmeErrors];
+
+export type GithubGetRepositoryReadmeResponses = {
+    200: ActionResultGithubFileContent;
+};
+
+export type GithubGetRepositoryReadmeResponse = GithubGetRepositoryReadmeResponses[keyof GithubGetRepositoryReadmeResponses];
+
+export type GithubGetUserData = {
+    body: GetUser;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_user';
+};
+
+export type GithubGetUserErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetUserError = GithubGetUserErrors[keyof GithubGetUserErrors];
+
+export type GithubGetUserResponses = {
+    200: ActionResultGithubPublicUser;
+};
+
+export type GithubGetUserResponse = GithubGetUserResponses[keyof GithubGetUserResponses];
+
+export type GithubGetWorkflowData = {
+    body: GetWorkflow;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_workflow';
+};
+
+export type GithubGetWorkflowErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetWorkflowError = GithubGetWorkflowErrors[keyof GithubGetWorkflowErrors];
+
+export type GithubGetWorkflowResponses = {
+    200: ActionResultGithubWorkflow;
+};
+
+export type GithubGetWorkflowResponse = GithubGetWorkflowResponses[keyof GithubGetWorkflowResponses];
+
+export type GithubGetWorkflowJobLogsData = {
+    body: GetWorkflowJobLogs;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_workflow_job_logs';
+};
+
+export type GithubGetWorkflowJobLogsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetWorkflowJobLogsError = GithubGetWorkflowJobLogsErrors[keyof GithubGetWorkflowJobLogsErrors];
+
+export type GithubGetWorkflowJobLogsResponses = {
+    200: ActionResultGithubJobLogs;
+};
+
+export type GithubGetWorkflowJobLogsResponse = GithubGetWorkflowJobLogsResponses[keyof GithubGetWorkflowJobLogsResponses];
+
+export type GithubGetWorkflowRunData = {
+    body: GetWorkflowRun;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.get_workflow_run';
+};
+
+export type GithubGetWorkflowRunErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubGetWorkflowRunError = GithubGetWorkflowRunErrors[keyof GithubGetWorkflowRunErrors];
+
+export type GithubGetWorkflowRunResponses = {
+    200: ActionResultGithubWorkflowRun;
+};
+
+export type GithubGetWorkflowRunResponse = GithubGetWorkflowRunResponses[keyof GithubGetWorkflowRunResponses];
+
+export type GithubListAssigneesData = {
+    body: ListAssignees;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_assignees';
+};
+
+export type GithubListAssigneesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListAssigneesError = GithubListAssigneesErrors[keyof GithubListAssigneesErrors];
+
+export type GithubListAssigneesResponses = {
+    200: ActionResultVecGithubUser;
+};
+
+export type GithubListAssigneesResponse = GithubListAssigneesResponses[keyof GithubListAssigneesResponses];
+
+export type GithubListAuthenticatedUserEventsData = {
+    body: ListAuthenticatedUserEvents;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_authenticated_user_events';
+};
+
+export type GithubListAuthenticatedUserEventsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListAuthenticatedUserEventsError = GithubListAuthenticatedUserEventsErrors[keyof GithubListAuthenticatedUserEventsErrors];
+
+export type GithubListAuthenticatedUserEventsResponses = {
+    200: ActionResultVecGithubEvent;
+};
+
+export type GithubListAuthenticatedUserEventsResponse = GithubListAuthenticatedUserEventsResponses[keyof GithubListAuthenticatedUserEventsResponses];
+
+export type GithubListAuthenticatedUserReceivedEventsData = {
+    body: ListAuthenticatedUserReceivedEvents;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_authenticated_user_received_events';
+};
+
+export type GithubListAuthenticatedUserReceivedEventsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListAuthenticatedUserReceivedEventsError = GithubListAuthenticatedUserReceivedEventsErrors[keyof GithubListAuthenticatedUserReceivedEventsErrors];
+
+export type GithubListAuthenticatedUserReceivedEventsResponses = {
+    200: ActionResultVecGithubEvent;
+};
+
+export type GithubListAuthenticatedUserReceivedEventsResponse = GithubListAuthenticatedUserReceivedEventsResponses[keyof GithubListAuthenticatedUserReceivedEventsResponses];
+
+export type GithubListBranchesData = {
+    body: ListBranches;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_branches';
+};
+
+export type GithubListBranchesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListBranchesError = GithubListBranchesErrors[keyof GithubListBranchesErrors];
+
+export type GithubListBranchesResponses = {
+    200: ActionResultVecGithubBranch;
+};
+
+export type GithubListBranchesResponse = GithubListBranchesResponses[keyof GithubListBranchesResponses];
+
+export type GithubListCheckRunsForRefData = {
+    body: ListCheckRunsForRef;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_check_runs_for_ref';
+};
+
+export type GithubListCheckRunsForRefErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListCheckRunsForRefError = GithubListCheckRunsForRefErrors[keyof GithubListCheckRunsForRefErrors];
+
+export type GithubListCheckRunsForRefResponses = {
+    200: ActionResultVecGithubCheckRun;
+};
+
+export type GithubListCheckRunsForRefResponse = GithubListCheckRunsForRefResponses[keyof GithubListCheckRunsForRefResponses];
+
+export type GithubListCommitCommentsData = {
+    body: ListCommitComments;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_commit_comments';
+};
+
+export type GithubListCommitCommentsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListCommitCommentsError = GithubListCommitCommentsErrors[keyof GithubListCommitCommentsErrors];
+
+export type GithubListCommitCommentsResponses = {
+    200: ActionResultVecGithubCommitComment;
+};
+
+export type GithubListCommitCommentsResponse = GithubListCommitCommentsResponses[keyof GithubListCommitCommentsResponses];
+
+export type GithubListCommitsData = {
+    body: ListCommits;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_commits';
+};
+
+export type GithubListCommitsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListCommitsError = GithubListCommitsErrors[keyof GithubListCommitsErrors];
+
+export type GithubListCommitsResponses = {
+    200: ActionResultVecGithubCommit;
+};
+
+export type GithubListCommitsResponse = GithubListCommitsResponses[keyof GithubListCommitsResponses];
+
+export type GithubListDirectoryContentsData = {
+    body: ListDirectoryContents;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_directory_contents';
+};
+
+export type GithubListDirectoryContentsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListDirectoryContentsError = GithubListDirectoryContentsErrors[keyof GithubListDirectoryContentsErrors];
+
+export type GithubListDirectoryContentsResponses = {
+    200: ActionResultVecGithubContentEntry;
+};
+
+export type GithubListDirectoryContentsResponse = GithubListDirectoryContentsResponses[keyof GithubListDirectoryContentsResponses];
+
 export type GithubListInstallationsData = {
     body?: never;
     headers?: {
@@ -835,6 +10330,7 @@ export type GithubListInstallationsErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    403: ErrorBody;
     404: ErrorBody;
     /**
      * The request took longer than the server waits
@@ -865,6 +10361,1051 @@ export type GithubListInstallationsResponses = {
 
 export type GithubListInstallationsResponse = GithubListInstallationsResponses[keyof GithubListInstallationsResponses];
 
+export type GithubListIssueCommentsData = {
+    body: ListIssueComments;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_issue_comments';
+};
+
+export type GithubListIssueCommentsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListIssueCommentsError = GithubListIssueCommentsErrors[keyof GithubListIssueCommentsErrors];
+
+export type GithubListIssueCommentsResponses = {
+    200: ActionResultVecGithubIssueComment;
+};
+
+export type GithubListIssueCommentsResponse = GithubListIssueCommentsResponses[keyof GithubListIssueCommentsResponses];
+
+export type GithubListIssueEventsData = {
+    body: ListIssueEvents;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_issue_events';
+};
+
+export type GithubListIssueEventsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListIssueEventsError = GithubListIssueEventsErrors[keyof GithubListIssueEventsErrors];
+
+export type GithubListIssueEventsResponses = {
+    200: ActionResultVecGithubIssueEvent;
+};
+
+export type GithubListIssueEventsResponse = GithubListIssueEventsResponses[keyof GithubListIssueEventsResponses];
+
+export type GithubListIssueLabelsData = {
+    body: ListIssueLabels;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_issue_labels';
+};
+
+export type GithubListIssueLabelsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListIssueLabelsError = GithubListIssueLabelsErrors[keyof GithubListIssueLabelsErrors];
+
+export type GithubListIssueLabelsResponses = {
+    200: ActionResultVecGithubLabel;
+};
+
+export type GithubListIssueLabelsResponse = GithubListIssueLabelsResponses[keyof GithubListIssueLabelsResponses];
+
+export type GithubListIssueTimelineEventsData = {
+    body: ListIssueTimelineEvents;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_issue_timeline_events';
+};
+
+export type GithubListIssueTimelineEventsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListIssueTimelineEventsError = GithubListIssueTimelineEventsErrors[keyof GithubListIssueTimelineEventsErrors];
+
+export type GithubListIssueTimelineEventsResponses = {
+    200: ActionResultVecGithubTimelineEvent;
+};
+
+export type GithubListIssueTimelineEventsResponse = GithubListIssueTimelineEventsResponses[keyof GithubListIssueTimelineEventsResponses];
+
+export type GithubListMatchingRefsData = {
+    body: ListMatchingRefs;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_matching_refs';
+};
+
+export type GithubListMatchingRefsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListMatchingRefsError = GithubListMatchingRefsErrors[keyof GithubListMatchingRefsErrors];
+
+export type GithubListMatchingRefsResponses = {
+    200: ActionResultVecGithubGitRef;
+};
+
+export type GithubListMatchingRefsResponse = GithubListMatchingRefsResponses[keyof GithubListMatchingRefsResponses];
+
+export type GithubListMilestonesData = {
+    body: ListMilestones;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_milestones';
+};
+
+export type GithubListMilestonesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListMilestonesError = GithubListMilestonesErrors[keyof GithubListMilestonesErrors];
+
+export type GithubListMilestonesResponses = {
+    200: ActionResultVecGithubMilestone;
+};
+
+export type GithubListMilestonesResponse = GithubListMilestonesResponses[keyof GithubListMilestonesResponses];
+
+export type GithubListMyRepositoriesData = {
+    body: ListMyRepositories;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_my_repositories';
+};
+
+export type GithubListMyRepositoriesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListMyRepositoriesError = GithubListMyRepositoriesErrors[keyof GithubListMyRepositoriesErrors];
+
+export type GithubListMyRepositoriesResponses = {
+    200: ActionResultVecGithubRepository;
+};
+
+export type GithubListMyRepositoriesResponse = GithubListMyRepositoriesResponses[keyof GithubListMyRepositoriesResponses];
+
+export type GithubListMyStarredRepositoriesData = {
+    body: ListMyStarredRepositories;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_my_starred_repositories';
+};
+
+export type GithubListMyStarredRepositoriesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListMyStarredRepositoriesError = GithubListMyStarredRepositoriesErrors[keyof GithubListMyStarredRepositoriesErrors];
+
+export type GithubListMyStarredRepositoriesResponses = {
+    200: ActionResultVecGithubRepository;
+};
+
+export type GithubListMyStarredRepositoriesResponse = GithubListMyStarredRepositoriesResponses[keyof GithubListMyStarredRepositoriesResponses];
+
+export type GithubListOrganizationRepositoriesData = {
+    body: ListOrganizationRepositories;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_organization_repositories';
+};
+
+export type GithubListOrganizationRepositoriesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListOrganizationRepositoriesError = GithubListOrganizationRepositoriesErrors[keyof GithubListOrganizationRepositoriesErrors];
+
+export type GithubListOrganizationRepositoriesResponses = {
+    200: ActionResultVecGithubRepository;
+};
+
+export type GithubListOrganizationRepositoriesResponse = GithubListOrganizationRepositoriesResponses[keyof GithubListOrganizationRepositoriesResponses];
+
+export type GithubListPublicEventsData = {
+    body: ListPublicEvents;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_public_events';
+};
+
+export type GithubListPublicEventsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListPublicEventsError = GithubListPublicEventsErrors[keyof GithubListPublicEventsErrors];
+
+export type GithubListPublicEventsResponses = {
+    200: ActionResultVecGithubEvent;
+};
+
+export type GithubListPublicEventsResponse = GithubListPublicEventsResponses[keyof GithubListPublicEventsResponses];
+
+export type GithubListPullRequestCommitsData = {
+    body: ListPullRequestCommits;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_pull_request_commits';
+};
+
+export type GithubListPullRequestCommitsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListPullRequestCommitsError = GithubListPullRequestCommitsErrors[keyof GithubListPullRequestCommitsErrors];
+
+export type GithubListPullRequestCommitsResponses = {
+    200: ActionResultVecGithubCommit;
+};
+
+export type GithubListPullRequestCommitsResponse = GithubListPullRequestCommitsResponses[keyof GithubListPullRequestCommitsResponses];
+
+export type GithubListPullRequestFilesData = {
+    body: ListPullRequestFiles;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_pull_request_files';
+};
+
+export type GithubListPullRequestFilesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListPullRequestFilesError = GithubListPullRequestFilesErrors[keyof GithubListPullRequestFilesErrors];
+
+export type GithubListPullRequestFilesResponses = {
+    200: ActionResultVecGithubPullRequestFile;
+};
+
+export type GithubListPullRequestFilesResponse = GithubListPullRequestFilesResponses[keyof GithubListPullRequestFilesResponses];
+
+export type GithubListPullRequestRequestedReviewersData = {
+    body: ListPullRequestRequestedReviewers;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_pull_request_requested_reviewers';
+};
+
+export type GithubListPullRequestRequestedReviewersErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListPullRequestRequestedReviewersError = GithubListPullRequestRequestedReviewersErrors[keyof GithubListPullRequestRequestedReviewersErrors];
+
+export type GithubListPullRequestRequestedReviewersResponses = {
+    200: ActionResultGithubRequestedReviewers;
+};
+
+export type GithubListPullRequestRequestedReviewersResponse = GithubListPullRequestRequestedReviewersResponses[keyof GithubListPullRequestRequestedReviewersResponses];
+
+export type GithubListPullRequestReviewCommentsData = {
+    body: ListPullRequestReviewComments;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_pull_request_review_comments';
+};
+
+export type GithubListPullRequestReviewCommentsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListPullRequestReviewCommentsError = GithubListPullRequestReviewCommentsErrors[keyof GithubListPullRequestReviewCommentsErrors];
+
+export type GithubListPullRequestReviewCommentsResponses = {
+    200: ActionResultVecGithubReviewComment;
+};
+
+export type GithubListPullRequestReviewCommentsResponse = GithubListPullRequestReviewCommentsResponses[keyof GithubListPullRequestReviewCommentsResponses];
+
+export type GithubListPullRequestReviewsData = {
+    body: ListPullRequestReviews;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_pull_request_reviews';
+};
+
+export type GithubListPullRequestReviewsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListPullRequestReviewsError = GithubListPullRequestReviewsErrors[keyof GithubListPullRequestReviewsErrors];
+
+export type GithubListPullRequestReviewsResponses = {
+    200: ActionResultVecGithubReview;
+};
+
+export type GithubListPullRequestReviewsResponse = GithubListPullRequestReviewsResponses[keyof GithubListPullRequestReviewsResponses];
+
+export type GithubListPullRequestsData = {
+    body: ListPullRequests;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_pull_requests';
+};
+
+export type GithubListPullRequestsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListPullRequestsError = GithubListPullRequestsErrors[keyof GithubListPullRequestsErrors];
+
+export type GithubListPullRequestsResponses = {
+    200: ActionResultVecGithubPullRequest;
+};
+
+export type GithubListPullRequestsResponse = GithubListPullRequestsResponses[keyof GithubListPullRequestsResponses];
+
+export type GithubListPullRequestsAssociatedWithCommitData = {
+    body: ListPullRequestsAssociatedWithCommit;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_pull_requests_associated_with_commit';
+};
+
+export type GithubListPullRequestsAssociatedWithCommitErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListPullRequestsAssociatedWithCommitError = GithubListPullRequestsAssociatedWithCommitErrors[keyof GithubListPullRequestsAssociatedWithCommitErrors];
+
+export type GithubListPullRequestsAssociatedWithCommitResponses = {
+    200: ActionResultVecGithubPullRequest;
+};
+
+export type GithubListPullRequestsAssociatedWithCommitResponse = GithubListPullRequestsAssociatedWithCommitResponses[keyof GithubListPullRequestsAssociatedWithCommitResponses];
+
+export type GithubListReleaseAssetsData = {
+    body: ListReleaseAssets;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_release_assets';
+};
+
+export type GithubListReleaseAssetsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListReleaseAssetsError = GithubListReleaseAssetsErrors[keyof GithubListReleaseAssetsErrors];
+
+export type GithubListReleaseAssetsResponses = {
+    200: ActionResultVecGithubReleaseAsset;
+};
+
+export type GithubListReleaseAssetsResponse = GithubListReleaseAssetsResponses[keyof GithubListReleaseAssetsResponses];
+
+export type GithubListReleasesData = {
+    body: ListReleases;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_releases';
+};
+
+export type GithubListReleasesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListReleasesError = GithubListReleasesErrors[keyof GithubListReleasesErrors];
+
+export type GithubListReleasesResponses = {
+    200: ActionResultVecGithubRelease;
+};
+
+export type GithubListReleasesResponse = GithubListReleasesResponses[keyof GithubListReleasesResponses];
+
 export type GithubListRepositoriesData = {
     body?: never;
     headers?: {
@@ -889,6 +11430,7 @@ export type GithubListRepositoriesErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    403: ErrorBody;
     404: ErrorBody;
     /**
      * The request took longer than the server waits
@@ -919,6 +11461,3141 @@ export type GithubListRepositoriesResponses = {
 
 export type GithubListRepositoriesResponse = GithubListRepositoriesResponses[keyof GithubListRepositoriesResponses];
 
+export type GithubListRepositoryCollaboratorsData = {
+    body: ListRepositoryCollaborators;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_collaborators';
+};
+
+export type GithubListRepositoryCollaboratorsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryCollaboratorsError = GithubListRepositoryCollaboratorsErrors[keyof GithubListRepositoryCollaboratorsErrors];
+
+export type GithubListRepositoryCollaboratorsResponses = {
+    200: ActionResultVecGithubCollaborator;
+};
+
+export type GithubListRepositoryCollaboratorsResponse = GithubListRepositoryCollaboratorsResponses[keyof GithubListRepositoryCollaboratorsResponses];
+
+export type GithubListRepositoryContributorsData = {
+    body: ListRepositoryContributors;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_contributors';
+};
+
+export type GithubListRepositoryContributorsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryContributorsError = GithubListRepositoryContributorsErrors[keyof GithubListRepositoryContributorsErrors];
+
+export type GithubListRepositoryContributorsResponses = {
+    200: ActionResultVecGithubContributor;
+};
+
+export type GithubListRepositoryContributorsResponse = GithubListRepositoryContributorsResponses[keyof GithubListRepositoryContributorsResponses];
+
+export type GithubListRepositoryEventsData = {
+    body: ListRepositoryEvents;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_events';
+};
+
+export type GithubListRepositoryEventsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryEventsError = GithubListRepositoryEventsErrors[keyof GithubListRepositoryEventsErrors];
+
+export type GithubListRepositoryEventsResponses = {
+    200: ActionResultVecGithubEvent;
+};
+
+export type GithubListRepositoryEventsResponse = GithubListRepositoryEventsResponses[keyof GithubListRepositoryEventsResponses];
+
+export type GithubListRepositoryForksData = {
+    body: ListRepositoryForks;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_forks';
+};
+
+export type GithubListRepositoryForksErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryForksError = GithubListRepositoryForksErrors[keyof GithubListRepositoryForksErrors];
+
+export type GithubListRepositoryForksResponses = {
+    200: ActionResultVecGithubRepository;
+};
+
+export type GithubListRepositoryForksResponse = GithubListRepositoryForksResponses[keyof GithubListRepositoryForksResponses];
+
+export type GithubListRepositoryIssueEventsData = {
+    body: ListRepositoryIssueEvents;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_issue_events';
+};
+
+export type GithubListRepositoryIssueEventsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryIssueEventsError = GithubListRepositoryIssueEventsErrors[keyof GithubListRepositoryIssueEventsErrors];
+
+export type GithubListRepositoryIssueEventsResponses = {
+    200: ActionResultVecGithubIssueEvent;
+};
+
+export type GithubListRepositoryIssueEventsResponse = GithubListRepositoryIssueEventsResponses[keyof GithubListRepositoryIssueEventsResponses];
+
+export type GithubListRepositoryIssuesData = {
+    body: ListRepositoryIssues;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_issues';
+};
+
+export type GithubListRepositoryIssuesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryIssuesError = GithubListRepositoryIssuesErrors[keyof GithubListRepositoryIssuesErrors];
+
+export type GithubListRepositoryIssuesResponses = {
+    200: ActionResultGithubIssuePage;
+};
+
+export type GithubListRepositoryIssuesResponse = GithubListRepositoryIssuesResponses[keyof GithubListRepositoryIssuesResponses];
+
+export type GithubListRepositoryLabelsData = {
+    body: ListRepositoryLabels;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_labels';
+};
+
+export type GithubListRepositoryLabelsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryLabelsError = GithubListRepositoryLabelsErrors[keyof GithubListRepositoryLabelsErrors];
+
+export type GithubListRepositoryLabelsResponses = {
+    200: ActionResultVecGithubLabel;
+};
+
+export type GithubListRepositoryLabelsResponse = GithubListRepositoryLabelsResponses[keyof GithubListRepositoryLabelsResponses];
+
+export type GithubListRepositoryLanguagesData = {
+    body: ListRepositoryLanguages;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_languages';
+};
+
+export type GithubListRepositoryLanguagesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryLanguagesError = GithubListRepositoryLanguagesErrors[keyof GithubListRepositoryLanguagesErrors];
+
+export type GithubListRepositoryLanguagesResponses = {
+    200: ActionResultVecGithubLanguage;
+};
+
+export type GithubListRepositoryLanguagesResponse = GithubListRepositoryLanguagesResponses[keyof GithubListRepositoryLanguagesResponses];
+
+export type GithubListRepositoryStargazersData = {
+    body: ListRepositoryStargazers;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_stargazers';
+};
+
+export type GithubListRepositoryStargazersErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryStargazersError = GithubListRepositoryStargazersErrors[keyof GithubListRepositoryStargazersErrors];
+
+export type GithubListRepositoryStargazersResponses = {
+    200: ActionResultVecGithubUser;
+};
+
+export type GithubListRepositoryStargazersResponse = GithubListRepositoryStargazersResponses[keyof GithubListRepositoryStargazersResponses];
+
+export type GithubListRepositoryTagsData = {
+    body: ListRepositoryTags;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_tags';
+};
+
+export type GithubListRepositoryTagsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryTagsError = GithubListRepositoryTagsErrors[keyof GithubListRepositoryTagsErrors];
+
+export type GithubListRepositoryTagsResponses = {
+    200: ActionResultVecGithubTag;
+};
+
+export type GithubListRepositoryTagsResponse = GithubListRepositoryTagsResponses[keyof GithubListRepositoryTagsResponses];
+
+export type GithubListRepositoryTopicsData = {
+    body: ListRepositoryTopics;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_topics';
+};
+
+export type GithubListRepositoryTopicsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryTopicsError = GithubListRepositoryTopicsErrors[keyof GithubListRepositoryTopicsErrors];
+
+export type GithubListRepositoryTopicsResponses = {
+    200: ActionResultGithubTopics;
+};
+
+export type GithubListRepositoryTopicsResponse = GithubListRepositoryTopicsResponses[keyof GithubListRepositoryTopicsResponses];
+
+export type GithubListRepositoryWatchersData = {
+    body: ListRepositoryWatchers;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_watchers';
+};
+
+export type GithubListRepositoryWatchersErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryWatchersError = GithubListRepositoryWatchersErrors[keyof GithubListRepositoryWatchersErrors];
+
+export type GithubListRepositoryWatchersResponses = {
+    200: ActionResultVecGithubUser;
+};
+
+export type GithubListRepositoryWatchersResponse = GithubListRepositoryWatchersResponses[keyof GithubListRepositoryWatchersResponses];
+
+export type GithubListRepositoryWorkflowsData = {
+    body: ListRepositoryWorkflows;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_repository_workflows';
+};
+
+export type GithubListRepositoryWorkflowsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListRepositoryWorkflowsError = GithubListRepositoryWorkflowsErrors[keyof GithubListRepositoryWorkflowsErrors];
+
+export type GithubListRepositoryWorkflowsResponses = {
+    200: ActionResultVecGithubWorkflow;
+};
+
+export type GithubListRepositoryWorkflowsResponse = GithubListRepositoryWorkflowsResponses[keyof GithubListRepositoryWorkflowsResponses];
+
+export type GithubListUserPublicEventsData = {
+    body: ListUserPublicEvents;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_user_public_events';
+};
+
+export type GithubListUserPublicEventsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListUserPublicEventsError = GithubListUserPublicEventsErrors[keyof GithubListUserPublicEventsErrors];
+
+export type GithubListUserPublicEventsResponses = {
+    200: ActionResultVecGithubEvent;
+};
+
+export type GithubListUserPublicEventsResponse = GithubListUserPublicEventsResponses[keyof GithubListUserPublicEventsResponses];
+
+export type GithubListUserReceivedPublicEventsData = {
+    body: ListUserReceivedPublicEvents;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_user_received_public_events';
+};
+
+export type GithubListUserReceivedPublicEventsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListUserReceivedPublicEventsError = GithubListUserReceivedPublicEventsErrors[keyof GithubListUserReceivedPublicEventsErrors];
+
+export type GithubListUserReceivedPublicEventsResponses = {
+    200: ActionResultVecGithubEvent;
+};
+
+export type GithubListUserReceivedPublicEventsResponse = GithubListUserReceivedPublicEventsResponses[keyof GithubListUserReceivedPublicEventsResponses];
+
+export type GithubListUserRepositoriesData = {
+    body: ListUserRepositories;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_user_repositories';
+};
+
+export type GithubListUserRepositoriesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListUserRepositoriesError = GithubListUserRepositoriesErrors[keyof GithubListUserRepositoriesErrors];
+
+export type GithubListUserRepositoriesResponses = {
+    200: ActionResultVecGithubRepository;
+};
+
+export type GithubListUserRepositoriesResponse = GithubListUserRepositoriesResponses[keyof GithubListUserRepositoriesResponses];
+
+export type GithubListWorkflowRunArtifactsData = {
+    body: ListWorkflowRunArtifacts;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_workflow_run_artifacts';
+};
+
+export type GithubListWorkflowRunArtifactsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListWorkflowRunArtifactsError = GithubListWorkflowRunArtifactsErrors[keyof GithubListWorkflowRunArtifactsErrors];
+
+export type GithubListWorkflowRunArtifactsResponses = {
+    200: ActionResultVecGithubArtifact;
+};
+
+export type GithubListWorkflowRunArtifactsResponse = GithubListWorkflowRunArtifactsResponses[keyof GithubListWorkflowRunArtifactsResponses];
+
+export type GithubListWorkflowRunJobsData = {
+    body: ListWorkflowRunJobs;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_workflow_run_jobs';
+};
+
+export type GithubListWorkflowRunJobsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListWorkflowRunJobsError = GithubListWorkflowRunJobsErrors[keyof GithubListWorkflowRunJobsErrors];
+
+export type GithubListWorkflowRunJobsResponses = {
+    200: ActionResultVecGithubWorkflowJob;
+};
+
+export type GithubListWorkflowRunJobsResponse = GithubListWorkflowRunJobsResponses[keyof GithubListWorkflowRunJobsResponses];
+
+export type GithubListWorkflowRunsData = {
+    body: ListWorkflowRuns;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.list_workflow_runs';
+};
+
+export type GithubListWorkflowRunsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubListWorkflowRunsError = GithubListWorkflowRunsErrors[keyof GithubListWorkflowRunsErrors];
+
+export type GithubListWorkflowRunsResponses = {
+    200: ActionResultVecGithubWorkflowRun;
+};
+
+export type GithubListWorkflowRunsResponse = GithubListWorkflowRunsResponses[keyof GithubListWorkflowRunsResponses];
+
+export type GithubLockIssueData = {
+    body: LockIssue;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.lock_issue';
+};
+
+export type GithubLockIssueErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubLockIssueError = GithubLockIssueErrors[keyof GithubLockIssueErrors];
+
+export type GithubLockIssueResponses = {
+    200: ActionResultGithubIssueLock;
+};
+
+export type GithubLockIssueResponse = GithubLockIssueResponses[keyof GithubLockIssueResponses];
+
+export type GithubMergeBranchData = {
+    body: MergeBranch;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.merge_branch';
+};
+
+export type GithubMergeBranchErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubMergeBranchError = GithubMergeBranchErrors[keyof GithubMergeBranchErrors];
+
+export type GithubMergeBranchResponses = {
+    200: ActionResultGithubMergeResult;
+};
+
+export type GithubMergeBranchResponse = GithubMergeBranchResponses[keyof GithubMergeBranchResponses];
+
+export type GithubMergePullRequestData = {
+    body: MergePullRequest;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.merge_pull_request';
+};
+
+export type GithubMergePullRequestErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubMergePullRequestError = GithubMergePullRequestErrors[keyof GithubMergePullRequestErrors];
+
+export type GithubMergePullRequestResponses = {
+    200: ActionResultGithubMergeResult;
+};
+
+export type GithubMergePullRequestResponse = GithubMergePullRequestResponses[keyof GithubMergePullRequestResponses];
+
+export type GithubRemoveIssueAssigneesData = {
+    body: RemoveIssueAssignees;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.remove_issue_assignees';
+};
+
+export type GithubRemoveIssueAssigneesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubRemoveIssueAssigneesError = GithubRemoveIssueAssigneesErrors[keyof GithubRemoveIssueAssigneesErrors];
+
+export type GithubRemoveIssueAssigneesResponses = {
+    200: ActionResultGithubIssue;
+};
+
+export type GithubRemoveIssueAssigneesResponse = GithubRemoveIssueAssigneesResponses[keyof GithubRemoveIssueAssigneesResponses];
+
+export type GithubRemoveIssueLabelData = {
+    body: RemoveIssueLabel;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.remove_issue_label';
+};
+
+export type GithubRemoveIssueLabelErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubRemoveIssueLabelError = GithubRemoveIssueLabelErrors[keyof GithubRemoveIssueLabelErrors];
+
+export type GithubRemoveIssueLabelResponses = {
+    200: ActionResultVecGithubLabel;
+};
+
+export type GithubRemoveIssueLabelResponse = GithubRemoveIssueLabelResponses[keyof GithubRemoveIssueLabelResponses];
+
+export type GithubRemovePullRequestReviewersData = {
+    body: RemovePullRequestReviewers;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.remove_pull_request_reviewers';
+};
+
+export type GithubRemovePullRequestReviewersErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubRemovePullRequestReviewersError = GithubRemovePullRequestReviewersErrors[keyof GithubRemovePullRequestReviewersErrors];
+
+export type GithubRemovePullRequestReviewersResponses = {
+    200: ActionResultGithubReviewRequest;
+};
+
+export type GithubRemovePullRequestReviewersResponse = GithubRemovePullRequestReviewersResponses[keyof GithubRemovePullRequestReviewersResponses];
+
+export type GithubRemoveRepositoryCollaboratorData = {
+    body: RemoveRepositoryCollaborator;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.remove_repository_collaborator';
+};
+
+export type GithubRemoveRepositoryCollaboratorErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubRemoveRepositoryCollaboratorError = GithubRemoveRepositoryCollaboratorErrors[keyof GithubRemoveRepositoryCollaboratorErrors];
+
+export type GithubRemoveRepositoryCollaboratorResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubRemoveRepositoryCollaboratorResponse = GithubRemoveRepositoryCollaboratorResponses[keyof GithubRemoveRepositoryCollaboratorResponses];
+
+export type GithubRenameBranchData = {
+    body: RenameBranch;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.rename_branch';
+};
+
+export type GithubRenameBranchErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubRenameBranchError = GithubRenameBranchErrors[keyof GithubRenameBranchErrors];
+
+export type GithubRenameBranchResponses = {
+    200: ActionResultGithubBranch;
+};
+
+export type GithubRenameBranchResponse = GithubRenameBranchResponses[keyof GithubRenameBranchResponses];
+
+export type GithubReplaceRepositoryTopicsData = {
+    body: ReplaceRepositoryTopics;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.replace_repository_topics';
+};
+
+export type GithubReplaceRepositoryTopicsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubReplaceRepositoryTopicsError = GithubReplaceRepositoryTopicsErrors[keyof GithubReplaceRepositoryTopicsErrors];
+
+export type GithubReplaceRepositoryTopicsResponses = {
+    200: ActionResultGithubTopics;
+};
+
+export type GithubReplaceRepositoryTopicsResponse = GithubReplaceRepositoryTopicsResponses[keyof GithubReplaceRepositoryTopicsResponses];
+
+export type GithubReplyPullRequestReviewCommentData = {
+    body: ReplyPullRequestReviewComment;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.reply_pull_request_review_comment';
+};
+
+export type GithubReplyPullRequestReviewCommentErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubReplyPullRequestReviewCommentError = GithubReplyPullRequestReviewCommentErrors[keyof GithubReplyPullRequestReviewCommentErrors];
+
+export type GithubReplyPullRequestReviewCommentResponses = {
+    200: ActionResultGithubReviewComment;
+};
+
+export type GithubReplyPullRequestReviewCommentResponse = GithubReplyPullRequestReviewCommentResponses[keyof GithubReplyPullRequestReviewCommentResponses];
+
+export type GithubRequestPullRequestReviewersData = {
+    body: RequestPullRequestReviewers;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.request_pull_request_reviewers';
+};
+
+export type GithubRequestPullRequestReviewersErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubRequestPullRequestReviewersError = GithubRequestPullRequestReviewersErrors[keyof GithubRequestPullRequestReviewersErrors];
+
+export type GithubRequestPullRequestReviewersResponses = {
+    200: ActionResultGithubReviewRequest;
+};
+
+export type GithubRequestPullRequestReviewersResponse = GithubRequestPullRequestReviewersResponses[keyof GithubRequestPullRequestReviewersResponses];
+
+export type GithubRerequestCheckRunData = {
+    body: RerequestCheckRun;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.rerequest_check_run';
+};
+
+export type GithubRerequestCheckRunErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubRerequestCheckRunError = GithubRerequestCheckRunErrors[keyof GithubRerequestCheckRunErrors];
+
+export type GithubRerequestCheckRunResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubRerequestCheckRunResponse = GithubRerequestCheckRunResponses[keyof GithubRerequestCheckRunResponses];
+
+export type GithubRerequestCheckSuiteData = {
+    body: RerequestCheckSuite;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.rerequest_check_suite';
+};
+
+export type GithubRerequestCheckSuiteErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubRerequestCheckSuiteError = GithubRerequestCheckSuiteErrors[keyof GithubRerequestCheckSuiteErrors];
+
+export type GithubRerequestCheckSuiteResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubRerequestCheckSuiteResponse = GithubRerequestCheckSuiteResponses[keyof GithubRerequestCheckSuiteResponses];
+
+export type GithubRerunFailedJobsData = {
+    body: RerunFailedJobs;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.rerun_failed_jobs';
+};
+
+export type GithubRerunFailedJobsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubRerunFailedJobsError = GithubRerunFailedJobsErrors[keyof GithubRerunFailedJobsErrors];
+
+export type GithubRerunFailedJobsResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubRerunFailedJobsResponse = GithubRerunFailedJobsResponses[keyof GithubRerunFailedJobsResponses];
+
+export type GithubRerunWorkflowData = {
+    body: RerunWorkflow;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.rerun_workflow';
+};
+
+export type GithubRerunWorkflowErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubRerunWorkflowError = GithubRerunWorkflowErrors[keyof GithubRerunWorkflowErrors];
+
+export type GithubRerunWorkflowResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubRerunWorkflowResponse = GithubRerunWorkflowResponses[keyof GithubRerunWorkflowResponses];
+
+export type GithubSearchCodeData = {
+    body: SearchCode;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.search_code';
+};
+
+export type GithubSearchCodeErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubSearchCodeError = GithubSearchCodeErrors[keyof GithubSearchCodeErrors];
+
+export type GithubSearchCodeResponses = {
+    200: ActionResultGithubCodeSearchResults;
+};
+
+export type GithubSearchCodeResponse = GithubSearchCodeResponses[keyof GithubSearchCodeResponses];
+
+export type GithubSearchCommitsData = {
+    body: SearchCommits;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.search_commits';
+};
+
+export type GithubSearchCommitsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubSearchCommitsError = GithubSearchCommitsErrors[keyof GithubSearchCommitsErrors];
+
+export type GithubSearchCommitsResponses = {
+    200: ActionResultGithubCommitSearchResults;
+};
+
+export type GithubSearchCommitsResponse = GithubSearchCommitsResponses[keyof GithubSearchCommitsResponses];
+
+export type GithubSearchIssuesAndPullRequestsData = {
+    body: SearchIssuesAndPullRequests;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.search_issues_and_pull_requests';
+};
+
+export type GithubSearchIssuesAndPullRequestsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubSearchIssuesAndPullRequestsError = GithubSearchIssuesAndPullRequestsErrors[keyof GithubSearchIssuesAndPullRequestsErrors];
+
+export type GithubSearchIssuesAndPullRequestsResponses = {
+    200: ActionResultGithubSearchIssueResults;
+};
+
+export type GithubSearchIssuesAndPullRequestsResponse = GithubSearchIssuesAndPullRequestsResponses[keyof GithubSearchIssuesAndPullRequestsResponses];
+
+export type GithubSearchLabelsData = {
+    body: SearchLabels;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.search_labels';
+};
+
+export type GithubSearchLabelsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubSearchLabelsError = GithubSearchLabelsErrors[keyof GithubSearchLabelsErrors];
+
+export type GithubSearchLabelsResponses = {
+    200: ActionResultGithubLabelSearchResults;
+};
+
+export type GithubSearchLabelsResponse = GithubSearchLabelsResponses[keyof GithubSearchLabelsResponses];
+
+export type GithubSearchRepositoriesData = {
+    body: SearchRepositories;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.search_repositories';
+};
+
+export type GithubSearchRepositoriesErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubSearchRepositoriesError = GithubSearchRepositoriesErrors[keyof GithubSearchRepositoriesErrors];
+
+export type GithubSearchRepositoriesResponses = {
+    200: ActionResultGithubRepositorySearchResults;
+};
+
+export type GithubSearchRepositoriesResponse = GithubSearchRepositoriesResponses[keyof GithubSearchRepositoriesResponses];
+
+export type GithubSearchTopicsData = {
+    body: SearchTopics;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.search_topics';
+};
+
+export type GithubSearchTopicsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubSearchTopicsError = GithubSearchTopicsErrors[keyof GithubSearchTopicsErrors];
+
+export type GithubSearchTopicsResponses = {
+    200: ActionResultGithubTopicSearchResults;
+};
+
+export type GithubSearchTopicsResponse = GithubSearchTopicsResponses[keyof GithubSearchTopicsResponses];
+
+export type GithubSearchUsersData = {
+    body: SearchUsers;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.search_users';
+};
+
+export type GithubSearchUsersErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubSearchUsersError = GithubSearchUsersErrors[keyof GithubSearchUsersErrors];
+
+export type GithubSearchUsersResponses = {
+    200: ActionResultGithubUserSearchResults;
+};
+
+export type GithubSearchUsersResponse = GithubSearchUsersResponses[keyof GithubSearchUsersResponses];
+
+export type GithubSetIssueLabelsData = {
+    body: SetIssueLabels;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.set_issue_labels';
+};
+
+export type GithubSetIssueLabelsErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubSetIssueLabelsError = GithubSetIssueLabelsErrors[keyof GithubSetIssueLabelsErrors];
+
+export type GithubSetIssueLabelsResponses = {
+    200: ActionResultVecGithubLabel;
+};
+
+export type GithubSetIssueLabelsResponse = GithubSetIssueLabelsResponses[keyof GithubSetIssueLabelsResponses];
+
+export type GithubStarRepositoryData = {
+    body: StarRepository;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.star_repository';
+};
+
+export type GithubStarRepositoryErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubStarRepositoryError = GithubStarRepositoryErrors[keyof GithubStarRepositoryErrors];
+
+export type GithubStarRepositoryResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubStarRepositoryResponse = GithubStarRepositoryResponses[keyof GithubStarRepositoryResponses];
+
+export type GithubSubmitPullRequestReviewData = {
+    body: SubmitPullRequestReview;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.submit_pull_request_review';
+};
+
+export type GithubSubmitPullRequestReviewErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubSubmitPullRequestReviewError = GithubSubmitPullRequestReviewErrors[keyof GithubSubmitPullRequestReviewErrors];
+
+export type GithubSubmitPullRequestReviewResponses = {
+    200: ActionResultGithubReview;
+};
+
+export type GithubSubmitPullRequestReviewResponse = GithubSubmitPullRequestReviewResponses[keyof GithubSubmitPullRequestReviewResponses];
+
+export type GithubSyncForkBranchWithUpstreamData = {
+    body: SyncForkBranchWithUpstream;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.sync_fork_branch_with_upstream';
+};
+
+export type GithubSyncForkBranchWithUpstreamErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubSyncForkBranchWithUpstreamError = GithubSyncForkBranchWithUpstreamErrors[keyof GithubSyncForkBranchWithUpstreamErrors];
+
+export type GithubSyncForkBranchWithUpstreamResponses = {
+    200: ActionResultGithubForkSync;
+};
+
+export type GithubSyncForkBranchWithUpstreamResponse = GithubSyncForkBranchWithUpstreamResponses[keyof GithubSyncForkBranchWithUpstreamResponses];
+
+export type GithubUnlockIssueData = {
+    body: UnlockIssue;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.unlock_issue';
+};
+
+export type GithubUnlockIssueErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUnlockIssueError = GithubUnlockIssueErrors[keyof GithubUnlockIssueErrors];
+
+export type GithubUnlockIssueResponses = {
+    200: ActionResultGithubIssueLock;
+};
+
+export type GithubUnlockIssueResponse = GithubUnlockIssueResponses[keyof GithubUnlockIssueResponses];
+
+export type GithubUnstarRepositoryData = {
+    body: UnstarRepository;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.unstar_repository';
+};
+
+export type GithubUnstarRepositoryErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUnstarRepositoryError = GithubUnstarRepositoryErrors[keyof GithubUnstarRepositoryErrors];
+
+export type GithubUnstarRepositoryResponses = {
+    200: ActionResultGithubAcknowledgement;
+};
+
+export type GithubUnstarRepositoryResponse = GithubUnstarRepositoryResponses[keyof GithubUnstarRepositoryResponses];
+
+export type GithubUpdateIssueData = {
+    body: UpdateIssue;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.update_issue';
+};
+
+export type GithubUpdateIssueErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUpdateIssueError = GithubUpdateIssueErrors[keyof GithubUpdateIssueErrors];
+
+export type GithubUpdateIssueResponses = {
+    200: ActionResultGithubIssue;
+};
+
+export type GithubUpdateIssueResponse = GithubUpdateIssueResponses[keyof GithubUpdateIssueResponses];
+
+export type GithubUpdateIssueCommentData = {
+    body: UpdateIssueComment;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.update_issue_comment';
+};
+
+export type GithubUpdateIssueCommentErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUpdateIssueCommentError = GithubUpdateIssueCommentErrors[keyof GithubUpdateIssueCommentErrors];
+
+export type GithubUpdateIssueCommentResponses = {
+    200: ActionResultGithubIssueComment;
+};
+
+export type GithubUpdateIssueCommentResponse = GithubUpdateIssueCommentResponses[keyof GithubUpdateIssueCommentResponses];
+
+export type GithubUpdateLabelData = {
+    body: UpdateLabel;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.update_label';
+};
+
+export type GithubUpdateLabelErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUpdateLabelError = GithubUpdateLabelErrors[keyof GithubUpdateLabelErrors];
+
+export type GithubUpdateLabelResponses = {
+    200: ActionResultGithubLabel;
+};
+
+export type GithubUpdateLabelResponse = GithubUpdateLabelResponses[keyof GithubUpdateLabelResponses];
+
+export type GithubUpdateMilestoneData = {
+    body: UpdateMilestone;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.update_milestone';
+};
+
+export type GithubUpdateMilestoneErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUpdateMilestoneError = GithubUpdateMilestoneErrors[keyof GithubUpdateMilestoneErrors];
+
+export type GithubUpdateMilestoneResponses = {
+    200: ActionResultGithubMilestone;
+};
+
+export type GithubUpdateMilestoneResponse = GithubUpdateMilestoneResponses[keyof GithubUpdateMilestoneResponses];
+
+export type GithubUpdatePullRequestData = {
+    body: UpdatePullRequest;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.update_pull_request';
+};
+
+export type GithubUpdatePullRequestErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUpdatePullRequestError = GithubUpdatePullRequestErrors[keyof GithubUpdatePullRequestErrors];
+
+export type GithubUpdatePullRequestResponses = {
+    200: ActionResultGithubPullRequest;
+};
+
+export type GithubUpdatePullRequestResponse = GithubUpdatePullRequestResponses[keyof GithubUpdatePullRequestResponses];
+
+export type GithubUpdatePullRequestBranchData = {
+    body: UpdatePullRequestBranch;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.update_pull_request_branch';
+};
+
+export type GithubUpdatePullRequestBranchErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUpdatePullRequestBranchError = GithubUpdatePullRequestBranchErrors[keyof GithubUpdatePullRequestBranchErrors];
+
+export type GithubUpdatePullRequestBranchResponses = {
+    200: ActionResultGithubPullRequestBranchUpdate;
+};
+
+export type GithubUpdatePullRequestBranchResponse = GithubUpdatePullRequestBranchResponses[keyof GithubUpdatePullRequestBranchResponses];
+
+export type GithubUpdatePullRequestReviewCommentData = {
+    body: UpdatePullRequestReviewComment;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.update_pull_request_review_comment';
+};
+
+export type GithubUpdatePullRequestReviewCommentErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUpdatePullRequestReviewCommentError = GithubUpdatePullRequestReviewCommentErrors[keyof GithubUpdatePullRequestReviewCommentErrors];
+
+export type GithubUpdatePullRequestReviewCommentResponses = {
+    200: ActionResultGithubReviewComment;
+};
+
+export type GithubUpdatePullRequestReviewCommentResponse = GithubUpdatePullRequestReviewCommentResponses[keyof GithubUpdatePullRequestReviewCommentResponses];
+
+export type GithubUpdateRefData = {
+    body: UpdateRef;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.update_ref';
+};
+
+export type GithubUpdateRefErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUpdateRefError = GithubUpdateRefErrors[keyof GithubUpdateRefErrors];
+
+export type GithubUpdateRefResponses = {
+    200: ActionResultGithubGitRef;
+};
+
+export type GithubUpdateRefResponse = GithubUpdateRefResponses[keyof GithubUpdateRefResponses];
+
+export type GithubUpdateReleaseData = {
+    body: UpdateRelease;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.update_release';
+};
+
+export type GithubUpdateReleaseErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUpdateReleaseError = GithubUpdateReleaseErrors[keyof GithubUpdateReleaseErrors];
+
+export type GithubUpdateReleaseResponses = {
+    200: ActionResultGithubRelease;
+};
+
+export type GithubUpdateReleaseResponse = GithubUpdateReleaseResponses[keyof GithubUpdateReleaseResponses];
+
+export type GithubUpdateRepositoryData = {
+    body: UpdateRepository;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/connected-accounts/{id}/actions/github.update_repository';
+};
+
+export type GithubUpdateRepositoryErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type GithubUpdateRepositoryError = GithubUpdateRepositoryErrors[keyof GithubUpdateRepositoryErrors];
+
+export type GithubUpdateRepositoryResponses = {
+    200: ActionResultGithubRepository;
+};
+
+export type GithubUpdateRepositoryResponse = GithubUpdateRepositoryResponses[keyof GithubUpdateRepositoryResponses];
+
 export type LinearListTeamsData = {
     body?: never;
     headers?: {
@@ -943,6 +14620,7 @@ export type LinearListTeamsErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    403: ErrorBody;
     404: ErrorBody;
     /**
      * The request took longer than the server waits
@@ -997,6 +14675,7 @@ export type SlackListChannelsErrors = {
      * A missing or wrong key
      */
     401: ErrorBody;
+    403: ErrorBody;
     404: ErrorBody;
     /**
      * The request took longer than the server waits
@@ -1131,6 +14810,208 @@ export type TriggerEventResponses = {
 };
 
 export type TriggerEventResponse = TriggerEventResponses[keyof TriggerEventResponses];
+
+export type ListTriggersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Only this connection's triggers.
+         */
+        connected_account_id?: string;
+        /**
+         * A batch's `next_cursor`: the batch after it.
+         */
+        after?: string;
+        /**
+         * A batch's `previous_cursor`: the batch before it.
+         */
+        before?: string;
+        limit?: number;
+    };
+    url: '/v1/triggers';
+};
+
+export type ListTriggersErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+};
+
+export type ListTriggersError = ListTriggersErrors[keyof ListTriggersErrors];
+
+export type ListTriggersResponses = {
+    200: ListTrigger;
+};
+
+export type ListTriggersResponse = ListTriggersResponses[keyof ListTriggersResponses];
+
+export type CreateTriggerData = {
+    body: CreateTrigger;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/triggers';
+};
+
+export type CreateTriggerErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    403: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    424: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type CreateTriggerError = CreateTriggerErrors[keyof CreateTriggerErrors];
+
+export type CreateTriggerResponses = {
+    201: Trigger;
+};
+
+export type CreateTriggerResponse = CreateTriggerResponses[keyof CreateTriggerResponses];
+
+export type DeleteTriggerData = {
+    body?: never;
+    headers?: {
+        /**
+         * Runs the request once; a retry gets the first answer
+         */
+        'Idempotency-Key'?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/triggers/{id}';
+};
+
+export type DeleteTriggerErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The first request with this `Idempotency-Key` is still running
+     */
+    409: ErrorBody;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * This `Idempotency-Key` was used for another request
+     */
+    422: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+    502: ErrorBody;
+};
+
+export type DeleteTriggerError = DeleteTriggerErrors[keyof DeleteTriggerErrors];
+
+export type DeleteTriggerResponses = {
+    200: Deleted;
+};
+
+export type DeleteTriggerResponse = DeleteTriggerResponses[keyof DeleteTriggerResponses];
+
+export type RetrieveTriggerData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/triggers/{id}';
+};
+
+export type RetrieveTriggerErrors = {
+    /**
+     * An unknown `Osiris-Version`, or a request that isn't valid
+     */
+    400: ErrorBody;
+    /**
+     * A missing or wrong key
+     */
+    401: ErrorBody;
+    404: ErrorBody;
+    /**
+     * The request took longer than the server waits
+     */
+    408: unknown;
+    /**
+     * The body is larger than the server reads (`OS_10`)
+     */
+    413: ErrorBody;
+    /**
+     * An internal error; the request may be retried
+     */
+    500: ErrorBody;
+};
+
+export type RetrieveTriggerError = RetrieveTriggerErrors[keyof RetrieveTriggerErrors];
+
+export type RetrieveTriggerResponses = {
+    200: Trigger;
+};
+
+export type RetrieveTriggerResponse = RetrieveTriggerResponses[keyof RetrieveTriggerResponses];
 
 export type ReceiveEventWebhookPayload = EventDelivery;
 

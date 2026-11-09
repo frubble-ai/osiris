@@ -8,18 +8,18 @@
     reason = "tests: a failure here is the test failing"
 )]
 
+use super::whoami::{PLAIN, run_whoami};
 use crate::testing::{API_KEY, setup_test_context};
 use axum::http::StatusCode;
 use osiris_domain::EventType;
-use osiris_providers::github::mocks::MockGithubNetwork;
-use osiris_providers::mocks::generate_token_answer::generate_token_answer;
+use osiris_providers::mocks::{MockFakeNetwork, generate_token_answer::generate_token_answer};
 use osiris_tasks::{RefreshReason, Task, TaskPayload, names};
 use serde_json::json;
 use sqlx::PgPool;
 
 /// Makes the provider answer a refresh with `status` and `body`.
 async fn refresh_answers(app: &crate::testing::TestContext, status: u16, body: serde_json::Value) {
-    MockGithubNetwork::on(&app.provider)
+    MockFakeNetwork::on(&app.provider)
         .answer_refresh(status, body)
         .await;
 }
@@ -77,9 +77,7 @@ async fn acknowledges_a_task_for_an_older_generation_as_stale_and_does_nothing(p
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
     // The provider must not be asked to refresh: the test fails if it is.
-    MockGithubNetwork::on(&app.provider)
-        .expect_no_refresh()
-        .await;
+    MockFakeNetwork::on(&app.provider).expect_no_refresh().await;
     let stale = Task {
         name: names::refresh(&id, 0),
         run_at: time::OffsetDateTime::now_utc(),
@@ -115,8 +113,8 @@ async fn acknowledges_a_refresh_for_a_deleted_connection_as_stale(pool: PgPool) 
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
     let task = app.tasks.take(&names::refresh(&id, 1)).unwrap();
-    MockGithubNetwork::on(&app.provider)
-        .answer_revoke(204, None)
+    MockFakeNetwork::on(&app.provider)
+        .answer_revoke(200, None)
         .await;
     let deleted = app
         .send(
@@ -136,7 +134,7 @@ async fn acknowledges_a_refresh_for_a_deleted_connection_as_stale(pool: PgPool) 
 async fn answers_an_error_on_a_temporary_failure_so_the_same_task_runs_again(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
-    MockGithubNetwork::on(&app.provider)
+    MockFakeNetwork::on(&app.provider)
         .answer_refresh_text(503, "Service Unavailable")
         .await;
     let task = app.tasks.take(&names::refresh(&id, 1)).unwrap();
@@ -202,20 +200,11 @@ async fn restores_a_disabled_connection_when_an_action_uses_it(pool: PgPool) {
     app.tasks.fail(true);
     let _ = app.run(&task).await;
     app.tasks.fail(false);
-    MockGithubNetwork::on(&app.provider)
-        .answer_installations(&[])
+    MockFakeNetwork::on(&app.provider)
+        .answer_whoami(json!({ "login": "someone" }))
         .await;
 
-    let answer = app
-        .send(
-            "POST",
-            &format!("/v1/connected-accounts/{id}/actions/github.list_installations"),
-            Some(API_KEY),
-            None,
-            &[],
-        )
-        .await;
-    assert_eq!(answer.status, StatusCode::OK, "{}", answer.body);
+    run_whoami(&app, &id, PLAIN).await.unwrap();
     assert_eq!(app.account(&id).await["status"], "active");
     assert!(app.tasks.get(&names::refresh(&id, 2)).is_some());
 }
@@ -244,8 +233,8 @@ async fn ends_the_connection_on_a_permanent_refusal_with_its_event_and_no_new_ta
 async fn deletes_the_pending_refresh_task_on_disconnect(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let id = app.connected(28800).await;
-    MockGithubNetwork::on(&app.provider)
-        .answer_revoke(204, None)
+    MockFakeNetwork::on(&app.provider)
+        .answer_revoke(200, None)
         .await;
 
     let answer = app
@@ -265,7 +254,7 @@ async fn deletes_the_pending_refresh_task_on_disconnect(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn fails_a_consent_still_open_when_its_expiry_task_runs(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     let (id, _) = app.start_connect(&config).await;
 
     assert!(app.run_pending(&names::consent(&id)).await.is_ok());

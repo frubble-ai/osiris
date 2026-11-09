@@ -1,0 +1,11 @@
+[
+ {
+  "group": "teams",
+  "name": "list_teams",
+  "input": "ListTeams",
+  "output": "LinearTeam",
+  "list": true,
+  "no_input": true,
+  "summary": "every team the connected user can see, archived ones left out."
+ }
+]

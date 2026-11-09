@@ -1,0 +1,66 @@
+{
+  "steps": [
+    {
+      "answer": {
+        "body": {
+          "data": [
+            {
+              "account": "golden-org",
+              "account_type": "organization",
+              "app_slug": "golden-app",
+              "created_at": "<time>",
+              "events": [
+                "push"
+              ],
+              "id": "7",
+              "permissions": {
+                "contents": "read",
+                "metadata": "read"
+              },
+              "repository_selection": "selected",
+              "suspended_at": null,
+              "updated_at": "<time>"
+            }
+          ]
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 200
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "api",
+        "method": "POST",
+        "path": "/v1/connected-accounts/<ca_1>/actions/github.list_installations"
+      }
+    },
+    {
+      "answer": {
+        "body": {
+          "error": {
+            "code": "OS_02",
+            "message": "github.list_installations runs on a github connection; <ca_2> is fake",
+            "type": "invalid_request"
+          }
+        },
+        "headers": {
+          "osiris-stability": "preview",
+          "osiris-version": "2026-11-04.anubis"
+        },
+        "status": 400
+      },
+      "events": [],
+      "request": {
+        "body": null,
+        "headers": [],
+        "key": "api",
+        "method": "POST",
+        "path": "/v1/connected-accounts/<ca_2>/actions/github.list_installations"
+      }
+    }
+  ]
+}

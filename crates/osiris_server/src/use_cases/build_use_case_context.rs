@@ -23,12 +23,9 @@ use std::{sync::Arc, time::Duration};
 pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCaseContext> {
     let settings = &config.settings;
     let master = MasterKey::from_secret(config.encryption_key.expose_secret())?;
-    let providers = &settings.providers;
     let providers = Providers::new(
-        &providers.github.urls()?,
-        &providers.linear.urls()?,
-        &providers.slack.urls()?,
-        providers.listing.limits(),
+        |registration| settings.providers.urls(registration),
+        settings.providers.listing.limits(),
     )?;
     // The three connections are independent, so a cold start opens them at once.
     // Boxed: the three connections' futures together are large.
@@ -45,12 +42,14 @@ pub async fn build_use_case_context(config: Arc<Config>) -> anyhow::Result<UseCa
     })
     .await?;
     settings.refresh.check_against(tasks.max_lead_time())?;
+    settings.triggers.check_against(tasks.max_lead_time())?;
     Ok(UseCaseContext {
         db: Db::new(pool, master, settings.database.lock_timeout()),
         messages: build_message_bus(Arc::new(transport), RELEASES, &settings.api.pinned_version)?,
         tasks,
         providers: Arc::new(providers),
         http: settings.http.client()?,
+        installation_tokens: Arc::default(),
         config,
     })
 }

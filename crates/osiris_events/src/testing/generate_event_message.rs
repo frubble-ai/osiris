@@ -16,5 +16,8 @@ pub fn generate_event_message() -> EventMessage {
             .get((0..types.len()).fake::<usize>())
             .unwrap_or(&EventType::ConnectionActive),
         connected_account_id: format!("ca_{}", 16.fake::<String>()),
+        trigger_id: None,
+        trigger: None,
+        data: None,
     }
 }

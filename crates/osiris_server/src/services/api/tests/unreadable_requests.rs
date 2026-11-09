@@ -12,7 +12,8 @@ use axum::{
     http::{Request, StatusCode},
 };
 use http_body_util::BodyExt;
-use serde_json::Value;
+use osiris_providers::mocks::FAKE_ID;
+use serde_json::{Value, json};
 use sqlx::PgPool;
 use tower::ServiceExt;
 
@@ -24,7 +25,7 @@ async fn refuses_a_body_sent_without_a_json_content_type(pool: PgPool) {
         .uri("/v1/auth-configs")
         .header("authorization", format!("Bearer {ADMIN_KEY}"))
         .body(Body::from(
-            r#"{"provider":"github","client_id":"c","client_secret":"s"}"#,
+            json!({ "provider": FAKE_ID, "client_id": "c", "client_secret": "s" }).to_string(),
         ))
         .unwrap();
 
@@ -49,27 +50,25 @@ async fn names_why_a_body_or_a_query_cannot_be_read(pool: PgPool) {
             "POST",
             "/v1/auth-configs",
             ADMIN_KEY,
-            "not json",
+            "not json".to_owned(),
             "the body is not valid JSON",
         ),
         (
             "POST",
             "/v1/auth-configs",
             ADMIN_KEY,
-            r#"{"provider":"github"}"#,
+            json!({ "provider": FAKE_ID }).to_string(),
             "the body does not match the request: a field is missing or has the wrong type",
         ),
         (
             "GET",
             "/v1/connected-accounts?limit=abc",
             API_KEY,
-            "",
+            String::new(),
             "the query does not match the request: a parameter has the wrong type",
         ),
     ] {
-        let refused = app
-            .send_raw(method, path, Some(key), body.to_owned(), &[])
-            .await;
+        let refused = app.send_raw(method, path, Some(key), body, &[]).await;
 
         assert_eq!(refused.status, StatusCode::BAD_REQUEST, "{path}");
         assert_eq!(refused.body["error"]["code"], "OS_02", "{path}");
@@ -81,7 +80,8 @@ async fn names_why_a_body_or_a_query_cannot_be_read(pool: PgPool) {
 async fn refuses_a_json_body_too_large_as_os_10_with_its_413(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let padding = "x".repeat(app.config.settings.server.max_body());
-    let body = format!(r#"{{"provider":"github","client_id":"{padding}","client_secret":"s"}}"#);
+    let body =
+        json!({ "provider": FAKE_ID, "client_id": padding, "client_secret": "s" }).to_string();
 
     let refused = app
         .send_raw("POST", "/v1/auth-configs", Some(ADMIN_KEY), body, &[])

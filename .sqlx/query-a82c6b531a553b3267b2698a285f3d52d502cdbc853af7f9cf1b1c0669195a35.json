@@ -1,0 +1,274 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, auth_config_id, provider, user_id, alias, status, credential_kind, installation_id, callback_url, access_token, refresh_token, access_token_expires_at, refresh_token_issued_at, scope, last_refresh_error, refresh_failures, token_generation, refresh_task, refresh_task_at, created_at, updated_at FROM connected_account\n             WHERE ($1::text IS NULL OR user_id = $1)\n               AND ($2::text IS NULL OR provider = $2)\n               AND ($3::text IS NULL OR auth_config_id = $3)\n               AND ($4::text IS NULL OR alias = $4)\n               AND ($5::text IS NULL OR status = $5)\n               AND (created_at, id) < (SELECT created_at, id FROM connected_account WHERE id = $6)\n             ORDER BY created_at DESC, id DESC\n             LIMIT $7",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "auth_config_id",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "auth_config_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "provider",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "provider"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "user_id",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "alias",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "alias"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "credential_kind",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "credential_kind"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "installation_id",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "installation_id"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "callback_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "callback_url"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "access_token",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "access_token"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "refresh_token",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "refresh_token"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "access_token_expires_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "access_token_expires_at"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "refresh_token_issued_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "refresh_token_issued_at"
+          }
+        }
+      },
+      {
+        "ordinal": 13,
+        "name": "scope",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "scope"
+          }
+        }
+      },
+      {
+        "ordinal": 14,
+        "name": "last_refresh_error",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "last_refresh_error"
+          }
+        }
+      },
+      {
+        "ordinal": 15,
+        "name": "refresh_failures",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "refresh_failures"
+          }
+        }
+      },
+      {
+        "ordinal": 16,
+        "name": "token_generation",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "token_generation"
+          }
+        }
+      },
+      {
+        "ordinal": 17,
+        "name": "refresh_task",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "refresh_task"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
+        "name": "refresh_task_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "refresh_task_at"
+          }
+        }
+      },
+      {
+        "ordinal": 19,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 20,
+        "name": "updated_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "connected_account",
+            "name": "updated_at"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "a82c6b531a553b3267b2698a285f3d52d502cdbc853af7f9cf1b1c0669195a35"
+}

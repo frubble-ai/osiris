@@ -4,7 +4,7 @@ use super::decrypt;
 use crate::use_cases::UseCaseResult;
 use osiris_common::{crypto::Cipher, secret::secret};
 use osiris_domain::DomainError;
-use osiris_domain::{ConnectedAccount, ConnectionStatus, TokenSet};
+use osiris_domain::{ConnectedAccount, ConnectionStatus, CredentialKind, TokenSet};
 use time::OffsetDateTime;
 
 pub struct AccountRow {
@@ -14,6 +14,8 @@ pub struct AccountRow {
     pub user_id: String,
     pub alias: Option<String>,
     pub status: String,
+    pub credential_kind: String,
+    pub installation_id: Option<String>,
     pub callback_url: String,
     pub access_token: Option<Vec<u8>>,
     pub refresh_token: Option<Vec<u8>>,
@@ -47,6 +49,9 @@ impl AccountRow {
         };
         Ok(ConnectedAccount {
             status: ConnectionStatus::parse(&self.status).ok_or(DomainError::Internal)?,
+            credential_kind: CredentialKind::parse(&self.credential_kind)
+                .ok_or(DomainError::Internal)?,
+            installation_id: self.installation_id,
             id: self.id,
             auth_config_id: self.auth_config_id,
             provider: self.provider,

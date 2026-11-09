@@ -1,4 +1,4 @@
-//! `osiris auth-configs create --provider github --client-id … --client-secret …`.
+//! `osiris auth-configs create --provider <provider> --client-id … --client-secret …`.
 
 use crate::{
     client::{Client, Key, print},

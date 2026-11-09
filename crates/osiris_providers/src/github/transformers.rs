@@ -1,78 +1,57 @@
-//! GitHub's answers as it sends them, and into our types.
+//! GitHub's answers as it sends them, one file per resource, each turned into our type.
 
-use super::types::{GithubInstallation, GithubRepository};
-use serde::Deserialize;
-
-/// A page of `GET /user/installations`.
-#[derive(Deserialize)]
-pub struct InstallationsPage {
-    pub total_count: u64,
-    pub installations: Vec<InstallationAnswer>,
-}
-
-#[derive(Deserialize)]
-pub struct InstallationAnswer {
-    id: u64,
-    account: AccountAnswer,
-    /// `all` or `selected` today, passed on as GitHub sends it.
-    repository_selection: String,
-}
-
-#[derive(Deserialize)]
-struct AccountAnswer {
-    login: String,
-    #[serde(rename = "type")]
-    kind: String,
-}
-
-/// A page of `GET /user/installations/{id}/repositories`.
-#[derive(Deserialize)]
-pub struct RepositoriesPage {
-    pub total_count: u64,
-    pub repositories: Vec<RepositoryAnswer>,
-}
-
-#[derive(Deserialize)]
-pub struct RepositoryAnswer {
-    pub id: u64,
-    full_name: String,
-    private: bool,
-    html_url: String,
-    description: Option<String>,
-}
-
-impl From<InstallationAnswer> for GithubInstallation {
-    /// The installation in our terms, its account type and selection passed on as open strings.
-    fn from(answer: InstallationAnswer) -> Self {
-        Self {
-            id: answer.id.to_string(),
-            account: answer.account.login,
-            account_type: account_type(&answer.account.kind),
-            repository_selection: answer.repository_selection,
-        }
-    }
-}
-
-impl From<RepositoryAnswer> for GithubRepository {
-    /// The repository in our terms.
-    fn from(answer: RepositoryAnswer) -> Self {
-        Self {
-            id: answer.id.to_string(),
-            full_name: answer.full_name,
-            private: answer.private,
-            url: answer.html_url,
-            description: answer.description,
-        }
-    }
-}
-
-/// GitHub's account `type` in our words: `User` and `Organization` as `user` and `organization`.
-/// `Enterprise` holds organizations, so it reads as one; any other type GitHub adds is passed on in
-/// lower case, since the field is an open string.
-fn account_type(kind: &str) -> String {
-    match kind {
-        "User" => "user".to_owned(),
-        "Organization" | "Enterprise" => "organization".to_owned(),
-        other => other.to_ascii_lowercase(),
-    }
-}
+pub mod acknowledgement;
+pub mod artifact;
+pub mod artifacts_page;
+pub mod branch;
+pub mod check_run;
+pub mod check_runs_page;
+pub mod collaborator;
+pub mod collaborator_addition;
+pub mod combined_status;
+pub mod commit;
+pub mod commit_comment;
+pub mod commit_comparison;
+pub mod commit_status;
+pub mod content;
+pub mod contributor;
+pub mod event;
+pub mod event_details;
+pub mod fork_sync;
+pub mod git_ref;
+pub mod installation;
+pub mod issue;
+pub mod issue_comment;
+pub mod issue_event;
+pub mod label;
+pub mod language;
+pub mod merge_result;
+pub mod milestone;
+pub mod public_user;
+pub mod pull_request;
+pub mod pull_request_branch_update;
+pub mod pull_request_file;
+pub mod reaction;
+pub mod reactions;
+pub mod release;
+pub mod release_asset;
+pub mod repository;
+pub mod repository_permission;
+pub mod requested_reviewers;
+pub mod review;
+pub mod review_comment;
+pub mod review_request;
+pub mod search;
+pub mod search_issue_results;
+pub mod search_results;
+pub mod tag;
+pub mod team;
+pub mod timeline_event;
+pub mod topics;
+pub mod user;
+pub mod workflow;
+pub mod workflow_job;
+pub mod workflow_jobs_page;
+pub mod workflow_run;
+pub mod workflow_runs_page;
+pub mod workflows_page;

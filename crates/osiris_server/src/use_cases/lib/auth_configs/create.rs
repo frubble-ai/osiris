@@ -14,15 +14,21 @@ impl Db {
     pub async fn create_auth_config(&self, new: NewAuthConfig) -> UseCaseResult<AuthConfig> {
         let cipher = self.cipher_for(&Tenant::Osiris).await?;
         let secret = encrypt(&cipher, new.client_secret.expose_secret())?;
+        let secret_settings = new
+            .secret_settings
+            .map(|settings| encrypt(&cipher, settings.expose_secret()))
+            .transpose()?;
         sqlx::query_as!(
             AuthConfigRow,
-            "INSERT INTO auth_config (id, provider, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)
-             RETURNING id, provider, client_id, client_secret, scopes, created_at, updated_at",
+            "INSERT INTO auth_config (id, provider, client_id, client_secret, scopes, settings, secret_settings) VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING id, provider, client_id, client_secret, scopes, settings, secret_settings, created_at, updated_at",
             ids::id("ac"),
             new.provider,
             new.client_id,
             secret,
             &new.scopes,
+            new.settings,
+            secret_settings,
         )
         .fetch_one(&self.pool)
         .await

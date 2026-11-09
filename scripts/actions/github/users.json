@@ -1,0 +1,18 @@
+[
+ {
+  "group": "users",
+  "name": "get_current_user",
+  "input": "GetCurrentUser",
+  "output": "GithubCurrentUser",
+  "no_input": true,
+  "summary": "the authenticated user and their profile.",
+  "user_only": true
+ },
+ {
+  "group": "users",
+  "name": "get_user",
+  "input": "GetUser",
+  "output": "GithubPublicUser",
+  "summary": "a user's public profile, by login."
+ }
+]

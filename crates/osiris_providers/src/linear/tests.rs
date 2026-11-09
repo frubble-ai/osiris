@@ -8,6 +8,7 @@
 use super::{
     Linear,
     mocks::{MockLinearNetwork, generate_linear_team::generate_linear_team},
+    teams::ListTeams,
 };
 use crate::{ListLimits, OAuthClient, Provider, ProviderError, ProviderUrls};
 use rstest::rstest;
@@ -29,6 +30,8 @@ fn linear_capped_at(server: &MockServer, max_items: usize) -> Linear {
         ListLimits {
             concurrency: 2,
             max_items,
+            max_log_bytes: 262_144,
+            max_scan_pages: 10,
         },
     )
     .unwrap()
@@ -47,7 +50,7 @@ async fn lists_teams_across_pages() {
         .await;
 
     let teams = linear(&server)
-        .list_teams(&reqwest::Client::new(), "token")
+        .list_teams(&reqwest::Client::new(), "token", &ListTeams {})
         .await
         .unwrap();
 
@@ -71,7 +74,7 @@ async fn reads_an_authentication_error_beside_a_200_as_a_rejected_token() {
         .await;
 
     let error = linear(&server)
-        .list_teams(&reqwest::Client::new(), "token")
+        .list_teams(&reqwest::Client::new(), "token", &ListTeams {})
         .await
         .unwrap_err();
 
@@ -91,7 +94,7 @@ async fn stops_reading_teams_at_the_cap() {
         .await;
 
     let listed = linear_capped_at(&server, 2)
-        .list_teams(&reqwest::Client::new(), "token")
+        .list_teams(&reqwest::Client::new(), "token", &ListTeams {})
         .await
         .unwrap();
 

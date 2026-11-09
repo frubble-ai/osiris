@@ -81,6 +81,12 @@ jobs:
           tool: typos,cocogitto
       - name: Spelling
         run: typos
+      - name: The actions are what the generator writes
+        run: python3 scripts/actions/check.py
+      - name: No provider named outside its folders
+        run: |
+          python3 -m unittest scripts/test_placement_check.py
+          python3 scripts/placement-check.py
       - name: Every commit is a Conventional Commit
         if: github.event_name == 'pull_request'
         env:

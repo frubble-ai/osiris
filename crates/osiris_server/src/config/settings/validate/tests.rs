@@ -1,6 +1,7 @@
 //! `validate` refuses each setting that can't work, naming it.
 
-use super::super::Settings;
+use super::super::{Settings, providers::ProviderUrlSettings};
+use osiris_providers::REGISTRATIONS;
 use rstest::rstest;
 
 fn broken(change: impl FnOnce(&mut Settings)) -> String {
@@ -25,6 +26,17 @@ fn accepts_more_concurrent_tasks_than_connections() {
 #[rstest]
 #[case::a_zero_value("server.max_body_bytes", |settings: &mut Settings| settings.server.max_body_bytes = 0)]
 #[case::a_zero_timeout("http.timeout_seconds", |settings: &mut Settings| settings.http.timeout_seconds = 0)]
+#[case::a_zero_check_interval("triggers.check_seconds", |settings: &mut Settings| settings.triggers.check_seconds = 0)]
+#[case::no_delivery_size("triggers.max_delivery_bytes", |settings: &mut Settings| settings.triggers.max_delivery_bytes = 0)]
+#[case::no_delivery_at_once("triggers.max_concurrent_deliveries", |settings: &mut Settings| settings.triggers.max_concurrent_deliveries = 0)]
+#[case::no_event_data("triggers.max_event_data_bytes", |settings: &mut Settings| settings.triggers.max_event_data_bytes = 0)]
+#[case::no_time_to_read_a_delivery("triggers.delivery_read_seconds", |settings: &mut Settings| settings.triggers.delivery_read_seconds = 0)]
+#[case::no_token_margin(
+    "providers.installation_tokens.margin_seconds",
+    |settings: &mut Settings| settings.providers.installation_tokens.margin_seconds = 0
+)]
+#[case::no_log_bytes("providers.listing.max_log_bytes", |settings: &mut Settings| settings.providers.listing.max_log_bytes = 0)]
+#[case::no_scan_pages("providers.listing.max_scan_pages", |settings: &mut Settings| settings.providers.listing.max_scan_pages = 0)]
 #[case::a_short_consent_state("consent.state_length", |settings: &mut Settings| settings.consent.state_length = 31)]
 #[case::more_tasks_than_a_semaphore_holds(
     "tasks.max_concurrent",
@@ -44,10 +56,6 @@ fn accepts_more_concurrent_tasks_than_connections() {
     |settings: &mut Settings| settings.api.support_days = 999_999_999_999_999
 )]
 #[case::an_unknown_api_version("api.pinned_version", |settings: &mut Settings| settings.api.pinned_version = "1999-01-01.nope".into())]
-#[case::a_provider_url_that_is_not_a_url(
-    "providers.github",
-    |settings: &mut Settings| settings.providers.github.api_base_url = "not a url".into()
-)]
 fn refuses_a_setting_that_cannot_work_naming_it(
     #[case] name: &str,
     #[case] change: fn(&mut Settings),
@@ -63,4 +71,32 @@ fn saturates_a_support_window_too_long_to_compute_instead_of_overflowing() {
     settings.api.support_days = u64::MAX;
 
     assert_eq!(settings.api.support(), time::Duration::MAX);
+}
+
+#[test]
+fn refuses_a_provider_url_that_is_not_a_url_naming_its_provider() {
+    let id = REGISTRATIONS[0].id;
+    let error = broken(|settings| {
+        settings.providers.at.insert(
+            id.to_owned(),
+            ProviderUrlSettings {
+                oauth_base_url: None,
+                api_base_url: Some("not a url".into()),
+            },
+        );
+    });
+
+    assert!(error.contains(&format!("providers.{id}")), "{error}");
+}
+
+#[test]
+fn refuses_a_section_that_is_no_provider() {
+    let error = broken(|settings| {
+        settings
+            .providers
+            .at
+            .insert("listng".into(), ProviderUrlSettings::default());
+    });
+
+    assert!(error.contains("providers.listng"), "{error}");
 }

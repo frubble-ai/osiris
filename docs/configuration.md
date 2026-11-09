@@ -45,7 +45,7 @@ already started finish for at most `[server] shutdown_grace_seconds` (8), then e
 | `RUST_LOG` | all | the log filter, `info` when unset |
 | `OSIRIS__<SECTION>__<KEY>` | all | changes one setting (see Settings below) |
 | `OSIRIS_EVENTS_PUSH_ENDPOINT` | locally (docker-compose's `pubsub-setup`) | where the emulator pushes events; empty means nowhere |
-| `OSIRIS_LIVE_GITHUB_TOKEN`, `OSIRIS_LIVE_LINEAR_TOKEN`, `OSIRIS_LIVE_SLACK_TOKEN` | the live provider tests (`live.yml`) | a real access token per provider; a test without its token is skipped locally and fails in CI |
+| `OSIRIS_LIVE_<ID>_TOKEN` | the live provider tests (`live.yml`) | a real access token per provider, named on its page in [providers](providers.md); a test without its token is skipped locally and fails in CI |
 
 A required variable that is missing or malformed stops the process at startup, naming it.
 
@@ -114,7 +114,7 @@ same CA. Osiris does not read it.
   services. The process takes a session advisory lock and runs the drop and the migrations on
   that same connection, which it keeps open until it exits. A second execution waits for the
   lock before it drops or migrates. If PostgreSQL closes the session, the lock and the work
-  stop together. GitHub kills a cancelled job's cleanup after five minutes, which releases the
+  stop together. The CI runner kills a cancelled job's cleanup after five minutes, which releases the
   workflow's concurrency group; the lock is what still keeps the next execution off the schema
   while the earlier one is running.
 - The database: the `DB_*` variables, `DB_PASSWORD` from Secret Manager and `DB_CA_PEM` the Cloud

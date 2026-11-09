@@ -7,6 +7,7 @@ mod connect;
 mod drop_owned;
 mod exclude;
 mod migrate;
+pub(crate) mod register_providers;
 
 pub use connect::connect;
 pub(crate) use drop_owned::drop_owned;

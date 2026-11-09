@@ -9,6 +9,10 @@ pub enum DomainError {
     Invalid(String),
     #[error("{0}")]
     Conflict(String),
+    /// The provider has no such item (it answered 404): the caller asked for something that isn't
+    /// there, or that the connection can't see.
+    #[error("the provider has no such item: {0}")]
+    ProviderNotFound(String),
     /// The provider refused: the user may have to reconnect.
     #[error("the provider refused: {0}")]
     ProviderRefused(String),
@@ -17,6 +21,9 @@ pub enum DomainError {
     ProviderUnavailable(String),
     #[error("the connection is {0}: reconnect it")]
     NotActive(&'static str),
+    /// The connection wasn't granted a scope the action needs; reconnecting with it fixes that.
+    #[error("the connection lacks the scopes this action needs: {0}")]
+    MissingScopes(String),
     #[error("an internal error")]
     Internal,
 }

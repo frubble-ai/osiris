@@ -10,13 +10,14 @@ use crate::testing::db_fixtures::generate_secret;
 use crate::testing::generate_connect_attempt::generate_connect_attempt;
 use crate::testing::{ADMIN_KEY, API_KEY, setup_test_context};
 use axum::http::StatusCode;
+use osiris_providers::mocks::FAKE_ID;
 use serde_json::{Value, json};
 use sqlx::PgPool;
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn manages_auth_configs_without_ever_returning_the_secret(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let id = app.github_config().await;
+    let id = app.fake_config().await;
 
     let read = app
         .send(
@@ -28,7 +29,7 @@ async fn manages_auth_configs_without_ever_returning_the_secret(pool: PgPool) {
         )
         .await;
     assert_eq!(read.status, StatusCode::OK);
-    assert_eq!(read.body["provider"], "github");
+    assert_eq!(read.body["provider"], FAKE_ID);
     assert!(read.body.get("client_secret").is_none());
 
     let client_id = generate_secret("client");
@@ -77,7 +78,7 @@ async fn manages_auth_configs_without_ever_returning_the_secret(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_to_delete_an_auth_config_a_connection_uses(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
     app.start_connect(&config).await;
     let answer = app
         .send(
@@ -99,7 +100,7 @@ async fn answers_an_invalid_request_with_os_02(
     body: impl FnOnce(&str) -> Value,
 ) {
     let app = setup_test_context(pool).await;
-    let config = app.github_config().await;
+    let config = app.fake_config().await;
 
     let answer = app
         .send("POST", route, Some(key), Some(body(&config)), &[])
@@ -127,7 +128,7 @@ async fn refuses_an_empty_client_secret(pool: PgPool) {
         pool,
         "/v1/auth-configs",
         ADMIN_KEY,
-        |_| json!({ "provider": "github", "client_id": "c", "client_secret": "" }),
+        |_| json!({ "provider": FAKE_ID, "client_id": "c", "client_secret": "" }),
     )
     .await;
 }
@@ -135,7 +136,7 @@ async fn refuses_an_empty_client_secret(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_a_blank_client_id_on_update(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let id = app.github_config().await;
+    let id = app.fake_config().await;
     let answer = app
         .send(
             "PATCH",
@@ -152,7 +153,7 @@ async fn refuses_a_blank_client_id_on_update(pool: PgPool) {
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
 async fn refuses_a_blank_client_secret_on_update(pool: PgPool) {
     let app = setup_test_context(pool).await;
-    let id = app.github_config().await;
+    let id = app.fake_config().await;
     let answer = app
         .send(
             "PATCH",
@@ -180,6 +181,20 @@ async fn refuses_a_callback_that_is_not_http(pool: PgPool) {
 async fn refuses_a_blank_user(pool: PgPool) {
     answers_an_invalid_request_with_os_02(pool, "/v1/connected-accounts", API_KEY, |config| {
         json!({ "auth_config_id": config, "user_id": " ", "callback_url": "http://app.test/cb" })
+    })
+    .await;
+}
+
+#[sqlx::test(migrator = "crate::db::MIGRATOR")]
+async fn refuses_settings_a_provider_does_not_read(pool: PgPool) {
+    answers_an_invalid_request_with_os_02(pool, "/v1/auth-configs", ADMIN_KEY, |_| {
+        json!({
+            "provider": FAKE_ID,
+            "client_id": "c",
+            "client_secret": "s",
+            "settings": { "anything": true },
+            "secret_settings": {},
+        })
     })
     .await;
 }

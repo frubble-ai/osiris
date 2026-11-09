@@ -14,6 +14,7 @@ pub mod refresh;
 pub mod seconds;
 pub mod server;
 pub mod tasks;
+pub mod triggers;
 pub mod validate;
 
 pub use all::Settings;

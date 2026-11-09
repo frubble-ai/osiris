@@ -7,6 +7,7 @@ pub mod find;
 pub mod list;
 pub mod types;
 pub mod update;
+pub mod validated_settings;
 
 pub use types::{AuthConfigChanges, NewAuthConfig};
 

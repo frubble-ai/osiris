@@ -1,19 +1,21 @@
 //! A provider's app through its whole life: registered, read, listed, updated, deleted, and gone.
 
+use crate::testing::TestContext;
 use crate::testing::golden::{GoldenSession, Key};
+use osiris_providers::mocks::FAKE_ID;
 use serde_json::json;
 
-pub async fn run(session: &mut GoldenSession<'_>) {
+pub async fn run(_app: &TestContext, session: &mut GoldenSession<'_>) {
     let created = session
         .send(
             "POST",
             "/v1/auth-configs",
             Key::Admin,
             Some(json!({
-                "provider": "github",
-                "client_id": "golden-github-app",
-                "client_secret": "golden-github-secret",
-                "scopes": ["repo"],
+                "provider": FAKE_ID,
+                "client_id": "golden-app",
+                "client_secret": "golden-secret",
+                "scopes": ["read"],
             })),
             &[],
         )
@@ -29,10 +31,12 @@ pub async fn run(session: &mut GoldenSession<'_>) {
             "PATCH",
             &one,
             Key::Admin,
-            Some(json!({ "scopes": ["repo", "read:org"] })),
+            Some(json!({ "scopes": ["read", "write"] })),
             &[],
         )
         .await;
     session.send("DELETE", &one, Key::Admin, None, &[]).await;
     session.send("GET", &one, Key::Admin, None, &[]).await;
 }
+
+golden!("auth_configs", run);

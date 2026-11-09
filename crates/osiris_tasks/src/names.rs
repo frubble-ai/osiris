@@ -18,6 +18,11 @@ pub fn consent(connected_account_id: &str) -> String {
     format!("consent-expire-{connected_account_id}")
 }
 
+/// A trigger's scheduled check number `check`, one name per check.
+pub fn trigger_poll(trigger_id: &str, check: i64) -> String {
+    format!("trigger-poll-{trigger_id}-{check}")
+}
+
 /// The task that publishes an event again.
 pub fn event(event_id: &str) -> String {
     format!("event-publish-{event_id}")

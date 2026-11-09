@@ -1,19 +1,30 @@
 //! `/v1/auth-configs`.
 
+use crate::secret_settings::SecretSettings;
 use osiris_common::secret::Secret;
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct CreateAuthConfig {
-    /// A provider osiris implements: `github`, `linear` or `slack`.
+    /// A provider osiris implements, by its id.
     pub provider: String,
     pub client_id: String,
     #[schema(value_type = String)]
     pub client_secret: Secret,
     #[serde(default)]
     pub scopes: Vec<String>,
+    /// The provider's own settings for the app, which it validates; answered back. An app that
+    /// acts as its installations names itself here, as its provider's documentation says.
+    #[serde(default)]
+    #[schema(value_type = Object)]
+    pub settings: Map<String, Value>,
+    /// The provider's own secret settings for the app, never answered. An app that acts as its
+    /// installations puts the key it signs with here, as its provider's documentation says.
+    #[schema(value_type = Option<Object>)]
+    pub secret_settings: Option<SecretSettings>,
 }
 
 #[derive(Debug, Default, Deserialize, ToSchema)]
@@ -22,6 +33,12 @@ pub struct UpdateAuthConfig {
     #[schema(value_type = Option<String>)]
     pub client_secret: Option<Secret>,
     pub scopes: Option<Vec<String>>,
+    /// Replaces the app's settings, when given.
+    #[schema(value_type = Option<Object>)]
+    pub settings: Option<Map<String, Value>>,
+    /// Replaces the app's secret settings, when given.
+    #[schema(value_type = Option<Object>)]
+    pub secret_settings: Option<SecretSettings>,
 }
 
 /// An auth config, without its secret.
@@ -32,6 +49,11 @@ pub struct AuthConfig {
     pub provider: String,
     pub client_id: String,
     pub scopes: Vec<String>,
+    /// The provider's own settings for the app; an empty object when it has none.
+    #[schema(value_type = Object)]
+    pub settings: Value,
+    /// Whether the app has secret settings (which are never answered).
+    pub has_secret_settings: bool,
     #[serde(with = "time::serde::rfc3339")]
     #[schema(value_type = String, format = DateTime)]
     pub created_at: OffsetDateTime,
@@ -47,6 +69,8 @@ impl From<osiris_domain::AuthConfig> for AuthConfig {
             provider: config.provider,
             client_id: config.client_id,
             scopes: config.scopes,
+            settings: config.settings,
+            has_secret_settings: config.secret_settings.is_some(),
             created_at: config.created_at,
             updated_at: config.updated_at,
         }

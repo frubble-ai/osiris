@@ -1,25 +1,30 @@
 //! Runs an action with a connection's token. A rejected token is refreshed once and the action run
 //! again; rejected still, or with nothing to refresh it with, the grant is gone and the connection
-//! is revoked.
+//! is revoked. An installation connection's rejected token is minted again instead, and tried once.
 
 use crate::use_cases::{
     UseCaseResult, UseCases,
     cases::{
         connected_account_token::ConnectedAccountTokenArgs,
+        get_connected_account::GetConnectedAccountArgs,
         refresh_connected_account::RefreshConnectedAccountArgs,
         revoke_connected_account::RevokeConnectedAccountArgs,
     },
     lib::{refresh::When, shared::domain_errors::provider},
 };
 use osiris_common::secret::Secret;
-use osiris_domain::{ConnectionStatus, DomainError};
-use osiris_interfaces::ProviderError;
+use osiris_domain::{ConnectionStatus, CredentialKind, DomainError};
+use osiris_interfaces::{ActingAs, ProviderError};
 
 pub struct RunConnectedAccountActionArgs<'a, F> {
     pub id: &'a str,
     pub provider: &'a str,
     pub action: &'a str,
-    /// The provider call, given the token.
+    /// The scopes the action needs, checked before the call.
+    pub required_scopes: &'a [&'a str],
+    /// The action only works as a user: refused on an installation connection before the call.
+    pub user_only: bool,
+    /// The provider call, given the token and what it acts as.
     pub call: F,
 }
 
@@ -29,7 +34,7 @@ impl UseCases {
         args: RunConnectedAccountActionArgs<'_, F>,
     ) -> UseCaseResult<T>
     where
-        F: Fn(Secret) -> Fut,
+        F: Fn(Secret, ActingAs) -> Fut,
         Fut: Future<Output = Result<T, ProviderError>>,
     {
         self.run("run_connected_account_action", async {
@@ -37,20 +42,57 @@ impl UseCases {
                 id,
                 provider: provider_id,
                 action,
+                required_scopes,
+                user_only,
                 call,
             } = args;
-            let token = self
+            let (token, acting) = self
                 .connected_account_token(ConnectedAccountTokenArgs {
                     id,
                     provider: provider_id,
                     action,
+                    required_scopes,
+                    user_only,
                 })
                 .await?;
-            let first = match call(token).await {
+            let first = match call(token, acting).await {
                 Ok(answer) => return Ok(answer),
                 Err(ProviderError::Unauthorized { message, .. }) => message,
                 Err(error) => return Err(provider(error)),
             };
+            let current = self
+                .get_connected_account(GetConnectedAccountArgs { id })
+                .await?;
+            if current.credential_kind == CredentialKind::AppInstallation {
+                // The installation's token was refused: a new one is minted and tried once. Refused
+                // still, the app no longer acts as the installation (uninstalled or suspended).
+                if let Some(installation_id) = current.installation_id.as_deref() {
+                    self.context()
+                        .installation_tokens
+                        .forget(&current.auth_config_id, installation_id);
+                }
+                let (token, acting) = self
+                    .connected_account_token(ConnectedAccountTokenArgs {
+                        id,
+                        provider: provider_id,
+                        action,
+                        required_scopes,
+                        user_only,
+                    })
+                    .await?;
+                return match call(token, acting).await {
+                    Ok(answer) => Ok(answer),
+                    Err(ProviderError::Unauthorized { message, .. }) => {
+                        self.revoke_connected_account(RevokeConnectedAccountArgs {
+                            id,
+                            reason: &message,
+                        })
+                        .await?;
+                        Err(DomainError::NotActive("expired").into())
+                    }
+                    Err(error) => Err(provider(error)),
+                };
+            }
             let account = self
                 .refresh_connected_account(RefreshConnectedAccountArgs {
                     id,
@@ -71,7 +113,7 @@ impl UseCases {
                     .await?;
                 return Err(DomainError::NotActive("expired").into());
             };
-            match call(tokens.access_token).await {
+            match call(tokens.access_token, ActingAs::User).await {
                 Ok(answer) => Ok(answer),
                 Err(ProviderError::Unauthorized { message, .. }) => {
                     self.revoke_connected_account(RevokeConnectedAccountArgs {

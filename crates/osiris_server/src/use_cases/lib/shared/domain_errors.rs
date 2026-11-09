@@ -11,9 +11,13 @@ pub type UseCaseResult<T> = CustomResult<T, DomainError>;
 /// A provider's error as a domain report, keeping the provider's message in the report.
 pub fn provider(error: ProviderError) -> Report<DomainError> {
     let domain = match &error {
+        ProviderError::Refused { message, .. } if error.is_not_found() => {
+            DomainError::ProviderNotFound(message.clone())
+        }
         ProviderError::Unauthorized { message, .. } | ProviderError::Refused { message, .. } => {
             DomainError::ProviderRefused(message.clone())
         }
+        ProviderError::Invalid { message, .. } => DomainError::Invalid(message.clone()),
         ProviderError::Unavailable { message, .. } => {
             DomainError::ProviderUnavailable(message.clone())
         }

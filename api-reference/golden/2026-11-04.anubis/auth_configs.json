@@ -3,13 +3,15 @@
     {
       "answer": {
         "body": {
-          "client_id": "golden-github-app",
+          "client_id": "golden-app",
           "created_at": "<time>",
+          "has_secret_settings": false,
           "id": "<ac_1>",
-          "provider": "github",
+          "provider": "fake",
           "scopes": [
-            "repo"
+            "read"
           ],
+          "settings": {},
           "updated_at": "<time>"
         },
         "headers": {
@@ -21,11 +23,11 @@
       "events": [],
       "request": {
         "body": {
-          "client_id": "golden-github-app",
-          "client_secret": "golden-github-secret",
-          "provider": "github",
+          "client_id": "golden-app",
+          "client_secret": "golden-secret",
+          "provider": "fake",
           "scopes": [
-            "repo"
+            "read"
           ]
         },
         "headers": [],
@@ -37,13 +39,15 @@
     {
       "answer": {
         "body": {
-          "client_id": "golden-github-app",
+          "client_id": "golden-app",
           "created_at": "<time>",
+          "has_secret_settings": false,
           "id": "<ac_1>",
-          "provider": "github",
+          "provider": "fake",
           "scopes": [
-            "repo"
+            "read"
           ],
+          "settings": {},
           "updated_at": "<time>"
         },
         "headers": {
@@ -66,13 +70,15 @@
         "body": {
           "data": [
             {
-              "client_id": "golden-github-app",
+              "client_id": "golden-app",
               "created_at": "<time>",
+              "has_secret_settings": false,
               "id": "<ac_1>",
-              "provider": "github",
+              "provider": "fake",
               "scopes": [
-                "repo"
+                "read"
               ],
+              "settings": {},
               "updated_at": "<time>"
             }
           ],
@@ -97,14 +103,16 @@
     {
       "answer": {
         "body": {
-          "client_id": "golden-github-app",
+          "client_id": "golden-app",
           "created_at": "<time>",
+          "has_secret_settings": false,
           "id": "<ac_1>",
-          "provider": "github",
+          "provider": "fake",
           "scopes": [
-            "repo",
-            "read:org"
+            "read",
+            "write"
           ],
+          "settings": {},
           "updated_at": "<time>"
         },
         "headers": {
@@ -117,8 +125,8 @@
       "request": {
         "body": {
           "scopes": [
-            "repo",
-            "read:org"
+            "read",
+            "write"
           ]
         },
         "headers": [],

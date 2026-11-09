@@ -2,6 +2,7 @@
 
 use super::{
     api, consent, database, http, idempotency, pagination, providers, refresh, server, tasks,
+    triggers,
 };
 use serde::{Deserialize, Serialize};
 
@@ -19,4 +20,5 @@ pub struct Settings {
     pub idempotency: idempotency::IdempotencySettings,
     pub pagination: pagination::PaginationSettings,
     pub providers: providers::ProvidersSettings,
+    pub triggers: triggers::TriggersSettings,
 }

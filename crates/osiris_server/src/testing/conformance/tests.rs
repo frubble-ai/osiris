@@ -12,7 +12,8 @@ fn answer(method: &str, path: &str, status: StatusCode, body: &Value) {
 
 fn auth_config() -> Value {
     json!({
-        "id": "ac_1", "provider": "github", "client_id": "c", "scopes": [],
+        "id": "ac_1", "provider": "fake", "client_id": "c", "scopes": [],
+        "settings": {}, "has_secret_settings": false,
         "created_at": "2026-11-04T00:00:00Z", "updated_at": "2026-11-04T00:00:00Z",
     })
 }

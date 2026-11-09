@@ -83,7 +83,7 @@ schemathesis:
     scripts/schemathesis/run.sh
 
 # Everything CI checks.
-check: fmt-check lint deny typos sqlx-check test openapi-check
+check: fmt-check lint deny typos placement-check actions-check sqlx-check test openapi-check
 
 fmt:
     cargo fmt
@@ -99,6 +99,15 @@ deny:
 
 typos:
     typos
+
+# The committed actions are what scripts/actions/generate.py writes.
+actions-check:
+    python3 scripts/actions/check.py
+
+# No file outside a provider's folders names that provider (docs/style-guide/placement-rule.md).
+placement-check:
+    python3 -m unittest scripts/test_placement_check.py
+    python3 scripts/placement-check.py
 
 # The tests; arguments filter them, such as `just test golden`.
 test *filters:

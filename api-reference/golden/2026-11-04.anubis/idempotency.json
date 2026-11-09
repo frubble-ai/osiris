@@ -3,11 +3,13 @@
     {
       "answer": {
         "body": {
-          "client_id": "golden-linear-app",
+          "client_id": "golden-app",
           "created_at": "<time>",
+          "has_secret_settings": false,
           "id": "<ac_1>",
-          "provider": "linear",
+          "provider": "fake",
           "scopes": [],
+          "settings": {},
           "updated_at": "<time>"
         },
         "headers": {
@@ -19,9 +21,9 @@
       "events": [],
       "request": {
         "body": {
-          "client_id": "golden-linear-app",
-          "client_secret": "golden-linear-secret",
-          "provider": "linear"
+          "client_id": "golden-app",
+          "client_secret": "golden-secret",
+          "provider": "fake"
         },
         "headers": [
           [
@@ -37,11 +39,13 @@
     {
       "answer": {
         "body": {
-          "client_id": "golden-linear-app",
+          "client_id": "golden-app",
           "created_at": "<time>",
+          "has_secret_settings": false,
           "id": "<ac_1>",
-          "provider": "linear",
+          "provider": "fake",
           "scopes": [],
+          "settings": {},
           "updated_at": "<time>"
         },
         "headers": {
@@ -53,9 +57,9 @@
       "events": [],
       "request": {
         "body": {
-          "client_id": "golden-linear-app",
-          "client_secret": "golden-linear-secret",
-          "provider": "linear"
+          "client_id": "golden-app",
+          "client_secret": "golden-secret",
+          "provider": "fake"
         },
         "headers": [
           [
@@ -86,9 +90,9 @@
       "events": [],
       "request": {
         "body": {
-          "client_id": "golden-slack-app",
-          "client_secret": "golden-slack-secret",
-          "provider": "slack"
+          "client_id": "golden-other-app",
+          "client_secret": "golden-other-secret",
+          "provider": "fake"
         },
         "headers": [
           [
@@ -106,11 +110,13 @@
         "body": {
           "data": [
             {
-              "client_id": "golden-linear-app",
+              "client_id": "golden-app",
               "created_at": "<time>",
+              "has_secret_settings": false,
               "id": "<ac_1>",
-              "provider": "linear",
+              "provider": "fake",
               "scopes": [],
+              "settings": {},
               "updated_at": "<time>"
             }
           ],

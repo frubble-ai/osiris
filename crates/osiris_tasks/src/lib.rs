@@ -1,6 +1,7 @@
 //! Scheduled tasks: work osiris must do at a set time rather than in answer to a request. There are
-//! three kinds: refreshing a connection's token before it expires, failing a consent that nobody
-//! finished, and publishing again an event whose first publish failed.
+//! four kinds: refreshing a connection's token before it expires, failing a consent that nobody
+//! finished, publishing again an event whose first publish failed, and checking a trigger that
+//! checks on a schedule (a watched pull request).
 //!
 //! Each task does one job for one connection or event. It carries everything the worker needs to
 //! check that the job is still wanted, and its name is built from what it is for, so scheduling
@@ -28,6 +29,7 @@ pub mod scheduler;
 pub mod task;
 #[cfg(any(test, feature = "testing"))]
 pub mod testing;
+pub mod trigger_task;
 
 pub use auth_error::AuthError;
 pub use authenticator::TaskAuthenticator;
@@ -40,3 +42,4 @@ pub use refresh_task::RefreshTask;
 pub use scheduled::Scheduled;
 pub use scheduler::TaskScheduler;
 pub use task::Task;
+pub use trigger_task::TriggerTask;

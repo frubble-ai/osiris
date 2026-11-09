@@ -7,13 +7,17 @@
     reason = "test fixtures: a failure here is the test failing"
 )]
 
+use crate::db::register_providers::register_providers;
 use crate::use_cases::lib::{
     auth_configs::NewAuthConfig,
     connected_accounts::{NewPending, NewTokens, ScheduledRefresh},
     database::Db,
+    triggers::NewTrigger,
 };
 use fake::Fake;
-use osiris_common::{crypto::MasterKey, secret::secret};
+use osiris_common::{crypto::MasterKey, ids, secret::secret};
+use osiris_domain::TriggerStatus;
+use osiris_providers::mocks::FAKE_ID;
 use sqlx::PgPool;
 use time::{Duration, OffsetDateTime};
 
@@ -50,16 +54,24 @@ pub fn generate_state() -> String {
     generate_secret("state")
 }
 
-pub async fn github_config(db: &Db) -> String {
-    github_config_with(db, &generate_secret("client-secret")).await
+/// The fake provider's app, saved; answers its id.
+pub async fn fake_config(db: &Db) -> String {
+    fake_config_with(db, &generate_secret("client-secret")).await
 }
 
-pub async fn github_config_with(db: &Db, client_secret: &str) -> String {
+/// The fake provider's app with `client_secret`, saved with the provider's row; answers its id.
+pub async fn fake_config_with(db: &Db, client_secret: &str) -> String {
+    // The migrations write only the registered providers' rows; the fake one is added here.
+    register_providers(&mut db.pool.acquire().await.unwrap(), &[FAKE_ID])
+        .await
+        .unwrap();
     db.create_auth_config(NewAuthConfig {
-        provider: "github".into(),
+        provider: FAKE_ID.into(),
         client_id: generate_secret("client"),
         client_secret: secret(client_secret),
         scopes: vec![],
+        settings: serde_json::json!({}),
+        secret_settings: None,
     })
     .await
     .unwrap()
@@ -124,7 +136,7 @@ pub async fn active(db: &Db, user_id: &str, state: &str, expires_in: Option<i64>
 
 /// An active connection holding `tokens`, and its refresh task.
 pub async fn active_with(db: &Db, user_id: &str, state: &str, tokens: &NewTokens) -> String {
-    let config = github_config(db).await;
+    let config = fake_config(db).await;
     let id = pending(db, &config, user_id, state).await;
     let account = db.connected_account(&id).await.unwrap();
     db.activate(
@@ -135,4 +147,26 @@ pub async fn active_with(db: &Db, user_id: &str, state: &str, tokens: &NewTokens
     .await
     .unwrap();
     id
+}
+
+/// An active trigger of the fake provider on `connected_account_id`, signed with `secret`, waiting
+/// for the scheduled check `poll_task`.
+pub fn generate_trigger(
+    connected_account_id: &str,
+    secret_value: &str,
+    poll_task: Option<&str>,
+) -> NewTrigger {
+    NewTrigger {
+        id: ids::id("tr"),
+        connected_account_id: connected_account_id.into(),
+        kind: format!("{FAKE_ID}.on_event"),
+        config: serde_json::json!({}),
+        secret: secret(secret_value),
+        status: TriggerStatus::Active,
+        subscription_id: Some(generate_secret("subscription")),
+        checkpoint: None,
+        last_error: None,
+        poll_task: poll_task.map(str::to_owned),
+        poll_task_at: poll_task.map(|_| OffsetDateTime::now_utc() + Duration::hours(1)),
+    }
 }

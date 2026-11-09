@@ -5,8 +5,8 @@
 use crate::use_cases::{
     UseCaseResult, UseCases,
     cases::{
-        expire_consent::ExpireConsentArgs, publish_event_retry::PublishEventRetryArgs,
-        run_refresh_task::RunRefreshTaskArgs,
+        check_trigger::CheckTriggerArgs, expire_consent::ExpireConsentArgs,
+        publish_event_retry::PublishEventRetryArgs, run_refresh_task::RunRefreshTaskArgs,
     },
     lib::tasks::record_outcome::record_outcome,
 };
@@ -36,6 +36,13 @@ impl UseCases {
                 TaskPayload::EventPublish(event) => {
                     self.publish_event_retry(PublishEventRetryArgs { task: event })
                         .await
+                }
+                TaskPayload::TriggerPoll(poll) => {
+                    self.check_trigger(CheckTriggerArgs {
+                        trigger_id: &poll.trigger_id,
+                        task: Some((&task.name, poll.check)),
+                    })
+                    .await
                 }
             };
             let settings = &ctx.config.settings.tasks;

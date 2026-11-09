@@ -1,7 +1,7 @@
 //! The one way a provider's API is called: the provider's base URL and auth header, and its errors
 //! read by the provider itself.
 
-use crate::{ProviderCommon, ProviderError};
+use crate::{ProviderCommon, ProviderError, request_path};
 use reqwest::Method;
 use serde::{Serialize, de::DeserializeOwned};
 
@@ -20,7 +20,8 @@ pub async fn call<T: DeserializeOwned, B: Serialize>(
     token: &str,
     request: Request<'_, B>,
 ) -> Result<T, ProviderError> {
-    let url = provider.base_url().join(request.path).map_err(|error| {
+    let path = request_path(provider.id(), request.path)?;
+    let url = provider.base_url().join(path).map_err(|error| {
         ProviderError::unavailable(provider.id(), format!("{}: {error}", request.path))
     })?;
     let (header, value) = provider.auth_header(token);
@@ -46,5 +47,11 @@ pub async fn call<T: DeserializeOwned, B: Serialize>(
     if !status.is_success() {
         return Err(provider.parse_error(status, &body));
     }
-    serde_json::from_str(&body).map_err(|error| ProviderError::unavailable(provider.id(), error))
+    // An empty answer (a 204) reads as JSON null, so `()` or an `Option` stands for it.
+    let body = if body.trim().is_empty() {
+        "null"
+    } else {
+        body.as_str()
+    };
+    serde_json::from_str(body).map_err(|error| ProviderError::unavailable(provider.id(), error))
 }

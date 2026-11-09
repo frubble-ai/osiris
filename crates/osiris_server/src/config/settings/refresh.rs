@@ -50,8 +50,8 @@ impl Default for RefreshSettings {
         Self {
             margin_seconds: 300,
             min_lead_seconds: 30,
-            // 29 days: under Cloud Tasks' 30-day limit, and well within the six months after
-            // which GitHub drops an unused refresh token.
+            // 29 days: under Cloud Tasks' 30-day limit, and well within the months after which a
+            // provider may drop an unused refresh token.
             keepalive_seconds: 2_505_600,
         }
     }

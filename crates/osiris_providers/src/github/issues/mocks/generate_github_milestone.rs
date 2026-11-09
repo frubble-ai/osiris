@@ -1,0 +1,24 @@
+//! A milestone, as GitHub answers it.
+
+use crate::github::mocks::generate_github_user::generate_github_user;
+use fake::{Fake, faker::lorem::en::Sentence};
+use serde_json::{Value, json};
+
+/// Milestone `number`, whose id is `id`.
+pub fn generate_github_milestone(id: u64, number: u64) -> Value {
+    json!({
+        "id": id,
+        "number": number,
+        "title": Sentence(1..4).fake::<String>(),
+        "state": "open",
+        "description": null,
+        "due_on": "2026-12-31T00:00:00Z",
+        "open_issues": (0..50).fake::<i64>(),
+        "closed_issues": (0..50).fake::<i64>(),
+        "html_url": format!("https://github.com/octo/hello/milestone/{number}"),
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-02T00:00:00Z",
+        "closed_at": null,
+        "creator": generate_github_user(id + 1000),
+    })
+}

@@ -1,0 +1,92 @@
+//! A token for an installation connection: the one this process holds, or a new one minted with
+//! the app's credentials and kept until shortly before it expires.
+
+use super::InstallationTokenCache;
+use super::mint_failed::MintFailed;
+use crate::use_cases::UseCaseResult;
+use crate::use_cases::lib::shared::domain_errors::provider;
+use error_stack::Report;
+use osiris_common::secret::{ExposeSecret, Secret};
+use osiris_domain::{AuthConfig, DomainError};
+use osiris_interfaces::{Provider, ProviderError};
+use serde_json::Value;
+use time::{Duration, OffsetDateTime, format_description::well_known::Rfc3339};
+
+/// The token for `installation_id` through `config`'s app, from `cache` when it holds one good
+/// past `margin`, minted with `implementation` otherwise.
+pub async fn installation_token(
+    implementation: &dyn Provider,
+    http: &reqwest::Client,
+    cache: &InstallationTokenCache,
+    margin: Duration,
+    config: &AuthConfig,
+    installation_id: &str,
+) -> UseCaseResult<Secret> {
+    if let Some(token) = cache.get(
+        &config.id,
+        installation_id,
+        OffsetDateTime::now_utc(),
+        margin,
+    ) {
+        return Ok(token);
+    }
+    // One mint at a time per installation: a call that waited finds the token the one before it
+    // minted. The lock is let go of whether the mint worked or not.
+    let lock = cache.minting(&config.id, installation_id);
+    let minted = {
+        let _minting = lock.lock().await;
+        mint_once(implementation, http, cache, margin, config, installation_id).await
+    };
+    cache.done_minting(&config.id, installation_id, &lock);
+    minted
+}
+
+/// Under the installation's mint lock: the token a call before this one minted, or a new one.
+async fn mint_once(
+    implementation: &dyn Provider,
+    http: &reqwest::Client,
+    cache: &InstallationTokenCache,
+    margin: Duration,
+    config: &AuthConfig,
+    installation_id: &str,
+) -> UseCaseResult<Secret> {
+    if let Some(token) = cache.get(
+        &config.id,
+        installation_id,
+        OffsetDateTime::now_utc(),
+        margin,
+    ) {
+        return Ok(token);
+    }
+    let secret_settings = config
+        .secret_settings
+        .as_ref()
+        .map(|text| serde_json::from_str::<Value>(text.expose_secret()))
+        .transpose()
+        .map_err(|_| DomainError::Internal)?
+        .ok_or_else(|| {
+            Report::new(DomainError::Invalid(
+                "the auth config holds no app credentials (secret_settings) to act as an installation".into(),
+            ))
+            .attach(MintFailed)
+        })?;
+    let minted = implementation
+        .installation_token(http, &config.settings, &secret_settings, installation_id)
+        .await
+        .map_err(|error| {
+            // An outage is tried again as any is; anything else is the app's credentials.
+            let credentials = !matches!(error, ProviderError::Unavailable { .. });
+            let report = provider(error);
+            if credentials {
+                report.attach(MintFailed)
+            } else {
+                report
+            }
+        })?;
+    // A token whose expiry can't be read is used once and not kept.
+    let token = minted.token;
+    if let Ok(expires_at) = OffsetDateTime::parse(&minted.expires_at, &Rfc3339) {
+        cache.put(&config.id, installation_id, token.clone(), expires_at);
+    }
+    Ok(token)
+}

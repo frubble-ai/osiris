@@ -1,0 +1,80 @@
+//! Issues, their labels, milestones, assignees, comments, events and reactions.
+
+pub mod add_issue_assignees;
+pub mod add_issue_labels;
+pub mod clear_issue_labels;
+pub mod create_issue;
+pub mod create_issue_comment;
+pub mod create_issue_comment_reaction;
+pub mod create_issue_reaction;
+pub mod create_label;
+pub mod create_milestone;
+pub mod delete_issue_comment;
+pub mod delete_label;
+pub mod delete_milestone;
+pub mod get_issue;
+pub mod get_issue_comment;
+pub mod get_label;
+pub mod get_milestone;
+pub mod list_assignees;
+pub mod list_issue_comments;
+pub mod list_issue_events;
+pub mod list_issue_labels;
+pub mod list_issue_timeline_events;
+pub mod list_milestones;
+pub mod list_repository_issue_events;
+pub mod list_repository_issues;
+pub mod list_repository_labels;
+pub mod lock_issue;
+pub mod remove_issue_assignees;
+pub mod remove_issue_label;
+pub mod search_issues_and_pull_requests;
+mod search_query;
+pub mod set_issue_labels;
+pub mod unlock_issue;
+pub mod update_issue;
+pub mod update_issue_comment;
+pub mod update_label;
+pub mod update_milestone;
+
+pub use add_issue_assignees::AddIssueAssignees;
+pub use add_issue_labels::AddIssueLabels;
+pub use clear_issue_labels::ClearIssueLabels;
+pub use create_issue::CreateIssue;
+pub use create_issue_comment::CreateIssueComment;
+pub use create_issue_comment_reaction::CreateIssueCommentReaction;
+pub use create_issue_reaction::CreateIssueReaction;
+pub use create_label::CreateLabel;
+pub use create_milestone::CreateMilestone;
+pub use delete_issue_comment::DeleteIssueComment;
+pub use delete_label::DeleteLabel;
+pub use delete_milestone::DeleteMilestone;
+pub use get_issue::GetIssue;
+pub use get_issue_comment::GetIssueComment;
+pub use get_label::GetLabel;
+pub use get_milestone::GetMilestone;
+pub use list_assignees::ListAssignees;
+pub use list_issue_comments::ListIssueComments;
+pub use list_issue_events::ListIssueEvents;
+pub use list_issue_labels::ListIssueLabels;
+pub use list_issue_timeline_events::ListIssueTimelineEvents;
+pub use list_milestones::ListMilestones;
+pub use list_repository_issue_events::ListRepositoryIssueEvents;
+pub use list_repository_issues::ListRepositoryIssues;
+pub use list_repository_labels::ListRepositoryLabels;
+pub use lock_issue::LockIssue;
+pub use remove_issue_assignees::RemoveIssueAssignees;
+pub use remove_issue_label::RemoveIssueLabel;
+pub use search_issues_and_pull_requests::SearchIssuesAndPullRequests;
+pub use set_issue_labels::SetIssueLabels;
+pub use unlock_issue::UnlockIssue;
+pub use update_issue::UpdateIssue;
+pub use update_issue_comment::UpdateIssueComment;
+pub use update_label::UpdateLabel;
+pub use update_milestone::UpdateMilestone;
+
+#[cfg(any(test, feature = "testing"))]
+pub mod mocks;
+
+#[cfg(test)]
+mod tests;

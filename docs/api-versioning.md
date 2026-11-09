@@ -41,8 +41,8 @@ value outside an enum in an answer.
 - **Values that grow are open strings, never closed enums in answers.** The spec says
   `type: string` and the description lists today's values. A client keeps working on a value it
   doesn't know and ignores an event type it doesn't handle. This covers an event's `type`, an
-  error's `code`, `provider`, a connection's `status` and GitHub's `account_type` and
-  `repository_selection`. An enum is only for input osiris reads, where a new value is an addition.
+  error's `code`, `provider`, a connection's `status` and the open values each provider's page
+  lists. An enum is only for input osiris reads, where a new value is an addition.
 - **One action, one path, one schema.** A new provider brings new paths and touches none of the
   others.
 - **A provider's quirks stay in its own actions' answers.** Shared shapes (`ConnectedAccount`,
@@ -121,20 +121,22 @@ existing transcripts stay as they are. CI's Contract job confirms nothing stable
   1. If there is no next release yet, add one at the end of `RELEASES` as a preview, named with
      the next god, dated the day it is cut, and numbered one after the last release ever made.
      Point `CURRENT` (`osiris_versioning/src/releases.rs`) at it, and the client's
-     `OSIRIS_VERSION` (`clients/typescript/src/index.ts`) to its name. Give it a `golden_at!` line
-     in `services/api/tests/golden/releases.rs` and a changelog file, and move the client's major
-     version to its number (`npm run check` says which). The default pin (`[api] pinned_version`)
-     stays on the newest stable release, so clients that name no version keep it.
+     `OSIRIS_VERSION` (`clients/typescript/src/index.ts`) to its name. Give it a line in
+     `for_every_release!` (`services/api/tests/golden/releases.rs`) and a changelog file, and move
+     the client's major version to its number (`npm run check` says which). The default pin
+     (`[api] pinned_version`) stays on the newest stable release, so clients that name no version
+     keep it.
   2. Change the code to the new shape.
   3. Write a version change under `osiris_versioning/src/changes/<release>/`, one file per
      change, and list it in the release's `changes`. It must give the older release its old
      requests, answers, events and spec back. Its `description` goes in the release's changelog
      word for word; a test checks it is there.
   4. Run `just openapi`, then record only the new release's transcripts:
-     `OSIRIS_GOLDEN=record just test golden::releases::<god>` (its `golden_at!` module). Recording
-     the older ones would write their new `Deprecation` and `Sunset` headers into transcripts that
-     may not change. `just test golden` then replays every release, and the stable release's spec
-     and transcripts must come out unchanged, which the Contract job checks.
+     `OSIRIS_GOLDEN=record just test -E "'test(/golden::.*::<god>$/)'"` (each scenario's test at a
+     release is named after the release). Recording the older ones would write their new
+     `Deprecation` and `Sunset` headers into transcripts that may not change. `just test golden`
+     then replays every release, and the stable release's spec and transcripts must come out
+     unchanged, which the Contract job checks.
 
 Breaking changes collect in the next release until it is cut. Releases are cut on demand, not on a
 schedule.
@@ -143,8 +145,8 @@ schedule.
 
 One pull request:
 1. Set its `stability` to `Stability::Stable`.
-2. Run `just openapi` and record its transcripts (`OSIRIS_GOLDEN=record just test
-   golden::releases::<god>`).
+2. Run `just openapi` and record its transcripts (`OSIRIS_GOLDEN=record just test -E
+   "'test(/golden::.*::<god>$/)'"`).
 3. The default pin moves to it, the newest stable release, so update `pinned_version` in
    `config.example.toml` (a test holds it to the default). Clients that name no version move with
    it. To keep them on the release before until they migrate, set `OSIRIS__API__PINNED_VERSION` to
@@ -166,7 +168,7 @@ longest support window clients were promised: the base branch's documented `supp
 (`config.example.toml`), the pull request's, or `OSIRIS__API__SUPPORT_DAYS` when a deployment
 sets its own (set it for the job too). With none of them known, the removal is refused. The
 newest release has no sunset, so it is never removed.
-1. Remove it from `RELEASES`, along with its `golden_at!` line, its spec and its transcripts.
+1. Remove it from `RELEASES`, along with its `for_every_release!` line, its spec and its transcripts.
 2. The next release becomes the first: delete the version changes that only served the removed
    one, and empty that release's `changes`.
 

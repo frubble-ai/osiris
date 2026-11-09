@@ -1,17 +1,20 @@
 //! The payload of an `event.publish` task: an event to publish again. The task carries the whole
 //! event, so publishing it does not need the database.
 
-use osiris_domain::{Event, EventType};
+use osiris_domain::{Event, EventType, TriggerFired};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct EventTask {
     pub event_id: String,
     pub event_type: EventType,
     pub connected_account_id: String,
     #[serde(with = "time::serde::rfc3339")]
     pub occurred_at: OffsetDateTime,
+    /// The trigger and what it saw, for a `trigger.fired` event.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fired: Option<TriggerFired>,
 }
 
 impl From<&Event> for EventTask {
@@ -21,6 +24,7 @@ impl From<&Event> for EventTask {
             event_type: event.event_type,
             connected_account_id: event.connected_account_id.clone(),
             occurred_at: event.occurred_at,
+            fired: event.fired.clone(),
         }
     }
 }
@@ -32,6 +36,7 @@ impl From<&EventTask> for Event {
             event_type: task.event_type,
             connected_account_id: task.connected_account_id.clone(),
             occurred_at: task.occurred_at,
+            fired: task.fired.clone(),
         }
     }
 }

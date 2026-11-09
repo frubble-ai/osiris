@@ -93,20 +93,35 @@ retention_seconds = 86400
 purge_batch = 100
 
 [providers.listing]
-# A list that fans out over a provider's resources (GitHub's installations): how many it reads at
+# A list that fans out over a provider's resources (an app's installations): how many it reads at
 # once, and how many items it answers at most.
 concurrency = 4
 max_items = 5000
+# How much of a downloaded text (a job's logs) is answered: its last bytes.
+max_log_bytes = 262144
+# The most pages read looking for one item a provider has no lookup for (an existing webhook, by the
+# URL it delivers to).
+max_scan_pages = 10
 
-[providers.github]
-oauth_base_url = "https://github.com"
-api_base_url = "https://api.github.com"
+[providers.installation_tokens]
+# An app installation's token (one that lives an hour, for example) is minted again this long
+# before the provider stops accepting it.
+margin_seconds = 300
 
-[providers.linear]
-oauth_base_url = "https://linear.app"
-api_base_url = "https://api.linear.app"
+# [providers.<id>] moves one provider: `oauth_base_url` (its consent page) and `api_base_url`
+# (its API). Each provider's own folder has where it is by default; tests and a local fake point
+# it elsewhere.
 
-[providers.slack]
-oauth_base_url = "https://slack.com"
-# Ends with `/`: Slack's methods join onto it.
-api_base_url = "https://slack.com/api/"
+[triggers]
+# Between two scheduled checks of a trigger that checks on a schedule; its deliveries also check
+# it as they come.
+check_seconds = 300
+# The largest delivery body a trigger reads; a larger one is answered 413.
+max_delivery_bytes = 26214400
+# Deliveries read at once; more wait their turn before their body is read.
+max_concurrent_deliveries = 32
+# The largest data a trigger.fired event carries; larger data is replaced by
+# {"omitted": true, "bytes": <length>}. Under a Cloud Tasks task's 1 MB, which carries a retry.
+max_event_data_bytes = 900000
+# How long a delivery's body may take to arrive; a slower one is answered 408.
+delivery_read_seconds = 10

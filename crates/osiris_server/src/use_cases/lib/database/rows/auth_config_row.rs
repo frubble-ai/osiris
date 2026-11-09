@@ -12,6 +12,8 @@ pub struct AuthConfigRow {
     pub client_id: String,
     pub client_secret: Vec<u8>,
     pub scopes: Vec<String>,
+    pub settings: serde_json::Value,
+    pub secret_settings: Option<Vec<u8>>,
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
 }
@@ -24,6 +26,12 @@ impl AuthConfigRow {
             provider: self.provider,
             client_id: self.client_id,
             scopes: self.scopes,
+            settings: self.settings,
+            secret_settings: self
+                .secret_settings
+                .as_deref()
+                .map(|value| decrypt(cipher, value).map(secret))
+                .transpose()?,
             created_at: self.created_at,
             updated_at: self.updated_at,
         })

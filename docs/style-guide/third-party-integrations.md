@@ -16,9 +16,9 @@
 
 ## Providers
 
-GitHub, Linear and Slack are the providers users connect to. Each is a folder in
-`osiris_providers/` that implements `Provider` (`osiris_interfaces`); use cases find one by id
-through `Providers`. A provider's HTTP is faked at the network in tests
+The providers users connect to are each a folder in `osiris_providers/` that implements
+`Provider` (`osiris_interfaces`) and registers itself (`registration.rs`); use cases find one by
+id, or by type, through `Providers`. Each provider's page is in [providers](../providers.md). A provider's HTTP is faked at the network in tests
 ([test organization](./test-organization.md)).
 
 ## Contract tests

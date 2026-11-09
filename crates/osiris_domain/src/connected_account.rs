@@ -1,6 +1,6 @@
 //! One user's connection to a provider through an auth config.
 
-use crate::{ConnectionStatus, TokenSet};
+use crate::{ConnectionStatus, CredentialKind, TokenSet};
 use time::OffsetDateTime;
 
 #[derive(Debug, Clone)]
@@ -14,6 +14,10 @@ pub struct ConnectedAccount {
     /// The client's own mark for the attempt that made it.
     pub alias: Option<String>,
     pub status: ConnectionStatus,
+    /// What the connection acts as: the user who consented, or an app's installation.
+    pub credential_kind: CredentialKind,
+    /// The provider's id of the installation an `app_installation` connection acts as.
+    pub installation_id: Option<String>,
     pub callback_url: String,
     /// None until the consent finishes.
     pub tokens: Option<TokenSet>,
@@ -36,8 +40,13 @@ impl ConnectedAccount {
     /// refresh token, has its refresh task scheduled. A connection to a provider that issues no
     /// refresh tokens (its tokens never expire) is complete with its access token alone; osiris
     /// never activates a connection to a provider that does issue them without one. A connection
-    /// that is not complete is never reported as connected.
+    /// that is not complete is never reported as connected. An installation connection is
+    /// complete once active: it holds no tokens.
     pub fn is_complete(&self) -> bool {
+        if self.credential_kind == CredentialKind::AppInstallation {
+            // Its tokens are minted when an action runs; nothing is held or scheduled.
+            return self.status == ConnectionStatus::Active && self.installation_id.is_some();
+        }
         self.status == ConnectionStatus::Active
             && self
                 .tokens

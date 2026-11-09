@@ -1,31 +1,49 @@
-//! The providers osiris implements, found by id.
+//! The providers osiris implements, found by id, or by type for a provider's own actions.
 
-use crate::{ListLimits, Provider, ProviderUrls, github, linear, slack};
+use crate::{
+    ListLimits, Provider, ProviderUrls,
+    registration::{REGISTRATIONS, Registered, Registration},
+};
 
-/// Every provider osiris implements, at the URLs the settings give.
+/// Every registered provider, built at the URLs its settings give.
 pub struct Providers {
-    pub github: github::Github,
-    pub linear: linear::Linear,
-    pub slack: slack::Slack,
+    built: Vec<Registered>,
 }
 
 impl Providers {
-    pub fn new(
-        github: &ProviderUrls,
-        linear: &ProviderUrls,
-        slack: &ProviderUrls,
+    /// Builds every registered provider at the URLs `urls` answers for its id.
+    pub fn new<E: From<url::ParseError>>(
+        urls: impl Fn(&Registration) -> Result<ProviderUrls, E>,
         limits: ListLimits,
-    ) -> Result<Self, url::ParseError> {
-        Ok(Self {
-            github: github::Github::new(github, limits)?,
-            linear: linear::Linear::new(linear, limits)?,
-            slack: slack::Slack::new(slack, limits)?,
-        })
+    ) -> Result<Self, E> {
+        Self::of(REGISTRATIONS, urls, limits)
+    }
+
+    /// Builds the providers of `registrations` (a test adds its fake provider to them).
+    pub fn of<E: From<url::ParseError>>(
+        registrations: &[&Registration],
+        urls: impl Fn(&Registration) -> Result<ProviderUrls, E>,
+        limits: ListLimits,
+    ) -> Result<Self, E> {
+        let mut built = Vec::with_capacity(registrations.len());
+        for registration in registrations {
+            built.push((registration.build)(&urls(registration)?, limits)?);
+        }
+        Ok(Self { built })
     }
 
     /// The provider whose id is `id`.
     pub fn get(&self, id: &str) -> Option<&dyn Provider> {
-        let all: [&dyn Provider; 3] = [&self.github, &self.linear, &self.slack];
-        all.into_iter().find(|provider| provider.id() == id)
+        self.built
+            .iter()
+            .map(|registered| registered.provider.as_ref())
+            .find(|provider| provider.id() == id)
+    }
+
+    /// The provider of type `P`, for its own actions.
+    pub fn typed<P: Provider + 'static>(&self) -> Option<&P> {
+        self.built
+            .iter()
+            .find_map(|registered| registered.typed.downcast_ref::<P>())
     }
 }
