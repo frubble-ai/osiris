@@ -229,6 +229,7 @@ async fn lists_the_files_a_pull_request_changes() {
         (3, 2, 5)
     );
     assert_eq!(files[0].patch.as_deref(), file["patch"].as_str());
+    assert_eq!(files[0].blob_url.as_deref(), file["blob_url"].as_str());
 }
 
 #[tokio::test]
@@ -392,6 +393,13 @@ async fn lists_the_comments_on_a_pull_requests_diff_sorted_and_since_a_time() {
     assert_eq!(listed[0].side.as_deref(), Some("RIGHT"));
     assert_eq!(listed[0].in_reply_to_id, None);
     assert_eq!(listed[1].in_reply_to_id.as_deref(), Some("61"));
+    assert_eq!(
+        listed[0].original_line,
+        comments[0]["original_line"].as_i64()
+    );
+    assert_eq!(listed[0].pull_request_review_id.as_deref(), Some("5061"));
+    assert_eq!(listed[0].created_at, "2024-02-01T10:00:00Z");
+    assert_eq!(listed[0].updated_at, "2024-02-02T10:00:00Z");
 }
 
 #[tokio::test]

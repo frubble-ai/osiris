@@ -14,4 +14,5 @@ pub struct GithubPullRequestFile {
     pub changes: i64,
     pub patch: Option<String>,
     pub previous_filename: Option<String>,
+    pub blob_url: Option<String>,
 }

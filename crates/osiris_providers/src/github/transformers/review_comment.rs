@@ -21,10 +21,16 @@ pub struct ReviewCommentAnswer {
     #[serde(rename = "html_url", default)]
     pub url: String,
     pub line: Option<i64>,
+    pub original_line: Option<i64>,
     pub start_line: Option<i64>,
     pub side: Option<String>,
     pub start_side: Option<String>,
     pub in_reply_to_id: Option<u64>,
+    pub pull_request_review_id: Option<u64>,
+    #[serde(default)]
+    pub created_at: String,
+    #[serde(default)]
+    pub updated_at: String,
 }
 
 impl From<ReviewCommentAnswer> for GithubReviewComment {
@@ -40,10 +46,14 @@ impl From<ReviewCommentAnswer> for GithubReviewComment {
             diff_hunk: answer.diff_hunk,
             url: answer.url,
             line: answer.line,
+            original_line: answer.original_line,
             start_line: answer.start_line,
             side: answer.side,
             start_side: answer.start_side,
             in_reply_to_id: answer.in_reply_to_id.map(|id| id.to_string()),
+            pull_request_review_id: answer.pull_request_review_id.map(|id| id.to_string()),
+            created_at: answer.created_at,
+            updated_at: answer.updated_at,
         }
     }
 }

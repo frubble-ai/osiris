@@ -19,6 +19,7 @@ pub struct PullRequestFileAnswer {
     pub changes: i64,
     pub patch: Option<String>,
     pub previous_filename: Option<String>,
+    pub blob_url: Option<String>,
 }
 
 impl From<PullRequestFileAnswer> for GithubPullRequestFile {
@@ -33,6 +34,7 @@ impl From<PullRequestFileAnswer> for GithubPullRequestFile {
             changes: answer.changes,
             patch: answer.patch,
             previous_filename: answer.previous_filename,
+            blob_url: answer.blob_url,
         }
     }
 }

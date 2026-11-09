@@ -22,9 +22,13 @@ pub fn generate_github_review_comment(id: u64, in_reply_to: Option<u64>) -> Valu
         "diff_hunk": "@@ -1 +1 @@",
         "html_url": format!("https://github.com/octo/hello/pull/1#discussion_r{id}"),
         "line": (1..500).fake::<i64>(),
+        "original_line": (1..500).fake::<i64>(),
         "start_line": null,
         "side": "RIGHT",
         "start_side": null,
         "in_reply_to_id": in_reply_to,
+        "pull_request_review_id": id + 5000,
+        "created_at": "2024-02-01T10:00:00Z",
+        "updated_at": "2024-02-02T10:00:00Z",
     })
 }

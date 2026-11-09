@@ -1917,6 +1917,9 @@
               "commit_id": {
                 "type": "string"
               },
+              "created_at": {
+                "type": "string"
+              },
               "diff_hunk": {
                 "type": "string"
               },
@@ -1939,8 +1942,21 @@
               "original_commit_id": {
                 "type": "string"
               },
+              "original_line": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
               "path": {
                 "type": "string"
+              },
+              "pull_request_review_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "side": {
                 "type": [
@@ -1960,6 +1976,9 @@
                   "string",
                   "null"
                 ]
+              },
+              "updated_at": {
+                "type": "string"
               },
               "url": {
                 "type": "string"
@@ -1982,7 +2001,9 @@
               "commit_id",
               "original_commit_id",
               "diff_hunk",
-              "url"
+              "url",
+              "created_at",
+              "updated_at"
             ],
             "type": "object"
           }
@@ -3516,6 +3537,12 @@
                   "format": "int64",
                   "type": "integer"
                 },
+                "blob_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "changes": {
                   "format": "int64",
                   "type": "integer"
@@ -3876,6 +3903,9 @@
                 "commit_id": {
                   "type": "string"
                 },
+                "created_at": {
+                  "type": "string"
+                },
                 "diff_hunk": {
                   "type": "string"
                 },
@@ -3898,8 +3928,21 @@
                 "original_commit_id": {
                   "type": "string"
                 },
+                "original_line": {
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
                 "path": {
                   "type": "string"
+                },
+                "pull_request_review_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "side": {
                   "type": [
@@ -3919,6 +3962,9 @@
                     "string",
                     "null"
                   ]
+                },
+                "updated_at": {
+                  "type": "string"
                 },
                 "url": {
                   "type": "string"
@@ -3941,7 +3987,9 @@
                 "commit_id",
                 "original_commit_id",
                 "diff_hunk",
-                "url"
+                "url",
+                "created_at",
+                "updated_at"
               ],
               "type": "object"
             },
@@ -8489,6 +8537,12 @@
             "format": "int64",
             "type": "integer"
           },
+          "blob_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "changes": {
             "format": "int64",
             "type": "integer"
@@ -9014,6 +9068,9 @@
           "commit_id": {
             "type": "string"
           },
+          "created_at": {
+            "type": "string"
+          },
           "diff_hunk": {
             "type": "string"
           },
@@ -9036,8 +9093,21 @@
           "original_commit_id": {
             "type": "string"
           },
+          "original_line": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
           "path": {
             "type": "string"
+          },
+          "pull_request_review_id": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "side": {
             "type": [
@@ -9057,6 +9127,9 @@
               "string",
               "null"
             ]
+          },
+          "updated_at": {
+            "type": "string"
           },
           "url": {
             "type": "string"
@@ -9079,7 +9152,9 @@
           "commit_id",
           "original_commit_id",
           "diff_hunk",
-          "url"
+          "url",
+          "created_at",
+          "updated_at"
         ],
         "type": "object"
       },

@@ -762,15 +762,19 @@ export type ActionResultGithubReviewComment = {
     data: {
         body: string;
         commit_id: string;
+        created_at: string;
         diff_hunk: string;
         id: string;
         in_reply_to_id?: string | null;
         line?: number | null;
         original_commit_id: string;
+        original_line?: number | null;
         path: string;
+        pull_request_review_id?: string | null;
         side?: string | null;
         start_line?: number | null;
         start_side?: string | null;
+        updated_at: string;
         url: string;
         user?: GithubUser | null;
     };
@@ -1265,6 +1269,7 @@ export type ActionResultVecGithubPullRequest = {
 export type ActionResultVecGithubPullRequestFile = {
     data: Array<{
         additions: number;
+        blob_url?: string | null;
         changes: number;
         deletions: number;
         filename: string;
@@ -1367,15 +1372,19 @@ export type ActionResultVecGithubReviewComment = {
     data: Array<{
         body: string;
         commit_id: string;
+        created_at: string;
         diff_hunk: string;
         id: string;
         in_reply_to_id?: string | null;
         line?: number | null;
         original_commit_id: string;
+        original_line?: number | null;
         path: string;
+        pull_request_review_id?: string | null;
         side?: string | null;
         start_line?: number | null;
         start_side?: string | null;
+        updated_at: string;
         url: string;
         user?: GithubUser | null;
     }>;
@@ -3161,6 +3170,7 @@ export type GithubPullRequestBranchUpdate = {
  */
 export type GithubPullRequestFile = {
     additions: number;
+    blob_url?: string | null;
     changes: number;
     deletions: number;
     filename: string;
@@ -3338,15 +3348,19 @@ export type GithubReview = {
 export type GithubReviewComment = {
     body: string;
     commit_id: string;
+    created_at: string;
     diff_hunk: string;
     id: string;
     in_reply_to_id?: string | null;
     line?: number | null;
     original_commit_id: string;
+    original_line?: number | null;
     path: string;
+    pull_request_review_id?: string | null;
     side?: string | null;
     start_line?: number | null;
     start_side?: string | null;
+    updated_at: string;
     url: string;
     user?: GithubUser | null;
 };

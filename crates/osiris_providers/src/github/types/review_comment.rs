@@ -16,8 +16,12 @@ pub struct GithubReviewComment {
     pub diff_hunk: String,
     pub url: String,
     pub line: Option<i64>,
+    pub original_line: Option<i64>,
     pub start_line: Option<i64>,
     pub side: Option<String>,
     pub start_side: Option<String>,
     pub in_reply_to_id: Option<String>,
+    pub pull_request_review_id: Option<String>,
+    pub created_at: String,
+    pub updated_at: String,
 }

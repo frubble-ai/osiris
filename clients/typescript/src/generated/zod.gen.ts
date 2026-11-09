@@ -425,6 +425,7 @@ export const zActionResultVecGithubMilestone = z.object({
 export const zActionResultVecGithubPullRequestFile = z.object({
     data: z.array(z.object({
         additions: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        blob_url: z.string().nullish(),
         changes: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         deletions: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         filename: z.string(),
@@ -1428,6 +1429,7 @@ export const zGithubPullRequestBranchUpdate = z.object({
  */
 export const zGithubPullRequestFile = z.object({
     additions: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    blob_url: z.string().nullish(),
     changes: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     deletions: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     filename: z.string(),
@@ -1835,15 +1837,19 @@ export const zActionResultGithubReviewComment = z.object({
     data: z.object({
         body: z.string(),
         commit_id: z.string(),
+        created_at: z.string(),
         diff_hunk: z.string(),
         id: z.string(),
         in_reply_to_id: z.string().nullish(),
         line: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
         original_commit_id: z.string(),
+        original_line: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
         path: z.string(),
+        pull_request_review_id: z.string().nullish(),
         side: z.string().nullish(),
         start_line: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
         start_side: z.string().nullish(),
+        updated_at: z.string(),
         url: z.string(),
         user: zGithubUser.nullish()
     })
@@ -2060,15 +2066,19 @@ export const zActionResultVecGithubReviewComment = z.object({
     data: z.array(z.object({
         body: z.string(),
         commit_id: z.string(),
+        created_at: z.string(),
         diff_hunk: z.string(),
         id: z.string(),
         in_reply_to_id: z.string().nullish(),
         line: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
         original_commit_id: z.string(),
+        original_line: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
         path: z.string(),
+        pull_request_review_id: z.string().nullish(),
         side: z.string().nullish(),
         start_line: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
         start_side: z.string().nullish(),
+        updated_at: z.string(),
         url: z.string(),
         user: zGithubUser.nullish()
     }))
@@ -2430,15 +2440,19 @@ export const zGithubReview = z.object({
 export const zGithubReviewComment = z.object({
     body: z.string(),
     commit_id: z.string(),
+    created_at: z.string(),
     diff_hunk: z.string(),
     id: z.string(),
     in_reply_to_id: z.string().nullish(),
     line: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
     original_commit_id: z.string(),
+    original_line: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
     path: z.string(),
+    pull_request_review_id: z.string().nullish(),
     side: z.string().nullish(),
     start_line: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
     start_side: z.string().nullish(),
+    updated_at: z.string(),
     url: z.string(),
     user: zGithubUser.nullish()
 });
