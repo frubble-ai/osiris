@@ -552,12 +552,6 @@ export const zAuthConfig = z.object({
     updated_at: z.iso.datetime()
 });
 
-export const zCancelWorkflowRun = z.object({
-    owner: z.string(),
-    repo: z.string(),
-    run_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
-});
-
 export const zCheckPullRequestMerged = z.object({
     owner: z.string(),
     pull_number: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
@@ -664,13 +658,6 @@ export const zCreateIssueComment = z.object({
     repo: z.string()
 });
 
-export const zCreateIssueCommentReaction = z.object({
-    comment_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    content: z.string(),
-    owner: z.string(),
-    repo: z.string()
-});
-
 export const zCreateIssueReaction = z.object({
     content: z.string(),
     issue_number: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
@@ -766,12 +753,6 @@ export const zDeleteFile = z.object({
     sha: z.string()
 });
 
-export const zDeleteIssueComment = z.object({
-    comment_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    owner: z.string(),
-    repo: z.string()
-});
-
 export const zDeleteLabel = z.object({
     name: z.string(),
     owner: z.string(),
@@ -784,34 +765,9 @@ export const zDeleteMilestone = z.object({
     repo: z.string()
 });
 
-export const zDeletePendingPullRequestReview = z.object({
-    owner: z.string(),
-    pull_number: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    repo: z.string(),
-    review_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
-});
-
-export const zDeletePullRequestReviewComment = z.object({
-    comment_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    owner: z.string(),
-    repo: z.string()
-});
-
 export const zDeleteRef = z.object({
     owner: z.string(),
     ref: z.string(),
-    repo: z.string()
-});
-
-export const zDeleteRelease = z.object({
-    owner: z.string(),
-    release_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    repo: z.string()
-});
-
-export const zDeleteReleaseAsset = z.object({
-    asset_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    owner: z.string(),
     repo: z.string()
 });
 
@@ -850,26 +806,12 @@ export const zDisableWorkflow = z.object({
     workflow_id: z.string()
 });
 
-export const zDismissPullRequestReview = z.object({
-    message: z.string(),
-    owner: z.string(),
-    pull_number: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    repo: z.string(),
-    review_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
-});
-
 export const zDispatchWorkflow = z.object({
     inputs: z.record(z.string(), z.string()).nullish(),
     owner: z.string(),
     ref: z.string(),
     repo: z.string(),
     workflow_id: z.string()
-});
-
-export const zDownloadWorkflowArtifact = z.object({
-    artifact_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    owner: z.string(),
-    repo: z.string()
 });
 
 export const zEnableWorkflow = z.object({
@@ -954,12 +896,6 @@ export const zGetIssue = z.object({
     repo: z.string()
 });
 
-export const zGetIssueComment = z.object({
-    comment_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    owner: z.string(),
-    repo: z.string()
-});
-
 export const zGetLabel = z.object({
     name: z.string(),
     owner: z.string(),
@@ -983,28 +919,9 @@ export const zGetPullRequest = z.object({
     repo: z.string()
 });
 
-export const zGetPullRequestReview = z.object({
-    owner: z.string(),
-    pull_number: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    repo: z.string(),
-    review_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
-});
-
 export const zGetRef = z.object({
     owner: z.string(),
     ref: z.string(),
-    repo: z.string()
-});
-
-export const zGetRelease = z.object({
-    owner: z.string(),
-    release_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    repo: z.string()
-});
-
-export const zGetReleaseAsset = z.object({
-    asset_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    owner: z.string(),
     repo: z.string()
 });
 
@@ -1039,18 +956,6 @@ export const zGetWorkflow = z.object({
     owner: z.string(),
     repo: z.string(),
     workflow_id: z.string()
-});
-
-export const zGetWorkflowJobLogs = z.object({
-    job_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    owner: z.string(),
-    repo: z.string()
-});
-
-export const zGetWorkflowRun = z.object({
-    owner: z.string(),
-    repo: z.string(),
-    run_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
 });
 
 /**
@@ -1268,6 +1173,109 @@ export const zGithubGitRef = z.object({
     object_type: z.string(),
     ref_name: z.string(),
     sha: z.string()
+});
+
+/**
+ * An id GitHub gave something: a whole number, or the text of one, as answers give it.
+ */
+export const zGithubId = z.union([
+    z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    z.string().regex(/^[0-9]+$/)
+]);
+
+export const zCancelWorkflowRun = z.object({
+    owner: z.string(),
+    repo: z.string(),
+    run_id: zGithubId
+});
+
+export const zCreateIssueCommentReaction = z.object({
+    comment_id: zGithubId,
+    content: z.string(),
+    owner: z.string(),
+    repo: z.string()
+});
+
+export const zDeleteIssueComment = z.object({
+    comment_id: zGithubId,
+    owner: z.string(),
+    repo: z.string()
+});
+
+export const zDeletePendingPullRequestReview = z.object({
+    owner: z.string(),
+    pull_number: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    repo: z.string(),
+    review_id: zGithubId
+});
+
+export const zDeletePullRequestReviewComment = z.object({
+    comment_id: zGithubId,
+    owner: z.string(),
+    repo: z.string()
+});
+
+export const zDeleteRelease = z.object({
+    owner: z.string(),
+    release_id: zGithubId,
+    repo: z.string()
+});
+
+export const zDeleteReleaseAsset = z.object({
+    asset_id: zGithubId,
+    owner: z.string(),
+    repo: z.string()
+});
+
+export const zDismissPullRequestReview = z.object({
+    message: z.string(),
+    owner: z.string(),
+    pull_number: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    repo: z.string(),
+    review_id: zGithubId
+});
+
+export const zDownloadWorkflowArtifact = z.object({
+    artifact_id: zGithubId,
+    owner: z.string(),
+    repo: z.string()
+});
+
+export const zGetIssueComment = z.object({
+    comment_id: zGithubId,
+    owner: z.string(),
+    repo: z.string()
+});
+
+export const zGetPullRequestReview = z.object({
+    owner: z.string(),
+    pull_number: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    repo: z.string(),
+    review_id: zGithubId
+});
+
+export const zGetRelease = z.object({
+    owner: z.string(),
+    release_id: zGithubId,
+    repo: z.string()
+});
+
+export const zGetReleaseAsset = z.object({
+    asset_id: zGithubId,
+    owner: z.string(),
+    repo: z.string()
+});
+
+export const zGetWorkflowJobLogs = z.object({
+    job_id: zGithubId,
+    owner: z.string(),
+    repo: z.string()
+});
+
+export const zGetWorkflowRun = z.object({
+    owner: z.string(),
+    repo: z.string(),
+    run_id: zGithubId
 });
 
 /**
@@ -2758,7 +2766,7 @@ export const zListBranches = z.object({
 });
 
 export const zListCheckRunsForRef = z.object({
-    app_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+    app_id: zGithubId.nullish(),
     check_name: z.string().nullish(),
     filter: z.string().nullish(),
     owner: z.string(),
@@ -2916,7 +2924,7 @@ export const zListReleaseAssets = z.object({
     owner: z.string(),
     page: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).nullish(),
     per_page: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).nullish(),
-    release_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    release_id: zGithubId,
     repo: z.string()
 });
 
@@ -3052,7 +3060,7 @@ export const zListWorkflowRunArtifacts = z.object({
     page: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).nullish(),
     per_page: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).nullish(),
     repo: z.string(),
-    run_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
+    run_id: zGithubId
 });
 
 export const zListWorkflowRunJobs = z.object({
@@ -3061,13 +3069,13 @@ export const zListWorkflowRunJobs = z.object({
     page: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).nullish(),
     per_page: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).nullish(),
     repo: z.string(),
-    run_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
+    run_id: zGithubId
 });
 
 export const zListWorkflowRuns = z.object({
     actor: z.string().nullish(),
     branch: z.string().nullish(),
-    check_suite_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+    check_suite_id: zGithubId.nullish(),
     created: z.string().nullish(),
     event: z.string().nullish(),
     exclude_pull_requests: z.boolean().nullish(),
@@ -3237,7 +3245,7 @@ export const zReplaceRepositoryTopics = z.object({
 
 export const zReplyPullRequestReviewComment = z.object({
     body: z.string(),
-    comment_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    comment_id: zGithubId,
     owner: z.string(),
     pull_number: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     repo: z.string()
@@ -3252,13 +3260,13 @@ export const zRequestPullRequestReviewers = z.object({
 });
 
 export const zRerequestCheckRun = z.object({
-    check_run_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    check_run_id: zGithubId,
     owner: z.string(),
     repo: z.string()
 });
 
 export const zRerequestCheckSuite = z.object({
-    check_suite_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    check_suite_id: zGithubId,
     owner: z.string(),
     repo: z.string()
 });
@@ -3267,14 +3275,14 @@ export const zRerunFailedJobs = z.object({
     enable_debug_logging: z.boolean().nullish(),
     owner: z.string(),
     repo: z.string(),
-    run_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
+    run_id: zGithubId
 });
 
 export const zRerunWorkflow = z.object({
     enable_debug_logging: z.boolean().nullish(),
     owner: z.string(),
     repo: z.string(),
-    run_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
+    run_id: zGithubId
 });
 
 /**
@@ -3359,7 +3367,7 @@ export const zSearchLabels = z.object({
     page: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).nullish(),
     per_page: z.int().gte(0).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).nullish(),
     query: z.string(),
-    repository_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    repository_id: zGithubId,
     sort: z.string().nullish()
 });
 
@@ -3441,7 +3449,7 @@ export const zSubmitPullRequestReview = z.object({
     owner: z.string(),
     pull_number: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     repo: z.string(),
-    review_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
+    review_id: zGithubId
 });
 
 export const zSyncForkBranchWithUpstream = z.object({
@@ -3520,7 +3528,7 @@ export const zUpdateIssue = z.object({
 
 export const zUpdateIssueComment = z.object({
     body: z.string(),
-    comment_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    comment_id: zGithubId,
     owner: z.string(),
     repo: z.string()
 });
@@ -3570,7 +3578,7 @@ export const zUpdatePullRequestBranch = z.object({
 
 export const zUpdatePullRequestReviewComment = z.object({
     body: z.string(),
-    comment_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    comment_id: zGithubId,
     owner: z.string(),
     repo: z.string()
 });
@@ -3593,7 +3601,7 @@ export const zUpdateRelease = z.object({
     name: z.string().nullish(),
     owner: z.string(),
     prerelease: z.boolean().nullish(),
-    release_id: z.coerce.bigint().gte(BigInt(0)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    release_id: zGithubId,
     repo: z.string(),
     tag_name: z.string().nullish(),
     target_commitish: z.string().nullish()

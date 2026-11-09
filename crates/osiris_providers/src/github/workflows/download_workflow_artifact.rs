@@ -3,7 +3,9 @@
 use super::follow_download::follow_download;
 use crate::{
     ProviderCommon, ProviderError,
-    github::{Github, path_segment::path_segment, types::GithubArtifactDownload},
+    github::{
+        Github, github_id::GithubId, path_segment::path_segment, types::GithubArtifactDownload,
+    },
 };
 use serde::Deserialize;
 use utoipa::ToSchema;
@@ -13,7 +15,7 @@ use utoipa::ToSchema;
 pub struct DownloadWorkflowArtifact {
     pub owner: String,
     pub repo: String,
-    pub artifact_id: u64,
+    pub artifact_id: GithubId,
 }
 
 impl DownloadWorkflowArtifact {

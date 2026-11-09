@@ -3,7 +3,7 @@
 use crate::{
     ProviderError,
     github::{
-        Github, path_segment::path_segment, request::send,
+        Github, github_id::GithubId, path_segment::path_segment, request::send,
         transformers::review_comment::ReviewCommentAnswer, types::GithubReviewComment,
     },
 };
@@ -18,7 +18,7 @@ pub struct ReplyPullRequestReviewComment {
     pub repo: String,
     pub pull_number: u64,
     /// The comment replied to. It must be a comment that is not itself a reply.
-    pub comment_id: u64,
+    pub comment_id: GithubId,
     pub body: String,
 }
 

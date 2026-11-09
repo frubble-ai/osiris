@@ -4629,9 +4629,7 @@
             "type": "string"
           },
           "run_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           }
         },
         "required": [
@@ -5113,9 +5111,7 @@
         "additionalProperties": false,
         "properties": {
           "comment_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           },
           "content": {
             "description": "The reaction: `+1`, `-1`, `laugh`, `confused`, `heart`, `hooray`, `rocket` or `eyes`.",
@@ -5707,9 +5703,7 @@
         "additionalProperties": false,
         "properties": {
           "comment_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           },
           "owner": {
             "type": "string"
@@ -5782,9 +5776,7 @@
             "type": "string"
           },
           "review_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           }
         },
         "required": [
@@ -5799,9 +5791,7 @@
         "additionalProperties": false,
         "properties": {
           "comment_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           },
           "owner": {
             "type": "string"
@@ -5846,10 +5836,8 @@
             "type": "string"
           },
           "release_id": {
-            "description": "GitHub's numeric id of the release.",
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId",
+            "description": "GitHub's numeric id of the release."
           },
           "repo": {
             "type": "string"
@@ -5866,10 +5854,8 @@
         "additionalProperties": false,
         "properties": {
           "asset_id": {
-            "description": "GitHub's numeric id of the asset.",
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId",
+            "description": "GitHub's numeric id of the asset."
           },
           "owner": {
             "description": "The account or organization that owns the repository.",
@@ -5966,9 +5952,7 @@
             "type": "string"
           },
           "review_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           }
         },
         "required": [
@@ -6023,9 +6007,7 @@
         "additionalProperties": false,
         "properties": {
           "artifact_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           },
           "owner": {
             "type": "string"
@@ -6352,9 +6334,7 @@
         "additionalProperties": false,
         "properties": {
           "comment_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           },
           "owner": {
             "type": "string"
@@ -6466,9 +6446,7 @@
             "type": "string"
           },
           "review_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           }
         },
         "required": [
@@ -6508,10 +6486,8 @@
             "type": "string"
           },
           "release_id": {
-            "description": "GitHub's numeric id of the release.",
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId",
+            "description": "GitHub's numeric id of the release."
           },
           "repo": {
             "type": "string"
@@ -6528,10 +6504,8 @@
         "additionalProperties": false,
         "properties": {
           "asset_id": {
-            "description": "GitHub's numeric id of the asset.",
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId",
+            "description": "GitHub's numeric id of the asset."
           },
           "owner": {
             "description": "The account or organization that owns the repository.",
@@ -6669,9 +6643,7 @@
         "additionalProperties": false,
         "properties": {
           "job_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           },
           "owner": {
             "type": "string"
@@ -6697,9 +6669,7 @@
             "type": "string"
           },
           "run_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           }
         },
         "required": [
@@ -7642,6 +7612,20 @@
           "object_type"
         ],
         "type": "object"
+      },
+      "GithubId": {
+        "description": "An id GitHub gave something: a whole number, or the text of one, as answers give it.",
+        "oneOf": [
+          {
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "pattern": "^[0-9]+$",
+            "type": "string"
+          }
+        ]
       },
       "GithubInstallation": {
         "description": "Where our GitHub App is installed: an account or organization.",
@@ -10202,12 +10186,14 @@
         "additionalProperties": false,
         "properties": {
           "app_id": {
-            "description": "Only the check runs of the GitHub App with this id.",
-            "format": "int64",
-            "minimum": 0,
-            "type": [
-              "integer",
-              "null"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubId",
+                "description": "Only the check runs of the GitHub App with this id."
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "check_name": {
@@ -11158,10 +11144,8 @@
             ]
           },
           "release_id": {
-            "description": "GitHub's numeric id of the release.",
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId",
+            "description": "GitHub's numeric id of the release."
           },
           "repo": {
             "type": "string"
@@ -11851,9 +11835,7 @@
             "type": "string"
           },
           "run_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           }
         },
         "required": [
@@ -11898,9 +11880,7 @@
             "type": "string"
           },
           "run_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           }
         },
         "required": [
@@ -11928,12 +11908,14 @@
             ]
           },
           "check_suite_id": {
-            "description": "Only the runs of this check suite.",
-            "format": "int64",
-            "minimum": 0,
-            "type": [
-              "integer",
-              "null"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubId",
+                "description": "Only the runs of this check suite."
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "created": {
@@ -12620,10 +12602,8 @@
             "type": "string"
           },
           "comment_id": {
-            "description": "The comment replied to. It must be a comment that is not itself a reply.",
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId",
+            "description": "The comment replied to. It must be a comment that is not itself a reply."
           },
           "owner": {
             "type": "string"
@@ -12692,9 +12672,7 @@
         "additionalProperties": false,
         "properties": {
           "check_run_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           },
           "owner": {
             "type": "string"
@@ -12714,9 +12692,7 @@
         "additionalProperties": false,
         "properties": {
           "check_suite_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           },
           "owner": {
             "type": "string"
@@ -12749,9 +12725,7 @@
             "type": "string"
           },
           "run_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           }
         },
         "required": [
@@ -12778,9 +12752,7 @@
             "type": "string"
           },
           "run_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           }
         },
         "required": [
@@ -13125,10 +13097,8 @@
             "type": "string"
           },
           "repository_id": {
-            "description": "GitHub's numeric id of the repository whose labels are searched.",
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId",
+            "description": "GitHub's numeric id of the repository whose labels are searched."
           },
           "sort": {
             "description": "`created` or `updated`. Best match when left out.",
@@ -13374,9 +13344,7 @@
             "type": "string"
           },
           "review_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           }
         },
         "required": [
@@ -13695,9 +13663,7 @@
             "type": "string"
           },
           "comment_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           },
           "owner": {
             "type": "string"
@@ -13900,9 +13866,7 @@
             "type": "string"
           },
           "comment_id": {
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId"
           },
           "owner": {
             "type": "string"
@@ -13995,10 +13959,8 @@
             ]
           },
           "release_id": {
-            "description": "GitHub's numeric id of the release.",
-            "format": "int64",
-            "minimum": 0,
-            "type": "integer"
+            "$ref": "#/components/schemas/GithubId",
+            "description": "GitHub's numeric id of the release."
           },
           "repo": {
             "type": "string"

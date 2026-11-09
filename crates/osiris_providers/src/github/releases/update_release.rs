@@ -3,8 +3,8 @@
 use crate::{
     ProviderError,
     github::{
-        Github, path_segment::path_segment, request::send, transformers::release::ReleaseAnswer,
-        trimmed::trimmed, types::GithubRelease,
+        Github, github_id::GithubId, path_segment::path_segment, request::send,
+        transformers::release::ReleaseAnswer, trimmed::trimmed, types::GithubRelease,
     },
 };
 use reqwest::Method;
@@ -19,7 +19,7 @@ pub struct UpdateRelease {
     pub owner: String,
     pub repo: String,
     /// GitHub's numeric id of the release.
-    pub release_id: u64,
+    pub release_id: GithubId,
     pub tag_name: Option<String>,
     /// The branch or commit SHA a new tag is created from.
     pub target_commitish: Option<String>,

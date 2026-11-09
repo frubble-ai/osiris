@@ -6,6 +6,7 @@ pub mod activity;
 pub mod app;
 pub mod checks;
 pub mod get_page;
+pub mod github_id;
 pub mod installations;
 pub mod issues;
 #[cfg(any(test, feature = "testing"))]

@@ -3,7 +3,7 @@
 use crate::{
     ProviderError,
     github::{
-        Github, paging::paging, path_segment::path_segment, request::send,
+        Github, github_id::GithubId, paging::paging, path_segment::path_segment, request::send,
         transformers::workflow_runs_page::WorkflowRunsPage, trimmed::trimmed,
         types::GithubWorkflowRun,
     },
@@ -25,7 +25,7 @@ pub struct ListWorkflowRuns {
     /// `>=2024-01-01` or `2024-01-01..2024-01-31`.
     pub created: Option<String>,
     /// Only the runs of this check suite.
-    pub check_suite_id: Option<u64>,
+    pub check_suite_id: Option<GithubId>,
     /// Only the runs started by this event, such as `push` or `pull_request`.
     pub event: Option<String>,
     /// Only the runs of this commit.

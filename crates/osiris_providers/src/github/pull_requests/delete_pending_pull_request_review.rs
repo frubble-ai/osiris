@@ -3,8 +3,8 @@
 use crate::{
     ProviderError,
     github::{
-        Github, path_segment::path_segment, request::send, transformers::review::ReviewAnswer,
-        types::GithubReview,
+        Github, github_id::GithubId, path_segment::path_segment, request::send,
+        transformers::review::ReviewAnswer, types::GithubReview,
     },
 };
 use reqwest::Method;
@@ -17,7 +17,7 @@ pub struct DeletePendingPullRequestReview {
     pub owner: String,
     pub repo: String,
     pub pull_number: u64,
-    pub review_id: u64,
+    pub review_id: GithubId,
 }
 
 impl DeletePendingPullRequestReview {

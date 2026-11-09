@@ -3,7 +3,7 @@
 use crate::{
     ProviderError,
     github::{
-        Github, path_segment::path_segment, request::send,
+        Github, github_id::GithubId, path_segment::path_segment, request::send,
         transformers::workflow_run::WorkflowRunAnswer, types::GithubWorkflowRun,
     },
 };
@@ -16,7 +16,7 @@ use utoipa::ToSchema;
 pub struct GetWorkflowRun {
     pub owner: String,
     pub repo: String,
-    pub run_id: u64,
+    pub run_id: GithubId,
 }
 
 impl GetWorkflowRun {

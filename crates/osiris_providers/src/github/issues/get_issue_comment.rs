@@ -3,7 +3,7 @@
 use crate::{
     ProviderError,
     github::{
-        Github, path_segment::path_segment, request::send,
+        Github, github_id::GithubId, path_segment::path_segment, request::send,
         transformers::issue_comment::IssueCommentAnswer, types::GithubIssueComment,
     },
 };
@@ -16,7 +16,7 @@ use utoipa::ToSchema;
 pub struct GetIssueComment {
     pub owner: String,
     pub repo: String,
-    pub comment_id: u64,
+    pub comment_id: GithubId,
 }
 
 impl GetIssueComment {

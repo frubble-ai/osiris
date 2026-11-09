@@ -3,7 +3,7 @@
 use crate::{
     ProviderError,
     github::{
-        Github, paging::paging, path_segment::path_segment, request::send,
+        Github, github_id::GithubId, paging::paging, path_segment::path_segment, request::send,
         transformers::release_asset::ReleaseAssetAnswer, types::GithubReleaseAsset,
     },
 };
@@ -18,7 +18,7 @@ pub struct ListReleaseAssets {
     pub owner: String,
     pub repo: String,
     /// GitHub's numeric id of the release.
-    pub release_id: u64,
+    pub release_id: GithubId,
     /// At most 100.
     pub per_page: Option<u32>,
     /// From 1.

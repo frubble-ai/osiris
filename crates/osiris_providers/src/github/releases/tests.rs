@@ -15,6 +15,7 @@ use super::{
         generate_github_release_asset::generate_github_release_asset,
     },
 };
+use crate::github::github_id::GithubId;
 use crate::{
     ProviderError,
     github::mocks::{
@@ -173,7 +174,7 @@ async fn reads_a_release_by_its_id() {
     let input = GetRelease {
         owner: owner.clone(),
         repo: repo.clone(),
-        release_id: 13,
+        release_id: GithubId(13),
     };
 
     let release = generate_github(&server)
@@ -272,7 +273,7 @@ async fn lists_a_page_of_a_releases_assets() {
     let input = ListReleaseAssets {
         owner: owner.clone(),
         repo: repo.clone(),
-        release_id: 16,
+        release_id: GithubId(16),
         per_page: Some(50),
         page: None,
     };
@@ -309,7 +310,7 @@ async fn updates_a_release_sending_only_the_fields_given() {
     let input = UpdateRelease {
         owner: owner.clone(),
         repo: repo.clone(),
-        release_id: 17,
+        release_id: GithubId(17),
         tag_name: None,
         target_commitish: None,
         name: Some("Spring".into()),
@@ -380,7 +381,7 @@ async fn reads_a_release_asset_by_its_id() {
     let input = GetReleaseAsset {
         owner: owner.clone(),
         repo: repo.clone(),
-        asset_id: 22,
+        asset_id: GithubId(22),
     };
 
     let asset = generate_github(&server)
@@ -422,14 +423,14 @@ async fn deletes_a_release_or_an_asset_and_acknowledges_it(
         let input = DeleteReleaseAsset {
             owner: owner.clone(),
             repo: repo.clone(),
-            asset_id: 18,
+            asset_id: GithubId(18),
         };
         github.delete_release_asset(&http, &token, &input).await
     } else {
         let input = DeleteRelease {
             owner: owner.clone(),
             repo: repo.clone(),
-            release_id: 18,
+            release_id: GithubId(18),
         };
         github.delete_release(&http, &token, &input).await
     };

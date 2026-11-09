@@ -3,7 +3,7 @@
 use crate::{
     ProviderError,
     github::{
-        Github, paging::paging, path_segment::path_segment, request::send,
+        Github, github_id::GithubId, paging::paging, path_segment::path_segment, request::send,
         transformers::workflow_jobs_page::WorkflowJobsPage, trimmed::trimmed,
         types::GithubWorkflowJob,
     },
@@ -17,7 +17,7 @@ use utoipa::ToSchema;
 pub struct ListWorkflowRunJobs {
     pub owner: String,
     pub repo: String,
-    pub run_id: u64,
+    pub run_id: GithubId,
     /// `latest` (the jobs of the run's latest attempt, GitHub's default) or `all`.
     pub filter: Option<String>,
     /// At most 100.

@@ -2,7 +2,10 @@
 
 use crate::{
     ProviderError,
-    github::{Github, path_segment::path_segment, request::send, types::GithubAcknowledgement},
+    github::{
+        Github, github_id::GithubId, path_segment::path_segment, request::send,
+        types::GithubAcknowledgement,
+    },
 };
 use reqwest::Method;
 use serde::Deserialize;
@@ -13,7 +16,7 @@ use utoipa::ToSchema;
 pub struct DeleteIssueComment {
     pub owner: String,
     pub repo: String,
-    pub comment_id: u64,
+    pub comment_id: GithubId,
 }
 
 impl DeleteIssueComment {

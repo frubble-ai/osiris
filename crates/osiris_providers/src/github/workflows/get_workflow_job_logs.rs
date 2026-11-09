@@ -3,7 +3,7 @@
 use super::follow_download::follow_download;
 use crate::{
     ProviderCommon, ProviderError,
-    github::{Github, path_segment::path_segment, types::GithubJobLogs},
+    github::{Github, github_id::GithubId, path_segment::path_segment, types::GithubJobLogs},
 };
 use serde::Deserialize;
 use utoipa::ToSchema;
@@ -13,7 +13,7 @@ use utoipa::ToSchema;
 pub struct GetWorkflowJobLogs {
     pub owner: String,
     pub repo: String,
-    pub job_id: u64,
+    pub job_id: GithubId,
 }
 
 impl GetWorkflowJobLogs {

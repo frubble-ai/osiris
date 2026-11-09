@@ -5,6 +5,7 @@ use crate::{
     ProviderError,
     github::{
         Github,
+        github_id::GithubId,
         paging::paging,
         request::send,
         transformers::{search::SearchLabelAnswer, search_results::SearchResultsAnswer},
@@ -20,7 +21,7 @@ use utoipa::ToSchema;
 #[serde(deny_unknown_fields)]
 pub struct SearchLabels {
     /// GitHub's numeric id of the repository whose labels are searched.
-    pub repository_id: u64,
+    pub repository_id: GithubId,
     /// The words to look for in the labels' names and descriptions.
     pub query: String,
     /// `created` or `updated`. Best match when left out.

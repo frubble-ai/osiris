@@ -19,6 +19,7 @@ use super::{
         generate_github_search_user::generate_github_search_user,
     },
 };
+use crate::github::github_id::GithubId;
 use crate::github::mocks::{
     MockGithubNetwork,
     generate_github::generate_github,
@@ -210,7 +211,7 @@ async fn searches_the_labels_of_a_repository_by_its_id() {
         )
         .await;
     let input = SearchLabels {
-        repository_id: 64_778_136,
+        repository_id: GithubId(64_778_136),
         query: "bug".into(),
         sort: Some("created".into()),
         order: None,

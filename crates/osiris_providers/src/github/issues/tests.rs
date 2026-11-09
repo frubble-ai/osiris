@@ -31,6 +31,7 @@ use super::{
         },
     },
 };
+use crate::github::github_id::GithubId;
 use crate::{
     ProviderError,
     github::mocks::{
@@ -953,7 +954,7 @@ async fn reads_a_comment_on_an_issue_by_id() {
     let input = GetIssueComment {
         owner: owner.clone(),
         repo: repo.clone(),
-        comment_id: 191,
+        comment_id: GithubId(191),
     };
 
     let comment = generate_github(&server)
@@ -986,7 +987,7 @@ async fn replaces_a_comment_s_text() {
     let input = UpdateIssueComment {
         owner: owner.clone(),
         repo: repo.clone(),
-        comment_id: 201,
+        comment_id: GithubId(201),
         body,
     };
 
@@ -1014,7 +1015,7 @@ async fn deletes_a_comment_on_an_issue() {
     let input = DeleteIssueComment {
         owner: owner.clone(),
         repo: repo.clone(),
-        comment_id: 211,
+        comment_id: GithubId(211),
     };
 
     let done = generate_github(&server)
@@ -1419,7 +1420,7 @@ async fn reacts_to_a_comment_on_an_issue() {
     let input = CreateIssueCommentReaction {
         owner: owner.clone(),
         repo: repo.clone(),
-        comment_id: 301,
+        comment_id: GithubId(301),
         content: "rocket".into(),
     };
 

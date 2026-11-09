@@ -2,7 +2,10 @@
 
 use crate::{
     ProviderError,
-    github::{Github, path_segment::path_segment, request::send, types::GithubAcknowledgement},
+    github::{
+        Github, github_id::GithubId, path_segment::path_segment, request::send,
+        types::GithubAcknowledgement,
+    },
 };
 use reqwest::Method;
 use serde::Deserialize;
@@ -15,7 +18,7 @@ pub struct DeleteReleaseAsset {
     pub owner: String,
     pub repo: String,
     /// GitHub's numeric id of the asset.
-    pub asset_id: u64,
+    pub asset_id: GithubId,
 }
 
 impl DeleteReleaseAsset {

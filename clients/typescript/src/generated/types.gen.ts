@@ -1596,7 +1596,7 @@ export type AuthConfig = {
 export type CancelWorkflowRun = {
     owner: string;
     repo: string;
-    run_id: number;
+    run_id: GithubId;
 };
 
 export type CheckPullRequestMerged = {
@@ -1823,7 +1823,7 @@ export type CreateIssueComment = {
 };
 
 export type CreateIssueCommentReaction = {
-    comment_id: number;
+    comment_id: GithubId;
     /**
      * The reaction: `+1`, `-1`, `laugh`, `confused`, `heart`, `hooray`, `rocket` or `eyes`.
      */
@@ -2083,7 +2083,7 @@ export type DeleteFile = {
 };
 
 export type DeleteIssueComment = {
-    comment_id: number;
+    comment_id: GithubId;
     owner: string;
     repo: string;
 };
@@ -2104,11 +2104,11 @@ export type DeletePendingPullRequestReview = {
     owner: string;
     pull_number: number;
     repo: string;
-    review_id: number;
+    review_id: GithubId;
 };
 
 export type DeletePullRequestReviewComment = {
-    comment_id: number;
+    comment_id: GithubId;
     owner: string;
     repo: string;
 };
@@ -2130,7 +2130,7 @@ export type DeleteRelease = {
     /**
      * GitHub's numeric id of the release.
      */
-    release_id: number;
+    release_id: GithubId;
     repo: string;
 };
 
@@ -2138,7 +2138,7 @@ export type DeleteReleaseAsset = {
     /**
      * GitHub's numeric id of the asset.
      */
-    asset_id: number;
+    asset_id: GithubId;
     /**
      * The account or organization that owns the repository.
      */
@@ -2182,7 +2182,7 @@ export type DismissPullRequestReview = {
     owner: string;
     pull_number: number;
     repo: string;
-    review_id: number;
+    review_id: GithubId;
 };
 
 export type DispatchWorkflow = {
@@ -2205,7 +2205,7 @@ export type DispatchWorkflow = {
 };
 
 export type DownloadWorkflowArtifact = {
-    artifact_id: number;
+    artifact_id: GithubId;
     owner: string;
     repo: string;
 };
@@ -2368,7 +2368,7 @@ export type GetIssue = {
 };
 
 export type GetIssueComment = {
-    comment_id: number;
+    comment_id: GithubId;
     owner: string;
     repo: string;
 };
@@ -2403,7 +2403,7 @@ export type GetPullRequestReview = {
     owner: string;
     pull_number: number;
     repo: string;
-    review_id: number;
+    review_id: GithubId;
 };
 
 export type GetRef = {
@@ -2423,7 +2423,7 @@ export type GetRelease = {
     /**
      * GitHub's numeric id of the release.
      */
-    release_id: number;
+    release_id: GithubId;
     repo: string;
 };
 
@@ -2431,7 +2431,7 @@ export type GetReleaseAsset = {
     /**
      * GitHub's numeric id of the asset.
      */
-    asset_id: number;
+    asset_id: GithubId;
     /**
      * The account or organization that owns the repository.
      */
@@ -2494,7 +2494,7 @@ export type GetWorkflow = {
 };
 
 export type GetWorkflowJobLogs = {
-    job_id: number;
+    job_id: GithubId;
     owner: string;
     repo: string;
 };
@@ -2502,7 +2502,7 @@ export type GetWorkflowJobLogs = {
 export type GetWorkflowRun = {
     owner: string;
     repo: string;
-    run_id: number;
+    run_id: GithubId;
 };
 
 /**
@@ -2845,6 +2845,11 @@ export type GithubGitRef = {
     ref_name: string;
     sha: string;
 };
+
+/**
+ * An id GitHub gave something: a whole number, or the text of one, as answers give it.
+ */
+export type GithubId = number | string;
 
 /**
  * Where our GitHub App is installed: an account or organization.
@@ -3746,10 +3751,7 @@ export type ListBranches = {
 };
 
 export type ListCheckRunsForRef = {
-    /**
-     * Only the check runs of the GitHub App with this id.
-     */
-    app_id?: number | null;
+    app_id?: GithubId | null;
     /**
      * Only the check runs with this name.
      */
@@ -4135,7 +4137,7 @@ export type ListReleaseAssets = {
     /**
      * GitHub's numeric id of the release.
      */
-    release_id: number;
+    release_id: GithubId;
     repo: string;
 };
 
@@ -4433,7 +4435,7 @@ export type ListWorkflowRunArtifacts = {
      */
     per_page?: number | null;
     repo: string;
-    run_id: number;
+    run_id: GithubId;
 };
 
 export type ListWorkflowRunJobs = {
@@ -4451,7 +4453,7 @@ export type ListWorkflowRunJobs = {
      */
     per_page?: number | null;
     repo: string;
-    run_id: number;
+    run_id: GithubId;
 };
 
 export type ListWorkflowRuns = {
@@ -4463,10 +4465,7 @@ export type ListWorkflowRuns = {
      * Only the runs on this branch.
      */
     branch?: string | null;
-    /**
-     * Only the runs of this check suite.
-     */
-    check_suite_id?: number | null;
+    check_suite_id?: GithubId | null;
     /**
      * Only the runs created in this date range, in GitHub's search syntax, such as
      * `>=2024-01-01` or `2024-01-01..2024-01-31`.
@@ -4768,7 +4767,7 @@ export type ReplyPullRequestReviewComment = {
     /**
      * The comment replied to. It must be a comment that is not itself a reply.
      */
-    comment_id: number;
+    comment_id: GithubId;
     owner: string;
     pull_number: number;
     repo: string;
@@ -4789,13 +4788,13 @@ export type RequestPullRequestReviewers = {
 };
 
 export type RerequestCheckRun = {
-    check_run_id: number;
+    check_run_id: GithubId;
     owner: string;
     repo: string;
 };
 
 export type RerequestCheckSuite = {
-    check_suite_id: number;
+    check_suite_id: GithubId;
     owner: string;
     repo: string;
 };
@@ -4807,7 +4806,7 @@ export type RerunFailedJobs = {
     enable_debug_logging?: boolean | null;
     owner: string;
     repo: string;
-    run_id: number;
+    run_id: GithubId;
 };
 
 export type RerunWorkflow = {
@@ -4817,7 +4816,7 @@ export type RerunWorkflow = {
     enable_debug_logging?: boolean | null;
     owner: string;
     repo: string;
-    run_id: number;
+    run_id: GithubId;
 };
 
 /**
@@ -4998,7 +4997,7 @@ export type SearchLabels = {
     /**
      * GitHub's numeric id of the repository whose labels are searched.
      */
-    repository_id: number;
+    repository_id: GithubId;
     /**
      * `created` or `updated`. Best match when left out.
      */
@@ -5111,7 +5110,7 @@ export type SubmitPullRequestReview = {
     owner: string;
     pull_number: number;
     repo: string;
-    review_id: number;
+    review_id: GithubId;
 };
 
 export type SyncForkBranchWithUpstream = {
@@ -5267,7 +5266,7 @@ export type UpdateIssueComment = {
      * The comment's new text, in Markdown.
      */
     body: string;
-    comment_id: number;
+    comment_id: GithubId;
     owner: string;
     repo: string;
 };
@@ -5346,7 +5345,7 @@ export type UpdatePullRequestReviewComment = {
      * The comment's new text.
      */
     body: string;
-    comment_id: number;
+    comment_id: GithubId;
     owner: string;
     repo: string;
 };
@@ -5397,7 +5396,7 @@ export type UpdateRelease = {
     /**
      * GitHub's numeric id of the release.
      */
-    release_id: number;
+    release_id: GithubId;
     repo: string;
     tag_name?: string | null;
     /**

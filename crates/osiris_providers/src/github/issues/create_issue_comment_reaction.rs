@@ -3,8 +3,8 @@
 use crate::{
     ProviderError,
     github::{
-        Github, path_segment::path_segment, request::send, transformers::reaction::ReactionAnswer,
-        types::GithubReaction,
+        Github, github_id::GithubId, path_segment::path_segment, request::send,
+        transformers::reaction::ReactionAnswer, types::GithubReaction,
     },
 };
 use reqwest::Method;
@@ -16,7 +16,7 @@ use utoipa::ToSchema;
 pub struct CreateIssueCommentReaction {
     pub owner: String,
     pub repo: String,
-    pub comment_id: u64,
+    pub comment_id: GithubId,
     /// The reaction: `+1`, `-1`, `laugh`, `confused`, `heart`, `hooray`, `rocket` or `eyes`.
     pub content: String,
 }

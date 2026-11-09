@@ -4,7 +4,7 @@
 use crate::{
     ProviderError,
     github::{
-        Github, paging::paging, path_segment::path_segment, request::send,
+        Github, github_id::GithubId, paging::paging, path_segment::path_segment, request::send,
         transformers::check_runs_page::CheckRunsPage, trimmed::trimmed, types::GithubCheckRun,
     },
 };
@@ -21,7 +21,7 @@ pub struct ListCheckRunsForRef {
     #[serde(rename = "ref")]
     pub git_ref: String,
     /// Only the check runs of the GitHub App with this id.
-    pub app_id: Option<u64>,
+    pub app_id: Option<GithubId>,
     /// Only the check runs with this name.
     pub check_name: Option<String>,
     /// `latest` (each check's most recent run, GitHub's default) or `all`.

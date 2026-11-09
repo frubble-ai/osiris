@@ -26,6 +26,7 @@ use super::{
         generate_github_team::generate_github_team,
     },
 };
+use crate::github::github_id::GithubId;
 use crate::github::mocks::generate_github_commit::generate_github_commit;
 use crate::{
     ProviderError,
@@ -530,7 +531,7 @@ async fn submits_a_pending_review_with_its_verdict(
         owner: owner.clone(),
         repo: repo.clone(),
         pull_number: 5,
-        review_id: 81,
+        review_id: GithubId(81),
         event,
         body: Some(body),
     };
@@ -563,7 +564,7 @@ async fn reads_a_review_by_id() {
         owner: owner.clone(),
         repo: repo.clone(),
         pull_number: 5,
-        review_id: 91,
+        review_id: GithubId(91),
     };
 
     let read = generate_github(&server)
@@ -598,7 +599,7 @@ async fn dismisses_a_review_with_a_reason() {
         owner: owner.clone(),
         repo: repo.clone(),
         pull_number: 5,
-        review_id: 92,
+        review_id: GithubId(92),
         message: reason,
     };
 
@@ -628,7 +629,7 @@ async fn deletes_a_pending_review_and_answers_it() {
         owner: owner.clone(),
         repo: repo.clone(),
         pull_number: 5,
-        review_id: 93,
+        review_id: GithubId(93),
     };
 
     let deleted = generate_github(&server)
@@ -708,7 +709,7 @@ async fn replies_to_a_comment_on_the_diff() {
         owner: owner.clone(),
         repo: repo.clone(),
         pull_number: 5,
-        comment_id: 101,
+        comment_id: GithubId(101),
         body,
     };
 
@@ -741,7 +742,7 @@ async fn replaces_the_text_of_a_comment_on_the_diff() {
     let input = UpdatePullRequestReviewComment {
         owner: owner.clone(),
         repo: repo.clone(),
-        comment_id: 103,
+        comment_id: GithubId(103),
         body: body.clone(),
     };
 
@@ -771,7 +772,7 @@ async fn deletes_a_comment_on_the_diff_and_acknowledges_it() {
     let input = DeletePullRequestReviewComment {
         owner: owner.clone(),
         repo: repo.clone(),
-        comment_id: 104,
+        comment_id: GithubId(104),
     };
 
     let deleted = generate_github(&server)
@@ -1227,7 +1228,7 @@ async fn encodes_an_owner_and_a_repository_in_a_comment_path() {
     let input = DeletePullRequestReviewComment {
         owner: "my org".into(),
         repo: "hello/world".into(),
-        comment_id: 7,
+        comment_id: GithubId(7),
     };
 
     let deleted = generate_github(&server)

@@ -2,7 +2,10 @@
 
 use crate::{
     ProviderError,
-    github::{Github, path_segment::path_segment, request::send, types::GithubAcknowledgement},
+    github::{
+        Github, github_id::GithubId, path_segment::path_segment, request::send,
+        types::GithubAcknowledgement,
+    },
 };
 use reqwest::Method;
 use serde::{Deserialize, Serialize, de::IgnoredAny};
@@ -13,7 +16,7 @@ use utoipa::ToSchema;
 pub struct RerunFailedJobs {
     pub owner: String,
     pub repo: String,
-    pub run_id: u64,
+    pub run_id: GithubId,
     /// Whether the jobs run again with debug logging turned on.
     pub enable_debug_logging: Option<bool>,
 }

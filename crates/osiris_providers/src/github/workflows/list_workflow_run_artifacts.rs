@@ -3,7 +3,7 @@
 use crate::{
     ProviderError,
     github::{
-        Github, paging::paging, path_segment::path_segment, request::send,
+        Github, github_id::GithubId, paging::paging, path_segment::path_segment, request::send,
         transformers::artifacts_page::ArtifactsPage, trimmed::trimmed, types::GithubArtifact,
     },
 };
@@ -16,7 +16,7 @@ use utoipa::ToSchema;
 pub struct ListWorkflowRunArtifacts {
     pub owner: String,
     pub repo: String,
-    pub run_id: u64,
+    pub run_id: GithubId,
     /// Only the artifacts with exactly this name.
     pub name: Option<String>,
     /// At most 100.

@@ -3,8 +3,8 @@
 use crate::{
     ProviderError,
     github::{
-        Github, path_segment::path_segment, request::send, transformers::release::ReleaseAnswer,
-        types::GithubRelease,
+        Github, github_id::GithubId, path_segment::path_segment, request::send,
+        transformers::release::ReleaseAnswer, types::GithubRelease,
     },
 };
 use reqwest::Method;
@@ -18,7 +18,7 @@ pub struct GetRelease {
     pub owner: String,
     pub repo: String,
     /// GitHub's numeric id of the release.
-    pub release_id: u64,
+    pub release_id: GithubId,
 }
 
 impl GetRelease {

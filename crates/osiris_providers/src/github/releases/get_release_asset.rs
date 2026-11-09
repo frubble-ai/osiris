@@ -3,7 +3,7 @@
 use crate::{
     ProviderError,
     github::{
-        Github, path_segment::path_segment, request::send,
+        Github, github_id::GithubId, path_segment::path_segment, request::send,
         transformers::release_asset::ReleaseAssetAnswer, types::GithubReleaseAsset,
     },
 };
@@ -18,7 +18,7 @@ pub struct GetReleaseAsset {
     pub owner: String,
     pub repo: String,
     /// GitHub's numeric id of the asset.
-    pub asset_id: u64,
+    pub asset_id: GithubId,
 }
 
 impl GetReleaseAsset {

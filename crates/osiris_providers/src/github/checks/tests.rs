@@ -14,6 +14,7 @@ use super::{
         generate_github_commit_status::generate_github_commit_status,
     },
 };
+use crate::github::github_id::GithubId;
 use crate::{
     ProviderError,
     github::mocks::{
@@ -162,7 +163,7 @@ async fn lists_the_check_runs_of_a_ref_filtered_as_asked() {
         owner: owner.clone(),
         repo: repo.clone(),
         git_ref: "main".into(),
-        app_id: Some(15368),
+        app_id: Some(GithubId(15368)),
         check_name: Some("build".into()),
         filter: Some("all".into()),
         status: Some("completed".into()),
@@ -243,7 +244,7 @@ async fn acknowledges_a_check_run_rerequested(#[case] answer: serde_json::Value)
     let input = RerequestCheckRun {
         owner: owner.clone(),
         repo: repo.clone(),
-        check_run_id: 42,
+        check_run_id: GithubId(42),
     };
 
     let acknowledged = generate_github(&server)
@@ -271,7 +272,7 @@ async fn acknowledges_a_check_suite_rerequested() {
     let input = RerequestCheckSuite {
         owner: owner.clone(),
         repo: repo.clone(),
-        check_suite_id: 9,
+        check_suite_id: GithubId(9),
     };
 
     let acknowledged = generate_github(&server)
@@ -299,7 +300,7 @@ async fn refuses_a_check_run_github_will_not_rerequest() {
     let input = RerequestCheckRun {
         owner: owner.clone(),
         repo: repo.clone(),
-        check_run_id: 42,
+        check_run_id: GithubId(42),
     };
 
     let refused = generate_github(&server)

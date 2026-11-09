@@ -19,6 +19,7 @@ use super::{
         generate_github_workflow_run::generate_github_workflow_run,
     },
 };
+use crate::github::github_id::GithubId;
 use crate::{
     ListLimits, ProviderError, ProviderUrls,
     github::{
@@ -235,7 +236,7 @@ async fn lists_workflow_runs_filtered_as_asked() {
         actor: Some(actor.clone()),
         branch: Some("main".into()),
         created: Some(">=2024-01-01".into()),
-        check_suite_id: Some(77),
+        check_suite_id: Some(GithubId(77)),
         event: Some("push".into()),
         head_sha: Some("abc123".into()),
         status: Some("completed".into()),
@@ -317,7 +318,7 @@ async fn reads_a_workflow_run_by_id() {
     let input = GetWorkflowRun {
         owner: owner.clone(),
         repo: repo.clone(),
-        run_id: 30,
+        run_id: GithubId(30),
     };
 
     let run = generate_github(&server)
@@ -348,7 +349,7 @@ async fn lists_the_jobs_of_a_run_with_their_steps() {
     let input = ListWorkflowRunJobs {
         owner: owner.clone(),
         repo: repo.clone(),
-        run_id: 30,
+        run_id: GithubId(30),
         filter: Some("all".into()),
         per_page: Some(5),
         page: None,
@@ -386,7 +387,7 @@ async fn reads_the_logs_of_a_job_from_where_github_redirects() {
     let input = GetWorkflowJobLogs {
         owner: owner.clone(),
         repo: repo.clone(),
-        job_id: 400,
+        job_id: GithubId(400),
     };
 
     let read = generate_github(&server)
@@ -429,7 +430,7 @@ async fn keeps_only_the_end_of_a_log_longer_than_osiris_answers() {
     let input = GetWorkflowJobLogs {
         owner: owner.clone(),
         repo: repo.clone(),
-        job_id: 400,
+        job_id: GithubId(400),
     };
 
     let read = github
@@ -458,7 +459,7 @@ async fn refuses_the_logs_of_a_job_github_no_longer_keeps() {
     let input = GetWorkflowJobLogs {
         owner: owner.clone(),
         repo: repo.clone(),
-        job_id: 400,
+        job_id: GithubId(400),
     };
 
     let refused = generate_github(&server)
@@ -491,7 +492,7 @@ async fn reruns_a_whole_workflow_run(
     let input = RerunWorkflow {
         owner: owner.clone(),
         repo: repo.clone(),
-        run_id: 30,
+        run_id: GithubId(30),
         enable_debug_logging,
     };
 
@@ -520,7 +521,7 @@ async fn reruns_only_the_failed_jobs_of_a_run() {
     let input = RerunFailedJobs {
         owner: owner.clone(),
         repo: repo.clone(),
-        run_id: 30,
+        run_id: GithubId(30),
         enable_debug_logging: Some(false),
     };
 
@@ -549,7 +550,7 @@ async fn cancels_a_workflow_run() {
     let input = CancelWorkflowRun {
         owner: owner.clone(),
         repo: repo.clone(),
-        run_id: 30,
+        run_id: GithubId(30),
     };
 
     let acknowledged = generate_github(&server)
@@ -578,7 +579,7 @@ async fn lists_the_artifacts_of_a_run_by_name() {
     let input = ListWorkflowRunArtifacts {
         owner: owner.clone(),
         repo: repo.clone(),
-        run_id: 30,
+        run_id: GithubId(30),
         name: Some("coverage".into()),
         per_page: None,
         page: Some(1),
@@ -614,7 +615,7 @@ async fn answers_the_signed_url_github_redirects_an_artifact_to() {
     let input = DownloadWorkflowArtifact {
         owner: owner.clone(),
         repo: repo.clone(),
-        artifact_id: 500,
+        artifact_id: GithubId(500),
     };
 
     let download = generate_github(&server)
@@ -645,7 +646,7 @@ async fn refuses_an_artifact_that_has_expired() {
     let input = DownloadWorkflowArtifact {
         owner: owner.clone(),
         repo: repo.clone(),
-        artifact_id: 500,
+        artifact_id: GithubId(500),
     };
 
     let refused = generate_github(&server)
