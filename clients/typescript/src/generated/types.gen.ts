@@ -603,6 +603,7 @@ export type ActionResultGithubRelease = {
      * A release.
      */
     data: {
+        assets: Array<GithubReleaseAsset>;
         assets_url: string;
         author?: GithubUser | null;
         body?: string | null;
@@ -612,9 +613,11 @@ export type ActionResultGithubRelease = {
         name?: string | null;
         prerelease: boolean;
         published_at?: string | null;
+        reactions?: GithubReactions | null;
         tag_name: string;
         tarball_url?: string | null;
         target_commitish: string;
+        upload_url: string;
         url: string;
         zipball_url?: string | null;
     };
@@ -630,6 +633,7 @@ export type ActionResultGithubReleaseAsset = {
     data: {
         content_type: string;
         created_at: string;
+        digest?: string | null;
         download_count: number;
         download_url: string;
         id: string;
@@ -1285,6 +1289,7 @@ export type ActionResultVecGithubPullRequestFile = {
  */
 export type ActionResultVecGithubRelease = {
     data: Array<{
+        assets: Array<GithubReleaseAsset>;
         assets_url: string;
         author?: GithubUser | null;
         body?: string | null;
@@ -1294,9 +1299,11 @@ export type ActionResultVecGithubRelease = {
         name?: string | null;
         prerelease: boolean;
         published_at?: string | null;
+        reactions?: GithubReactions | null;
         tag_name: string;
         tarball_url?: string | null;
         target_commitish: string;
+        upload_url: string;
         url: string;
         zipball_url?: string | null;
     }>;
@@ -1309,6 +1316,7 @@ export type ActionResultVecGithubReleaseAsset = {
     data: Array<{
         content_type: string;
         created_at: string;
+        digest?: string | null;
         download_count: number;
         download_url: string;
         id: string;
@@ -3215,6 +3223,7 @@ export type GithubReactions = {
  * A release.
  */
 export type GithubRelease = {
+    assets: Array<GithubReleaseAsset>;
     assets_url: string;
     author?: GithubUser | null;
     body?: string | null;
@@ -3224,9 +3233,11 @@ export type GithubRelease = {
     name?: string | null;
     prerelease: boolean;
     published_at?: string | null;
+    reactions?: GithubReactions | null;
     tag_name: string;
     tarball_url?: string | null;
     target_commitish: string;
+    upload_url: string;
     url: string;
     zipball_url?: string | null;
 };
@@ -3237,6 +3248,7 @@ export type GithubRelease = {
 export type GithubReleaseAsset = {
     content_type: string;
     created_at: string;
+    digest?: string | null;
     download_count: number;
     download_url: string;
     id: string;

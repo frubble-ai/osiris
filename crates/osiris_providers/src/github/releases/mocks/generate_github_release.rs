@@ -20,6 +20,8 @@ pub fn generate_github_release(id: u64, tag_name: &str) -> Value {
         "prerelease": false,
         "html_url": format!("https://github.com/octo/hello/releases/tag/{tag_name}"),
         "assets_url": format!("https://api.github.com/repos/octo/hello/releases/{id}/assets"),
+        "upload_url": format!("https://uploads.github.com/repos/octo/hello/releases/{id}/assets{{?name,label}}"),
+        "assets": [],
         "tarball_url": format!("https://api.github.com/repos/octo/hello/tarball/{tag_name}"),
         "zipball_url": format!("https://api.github.com/repos/octo/hello/zipball/{tag_name}"),
         "target_commitish": generate_sha(),

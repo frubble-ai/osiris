@@ -1744,32 +1744,11 @@ export const zActionResultGithubReaction = z.object({
 /**
  * An action's answer: what it read, as `data`.
  */
-export const zActionResultGithubRelease = z.object({
-    data: z.object({
-        assets_url: z.string(),
-        author: zGithubUser.nullish(),
-        body: z.string().nullish(),
-        created_at: z.string(),
-        draft: z.boolean(),
-        id: z.string(),
-        name: z.string().nullish(),
-        prerelease: z.boolean(),
-        published_at: z.string().nullish(),
-        tag_name: z.string(),
-        tarball_url: z.string().nullish(),
-        target_commitish: z.string(),
-        url: z.string(),
-        zipball_url: z.string().nullish()
-    })
-});
-
-/**
- * An action's answer: what it read, as `data`.
- */
 export const zActionResultGithubReleaseAsset = z.object({
     data: z.object({
         content_type: z.string(),
         created_at: z.string(),
+        digest: z.string().nullish(),
         download_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         download_url: z.string(),
         id: z.string(),
@@ -1994,32 +1973,11 @@ export const zActionResultVecGithubPullRequest = z.object({
 /**
  * An action's answer: what it read, as `data`.
  */
-export const zActionResultVecGithubRelease = z.object({
-    data: z.array(z.object({
-        assets_url: z.string(),
-        author: zGithubUser.nullish(),
-        body: z.string().nullish(),
-        created_at: z.string(),
-        draft: z.boolean(),
-        id: z.string(),
-        name: z.string().nullish(),
-        prerelease: z.boolean(),
-        published_at: z.string().nullish(),
-        tag_name: z.string(),
-        tarball_url: z.string().nullish(),
-        target_commitish: z.string(),
-        url: z.string(),
-        zipball_url: z.string().nullish()
-    }))
-});
-
-/**
- * An action's answer: what it read, as `data`.
- */
 export const zActionResultVecGithubReleaseAsset = z.object({
     data: z.array(z.object({
         content_type: z.string(),
         created_at: z.string(),
+        digest: z.string().nullish(),
         download_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         download_url: z.string(),
         id: z.string(),
@@ -2326,31 +2284,12 @@ export const zGithubReaction = z.object({
 });
 
 /**
- * A release.
- */
-export const zGithubRelease = z.object({
-    assets_url: z.string(),
-    author: zGithubUser.nullish(),
-    body: z.string().nullish(),
-    created_at: z.string(),
-    draft: z.boolean(),
-    id: z.string(),
-    name: z.string().nullish(),
-    prerelease: z.boolean(),
-    published_at: z.string().nullish(),
-    tag_name: z.string(),
-    tarball_url: z.string().nullish(),
-    target_commitish: z.string(),
-    url: z.string(),
-    zipball_url: z.string().nullish()
-});
-
-/**
  * A file attached to a release.
  */
 export const zGithubReleaseAsset = z.object({
     content_type: z.string(),
     created_at: z.string(),
+    digest: z.string().nullish(),
     download_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     download_url: z.string(),
     id: z.string(),
@@ -2360,6 +2299,79 @@ export const zGithubReleaseAsset = z.object({
     state: z.string(),
     updated_at: z.string(),
     uploader: zGithubUser.nullish()
+});
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export const zActionResultGithubRelease = z.object({
+    data: z.object({
+        assets: z.array(zGithubReleaseAsset),
+        assets_url: z.string(),
+        author: zGithubUser.nullish(),
+        body: z.string().nullish(),
+        created_at: z.string(),
+        draft: z.boolean(),
+        id: z.string(),
+        name: z.string().nullish(),
+        prerelease: z.boolean(),
+        published_at: z.string().nullish(),
+        reactions: zGithubReactions.nullish(),
+        tag_name: z.string(),
+        tarball_url: z.string().nullish(),
+        target_commitish: z.string(),
+        upload_url: z.string(),
+        url: z.string(),
+        zipball_url: z.string().nullish()
+    })
+});
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export const zActionResultVecGithubRelease = z.object({
+    data: z.array(z.object({
+        assets: z.array(zGithubReleaseAsset),
+        assets_url: z.string(),
+        author: zGithubUser.nullish(),
+        body: z.string().nullish(),
+        created_at: z.string(),
+        draft: z.boolean(),
+        id: z.string(),
+        name: z.string().nullish(),
+        prerelease: z.boolean(),
+        published_at: z.string().nullish(),
+        reactions: zGithubReactions.nullish(),
+        tag_name: z.string(),
+        tarball_url: z.string().nullish(),
+        target_commitish: z.string(),
+        upload_url: z.string(),
+        url: z.string(),
+        zipball_url: z.string().nullish()
+    }))
+});
+
+/**
+ * A release.
+ */
+export const zGithubRelease = z.object({
+    assets: z.array(zGithubReleaseAsset),
+    assets_url: z.string(),
+    author: zGithubUser.nullish(),
+    body: z.string().nullish(),
+    created_at: z.string(),
+    draft: z.boolean(),
+    id: z.string(),
+    name: z.string().nullish(),
+    prerelease: z.boolean(),
+    published_at: z.string().nullish(),
+    reactions: zGithubReactions.nullish(),
+    tag_name: z.string(),
+    tarball_url: z.string().nullish(),
+    target_commitish: z.string(),
+    upload_url: z.string(),
+    url: z.string(),
+    zipball_url: z.string().nullish()
 });
 
 /**

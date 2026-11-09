@@ -20,6 +20,7 @@ pub struct ReleaseAssetAnswer {
     pub download_count: i64,
     #[serde(rename = "browser_download_url", default)]
     pub download_url: String,
+    pub digest: Option<String>,
     pub uploader: Option<UserAnswer>,
     #[serde(default)]
     pub created_at: String,
@@ -39,6 +40,7 @@ impl From<ReleaseAssetAnswer> for GithubReleaseAsset {
             size: answer.size,
             download_count: answer.download_count,
             download_url: answer.download_url,
+            digest: answer.digest,
             uploader: answer.uploader.map(GithubUser::from),
             created_at: answer.created_at,
             updated_at: answer.updated_at,

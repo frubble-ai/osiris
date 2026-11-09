@@ -15,6 +15,7 @@ pub struct GithubReleaseAsset {
     pub size: i64,
     pub download_count: i64,
     pub download_url: String,
+    pub digest: Option<String>,
     pub uploader: Option<GithubUser>,
     pub created_at: String,
     pub updated_at: String,

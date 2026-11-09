@@ -16,6 +16,7 @@ pub fn generate_github_release_asset(id: u64) -> Value {
         "size": (1..10_000_000).fake::<i64>(),
         "download_count": (0..1000).fake::<i64>(),
         "browser_download_url": format!("https://github.com/octo/hello/releases/download/v1/{name}"),
+        "digest": format!("sha256:{}", "ab".repeat(32)),
         "uploader": generate_github_user(id + 1000),
         "created_at": "2026-11-01T10:00:00Z",
         "updated_at": "2026-11-01T10:01:00Z",

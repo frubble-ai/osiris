@@ -161,7 +161,9 @@ async fn reads_a_release_by_its_id() {
     let repo = generate_github_repo();
     let token = generate_github_token();
     let server = MockServer::start().await;
-    let answer = generate_github_release(13, "v1.2.0");
+    let mut answer = generate_github_release(13, "v1.2.0");
+    answer["assets"] = json!([generate_github_release_asset(21)]);
+    answer["reactions"] = json!({"total_count": 2, "+1": 1, "-1": 0, "laugh": 0, "confused": 0, "heart": 1, "hooray": 0, "rocket": 0, "eyes": 0});
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
@@ -187,6 +189,17 @@ async fn reads_a_release_by_its_id() {
     assert_eq!(
         release.published_at.as_deref(),
         Some("2026-11-01T10:05:00Z")
+    );
+    assert_eq!(
+        Some(release.upload_url.as_str()),
+        answer["upload_url"].as_str()
+    );
+    assert_eq!(release.assets.len(), 1);
+    assert_eq!(release.assets[0].id, "21");
+    let reactions = release.reactions.unwrap();
+    assert_eq!(
+        (reactions.total_count, reactions.plus_one, reactions.heart),
+        (2, 1, 1)
     );
 }
 
@@ -393,6 +406,7 @@ async fn reads_a_release_asset_by_its_id() {
     assert_eq!(asset.name, answer["name"].as_str().unwrap());
     assert_eq!(asset.label, None);
     assert_eq!(asset.state, "uploaded");
+    assert_eq!(asset.digest.as_deref(), answer["digest"].as_str());
 }
 
 #[rstest]
