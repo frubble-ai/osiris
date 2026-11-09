@@ -320,6 +320,11 @@ async fn reads_whether_an_issue_is_locked_and_why_it_was_closed() {
     assert!(issue.locked);
     assert_eq!(issue.active_lock_reason.as_deref(), Some("resolved"));
     assert_eq!(issue.state_reason.as_deref(), Some("not_planned"));
+    let reactions = issue.reactions.unwrap();
+    assert_eq!(
+        (reactions.total_count, reactions.plus_one, reactions.heart),
+        (3, 2, 1)
+    );
 }
 
 #[tokio::test]
@@ -958,6 +963,8 @@ async fn reads_a_comment_on_an_issue_by_id() {
 
     assert_eq!(comment.id, "191");
     assert_eq!(comment.created_at, text(&answer, "created_at"));
+    let reactions = comment.reactions.unwrap();
+    assert_eq!((reactions.total_count, reactions.minus_one), (1, 1));
 }
 
 #[tokio::test]

@@ -31,6 +31,7 @@ pub mod pull_request;
 pub mod pull_request_branch_update;
 pub mod pull_request_file;
 pub mod reaction;
+pub mod reactions;
 pub mod release;
 pub mod release_asset;
 pub mod repository;

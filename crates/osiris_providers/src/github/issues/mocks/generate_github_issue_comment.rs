@@ -13,5 +13,6 @@ pub fn generate_github_issue_comment(id: u64) -> Value {
         "user": generate_github_user(id + 1),
         "created_at": "2026-01-01T00:00:00Z",
         "updated_at": "2026-01-02T00:00:00Z",
+        "reactions": { "total_count": 1, "+1": 0, "-1": 1, "laugh": 0, "confused": 0, "heart": 0, "hooray": 0, "rocket": 0, "eyes": 0 },
     })
 }

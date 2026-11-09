@@ -1,6 +1,6 @@
 //! A comment on an issue or a pull request.
 
-use super::GithubUser;
+use super::{GithubReactions, GithubUser};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -11,6 +11,8 @@ pub struct GithubIssueComment {
     pub url: String,
     pub body: String,
     pub user: Option<GithubUser>,
+    /// How many of each reaction it has.
+    pub reactions: Option<GithubReactions>,
     pub created_at: String,
     pub updated_at: String,
 }

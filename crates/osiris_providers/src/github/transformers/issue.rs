@@ -2,8 +2,11 @@
 
 use super::label::LabelAnswer;
 use super::milestone::MilestoneAnswer;
+use super::reactions::ReactionsAnswer;
 use super::user::UserAnswer;
-use crate::github::types::{GithubIssue, GithubLabel, GithubMilestone, GithubUser};
+use crate::github::types::{
+    GithubIssue, GithubLabel, GithubMilestone, GithubReactions, GithubUser,
+};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -32,6 +35,7 @@ pub struct IssueAnswer {
     pub locked: bool,
     pub active_lock_reason: Option<String>,
     pub state_reason: Option<String>,
+    pub reactions: Option<ReactionsAnswer>,
     #[serde(default)]
     pub created_at: String,
     #[serde(default)]
@@ -58,6 +62,7 @@ impl From<IssueAnswer> for GithubIssue {
             locked: answer.locked,
             active_lock_reason: answer.active_lock_reason,
             state_reason: answer.state_reason,
+            reactions: answer.reactions.map(GithubReactions::from),
             created_at: answer.created_at,
             updated_at: answer.updated_at,
             closed_at: answer.closed_at,

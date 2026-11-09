@@ -1,6 +1,6 @@
 //! An issue (GitHub also answers pull requests as issues; `is_pull_request` says which).
 
-use super::{GithubLabel, GithubMilestone, GithubUser};
+use super::{GithubLabel, GithubMilestone, GithubReactions, GithubUser};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -25,6 +25,8 @@ pub struct GithubIssue {
     pub active_lock_reason: Option<String>,
     /// Why it is closed or open again: `completed`, `not_planned`, `duplicate` or `reopened`.
     pub state_reason: Option<String>,
+    /// How many of each reaction it has.
+    pub reactions: Option<GithubReactions>,
     pub created_at: String,
     pub updated_at: String,
     pub closed_at: Option<String>,

@@ -304,6 +304,7 @@ export type ActionResultGithubIssue = {
         locked: boolean;
         milestone?: GithubMilestone | null;
         number: number;
+        reactions?: GithubReactions | null;
         state: string;
         /**
          * Why it is closed or open again: `completed`, `not_planned`, `duplicate` or `reopened`.
@@ -327,6 +328,7 @@ export type ActionResultGithubIssueComment = {
         body: string;
         created_at: string;
         id: string;
+        reactions?: GithubReactions | null;
         updated_at: string;
         url: string;
         user?: GithubUser | null;
@@ -1069,6 +1071,7 @@ export type ActionResultVecGithubIssueComment = {
         body: string;
         created_at: string;
         id: string;
+        reactions?: GithubReactions | null;
         updated_at: string;
         url: string;
         user?: GithubUser | null;
@@ -2723,6 +2726,7 @@ export type GithubIssue = {
     locked: boolean;
     milestone?: GithubMilestone | null;
     number: number;
+    reactions?: GithubReactions | null;
     state: string;
     /**
      * Why it is closed or open again: `completed`, `not_planned`, `duplicate` or `reopened`.
@@ -2741,6 +2745,7 @@ export type GithubIssueComment = {
     body: string;
     created_at: string;
     id: string;
+    reactions?: GithubReactions | null;
     updated_at: string;
     url: string;
     user?: GithubUser | null;
@@ -2956,6 +2961,22 @@ export type GithubReaction = {
     created_at: string;
     id: string;
     user?: GithubUser | null;
+};
+
+/**
+ * How many of each reaction an issue or a comment has: GitHub's `+1` is `plus_one`, its `-1`
+ * `minus_one`.
+ */
+export type GithubReactions = {
+    confused: number;
+    eyes: number;
+    heart: number;
+    hooray: number;
+    laugh: number;
+    minus_one: number;
+    plus_one: number;
+    rocket: number;
+    total_count: number;
 };
 
 /**
