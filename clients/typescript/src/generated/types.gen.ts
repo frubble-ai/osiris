@@ -96,7 +96,7 @@ export type ActionResultGithubCommit = {
         committed_at?: string | null;
         committer?: GithubUser | null;
         committer_name?: string | null;
-        files: Array<GithubCommitFile>;
+        files?: Array<GithubCommitFile> | null;
         message: string;
         parents: Array<string>;
         sha: string;
@@ -931,7 +931,7 @@ export type ActionResultVecGithubCommit = {
         committed_at?: string | null;
         committer?: GithubUser | null;
         committer_name?: string | null;
-        files: Array<GithubCommitFile>;
+        files?: Array<GithubCommitFile> | null;
         message: string;
         parents: Array<string>;
         sha: string;
@@ -2456,7 +2456,7 @@ export type GithubCommit = {
     committed_at?: string | null;
     committer?: GithubUser | null;
     committer_name?: string | null;
-    files: Array<GithubCommitFile>;
+    files?: Array<GithubCommitFile> | null;
     message: string;
     parents: Array<string>;
     sha: string;

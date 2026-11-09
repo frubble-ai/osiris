@@ -211,7 +211,9 @@ impl UseCases {
             Err(report)
                 if matches!(
                     report.current_context(),
-                    DomainError::ProviderRefused(_) | DomainError::Invalid(_)
+                    DomainError::ProviderRefused(_)
+                        | DomainError::ProviderNotFound(_)
+                        | DomainError::Invalid(_)
                 ) && !report.contains::<MintFailed>() =>
             {
                 tracing::warn!(error = ?report, trigger_id = %trigger.id, "the provider refuses the trigger's check; the trigger fails");

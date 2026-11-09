@@ -37,6 +37,8 @@ pub struct GithubCommit {
     pub author: Option<GithubUser>,
     pub committer: Option<GithubUser>,
     pub parents: Vec<String>,
+    /// What the commit changed, when GitHub answers it: reading one commit gives it; a list of
+    /// commits doesn't, and leaves both null.
     pub stats: Option<GithubCommitStats>,
-    pub files: Vec<GithubCommitFile>,
+    pub files: Option<Vec<GithubCommitFile>>,
 }

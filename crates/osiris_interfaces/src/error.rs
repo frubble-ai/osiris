@@ -16,8 +16,9 @@ pub enum ProviderError {
         /// The HTTP status it answered, when the refusal came as one.
         status: Option<u16>,
     },
-    /// The input can't be sent as given, such as a field the connection's kind of token can't
-    /// use. Nothing was sent.
+    /// The input can't be sent as given (a field the connection's kind of token can't use), or it
+    /// names something the action doesn't read (a directory asked for as a file). The caller
+    /// changes it; the reason is answered.
     #[error("{provider} can't take the input: {message}")]
     Invalid {
         provider: &'static str,

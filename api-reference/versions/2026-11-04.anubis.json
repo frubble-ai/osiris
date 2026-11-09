@@ -199,7 +199,10 @@
                 "items": {
                   "$ref": "#/components/schemas/GithubCommitFile"
                 },
-                "type": "array"
+                "type": [
+                  "array",
+                  "null"
+                ]
               },
               "message": {
                 "type": "string"
@@ -216,7 +219,8 @@
               "stats": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/GithubCommitStats"
+                    "$ref": "#/components/schemas/GithubCommitStats",
+                    "description": "What the commit changed, when GitHub answers it: reading one commit gives it; a list of\ncommits doesn't, and leaves both null."
                   },
                   {
                     "type": "null"
@@ -231,8 +235,7 @@
               "sha",
               "url",
               "message",
-              "parents",
-              "files"
+              "parents"
             ],
             "type": "object"
           }
@@ -2384,7 +2387,10 @@
                   "items": {
                     "$ref": "#/components/schemas/GithubCommitFile"
                   },
-                  "type": "array"
+                  "type": [
+                    "array",
+                    "null"
+                  ]
                 },
                 "message": {
                   "type": "string"
@@ -2401,7 +2407,8 @@
                 "stats": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/GithubCommitStats"
+                      "$ref": "#/components/schemas/GithubCommitStats",
+                      "description": "What the commit changed, when GitHub answers it: reading one commit gives it; a list of\ncommits doesn't, and leaves both null."
                     },
                     {
                       "type": "null"
@@ -2416,8 +2423,7 @@
                 "sha",
                 "url",
                 "message",
-                "parents",
-                "files"
+                "parents"
               ],
               "type": "object"
             },
@@ -6444,7 +6450,10 @@
             "items": {
               "$ref": "#/components/schemas/GithubCommitFile"
             },
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           },
           "message": {
             "type": "string"
@@ -6461,7 +6470,8 @@
           "stats": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/GithubCommitStats"
+                "$ref": "#/components/schemas/GithubCommitStats",
+                "description": "What the commit changed, when GitHub answers it: reading one commit gives it; a list of\ncommits doesn't, and leaves both null."
               },
               {
                 "type": "null"
@@ -6476,8 +6486,7 @@
           "sha",
           "url",
           "message",
-          "parents",
-          "files"
+          "parents"
         ],
         "type": "object"
       },

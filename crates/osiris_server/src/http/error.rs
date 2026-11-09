@@ -79,6 +79,13 @@ impl ApiError {
                     DomainError::Conflict(_) => {
                         (StatusCode::CONFLICT, "OS_03", "conflict", message)
                     }
+                    DomainError::ProviderNotFound(_) => (
+                        StatusCode::NOT_FOUND,
+                        "OS_01",
+                        "not_found",
+                        // The provider's answer stays in the logged report.
+                        "the provider has no such item".into(),
+                    ),
                     DomainError::ProviderRefused(_) => (
                         StatusCode::FAILED_DEPENDENCY,
                         "OS_04",

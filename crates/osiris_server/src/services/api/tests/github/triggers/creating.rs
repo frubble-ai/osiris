@@ -62,12 +62,7 @@ async fn deletes_the_webhook_again_when_the_first_check_fails(pool: PgPool) {
     )
     .await;
 
-    assert_eq!(
-        refused.status,
-        StatusCode::FAILED_DEPENDENCY,
-        "{}",
-        refused.body
-    );
+    assert_eq!(refused.status, StatusCode::NOT_FOUND, "{}", refused.body);
     let listed = app
         .send(
             "GET",

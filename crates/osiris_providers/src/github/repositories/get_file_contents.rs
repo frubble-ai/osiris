@@ -46,11 +46,11 @@ impl Github {
         let answer: ContentsAnswer =
             send::<_, ()>(self, http, token, Method::GET, &path, &query, None).await?;
         match answer {
-            ContentsAnswer::Directory(_) => Err(ProviderError::refused(
+            ContentsAnswer::Directory(_) => Err(ProviderError::invalid(
                 "github",
                 "path resolves to a directory, not a file",
             )),
-            ContentsAnswer::Item(item) if item.entry_type != "file" => Err(ProviderError::refused(
+            ContentsAnswer::Item(item) if item.entry_type != "file" => Err(ProviderError::invalid(
                 "github",
                 "path does not resolve to a regular file",
             )),

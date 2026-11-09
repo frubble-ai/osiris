@@ -71,8 +71,9 @@ pub struct CommitAnswer {
     #[serde(default)]
     pub parents: Vec<ShaAnswer>,
     pub stats: Option<CommitStatsAnswer>,
+    /// Absent in a list of commits, which GitHub answers without them.
     #[serde(default)]
-    pub files: Vec<CommitFileAnswer>,
+    pub files: Option<Vec<CommitFileAnswer>>,
     #[serde(default)]
     pub commit: Option<CommitCommitAnswer>,
 }
@@ -122,9 +123,7 @@ impl From<CommitAnswer> for GithubCommit {
             stats: answer.stats.map(GithubCommitStats::from),
             files: answer
                 .files
-                .into_iter()
-                .map(GithubCommitFile::from)
-                .collect(),
+                .map(|files| files.into_iter().map(GithubCommitFile::from).collect()),
             message: commit.message,
             author_name: commit
                 .author

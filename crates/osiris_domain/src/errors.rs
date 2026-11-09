@@ -9,6 +9,10 @@ pub enum DomainError {
     Invalid(String),
     #[error("{0}")]
     Conflict(String),
+    /// The provider has no such item (it answered 404): the caller asked for something that isn't
+    /// there, or that the connection can't see.
+    #[error("the provider has no such item: {0}")]
+    ProviderNotFound(String),
     /// The provider refused: the user may have to reconnect.
     #[error("the provider refused: {0}")]
     ProviderRefused(String),

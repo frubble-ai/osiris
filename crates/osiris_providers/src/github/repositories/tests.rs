@@ -596,7 +596,7 @@ async fn reads_a_commit_with_its_stats_and_files() {
         commit.stats.unwrap().total,
         answer["stats"]["total"].as_i64().unwrap()
     );
-    assert_eq!(commit.files[0].filename, "src/lib.rs");
+    assert_eq!(commit.files.as_ref().unwrap()[0].filename, "src/lib.rs");
     assert_eq!(
         commit.author_email.as_deref(),
         answer["commit"]["author"]["email"].as_str()
@@ -1051,7 +1051,7 @@ async fn refuses_to_list_a_file_as_a_directory() {
         .list_directory_contents(&http(), &token, &input)
         .await;
 
-    assert!(matches!(refused, Err(ProviderError::Refused { .. })));
+    assert!(matches!(refused, Err(ProviderError::Invalid { .. })));
 }
 
 #[tokio::test]
@@ -1148,7 +1148,7 @@ async fn refuses_to_read_what_is_not_a_regular_file(#[case] answer: serde_json::
         .get_file_contents(&http(), &token, &input)
         .await;
 
-    assert!(matches!(refused, Err(ProviderError::Refused { .. })));
+    assert!(matches!(refused, Err(ProviderError::Invalid { .. })));
 }
 
 #[tokio::test]

@@ -49,7 +49,7 @@ impl Github {
             ContentsAnswer::Directory(entries) => {
                 Ok(entries.into_iter().map(GithubContentEntry::from).collect())
             }
-            ContentsAnswer::Item(_) => Err(ProviderError::refused(
+            ContentsAnswer::Item(_) => Err(ProviderError::invalid(
                 "github",
                 "path does not resolve to a directory",
             )),

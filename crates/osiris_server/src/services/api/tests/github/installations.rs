@@ -218,7 +218,7 @@ async fn mints_again_once_when_github_refuses_the_installation_s_token(pool: PgP
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
-async fn refuses_an_installation_github_won_t_mint_a_token_for(pool: PgPool) {
+async fn answers_404_for_an_installation_github_doesn_t_know(pool: PgPool) {
     let app = setup_test_context(pool).await;
     let config = app_with_credentials(&app).await;
     MockGithubNetwork::on(&app.provider)
@@ -227,13 +227,8 @@ async fn refuses_an_installation_github_won_t_mint_a_token_for(pool: PgPool) {
 
     let refused = connect(&app, &config, "404404").await;
 
-    assert_eq!(
-        refused.status,
-        StatusCode::FAILED_DEPENDENCY,
-        "{}",
-        refused.body
-    );
-    assert_eq!(refused.body["error"]["code"], "OS_04");
+    assert_eq!(refused.status, StatusCode::NOT_FOUND, "{}", refused.body);
+    assert_eq!(refused.body["error"]["code"], "OS_01");
 }
 
 #[sqlx::test(migrator = "crate::db::MIGRATOR")]
