@@ -285,6 +285,44 @@ async fn reads_a_pull_request_answered_as_an_issue_as_one() {
 }
 
 #[tokio::test]
+async fn reads_whether_an_issue_is_locked_and_why_it_was_closed() {
+    let (owner, repo, token) = (
+        generate_github_login(),
+        generate_github_repo(),
+        generate_github_token(),
+    );
+    let server = MockServer::start().await;
+    let mut answer = generate_github_issue(43, 6, false);
+    answer["state"] = json!("closed");
+    answer["locked"] = json!(true);
+    answer["active_lock_reason"] = json!("resolved");
+    answer["state_reason"] = json!("not_planned");
+    MockGithubNetwork::on(&server)
+        .answer(
+            "GET",
+            &format!("/repos/{owner}/{repo}/issues/6"),
+            &[],
+            200,
+            answer,
+        )
+        .await;
+    let input = GetIssue {
+        owner,
+        repo,
+        issue_number: 6,
+    };
+
+    let issue = generate_github(&server)
+        .get_issue(&http(), &token, &input)
+        .await
+        .unwrap();
+
+    assert!(issue.locked);
+    assert_eq!(issue.active_lock_reason.as_deref(), Some("resolved"));
+    assert_eq!(issue.state_reason.as_deref(), Some("not_planned"));
+}
+
+#[tokio::test]
 async fn updates_an_issue_with_only_the_fields_given() {
     let owner = generate_github_login();
     let repo = generate_github_repo();

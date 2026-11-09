@@ -29,6 +29,9 @@ pub fn generate_github_issue(id: u64, number: u64, pull_request: bool) -> Value 
         "created_at": "2026-01-01T00:00:00Z",
         "updated_at": "2026-01-02T00:00:00Z",
         "closed_at": null,
+        "locked": false,
+        "active_lock_reason": null,
+        "state_reason": null,
     });
     if pull_request && let Some(fields) = issue.as_object_mut() {
         fields.insert(

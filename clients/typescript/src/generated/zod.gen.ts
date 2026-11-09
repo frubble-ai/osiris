@@ -1595,6 +1595,7 @@ export const zActionResultGithubCommitComment = z.object({
  */
 export const zActionResultGithubIssue = z.object({
     data: z.object({
+        active_lock_reason: z.string().nullish(),
         assignees: z.array(zGithubUser),
         body: z.string().nullish(),
         closed_at: z.string().nullish(),
@@ -1603,9 +1604,11 @@ export const zActionResultGithubIssue = z.object({
         id: z.string(),
         is_pull_request: z.boolean(),
         labels: z.array(zGithubLabel),
+        locked: z.boolean(),
         milestone: zGithubMilestone.nullish(),
         number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         state: z.string(),
+        state_reason: z.string().nullish(),
         title: z.string(),
         updated_at: z.string(),
         url: z.string(),
@@ -2070,6 +2073,7 @@ export const zGithubEvent = z.object({
  * An issue (GitHub also answers pull requests as issues; `is_pull_request` says which).
  */
 export const zGithubIssue = z.object({
+    active_lock_reason: z.string().nullish(),
     assignees: z.array(zGithubUser),
     body: z.string().nullish(),
     closed_at: z.string().nullish(),
@@ -2078,9 +2082,11 @@ export const zGithubIssue = z.object({
     id: z.string(),
     is_pull_request: z.boolean(),
     labels: z.array(zGithubLabel),
+    locked: z.boolean(),
     milestone: zGithubMilestone.nullish(),
     number: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     state: z.string(),
+    state_reason: z.string().nullish(),
     title: z.string(),
     updated_at: z.string(),
     url: z.string(),

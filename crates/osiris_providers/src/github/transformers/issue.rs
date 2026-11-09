@@ -29,6 +29,10 @@ pub struct IssueAnswer {
     #[serde(rename = "pull_request")]
     pub is_pull_request: Option<serde_json::Value>,
     #[serde(default)]
+    pub locked: bool,
+    pub active_lock_reason: Option<String>,
+    pub state_reason: Option<String>,
+    #[serde(default)]
     pub created_at: String,
     #[serde(default)]
     pub updated_at: String,
@@ -51,6 +55,9 @@ impl From<IssueAnswer> for GithubIssue {
             labels: answer.labels.into_iter().map(GithubLabel::from).collect(),
             milestone: answer.milestone.map(GithubMilestone::from),
             is_pull_request: answer.is_pull_request.is_some(),
+            locked: answer.locked,
+            active_lock_reason: answer.active_lock_reason,
+            state_reason: answer.state_reason,
             created_at: answer.created_at,
             updated_at: answer.updated_at,
             closed_at: answer.closed_at,

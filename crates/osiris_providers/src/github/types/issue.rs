@@ -19,6 +19,12 @@ pub struct GithubIssue {
     pub labels: Vec<GithubLabel>,
     pub milestone: Option<GithubMilestone>,
     pub is_pull_request: bool,
+    /// Whether its conversation is locked, and why when it is: `off-topic`, `too heated`,
+    /// `resolved` or `spam`.
+    pub locked: bool,
+    pub active_lock_reason: Option<String>,
+    /// Why it is closed or open again: `completed`, `not_planned`, `duplicate` or `reopened`.
+    pub state_reason: Option<String>,
     pub created_at: String,
     pub updated_at: String,
     pub closed_at: Option<String>,

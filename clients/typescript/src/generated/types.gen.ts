@@ -288,6 +288,7 @@ export type ActionResultGithubIssue = {
      * An issue (GitHub also answers pull requests as issues; `is_pull_request` says which).
      */
     data: {
+        active_lock_reason?: string | null;
         assignees: Array<GithubUser>;
         body?: string | null;
         closed_at?: string | null;
@@ -296,9 +297,18 @@ export type ActionResultGithubIssue = {
         id: string;
         is_pull_request: boolean;
         labels: Array<GithubLabel>;
+        /**
+         * Whether its conversation is locked, and why when it is: `off-topic`, `too heated`,
+         * `resolved` or `spam`.
+         */
+        locked: boolean;
         milestone?: GithubMilestone | null;
         number: number;
         state: string;
+        /**
+         * Why it is closed or open again: `completed`, `not_planned`, `duplicate` or `reopened`.
+         */
+        state_reason?: string | null;
         title: string;
         updated_at: string;
         url: string;
@@ -2697,6 +2707,7 @@ export type GithubInstallation = {
  * An issue (GitHub also answers pull requests as issues; `is_pull_request` says which).
  */
 export type GithubIssue = {
+    active_lock_reason?: string | null;
     assignees: Array<GithubUser>;
     body?: string | null;
     closed_at?: string | null;
@@ -2705,9 +2716,18 @@ export type GithubIssue = {
     id: string;
     is_pull_request: boolean;
     labels: Array<GithubLabel>;
+    /**
+     * Whether its conversation is locked, and why when it is: `off-topic`, `too heated`,
+     * `resolved` or `spam`.
+     */
+    locked: boolean;
     milestone?: GithubMilestone | null;
     number: number;
     state: string;
+    /**
+     * Why it is closed or open again: `completed`, `not_planned`, `duplicate` or `reopened`.
+     */
+    state_reason?: string | null;
     title: string;
     updated_at: string;
     url: string;

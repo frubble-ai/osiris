@@ -675,6 +675,12 @@
           "data": {
             "description": "An issue (GitHub also answers pull requests as issues; `is_pull_request` says which).",
             "properties": {
+              "active_lock_reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "assignees": {
                 "items": {
                   "$ref": "#/components/schemas/GithubUser"
@@ -712,6 +718,10 @@
                 },
                 "type": "array"
               },
+              "locked": {
+                "description": "Whether its conversation is locked, and why when it is: `off-topic`, `too heated`,\n`resolved` or `spam`.",
+                "type": "boolean"
+              },
               "milestone": {
                 "oneOf": [
                   {
@@ -728,6 +738,13 @@
               },
               "state": {
                 "type": "string"
+              },
+              "state_reason": {
+                "description": "Why it is closed or open again: `completed`, `not_planned`, `duplicate` or `reopened`.",
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "title": {
                 "type": "string"
@@ -759,6 +776,7 @@
               "assignees",
               "labels",
               "is_pull_request",
+              "locked",
               "created_at",
               "updated_at"
             ],
@@ -7081,6 +7099,12 @@
       "GithubIssue": {
         "description": "An issue (GitHub also answers pull requests as issues; `is_pull_request` says which).",
         "properties": {
+          "active_lock_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "assignees": {
             "items": {
               "$ref": "#/components/schemas/GithubUser"
@@ -7118,6 +7142,10 @@
             },
             "type": "array"
           },
+          "locked": {
+            "description": "Whether its conversation is locked, and why when it is: `off-topic`, `too heated`,\n`resolved` or `spam`.",
+            "type": "boolean"
+          },
           "milestone": {
             "oneOf": [
               {
@@ -7134,6 +7162,13 @@
           },
           "state": {
             "type": "string"
+          },
+          "state_reason": {
+            "description": "Why it is closed or open again: `completed`, `not_planned`, `duplicate` or `reopened`.",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "title": {
             "type": "string"
@@ -7165,6 +7200,7 @@
           "assignees",
           "labels",
           "is_pull_request",
+          "locked",
           "created_at",
           "updated_at"
         ],
