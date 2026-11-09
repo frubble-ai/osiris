@@ -1,7 +1,9 @@
 //! A pull request, as GitHub answers it.
 
-use super::user::UserAnswer;
-use crate::github::types::{GithubPullRequest, GithubPullRequestBranch, GithubUser};
+use super::{label::LabelAnswer, milestone::MilestoneAnswer, user::UserAnswer};
+use crate::github::types::{
+    GithubLabel, GithubMilestone, GithubPullRequest, GithubPullRequestBranch, GithubUser,
+};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -60,6 +62,33 @@ pub struct PullRequestAnswer {
     pub updated_at: String,
     pub closed_at: Option<String>,
     pub merged_at: Option<String>,
+    #[serde(default)]
+    pub labels: Vec<LabelAnswer>,
+    #[serde(default)]
+    pub assignees: Vec<UserAnswer>,
+    pub milestone: Option<MilestoneAnswer>,
+    #[serde(default)]
+    pub requested_reviewers: Vec<UserAnswer>,
+    #[serde(default)]
+    pub requested_teams: Vec<TeamAnswer>,
+    pub mergeable: Option<bool>,
+    pub mergeable_state: Option<String>,
+    pub merge_commit_sha: Option<String>,
+    pub maintainer_can_modify: Option<bool>,
+    pub auto_merge: Option<serde_json::Value>,
+    pub commits: Option<i64>,
+    pub additions: Option<i64>,
+    pub deletions: Option<i64>,
+    pub changed_files: Option<i64>,
+    pub comments: Option<i64>,
+    pub review_comments: Option<i64>,
+}
+
+/// A team asked to review, named by its slug.
+#[derive(Deserialize)]
+pub struct TeamAnswer {
+    #[serde(default)]
+    pub slug: String,
 }
 
 impl From<PullRequestAnswer> for GithubPullRequest {
@@ -82,6 +111,30 @@ impl From<PullRequestAnswer> for GithubPullRequest {
             updated_at: answer.updated_at,
             closed_at: answer.closed_at,
             merged_at: answer.merged_at,
+            labels: answer.labels.into_iter().map(GithubLabel::from).collect(),
+            assignees: answer.assignees.into_iter().map(GithubUser::from).collect(),
+            milestone: answer.milestone.map(GithubMilestone::from),
+            requested_reviewers: answer
+                .requested_reviewers
+                .into_iter()
+                .map(GithubUser::from)
+                .collect(),
+            requested_teams: answer
+                .requested_teams
+                .into_iter()
+                .map(|team| team.slug)
+                .collect(),
+            mergeable: answer.mergeable,
+            mergeable_state: answer.mergeable_state,
+            merge_commit_sha: answer.merge_commit_sha,
+            maintainer_can_modify: answer.maintainer_can_modify,
+            auto_merge: answer.auto_merge.is_some_and(|merge| !merge.is_null()),
+            commits: answer.commits,
+            additions: answer.additions,
+            deletions: answer.deletions,
+            changed_files: answer.changed_files,
+            comments: answer.comments,
+            review_comments: answer.review_comments,
         }
     }
 }

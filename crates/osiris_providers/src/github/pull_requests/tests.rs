@@ -782,6 +782,16 @@ async fn reads_a_pull_request_by_number() {
     let mut pull = generate_github_pull_request(111, 9);
     pull["merged"] = json!(true);
     pull["draft"] = json!(true);
+    pull["mergeable"] = json!(true);
+    pull["mergeable_state"] = json!("clean");
+    pull["merge_commit_sha"] = json!("abc123");
+    pull["requested_reviewers"] = json!([generate_github_user(5)]);
+    pull["requested_teams"] = json!([{ "slug": "reviewers" }]);
+    pull["labels"] = json!([{ "id": 1, "name": "bug", "color": "d73a4a", "description": null }]);
+    pull["commits"] = json!(3);
+    pull["additions"] = json!(9);
+    pull["changed_files"] = json!(2);
+    pull["auto_merge"] = json!({ "merge_method": "squash" });
     MockGithubNetwork::on(&server)
         .answer(
             "GET",
@@ -809,6 +819,17 @@ async fn reads_a_pull_request_by_number() {
     assert!(read.merged);
     assert!(read.draft);
     assert_eq!(read.created_at, text(&pull["created_at"]));
+    assert_eq!(read.mergeable, Some(true));
+    assert_eq!(read.mergeable_state.as_deref(), Some("clean"));
+    assert_eq!(read.merge_commit_sha.as_deref(), Some("abc123"));
+    assert_eq!(read.requested_reviewers[0].id, "5");
+    assert_eq!(read.requested_teams, ["reviewers"]);
+    assert_eq!(read.labels[0].name, "bug");
+    assert_eq!(
+        (read.commits, read.additions, read.changed_files),
+        (Some(3), Some(9), Some(2))
+    );
+    assert!(read.auto_merge);
 }
 
 #[tokio::test]

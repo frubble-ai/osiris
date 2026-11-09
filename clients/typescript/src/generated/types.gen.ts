@@ -506,16 +506,52 @@ export type ActionResultGithubPullRequest = {
      * A pull request.
      */
     data: {
+        additions?: number | null;
+        assignees: Array<GithubUser>;
+        /**
+         * Whether it merges by itself once its checks pass.
+         */
+        auto_merge: boolean;
         base: GithubPullRequestBranch;
         body?: string | null;
+        changed_files?: number | null;
         closed_at?: string | null;
+        comments?: number | null;
+        /**
+         * Its size and conversation, from reading one pull request; a list leaves them null.
+         */
+        commits?: number | null;
         created_at: string;
+        deletions?: number | null;
         draft: boolean;
         head: GithubPullRequestBranch;
         id: string;
+        labels: Array<GithubLabel>;
+        maintainer_can_modify?: boolean | null;
+        /**
+         * The commit its merge made, or the test merge GitHub keeps while it is open.
+         */
+        merge_commit_sha?: string | null;
+        /**
+         * Whether it can be merged now, as GitHub has worked it out: only reading one pull request
+         * answers these (a list leaves them null), and `mergeable` is null while GitHub is still
+         * working it out.
+         */
+        mergeable?: boolean | null;
+        /**
+         * `clean`, `blocked`, `behind`, `dirty`, `unstable`, `draft` or `unknown`. An open string.
+         */
+        mergeable_state?: string | null;
         merged: boolean;
         merged_at?: string | null;
+        milestone?: GithubMilestone | null;
         number: number;
+        /**
+         * Who is asked to review it: people, and teams by their slug.
+         */
+        requested_reviewers: Array<GithubUser>;
+        requested_teams: Array<string>;
+        review_comments?: number | null;
         state: string;
         title: string;
         updated_at: string;
@@ -1169,16 +1205,52 @@ export type ActionResultVecGithubMilestone = {
  */
 export type ActionResultVecGithubPullRequest = {
     data: Array<{
+        additions?: number | null;
+        assignees: Array<GithubUser>;
+        /**
+         * Whether it merges by itself once its checks pass.
+         */
+        auto_merge: boolean;
         base: GithubPullRequestBranch;
         body?: string | null;
+        changed_files?: number | null;
         closed_at?: string | null;
+        comments?: number | null;
+        /**
+         * Its size and conversation, from reading one pull request; a list leaves them null.
+         */
+        commits?: number | null;
         created_at: string;
+        deletions?: number | null;
         draft: boolean;
         head: GithubPullRequestBranch;
         id: string;
+        labels: Array<GithubLabel>;
+        maintainer_can_modify?: boolean | null;
+        /**
+         * The commit its merge made, or the test merge GitHub keeps while it is open.
+         */
+        merge_commit_sha?: string | null;
+        /**
+         * Whether it can be merged now, as GitHub has worked it out: only reading one pull request
+         * answers these (a list leaves them null), and `mergeable` is null while GitHub is still
+         * working it out.
+         */
+        mergeable?: boolean | null;
+        /**
+         * `clean`, `blocked`, `behind`, `dirty`, `unstable`, `draft` or `unknown`. An open string.
+         */
+        mergeable_state?: string | null;
         merged: boolean;
         merged_at?: string | null;
+        milestone?: GithubMilestone | null;
         number: number;
+        /**
+         * Who is asked to review it: people, and teams by their slug.
+         */
+        requested_reviewers: Array<GithubUser>;
+        requested_teams: Array<string>;
+        review_comments?: number | null;
         state: string;
         title: string;
         updated_at: string;
@@ -3006,16 +3078,52 @@ export type GithubPublicUser = {
  * A pull request.
  */
 export type GithubPullRequest = {
+    additions?: number | null;
+    assignees: Array<GithubUser>;
+    /**
+     * Whether it merges by itself once its checks pass.
+     */
+    auto_merge: boolean;
     base: GithubPullRequestBranch;
     body?: string | null;
+    changed_files?: number | null;
     closed_at?: string | null;
+    comments?: number | null;
+    /**
+     * Its size and conversation, from reading one pull request; a list leaves them null.
+     */
+    commits?: number | null;
     created_at: string;
+    deletions?: number | null;
     draft: boolean;
     head: GithubPullRequestBranch;
     id: string;
+    labels: Array<GithubLabel>;
+    maintainer_can_modify?: boolean | null;
+    /**
+     * The commit its merge made, or the test merge GitHub keeps while it is open.
+     */
+    merge_commit_sha?: string | null;
+    /**
+     * Whether it can be merged now, as GitHub has worked it out: only reading one pull request
+     * answers these (a list leaves them null), and `mergeable` is null while GitHub is still
+     * working it out.
+     */
+    mergeable?: boolean | null;
+    /**
+     * `clean`, `blocked`, `behind`, `dirty`, `unstable`, `draft` or `unknown`. An open string.
+     */
+    mergeable_state?: string | null;
     merged: boolean;
     merged_at?: string | null;
+    milestone?: GithubMilestone | null;
     number: number;
+    /**
+     * Who is asked to review it: people, and teams by their slug.
+     */
+    requested_reviewers: Array<GithubUser>;
+    requested_teams: Array<string>;
+    review_comments?: number | null;
     state: string;
     title: string;
     updated_at: string;

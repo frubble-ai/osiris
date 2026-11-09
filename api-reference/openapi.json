@@ -1226,6 +1226,23 @@
           "data": {
             "description": "A pull request.",
             "properties": {
+              "additions": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "assignees": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubUser"
+                },
+                "type": "array"
+              },
+              "auto_merge": {
+                "description": "Whether it merges by itself once its checks pass.",
+                "type": "boolean"
+              },
               "base": {
                 "$ref": "#/components/schemas/GithubPullRequestBranch"
               },
@@ -1235,14 +1252,43 @@
                   "null"
                 ]
               },
+              "changed_files": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
               "closed_at": {
                 "type": [
                   "string",
                   "null"
                 ]
               },
+              "comments": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "commits": {
+                "description": "Its size and conversation, from reading one pull request; a list leaves them null.",
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
               "created_at": {
                 "type": "string"
+              },
+              "deletions": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
               },
               "draft": {
                 "type": "boolean"
@@ -1253,6 +1299,39 @@
               "id": {
                 "type": "string"
               },
+              "labels": {
+                "items": {
+                  "$ref": "#/components/schemas/GithubLabel"
+                },
+                "type": "array"
+              },
+              "maintainer_can_modify": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "merge_commit_sha": {
+                "description": "The commit its merge made, or the test merge GitHub keeps while it is open.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mergeable": {
+                "description": "Whether it can be merged now, as GitHub has worked it out: only reading one pull request\nanswers these (a list leaves them null), and `mergeable` is null while GitHub is still\nworking it out.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "mergeable_state": {
+                "description": "`clean`, `blocked`, `behind`, `dirty`, `unstable`, `draft` or `unknown`. An open string.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "merged": {
                 "type": "boolean"
               },
@@ -1262,9 +1341,39 @@
                   "null"
                 ]
               },
+              "milestone": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubMilestone"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
               "number": {
                 "format": "int64",
                 "type": "integer"
+              },
+              "requested_reviewers": {
+                "description": "Who is asked to review it: people, and teams by their slug.",
+                "items": {
+                  "$ref": "#/components/schemas/GithubUser"
+                },
+                "type": "array"
+              },
+              "requested_teams": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "review_comments": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
               },
               "state": {
                 "type": "string"
@@ -1300,7 +1409,12 @@
               "head",
               "base",
               "created_at",
-              "updated_at"
+              "updated_at",
+              "labels",
+              "assignees",
+              "requested_reviewers",
+              "requested_teams",
+              "auto_merge"
             ],
             "type": "object"
           }
@@ -3191,6 +3305,23 @@
             "items": {
               "description": "A pull request.",
               "properties": {
+                "additions": {
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "assignees": {
+                  "items": {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  "type": "array"
+                },
+                "auto_merge": {
+                  "description": "Whether it merges by itself once its checks pass.",
+                  "type": "boolean"
+                },
                 "base": {
                   "$ref": "#/components/schemas/GithubPullRequestBranch"
                 },
@@ -3200,14 +3331,43 @@
                     "null"
                   ]
                 },
+                "changed_files": {
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
                 "closed_at": {
                   "type": [
                     "string",
                     "null"
                   ]
                 },
+                "comments": {
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "commits": {
+                  "description": "Its size and conversation, from reading one pull request; a list leaves them null.",
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
                 "created_at": {
                   "type": "string"
+                },
+                "deletions": {
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
                 },
                 "draft": {
                   "type": "boolean"
@@ -3218,6 +3378,39 @@
                 "id": {
                   "type": "string"
                 },
+                "labels": {
+                  "items": {
+                    "$ref": "#/components/schemas/GithubLabel"
+                  },
+                  "type": "array"
+                },
+                "maintainer_can_modify": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "merge_commit_sha": {
+                  "description": "The commit its merge made, or the test merge GitHub keeps while it is open.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "mergeable": {
+                  "description": "Whether it can be merged now, as GitHub has worked it out: only reading one pull request\nanswers these (a list leaves them null), and `mergeable` is null while GitHub is still\nworking it out.",
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "mergeable_state": {
+                  "description": "`clean`, `blocked`, `behind`, `dirty`, `unstable`, `draft` or `unknown`. An open string.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "merged": {
                   "type": "boolean"
                 },
@@ -3227,9 +3420,39 @@
                     "null"
                   ]
                 },
+                "milestone": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubMilestone"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
                 "number": {
                   "format": "int64",
                   "type": "integer"
+                },
+                "requested_reviewers": {
+                  "description": "Who is asked to review it: people, and teams by their slug.",
+                  "items": {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  "type": "array"
+                },
+                "requested_teams": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "review_comments": {
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
                 },
                 "state": {
                   "type": "string"
@@ -3265,7 +3488,12 @@
                 "head",
                 "base",
                 "created_at",
-                "updated_at"
+                "updated_at",
+                "labels",
+                "assignees",
+                "requested_reviewers",
+                "requested_teams",
+                "auto_merge"
               ],
               "type": "object"
             },
@@ -8018,6 +8246,23 @@
       "GithubPullRequest": {
         "description": "A pull request.",
         "properties": {
+          "additions": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "assignees": {
+            "items": {
+              "$ref": "#/components/schemas/GithubUser"
+            },
+            "type": "array"
+          },
+          "auto_merge": {
+            "description": "Whether it merges by itself once its checks pass.",
+            "type": "boolean"
+          },
           "base": {
             "$ref": "#/components/schemas/GithubPullRequestBranch"
           },
@@ -8027,14 +8272,43 @@
               "null"
             ]
           },
+          "changed_files": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
           "closed_at": {
             "type": [
               "string",
               "null"
             ]
           },
+          "comments": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "commits": {
+            "description": "Its size and conversation, from reading one pull request; a list leaves them null.",
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
           "created_at": {
             "type": "string"
+          },
+          "deletions": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "draft": {
             "type": "boolean"
@@ -8045,6 +8319,39 @@
           "id": {
             "type": "string"
           },
+          "labels": {
+            "items": {
+              "$ref": "#/components/schemas/GithubLabel"
+            },
+            "type": "array"
+          },
+          "maintainer_can_modify": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "merge_commit_sha": {
+            "description": "The commit its merge made, or the test merge GitHub keeps while it is open.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mergeable": {
+            "description": "Whether it can be merged now, as GitHub has worked it out: only reading one pull request\nanswers these (a list leaves them null), and `mergeable` is null while GitHub is still\nworking it out.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "mergeable_state": {
+            "description": "`clean`, `blocked`, `behind`, `dirty`, `unstable`, `draft` or `unknown`. An open string.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "merged": {
             "type": "boolean"
           },
@@ -8054,9 +8361,39 @@
               "null"
             ]
           },
+          "milestone": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubMilestone"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "number": {
             "format": "int64",
             "type": "integer"
+          },
+          "requested_reviewers": {
+            "description": "Who is asked to review it: people, and teams by their slug.",
+            "items": {
+              "$ref": "#/components/schemas/GithubUser"
+            },
+            "type": "array"
+          },
+          "requested_teams": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "review_comments": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "state": {
             "type": "string"
@@ -8092,7 +8429,12 @@
           "head",
           "base",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "labels",
+          "assignees",
+          "requested_reviewers",
+          "requested_teams",
+          "auto_merge"
         ],
         "type": "object"
       },
