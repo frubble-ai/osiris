@@ -103,7 +103,7 @@ pub use reaction::GithubReaction;
 pub use reactions::GithubReactions;
 pub use release::{GithubRelease, GithubReleaseNotes};
 pub use release_asset::GithubReleaseAsset;
-pub use repository::GithubRepository;
+pub use repository::{GithubLicense, GithubRepository};
 pub use repository_permission::GithubRepositoryPermission;
 pub use requested_reviewers::GithubRequestedReviewers;
 pub use review::GithubReview;

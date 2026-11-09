@@ -1,29 +1,17 @@
 //! A topic a search found, as GitHub answers it.
 
-use super::user::UserAnswer;
+use super::{repository::RepositoryAnswer, user::UserAnswer};
 use crate::github::types::{
-    GithubSearchCode, GithubSearchCodeRepository, GithubSearchCommit, GithubSearchCommitRepository,
-    GithubSearchIssue, GithubSearchLabel, GithubSearchRepository, GithubSearchTopic,
-    GithubSearchUser, GithubUser,
+    GithubRepository, GithubSearchCode, GithubSearchCodeRepository, GithubSearchCommit,
+    GithubSearchCommitRepository, GithubSearchIssue, GithubSearchLabel, GithubSearchRepository,
+    GithubSearchTopic, GithubSearchUser, GithubUser,
 };
 use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct SearchRepositoryAnswer {
-    pub id: u64,
-    #[serde(default)]
-    pub name: String,
-    #[serde(default)]
-    pub full_name: String,
-    #[serde(rename = "html_url", default)]
-    pub url: String,
-    pub description: Option<String>,
-    #[serde(default)]
-    pub private: bool,
-    #[serde(default)]
-    pub stargazers_count: i64,
-    pub language: Option<String>,
-    pub owner: Option<UserAnswer>,
+    #[serde(flatten)]
+    pub repository: RepositoryAnswer,
     #[serde(default)]
     pub score: f64,
 }
@@ -32,15 +20,7 @@ impl From<SearchRepositoryAnswer> for GithubSearchRepository {
     /// A repository a search found, in our terms.
     fn from(answer: SearchRepositoryAnswer) -> Self {
         Self {
-            id: answer.id.to_string(),
-            name: answer.name,
-            full_name: answer.full_name,
-            url: answer.url,
-            description: answer.description,
-            private: answer.private,
-            stargazers_count: answer.stargazers_count,
-            language: answer.language,
-            owner: answer.owner.map(GithubUser::from),
+            repository: GithubRepository::from(answer.repository),
             score: answer.score,
         }
     }

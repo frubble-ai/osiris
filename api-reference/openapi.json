@@ -1708,11 +1708,51 @@
           "data": {
             "description": "A repository.",
             "properties": {
+              "allow_auto_merge": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "allow_merge_commit": {
+                "description": "The merge settings and the watcher count, which GitHub answers only when it reads one\nrepository by itself.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "allow_rebase_merge": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "allow_squash_merge": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "archived": {
+                "type": "boolean"
+              },
               "clone_url": {
                 "type": "string"
               },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "default_branch": {
                 "type": "string"
+              },
+              "delete_branch_on_merge": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
               "description": {
                 "type": [
@@ -1720,27 +1760,123 @@
                   "null"
                 ]
               },
+              "disabled": {
+                "type": "boolean"
+              },
               "fork": {
                 "type": "boolean"
+              },
+              "forks_count": {
+                "format": "int64",
+                "type": "integer"
               },
               "full_name": {
                 "description": "`owner/name`.",
                 "type": "string"
               },
+              "has_discussions": {
+                "type": "boolean"
+              },
+              "has_issues": {
+                "type": "boolean"
+              },
+              "has_pages": {
+                "type": "boolean"
+              },
+              "has_projects": {
+                "type": "boolean"
+              },
+              "has_wiki": {
+                "type": "boolean"
+              },
+              "homepage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "id": {
                 "type": "string"
+              },
+              "is_template": {
+                "type": "boolean"
+              },
+              "language": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "license": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubLicense"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "name": {
                 "type": "string"
               },
+              "open_issues_count": {
+                "format": "int64",
+                "type": "integer"
+              },
               "owner": {
                 "$ref": "#/components/schemas/GithubUser"
+              },
+              "permissions": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubPermissions",
+                    "description": "What the account asking may do in it; GitHub leaves it out where nobody signed in asks."
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "private": {
                 "type": "boolean"
               },
+              "pushed_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "size": {
+                "description": "Its size in kilobytes.",
+                "format": "int64",
+                "type": "integer"
+              },
               "ssh_url": {
                 "type": "string"
+              },
+              "stargazers_count": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "subscribers_count": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "topics": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "url": {
                 "description": "Its page on GitHub.",
@@ -1749,6 +1885,10 @@
               "visibility": {
                 "description": "`public`, `private` or `internal` today. An open string.",
                 "type": "string"
+              },
+              "watchers_count": {
+                "format": "int64",
+                "type": "integer"
               }
             },
             "required": [
@@ -1762,7 +1902,21 @@
               "default_branch",
               "visibility",
               "fork",
-              "owner"
+              "owner",
+              "topics",
+              "archived",
+              "disabled",
+              "is_template",
+              "has_issues",
+              "has_projects",
+              "has_wiki",
+              "has_pages",
+              "has_discussions",
+              "stargazers_count",
+              "watchers_count",
+              "forks_count",
+              "open_issues_count",
+              "size"
             ],
             "type": "object"
           }
@@ -3950,11 +4104,51 @@
             "items": {
               "description": "A repository.",
               "properties": {
+                "allow_auto_merge": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "allow_merge_commit": {
+                  "description": "The merge settings and the watcher count, which GitHub answers only when it reads one\nrepository by itself.",
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "allow_rebase_merge": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "allow_squash_merge": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "archived": {
+                  "type": "boolean"
+                },
                 "clone_url": {
                   "type": "string"
                 },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "default_branch": {
                   "type": "string"
+                },
+                "delete_branch_on_merge": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
                 },
                 "description": {
                   "type": [
@@ -3962,27 +4156,123 @@
                     "null"
                   ]
                 },
+                "disabled": {
+                  "type": "boolean"
+                },
                 "fork": {
                   "type": "boolean"
+                },
+                "forks_count": {
+                  "format": "int64",
+                  "type": "integer"
                 },
                 "full_name": {
                   "description": "`owner/name`.",
                   "type": "string"
                 },
+                "has_discussions": {
+                  "type": "boolean"
+                },
+                "has_issues": {
+                  "type": "boolean"
+                },
+                "has_pages": {
+                  "type": "boolean"
+                },
+                "has_projects": {
+                  "type": "boolean"
+                },
+                "has_wiki": {
+                  "type": "boolean"
+                },
+                "homepage": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "id": {
                   "type": "string"
+                },
+                "is_template": {
+                  "type": "boolean"
+                },
+                "language": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "license": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubLicense"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "name": {
                   "type": "string"
                 },
+                "open_issues_count": {
+                  "format": "int64",
+                  "type": "integer"
+                },
                 "owner": {
                   "$ref": "#/components/schemas/GithubUser"
+                },
+                "permissions": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubPermissions",
+                      "description": "What the account asking may do in it; GitHub leaves it out where nobody signed in asks."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "private": {
                   "type": "boolean"
                 },
+                "pushed_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "size": {
+                  "description": "Its size in kilobytes.",
+                  "format": "int64",
+                  "type": "integer"
+                },
                 "ssh_url": {
                   "type": "string"
+                },
+                "stargazers_count": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "subscribers_count": {
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "topics": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "updated_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "url": {
                   "description": "Its page on GitHub.",
@@ -3991,6 +4281,10 @@
                 "visibility": {
                   "description": "`public`, `private` or `internal` today. An open string.",
                   "type": "string"
+                },
+                "watchers_count": {
+                  "format": "int64",
+                  "type": "integer"
                 }
               },
               "required": [
@@ -4004,7 +4298,21 @@
                 "default_branch",
                 "visibility",
                 "fork",
-                "owner"
+                "owner",
+                "topics",
+                "archived",
+                "disabled",
+                "is_template",
+                "has_issues",
+                "has_projects",
+                "has_wiki",
+                "has_pages",
+                "has_discussions",
+                "stargazers_count",
+                "watchers_count",
+                "forks_count",
+                "open_issues_count",
+                "size"
               ],
               "type": "object"
             },
@@ -8485,6 +8793,28 @@
         ],
         "type": "object"
       },
+      "GithubLicense": {
+        "description": "The license GitHub found in a repository.",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "spdx_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "key",
+          "name"
+        ],
+        "type": "object"
+      },
       "GithubMergeResult": {
         "description": "A pull request merged, or a merge refused.",
         "properties": {
@@ -9253,11 +9583,51 @@
       "GithubRepository": {
         "description": "A repository.",
         "properties": {
+          "allow_auto_merge": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "allow_merge_commit": {
+            "description": "The merge settings and the watcher count, which GitHub answers only when it reads one\nrepository by itself.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "allow_rebase_merge": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "allow_squash_merge": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "archived": {
+            "type": "boolean"
+          },
           "clone_url": {
             "type": "string"
           },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "default_branch": {
             "type": "string"
+          },
+          "delete_branch_on_merge": {
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "description": {
             "type": [
@@ -9265,27 +9635,123 @@
               "null"
             ]
           },
+          "disabled": {
+            "type": "boolean"
+          },
           "fork": {
             "type": "boolean"
+          },
+          "forks_count": {
+            "format": "int64",
+            "type": "integer"
           },
           "full_name": {
             "description": "`owner/name`.",
             "type": "string"
           },
+          "has_discussions": {
+            "type": "boolean"
+          },
+          "has_issues": {
+            "type": "boolean"
+          },
+          "has_pages": {
+            "type": "boolean"
+          },
+          "has_projects": {
+            "type": "boolean"
+          },
+          "has_wiki": {
+            "type": "boolean"
+          },
+          "homepage": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "id": {
             "type": "string"
+          },
+          "is_template": {
+            "type": "boolean"
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "license": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubLicense"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "name": {
             "type": "string"
           },
+          "open_issues_count": {
+            "format": "int64",
+            "type": "integer"
+          },
           "owner": {
             "$ref": "#/components/schemas/GithubUser"
+          },
+          "permissions": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubPermissions",
+                "description": "What the account asking may do in it; GitHub leaves it out where nobody signed in asks."
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "private": {
             "type": "boolean"
           },
+          "pushed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "size": {
+            "description": "Its size in kilobytes.",
+            "format": "int64",
+            "type": "integer"
+          },
           "ssh_url": {
             "type": "string"
+          },
+          "stargazers_count": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "subscribers_count": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "url": {
             "description": "Its page on GitHub.",
@@ -9294,6 +9760,10 @@
           "visibility": {
             "description": "`public`, `private` or `internal` today. An open string.",
             "type": "string"
+          },
+          "watchers_count": {
+            "format": "int64",
+            "type": "integer"
           }
         },
         "required": [
@@ -9307,7 +9777,21 @@
           "default_branch",
           "visibility",
           "fork",
-          "owner"
+          "owner",
+          "topics",
+          "archived",
+          "disabled",
+          "is_template",
+          "has_issues",
+          "has_projects",
+          "has_wiki",
+          "has_pages",
+          "has_discussions",
+          "stargazers_count",
+          "watchers_count",
+          "forks_count",
+          "open_issues_count",
+          "size"
         ],
         "type": "object"
       },
@@ -9857,64 +10341,25 @@
         "type": "object"
       },
       "GithubSearchRepository": {
-        "description": "A repository a search found.",
-        "properties": {
-          "description": {
-            "type": [
-              "string",
-              "null"
-            ]
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GithubRepository"
           },
-          "full_name": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "language": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "name": {
-            "type": "string"
-          },
-          "owner": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/GithubUser"
-              },
-              {
-                "type": "null"
+          {
+            "properties": {
+              "score": {
+                "description": "How well it matched, as GitHub ranks it.",
+                "format": "double",
+                "type": "number"
               }
-            ]
-          },
-          "private": {
-            "type": "boolean"
-          },
-          "score": {
-            "format": "double",
-            "type": "number"
-          },
-          "stargazers_count": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "url": {
-            "type": "string"
+            },
+            "required": [
+              "score"
+            ],
+            "type": "object"
           }
-        },
-        "required": [
-          "id",
-          "name",
-          "full_name",
-          "url",
-          "private",
-          "stargazers_count",
-          "score"
         ],
-        "type": "object"
+        "description": "A repository a search found."
       },
       "GithubSearchTopic": {
         "description": "A topic a search found.",

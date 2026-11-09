@@ -1,21 +1,15 @@
 //! A topic a search found, and its parts.
 
-use super::GithubUser;
+use super::{GithubRepository, GithubUser};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 /// A repository a search found.
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct GithubSearchRepository {
-    pub id: String,
-    pub name: String,
-    pub full_name: String,
-    pub url: String,
-    pub description: Option<String>,
-    pub private: bool,
-    pub stargazers_count: i64,
-    pub language: Option<String>,
-    pub owner: Option<GithubUser>,
+    #[serde(flatten)]
+    pub repository: GithubRepository,
+    /// How well it matched, as GitHub ranks it.
     pub score: f64,
 }
 

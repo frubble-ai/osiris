@@ -92,6 +92,29 @@ async fn reads_a_repository_by_owner_and_name() {
         answer["owner"]["login"].as_str().unwrap()
     );
     assert_eq!(repository.default_branch, "main");
+    assert_eq!(repository.homepage.as_deref(), Some("https://example.com"));
+    assert_eq!(repository.language.as_deref(), Some("Rust"));
+    assert_eq!(repository.topics, ["osiris", "seed"]);
+    assert_eq!(
+        repository.license.as_ref().unwrap().spdx_id.as_deref(),
+        Some("MIT")
+    );
+    assert!(repository.is_template && repository.has_discussions && !repository.has_projects);
+    assert_eq!(
+        (
+            repository.stargazers_count,
+            repository.forks_count,
+            repository.open_issues_count,
+            repository.size
+        ),
+        (12, 3, 4, 260)
+    );
+    assert_eq!(
+        repository.pushed_at.as_deref(),
+        Some("2024-02-02T00:00:00Z")
+    );
+    assert!(repository.permissions.as_ref().unwrap().admin);
+    assert_eq!(repository.allow_squash_merge, None);
 }
 
 #[tokio::test]

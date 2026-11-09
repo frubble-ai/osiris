@@ -72,16 +72,24 @@ async fn searches_repositories_sorted_as_asked(#[case] incomplete: bool) {
     assert_eq!(found.total_count, page["total_count"].as_i64().unwrap());
     assert_eq!(found.incomplete_results, incomplete);
     assert_eq!(found.repositories.len(), 2);
-    assert_eq!(found.repositories[0].id, "1");
+    assert_eq!(found.repositories[0].repository.id, "1");
     assert_eq!(
-        found.repositories[0].full_name,
+        found.repositories[0].repository.full_name,
         items[0]["full_name"].as_str().unwrap()
     );
     assert_eq!(
-        found.repositories[0].stargazers_count,
+        found.repositories[0].repository.stargazers_count,
         items[0]["stargazers_count"].as_i64().unwrap()
     );
-    assert_eq!(found.repositories[0].language.as_deref(), Some("Rust"));
+    assert_eq!(
+        found.repositories[0].repository.language.as_deref(),
+        Some("Rust")
+    );
+    assert!((found.repositories[0].score - 1.0).abs() < f64::EPSILON);
+    let answered = serde_json::to_value(&found.repositories[0]).unwrap();
+    assert_eq!(answered["full_name"], items[0]["full_name"]);
+    assert_eq!(answered["topics"], items[0]["topics"]);
+    assert_eq!(answered["score"], json!(1.0));
 }
 
 #[tokio::test]

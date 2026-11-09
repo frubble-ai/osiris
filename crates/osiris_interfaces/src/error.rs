@@ -18,11 +18,13 @@ pub enum ProviderError {
     },
     /// The input can't be sent as given (a field the connection's kind of token can't use), or it
     /// names something the action doesn't read (a directory asked for as a file). The caller
-    /// changes it; the reason is answered.
+    /// changes it; the reason is answered. A provider that read the input and said why it won't
+    /// take it answered with an HTTP status, kept here.
     #[error("{provider} can't take the input: {message}")]
     Invalid {
         provider: &'static str,
         message: String,
+        status: Option<u16>,
     },
     /// The provider could not be reached, or answered something we could not read.
     #[error("{provider} failed: {message}")]
@@ -67,10 +69,11 @@ impl ProviderError {
         self.status() == Some(404)
     }
 
-    /// The HTTP status a refusal came with, if it came as one.
+    /// The HTTP status a refusal, or a provider's reason it won't take the input, came with, if
+    /// it came as one.
     pub fn status(&self) -> Option<u16> {
         match self {
-            Self::Refused { status, .. } => *status,
+            Self::Refused { status, .. } | Self::Invalid { status, .. } => *status,
             _ => None,
         }
     }
@@ -79,6 +82,20 @@ impl ProviderError {
         Self::Invalid {
             provider,
             message: message.into(),
+            status: None,
+        }
+    }
+
+    /// The provider's own reason it won't take the input, answered with the HTTP status `status`.
+    pub fn invalid_with_status(
+        provider: &'static str,
+        status: u16,
+        message: impl Into<String>,
+    ) -> Self {
+        Self::Invalid {
+            provider,
+            message: message.into(),
+            status: Some(status),
         }
     }
 

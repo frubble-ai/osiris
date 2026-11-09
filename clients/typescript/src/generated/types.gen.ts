@@ -667,19 +667,52 @@ export type ActionResultGithubRepository = {
      * A repository.
      */
     data: {
+        allow_auto_merge?: boolean | null;
+        /**
+         * The merge settings and the watcher count, which GitHub answers only when it reads one
+         * repository by itself.
+         */
+        allow_merge_commit?: boolean | null;
+        allow_rebase_merge?: boolean | null;
+        allow_squash_merge?: boolean | null;
+        archived: boolean;
         clone_url: string;
+        created_at?: string | null;
         default_branch: string;
+        delete_branch_on_merge?: boolean | null;
         description?: string | null;
+        disabled: boolean;
         fork: boolean;
+        forks_count: number;
         /**
          * `owner/name`.
          */
         full_name: string;
+        has_discussions: boolean;
+        has_issues: boolean;
+        has_pages: boolean;
+        has_projects: boolean;
+        has_wiki: boolean;
+        homepage?: string | null;
         id: string;
+        is_template: boolean;
+        language?: string | null;
+        license?: GithubLicense | null;
         name: string;
+        open_issues_count: number;
         owner: GithubUser;
+        permissions?: GithubPermissions | null;
         private: boolean;
+        pushed_at?: string | null;
+        /**
+         * Its size in kilobytes.
+         */
+        size: number;
         ssh_url: string;
+        stargazers_count: number;
+        subscribers_count?: number | null;
+        topics: Array<string>;
+        updated_at?: string | null;
         /**
          * Its page on GitHub.
          */
@@ -688,6 +721,7 @@ export type ActionResultGithubRepository = {
          * `public`, `private` or `internal` today. An open string.
          */
         visibility: string;
+        watchers_count: number;
     };
 };
 
@@ -1363,19 +1397,52 @@ export type ActionResultVecGithubReleaseAsset = {
  */
 export type ActionResultVecGithubRepository = {
     data: Array<{
+        allow_auto_merge?: boolean | null;
+        /**
+         * The merge settings and the watcher count, which GitHub answers only when it reads one
+         * repository by itself.
+         */
+        allow_merge_commit?: boolean | null;
+        allow_rebase_merge?: boolean | null;
+        allow_squash_merge?: boolean | null;
+        archived: boolean;
         clone_url: string;
+        created_at?: string | null;
         default_branch: string;
+        delete_branch_on_merge?: boolean | null;
         description?: string | null;
+        disabled: boolean;
         fork: boolean;
+        forks_count: number;
         /**
          * `owner/name`.
          */
         full_name: string;
+        has_discussions: boolean;
+        has_issues: boolean;
+        has_pages: boolean;
+        has_projects: boolean;
+        has_wiki: boolean;
+        homepage?: string | null;
         id: string;
+        is_template: boolean;
+        language?: string | null;
+        license?: GithubLicense | null;
         name: string;
+        open_issues_count: number;
         owner: GithubUser;
+        permissions?: GithubPermissions | null;
         private: boolean;
+        pushed_at?: string | null;
+        /**
+         * Its size in kilobytes.
+         */
+        size: number;
         ssh_url: string;
+        stargazers_count: number;
+        subscribers_count?: number | null;
+        topics: Array<string>;
+        updated_at?: string | null;
         /**
          * Its page on GitHub.
          */
@@ -1384,6 +1451,7 @@ export type ActionResultVecGithubRepository = {
          * `public`, `private` or `internal` today. An open string.
          */
         visibility: string;
+        watchers_count: number;
     }>;
 };
 
@@ -3116,6 +3184,15 @@ export type GithubLanguage = {
 };
 
 /**
+ * The license GitHub found in a repository.
+ */
+export type GithubLicense = {
+    key: string;
+    name: string;
+    spdx_id?: string | null;
+};
+
+/**
  * A pull request merged, or a merge refused.
  */
 export type GithubMergeResult = {
@@ -3358,19 +3435,52 @@ export type GithubReleaseNotes = {
  * A repository.
  */
 export type GithubRepository = {
+    allow_auto_merge?: boolean | null;
+    /**
+     * The merge settings and the watcher count, which GitHub answers only when it reads one
+     * repository by itself.
+     */
+    allow_merge_commit?: boolean | null;
+    allow_rebase_merge?: boolean | null;
+    allow_squash_merge?: boolean | null;
+    archived: boolean;
     clone_url: string;
+    created_at?: string | null;
     default_branch: string;
+    delete_branch_on_merge?: boolean | null;
     description?: string | null;
+    disabled: boolean;
     fork: boolean;
+    forks_count: number;
     /**
      * `owner/name`.
      */
     full_name: string;
+    has_discussions: boolean;
+    has_issues: boolean;
+    has_pages: boolean;
+    has_projects: boolean;
+    has_wiki: boolean;
+    homepage?: string | null;
     id: string;
+    is_template: boolean;
+    language?: string | null;
+    license?: GithubLicense | null;
     name: string;
+    open_issues_count: number;
     owner: GithubUser;
+    permissions?: GithubPermissions | null;
     private: boolean;
+    pushed_at?: string | null;
+    /**
+     * Its size in kilobytes.
+     */
+    size: number;
     ssh_url: string;
+    stargazers_count: number;
+    subscribers_count?: number | null;
+    topics: Array<string>;
+    updated_at?: string | null;
     /**
      * Its page on GitHub.
      */
@@ -3379,6 +3489,7 @@ export type GithubRepository = {
      * `public`, `private` or `internal` today. An open string.
      */
     visibility: string;
+    watchers_count: number;
 };
 
 /**
@@ -3567,17 +3678,11 @@ export type GithubSearchLabel = {
 /**
  * A repository a search found.
  */
-export type GithubSearchRepository = {
-    description?: string | null;
-    full_name: string;
-    id: string;
-    language?: string | null;
-    name: string;
-    owner?: GithubUser | null;
-    private: boolean;
+export type GithubSearchRepository = GithubRepository & {
+    /**
+     * How well it matched, as GitHub ranks it.
+     */
     score: number;
-    stargazers_count: number;
-    url: string;
 };
 
 /**

@@ -1355,6 +1355,15 @@ export const zGithubLanguage = z.object({
 });
 
 /**
+ * The license GitHub found in a repository.
+ */
+export const zGithubLicense = z.object({
+    key: z.string(),
+    name: z.string(),
+    spdx_id: z.string().nullish()
+});
+
+/**
  * A pull request merged, or a merge refused.
  */
 export const zGithubMergeResult = z.object({
@@ -1799,18 +1808,45 @@ export const zActionResultGithubReleaseAsset = z.object({
  */
 export const zActionResultGithubRepository = z.object({
     data: z.object({
+        allow_auto_merge: z.boolean().nullish(),
+        allow_merge_commit: z.boolean().nullish(),
+        allow_rebase_merge: z.boolean().nullish(),
+        allow_squash_merge: z.boolean().nullish(),
+        archived: z.boolean(),
         clone_url: z.string(),
+        created_at: z.string().nullish(),
         default_branch: z.string(),
+        delete_branch_on_merge: z.boolean().nullish(),
         description: z.string().nullish(),
+        disabled: z.boolean(),
         fork: z.boolean(),
+        forks_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         full_name: z.string(),
+        has_discussions: z.boolean(),
+        has_issues: z.boolean(),
+        has_pages: z.boolean(),
+        has_projects: z.boolean(),
+        has_wiki: z.boolean(),
+        homepage: z.string().nullish(),
         id: z.string(),
+        is_template: z.boolean(),
+        language: z.string().nullish(),
+        license: zGithubLicense.nullish(),
         name: z.string(),
+        open_issues_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         owner: zGithubUser,
+        permissions: zGithubPermissions.nullish(),
         private: z.boolean(),
+        pushed_at: z.string().nullish(),
+        size: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         ssh_url: z.string(),
+        stargazers_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        subscribers_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+        topics: z.array(z.string()),
+        updated_at: z.string().nullish(),
         url: z.string(),
-        visibility: z.string()
+        visibility: z.string(),
+        watchers_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
     })
 });
 
@@ -2041,18 +2077,45 @@ export const zActionResultVecGithubReleaseAsset = z.object({
  */
 export const zActionResultVecGithubRepository = z.object({
     data: z.array(z.object({
+        allow_auto_merge: z.boolean().nullish(),
+        allow_merge_commit: z.boolean().nullish(),
+        allow_rebase_merge: z.boolean().nullish(),
+        allow_squash_merge: z.boolean().nullish(),
+        archived: z.boolean(),
         clone_url: z.string(),
+        created_at: z.string().nullish(),
         default_branch: z.string(),
+        delete_branch_on_merge: z.boolean().nullish(),
         description: z.string().nullish(),
+        disabled: z.boolean(),
         fork: z.boolean(),
+        forks_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         full_name: z.string(),
+        has_discussions: z.boolean(),
+        has_issues: z.boolean(),
+        has_pages: z.boolean(),
+        has_projects: z.boolean(),
+        has_wiki: z.boolean(),
+        homepage: z.string().nullish(),
         id: z.string(),
+        is_template: z.boolean(),
+        language: z.string().nullish(),
+        license: zGithubLicense.nullish(),
         name: z.string(),
+        open_issues_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         owner: zGithubUser,
+        permissions: zGithubPermissions.nullish(),
         private: z.boolean(),
+        pushed_at: z.string().nullish(),
+        size: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         ssh_url: z.string(),
+        stargazers_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        subscribers_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+        topics: z.array(z.string()),
+        updated_at: z.string().nullish(),
         url: z.string(),
-        visibility: z.string()
+        visibility: z.string(),
+        watchers_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
     }))
 });
 
@@ -2439,18 +2502,45 @@ export const zGithubRelease = z.object({
  * A repository.
  */
 export const zGithubRepository = z.object({
+    allow_auto_merge: z.boolean().nullish(),
+    allow_merge_commit: z.boolean().nullish(),
+    allow_rebase_merge: z.boolean().nullish(),
+    allow_squash_merge: z.boolean().nullish(),
+    archived: z.boolean(),
     clone_url: z.string(),
+    created_at: z.string().nullish(),
     default_branch: z.string(),
+    delete_branch_on_merge: z.boolean().nullish(),
     description: z.string().nullish(),
+    disabled: z.boolean(),
     fork: z.boolean(),
+    forks_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     full_name: z.string(),
+    has_discussions: z.boolean(),
+    has_issues: z.boolean(),
+    has_pages: z.boolean(),
+    has_projects: z.boolean(),
+    has_wiki: z.boolean(),
+    homepage: z.string().nullish(),
     id: z.string(),
+    is_template: z.boolean(),
+    language: z.string().nullish(),
+    license: zGithubLicense.nullish(),
     name: z.string(),
+    open_issues_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     owner: zGithubUser,
+    permissions: zGithubPermissions.nullish(),
     private: z.boolean(),
+    pushed_at: z.string().nullish(),
+    size: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     ssh_url: z.string(),
+    stargazers_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    subscribers_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+    topics: z.array(z.string()),
+    updated_at: z.string().nullish(),
     url: z.string(),
-    visibility: z.string()
+    visibility: z.string(),
+    watchers_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
 });
 
 /**
@@ -2662,18 +2752,9 @@ export const zGithubSearchIssueResults = z.object({
 /**
  * A repository a search found.
  */
-export const zGithubSearchRepository = z.object({
-    description: z.string().nullish(),
-    full_name: z.string(),
-    id: z.string(),
-    language: z.string().nullish(),
-    name: z.string(),
-    owner: zGithubUser.nullish(),
-    private: z.boolean(),
-    score: z.number(),
-    stargazers_count: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-    url: z.string()
-});
+export const zGithubSearchRepository = zGithubRepository.and(z.object({
+    score: z.number()
+}));
 
 /**
  * An action's answer: what it read, as `data`.
