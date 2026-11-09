@@ -6,7 +6,7 @@
 # cargo-chef builds the dependencies in their own layer, so a change to our code alone rebuilds in
 # seconds.
 
-FROM rust:1.98-slim-bookworm AS chef
+FROM rust:1.99-slim-bookworm AS chef
 RUN apt-get update && apt-get install -y --no-install-recommends cmake g++ make \
     && rm -rf /var/lib/apt/lists/* \
     && cargo install cargo-chef --locked
