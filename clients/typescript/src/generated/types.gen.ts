@@ -456,7 +456,12 @@ export type ActionResultGithubMilestone = {
      * A milestone.
      */
     data: {
+        /**
+         * When it was closed; none while it is open.
+         */
+        closed_at?: string | null;
         closed_issues: number;
+        created_at?: string | null;
         description?: string | null;
         due_on?: string | null;
         id: string;
@@ -464,6 +469,7 @@ export type ActionResultGithubMilestone = {
         open_issues: number;
         state: string;
         title: string;
+        updated_at?: string | null;
         url: string;
     };
 };
@@ -1140,7 +1146,12 @@ export type ActionResultVecGithubLanguage = {
  */
 export type ActionResultVecGithubMilestone = {
     data: Array<{
+        /**
+         * When it was closed; none while it is open.
+         */
+        closed_at?: string | null;
         closed_issues: number;
+        created_at?: string | null;
         description?: string | null;
         due_on?: string | null;
         id: string;
@@ -1148,6 +1159,7 @@ export type ActionResultVecGithubMilestone = {
         open_issues: number;
         state: string;
         title: string;
+        updated_at?: string | null;
         url: string;
     }>;
 };
@@ -2943,7 +2955,12 @@ export type GithubMergedCheck = {
  * A milestone.
  */
 export type GithubMilestone = {
+    /**
+     * When it was closed; none while it is open.
+     */
+    closed_at?: string | null;
     closed_issues: number;
+    created_at?: string | null;
     description?: string | null;
     due_on?: string | null;
     id: string;
@@ -2951,6 +2968,7 @@ export type GithubMilestone = {
     open_issues: number;
     state: string;
     title: string;
+    updated_at?: string | null;
     url: string;
 };
 

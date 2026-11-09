@@ -1065,9 +1065,22 @@
           "data": {
             "description": "A milestone.",
             "properties": {
+              "closed_at": {
+                "description": "When it was closed; none while it is open.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "closed_issues": {
                 "format": "int64",
                 "type": "integer"
+              },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "description": {
                 "type": [
@@ -1097,6 +1110,12 @@
               },
               "title": {
                 "type": "string"
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "url": {
                 "type": "string"
@@ -3090,9 +3109,22 @@
             "items": {
               "description": "A milestone.",
               "properties": {
+                "closed_at": {
+                  "description": "When it was closed; none while it is open.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "closed_issues": {
                   "format": "int64",
                   "type": "integer"
+                },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "description": {
                   "type": [
@@ -3122,6 +3154,12 @@
                 },
                 "title": {
                   "type": "string"
+                },
+                "updated_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "url": {
                   "type": "string"
@@ -7809,9 +7847,22 @@
       "GithubMilestone": {
         "description": "A milestone.",
         "properties": {
+          "closed_at": {
+            "description": "When it was closed; none while it is open.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "closed_issues": {
             "format": "int64",
             "type": "integer"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "description": {
             "type": [
@@ -7841,6 +7892,12 @@
           },
           "title": {
             "type": "string"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "url": {
             "type": "string"

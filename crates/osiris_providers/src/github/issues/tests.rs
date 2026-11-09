@@ -1233,6 +1233,11 @@ async fn reads_a_milestone_by_number() {
 
     assert_eq!(milestone.id, "261");
     assert_eq!(milestone.number, 3);
+    assert_eq!(
+        milestone.created_at.as_deref(),
+        Some("2026-01-01T00:00:00Z")
+    );
+    assert_eq!(milestone.closed_at, None);
     assert_eq!(milestone.title, text(&answer, "title"));
 }
 

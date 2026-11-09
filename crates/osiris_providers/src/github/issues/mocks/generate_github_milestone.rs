@@ -15,5 +15,8 @@ pub fn generate_github_milestone(id: u64, number: u64) -> Value {
         "open_issues": (0..50).fake::<i64>(),
         "closed_issues": (0..50).fake::<i64>(),
         "html_url": format!("https://github.com/octo/hello/milestone/{number}"),
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-02T00:00:00Z",
+        "closed_at": null,
     })
 }

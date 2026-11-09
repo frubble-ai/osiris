@@ -15,4 +15,8 @@ pub struct GithubMilestone {
     pub open_issues: i64,
     pub closed_issues: i64,
     pub url: String,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
+    /// When it was closed; none while it is open.
+    pub closed_at: Option<String>,
 }

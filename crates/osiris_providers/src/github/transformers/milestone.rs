@@ -20,6 +20,9 @@ pub struct MilestoneAnswer {
     pub closed_issues: i64,
     #[serde(rename = "html_url", default)]
     pub url: String,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
+    pub closed_at: Option<String>,
 }
 
 impl From<MilestoneAnswer> for GithubMilestone {
@@ -35,6 +38,9 @@ impl From<MilestoneAnswer> for GithubMilestone {
             open_issues: answer.open_issues,
             closed_issues: answer.closed_issues,
             url: answer.url,
+            created_at: answer.created_at,
+            updated_at: answer.updated_at,
+            closed_at: answer.closed_at,
         }
     }
 }

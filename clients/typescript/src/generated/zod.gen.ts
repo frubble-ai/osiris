@@ -159,7 +159,9 @@ export const zActionResultGithubMergedCheck = z.object({
  */
 export const zActionResultGithubMilestone = z.object({
     data: z.object({
+        closed_at: z.string().nullish(),
         closed_issues: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        created_at: z.string().nullish(),
         description: z.string().nullish(),
         due_on: z.string().nullish(),
         id: z.string(),
@@ -167,6 +169,7 @@ export const zActionResultGithubMilestone = z.object({
         open_issues: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         state: z.string(),
         title: z.string(),
+        updated_at: z.string().nullish(),
         url: z.string()
     })
 });
@@ -401,7 +404,9 @@ export const zActionResultVecGithubLanguage = z.object({
  */
 export const zActionResultVecGithubMilestone = z.object({
     data: z.array(z.object({
+        closed_at: z.string().nullish(),
         closed_issues: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        created_at: z.string().nullish(),
         description: z.string().nullish(),
         due_on: z.string().nullish(),
         id: z.string(),
@@ -409,6 +414,7 @@ export const zActionResultVecGithubMilestone = z.object({
         open_issues: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         state: z.string(),
         title: z.string(),
+        updated_at: z.string().nullish(),
         url: z.string()
     }))
 });
@@ -1326,7 +1332,9 @@ export const zGithubMergedCheck = z.object({
  * A milestone.
  */
 export const zGithubMilestone = z.object({
+    closed_at: z.string().nullish(),
     closed_issues: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    created_at: z.string().nullish(),
     description: z.string().nullish(),
     due_on: z.string().nullish(),
     id: z.string(),
@@ -1334,6 +1342,7 @@ export const zGithubMilestone = z.object({
     open_issues: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     state: z.string(),
     title: z.string(),
+    updated_at: z.string().nullish(),
     url: z.string()
 });
 
