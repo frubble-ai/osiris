@@ -17,6 +17,8 @@ pub struct IssueCommentAnswer {
     pub created_at: String,
     #[serde(default)]
     pub updated_at: String,
+    #[serde(default)]
+    pub author_association: String,
 }
 
 impl From<IssueCommentAnswer> for GithubIssueComment {
@@ -30,6 +32,7 @@ impl From<IssueCommentAnswer> for GithubIssueComment {
             reactions: answer.reactions.map(GithubReactions::from),
             created_at: answer.created_at,
             updated_at: answer.updated_at,
+            author_association: answer.author_association,
         }
     }
 }

@@ -153,6 +153,10 @@ async fn lists_a_page_of_branches_filtered_by_protection() {
         branches[0]["commit"]["sha"].as_str().unwrap()
     );
     assert!(listed[0].protected);
+    let protection = listed[0].protection.as_ref().unwrap();
+    assert!(protection.enabled);
+    assert_eq!(protection.enforcement_level.as_deref(), Some("everyone"));
+    assert_eq!(protection.required_status_checks, ["ci/build"]);
 }
 
 #[tokio::test]
@@ -182,6 +186,7 @@ async fn encodes_a_branch_name_with_a_slash_into_one_segment() {
         .unwrap();
 
     assert!(!branch.protected);
+    assert!(!branch.protection.as_ref().unwrap().enabled);
 }
 
 #[tokio::test]
@@ -667,6 +672,14 @@ async fn compares_two_commits() {
         answer["commits"][2]["sha"].as_str().unwrap()
     );
     assert_eq!(comparison.files[0].filename, "README.md");
+    assert_eq!(
+        comparison.base_commit_sha.as_deref(),
+        Some("1111111111111111111111111111111111111111")
+    );
+    assert_eq!(
+        comparison.merge_base_commit_sha.as_deref(),
+        Some("2222222222222222222222222222222222222222")
+    );
 }
 
 #[tokio::test]
@@ -1444,6 +1457,7 @@ async fn lists_the_contributors_of_a_repository_with_anonymous_ones() {
         listed[0].contributions,
         contributors[0]["contributions"].as_i64().unwrap()
     );
+    assert!(listed[0].site_admin);
 }
 
 #[tokio::test]
@@ -1752,4 +1766,11 @@ async fn lists_the_comments_on_a_commit() {
 
     assert_eq!(listed[0].id, "93");
     assert_eq!(listed[0].path.as_deref(), Some("README.md"));
+    assert_eq!(
+        listed[0].commit_id,
+        "6b6f6f3373bddf70d592019006ad64aec76fa8ae"
+    );
+    assert_eq!(listed[0].line, Some(3));
+    assert_eq!(listed[0].author_association, "OWNER");
+    assert_eq!(listed[0].reactions.as_ref().unwrap().heart, 1);
 }

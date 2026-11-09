@@ -44,6 +44,7 @@ export type ActionResultGithubBranch = {
         commit_sha: string;
         name: string;
         protected: boolean;
+        protection?: GithubBranchProtection | null;
     };
 };
 
@@ -114,11 +115,19 @@ export type ActionResultGithubCommitComment = {
      * A comment on a commit.
      */
     data: {
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
         body: string;
+        commit_id: string;
         created_at: string;
         id: string;
+        line?: number | null;
         path?: string | null;
         position?: number | null;
+        reactions?: GithubReactions | null;
         updated_at: string;
         url: string;
         user?: GithubUser | null;
@@ -134,9 +143,14 @@ export type ActionResultGithubCommitComparison = {
      */
     data: {
         ahead_by: number;
+        /**
+         * The commit compared from, and the latest one both sides share.
+         */
+        base_commit_sha?: string | null;
         behind_by: number;
         commits: Array<GithubCommit>;
         files: Array<GithubCommitFile>;
+        merge_base_commit_sha?: string | null;
         status: string;
         total_commits: number;
         url: string;
@@ -173,6 +187,7 @@ export type ActionResultGithubCommitStatus = {
     data: {
         context: string;
         created_at: string;
+        creator?: GithubUser | null;
         description?: string | null;
         id: string;
         state: string;
@@ -292,8 +307,14 @@ export type ActionResultGithubIssue = {
     data: {
         active_lock_reason?: string | null;
         assignees: Array<GithubUser>;
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
         body?: string | null;
         closed_at?: string | null;
+        closed_by?: GithubUser | null;
         comments: number;
         created_at: string;
         id: string;
@@ -327,6 +348,11 @@ export type ActionResultGithubIssueComment = {
      * A comment on an issue or a pull request.
      */
     data: {
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
         body: string;
         created_at: string;
         id: string;
@@ -398,6 +424,10 @@ export type ActionResultGithubLabel = {
      */
     data: {
         color: string;
+        /**
+         * Whether it is one of the labels GitHub gives every new repository.
+         */
+        default: boolean;
         description?: string | null;
         id: string;
         name: string;
@@ -464,6 +494,7 @@ export type ActionResultGithubMilestone = {
         closed_at?: string | null;
         closed_issues: number;
         created_at?: string | null;
+        creator?: GithubUser | null;
         description?: string | null;
         due_on?: string | null;
         id: string;
@@ -515,8 +546,14 @@ export type ActionResultGithubPullRequest = {
      * A pull request.
      */
     data: {
+        active_lock_reason?: string | null;
         additions?: number | null;
         assignees: Array<GithubUser>;
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
         /**
          * Whether it merges by itself once its checks pass.
          */
@@ -536,6 +573,10 @@ export type ActionResultGithubPullRequest = {
         head: GithubPullRequestBranch;
         id: string;
         labels: Array<GithubLabel>;
+        /**
+         * Whether its conversation is locked, and why when it is.
+         */
+        locked: boolean;
         maintainer_can_modify?: boolean | null;
         /**
          * The commit its merge made, or the test merge GitHub keeps while it is open.
@@ -553,8 +594,13 @@ export type ActionResultGithubPullRequest = {
         mergeable_state?: string | null;
         merged: boolean;
         merged_at?: string | null;
+        merged_by?: GithubUser | null;
         milestone?: GithubMilestone | null;
         number: number;
+        /**
+         * Whether it can be rebased onto its base; null while GitHub is still working it out.
+         */
+        rebaseable?: boolean | null;
         /**
          * Who is asked to review it: people, and teams by their slug.
          */
@@ -619,6 +665,10 @@ export type ActionResultGithubRelease = {
         created_at: string;
         draft: boolean;
         id: string;
+        /**
+         * Whether its tag and assets can no longer change.
+         */
+        immutable: boolean;
         name?: string | null;
         prerelease: boolean;
         published_at?: string | null;
@@ -626,6 +676,7 @@ export type ActionResultGithubRelease = {
         tag_name: string;
         tarball_url?: string | null;
         target_commitish: string;
+        updated_at?: string | null;
         upload_url: string;
         url: string;
         zipball_url?: string | null;
@@ -789,6 +840,11 @@ export type ActionResultGithubReview = {
      * A review of a pull request.
      */
     data: {
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
         body?: string | null;
         commit_id?: string | null;
         id: string;
@@ -807,6 +863,11 @@ export type ActionResultGithubReviewComment = {
      * A comment on a line of a pull request's diff.
      */
     data: {
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
         body: string;
         commit_id: string;
         created_at: string;
@@ -816,11 +877,17 @@ export type ActionResultGithubReviewComment = {
         line?: number | null;
         original_commit_id: string;
         original_line?: number | null;
+        original_start_line?: number | null;
         path: string;
         pull_request_review_id?: string | null;
+        reactions?: GithubReactions | null;
         side?: string | null;
         start_line?: number | null;
         start_side?: string | null;
+        /**
+         * What the comment is on: a `line` of the diff or the whole `file`.
+         */
+        subject_type?: string | null;
         updated_at: string;
         url: string;
         user?: GithubUser | null;
@@ -1010,6 +1077,7 @@ export type ActionResultVecGithubBranch = {
         commit_sha: string;
         name: string;
         protected: boolean;
+        protection?: GithubBranchProtection | null;
     }>;
 };
 
@@ -1048,6 +1116,7 @@ export type ActionResultVecGithubCollaborator = {
         login: string;
         permissions?: GithubPermissions | null;
         role_name?: string | null;
+        site_admin: boolean;
         url: string;
     }>;
 };
@@ -1079,11 +1148,19 @@ export type ActionResultVecGithubCommit = {
  */
 export type ActionResultVecGithubCommitComment = {
     data: Array<{
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
         body: string;
+        commit_id: string;
         created_at: string;
         id: string;
+        line?: number | null;
         path?: string | null;
         position?: number | null;
+        reactions?: GithubReactions | null;
         updated_at: string;
         url: string;
         user?: GithubUser | null;
@@ -1097,6 +1174,7 @@ export type ActionResultVecGithubCommitStatus = {
     data: Array<{
         context: string;
         created_at: string;
+        creator?: GithubUser | null;
         description?: string | null;
         id: string;
         state: string;
@@ -1130,6 +1208,7 @@ export type ActionResultVecGithubContributor = {
         contributions: number;
         id: string;
         login: string;
+        site_admin: boolean;
         url: string;
     }>;
 };
@@ -1211,6 +1290,11 @@ export type ActionResultVecGithubInstallation = {
  */
 export type ActionResultVecGithubIssueComment = {
     data: Array<{
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
         body: string;
         created_at: string;
         id: string;
@@ -1262,6 +1346,10 @@ export type ActionResultVecGithubIssueEvent = {
 export type ActionResultVecGithubLabel = {
     data: Array<{
         color: string;
+        /**
+         * Whether it is one of the labels GitHub gives every new repository.
+         */
+        default: boolean;
         description?: string | null;
         id: string;
         name: string;
@@ -1289,6 +1377,7 @@ export type ActionResultVecGithubMilestone = {
         closed_at?: string | null;
         closed_issues: number;
         created_at?: string | null;
+        creator?: GithubUser | null;
         description?: string | null;
         due_on?: string | null;
         id: string;
@@ -1306,8 +1395,14 @@ export type ActionResultVecGithubMilestone = {
  */
 export type ActionResultVecGithubPullRequest = {
     data: Array<{
+        active_lock_reason?: string | null;
         additions?: number | null;
         assignees: Array<GithubUser>;
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
         /**
          * Whether it merges by itself once its checks pass.
          */
@@ -1327,6 +1422,10 @@ export type ActionResultVecGithubPullRequest = {
         head: GithubPullRequestBranch;
         id: string;
         labels: Array<GithubLabel>;
+        /**
+         * Whether its conversation is locked, and why when it is.
+         */
+        locked: boolean;
         maintainer_can_modify?: boolean | null;
         /**
          * The commit its merge made, or the test merge GitHub keeps while it is open.
@@ -1344,8 +1443,13 @@ export type ActionResultVecGithubPullRequest = {
         mergeable_state?: string | null;
         merged: boolean;
         merged_at?: string | null;
+        merged_by?: GithubUser | null;
         milestone?: GithubMilestone | null;
         number: number;
+        /**
+         * Whether it can be rebased onto its base; null while GitHub is still working it out.
+         */
+        rebaseable?: boolean | null;
         /**
          * Who is asked to review it: people, and teams by their slug.
          */
@@ -1389,6 +1493,10 @@ export type ActionResultVecGithubRelease = {
         created_at: string;
         draft: boolean;
         id: string;
+        /**
+         * Whether its tag and assets can no longer change.
+         */
+        immutable: boolean;
         name?: string | null;
         prerelease: boolean;
         published_at?: string | null;
@@ -1396,6 +1504,7 @@ export type ActionResultVecGithubRelease = {
         tag_name: string;
         tarball_url?: string | null;
         target_commitish: string;
+        updated_at?: string | null;
         upload_url: string;
         url: string;
         zipball_url?: string | null;
@@ -1490,6 +1599,11 @@ export type ActionResultVecGithubRepository = {
  */
 export type ActionResultVecGithubReview = {
     data: Array<{
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
         body?: string | null;
         commit_id?: string | null;
         id: string;
@@ -1505,6 +1619,11 @@ export type ActionResultVecGithubReview = {
  */
 export type ActionResultVecGithubReviewComment = {
     data: Array<{
+        /**
+         * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+         * as GitHub names it. An open string.
+         */
+        author_association: string;
         body: string;
         commit_id: string;
         created_at: string;
@@ -1514,11 +1633,17 @@ export type ActionResultVecGithubReviewComment = {
         line?: number | null;
         original_commit_id: string;
         original_line?: number | null;
+        original_start_line?: number | null;
         path: string;
         pull_request_review_id?: string | null;
+        reactions?: GithubReactions | null;
         side?: string | null;
         start_line?: number | null;
         start_side?: string | null;
+        /**
+         * What the comment is on: a `line` of the diff or the whole `file`.
+         */
+        subject_type?: string | null;
         updated_at: string;
         url: string;
         user?: GithubUser | null;
@@ -2716,6 +2841,22 @@ export type GithubBranch = {
     commit_sha: string;
     name: string;
     protected: boolean;
+    protection?: GithubBranchProtection | null;
+};
+
+/**
+ * What a branch's protection asks of a change before it lands.
+ */
+export type GithubBranchProtection = {
+    enabled: boolean;
+    /**
+     * Who the required status checks apply to: `off`, `non_admins` or `everyone`.
+     */
+    enforcement_level?: string | null;
+    /**
+     * The status checks that must pass, by context.
+     */
+    required_status_checks: Array<string>;
 };
 
 /**
@@ -2775,6 +2916,7 @@ export type GithubCollaborator = {
     login: string;
     permissions?: GithubPermissions | null;
     role_name?: string | null;
+    site_admin: boolean;
     url: string;
 };
 
@@ -2811,11 +2953,19 @@ export type GithubCommit = {
  * A comment on a commit.
  */
 export type GithubCommitComment = {
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
     body: string;
+    commit_id: string;
     created_at: string;
     id: string;
+    line?: number | null;
     path?: string | null;
     position?: number | null;
+    reactions?: GithubReactions | null;
     updated_at: string;
     url: string;
     user?: GithubUser | null;
@@ -2826,9 +2976,14 @@ export type GithubCommitComment = {
  */
 export type GithubCommitComparison = {
     ahead_by: number;
+    /**
+     * The commit compared from, and the latest one both sides share.
+     */
+    base_commit_sha?: string | null;
     behind_by: number;
     commits: Array<GithubCommit>;
     files: Array<GithubCommitFile>;
+    merge_base_commit_sha?: string | null;
     status: string;
     total_commits: number;
     url: string;
@@ -2879,6 +3034,7 @@ export type GithubCommitStats = {
 export type GithubCommitStatus = {
     context: string;
     created_at: string;
+    creator?: GithubUser | null;
     description?: string | null;
     id: string;
     state: string;
@@ -2925,6 +3081,7 @@ export type GithubContributor = {
     contributions: number;
     id: string;
     login: string;
+    site_admin: boolean;
     url: string;
 };
 
@@ -3106,8 +3263,14 @@ export type GithubInstallation = {
 export type GithubIssue = {
     active_lock_reason?: string | null;
     assignees: Array<GithubUser>;
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
     body?: string | null;
     closed_at?: string | null;
+    closed_by?: GithubUser | null;
     comments: number;
     created_at: string;
     id: string;
@@ -3136,6 +3299,11 @@ export type GithubIssue = {
  * A comment on an issue or a pull request.
  */
 export type GithubIssueComment = {
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
     body: string;
     created_at: string;
     id: string;
@@ -3221,6 +3389,10 @@ export type GithubJobLogs = {
  */
 export type GithubLabel = {
     color: string;
+    /**
+     * Whether it is one of the labels GitHub gives every new repository.
+     */
+    default: boolean;
     description?: string | null;
     id: string;
     name: string;
@@ -3284,6 +3456,7 @@ export type GithubMilestone = {
     closed_at?: string | null;
     closed_issues: number;
     created_at?: string | null;
+    creator?: GithubUser | null;
     description?: string | null;
     due_on?: string | null;
     id: string;
@@ -3336,8 +3509,14 @@ export type GithubPublicUser = {
  * A pull request.
  */
 export type GithubPullRequest = {
+    active_lock_reason?: string | null;
     additions?: number | null;
     assignees: Array<GithubUser>;
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
     /**
      * Whether it merges by itself once its checks pass.
      */
@@ -3357,6 +3536,10 @@ export type GithubPullRequest = {
     head: GithubPullRequestBranch;
     id: string;
     labels: Array<GithubLabel>;
+    /**
+     * Whether its conversation is locked, and why when it is.
+     */
+    locked: boolean;
     maintainer_can_modify?: boolean | null;
     /**
      * The commit its merge made, or the test merge GitHub keeps while it is open.
@@ -3374,8 +3557,13 @@ export type GithubPullRequest = {
     mergeable_state?: string | null;
     merged: boolean;
     merged_at?: string | null;
+    merged_by?: GithubUser | null;
     milestone?: GithubMilestone | null;
     number: number;
+    /**
+     * Whether it can be rebased onto its base; null while GitHub is still working it out.
+     */
+    rebaseable?: boolean | null;
     /**
      * Who is asked to review it: people, and teams by their slug.
      */
@@ -3466,6 +3654,10 @@ export type GithubRelease = {
     created_at: string;
     draft: boolean;
     id: string;
+    /**
+     * Whether its tag and assets can no longer change.
+     */
+    immutable: boolean;
     name?: string | null;
     prerelease: boolean;
     published_at?: string | null;
@@ -3473,6 +3665,7 @@ export type GithubRelease = {
     tag_name: string;
     tarball_url?: string | null;
     target_commitish: string;
+    updated_at?: string | null;
     upload_url: string;
     url: string;
     zipball_url?: string | null;
@@ -3620,6 +3813,11 @@ export type GithubRequestedReviewers = {
  * A review of a pull request.
  */
 export type GithubReview = {
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
     body?: string | null;
     commit_id?: string | null;
     id: string;
@@ -3633,6 +3831,11 @@ export type GithubReview = {
  * A comment on a line of a pull request's diff.
  */
 export type GithubReviewComment = {
+    /**
+     * How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+     * as GitHub names it. An open string.
+     */
+    author_association: string;
     body: string;
     commit_id: string;
     created_at: string;
@@ -3642,11 +3845,17 @@ export type GithubReviewComment = {
     line?: number | null;
     original_commit_id: string;
     original_line?: number | null;
+    original_start_line?: number | null;
     path: string;
     pull_request_review_id?: string | null;
+    reactions?: GithubReactions | null;
     side?: string | null;
     start_line?: number | null;
     start_side?: string | null;
+    /**
+     * What the comment is on: a `line` of the diff or the whole `file`.
+     */
+    subject_type?: string | null;
     updated_at: string;
     url: string;
     user?: GithubUser | null;

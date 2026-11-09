@@ -1,7 +1,6 @@
 //! Two commits compared: how far apart they are, and the commits and files between them, as GitHub answers it.
 
-use super::commit::CommitAnswer;
-use super::commit::CommitFileAnswer;
+use super::commit::{CommitAnswer, CommitFileAnswer, ShaAnswer};
 use crate::github::types::{GithubCommit, GithubCommitComparison, GithubCommitFile};
 use serde::Deserialize;
 
@@ -21,6 +20,8 @@ pub struct CommitComparisonAnswer {
     pub commits: Vec<CommitAnswer>,
     #[serde(default)]
     pub files: Vec<CommitFileAnswer>,
+    pub base_commit: Option<ShaAnswer>,
+    pub merge_base_commit: Option<ShaAnswer>,
 }
 
 impl From<CommitComparisonAnswer> for GithubCommitComparison {
@@ -38,6 +39,8 @@ impl From<CommitComparisonAnswer> for GithubCommitComparison {
                 .into_iter()
                 .map(GithubCommitFile::from)
                 .collect(),
+            base_commit_sha: answer.base_commit.map(|commit| commit.sha),
+            merge_base_commit_sha: answer.merge_base_commit.map(|commit| commit.sha),
         }
     }
 }

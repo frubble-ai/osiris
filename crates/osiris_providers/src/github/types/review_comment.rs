@@ -1,6 +1,6 @@
 //! A comment on a line of a pull request's diff.
 
-use super::GithubUser;
+use super::{GithubReactions, GithubUser};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -24,4 +24,11 @@ pub struct GithubReviewComment {
     pub pull_request_review_id: Option<String>,
     pub created_at: String,
     pub updated_at: String,
+    /// How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+    /// as GitHub names it. An open string.
+    pub author_association: String,
+    /// What the comment is on: a `line` of the diff or the whole `file`.
+    pub subject_type: Option<String>,
+    pub original_start_line: Option<i64>,
+    pub reactions: Option<GithubReactions>,
 }

@@ -345,6 +345,7 @@ async fn lists_the_reviews_of_a_pull_request() {
         listed[0].commit_id.as_deref(),
         reviews[0]["commit_id"].as_str()
     );
+    assert_eq!(listed[0].author_association, "MEMBER");
 }
 
 #[tokio::test]
@@ -401,6 +402,10 @@ async fn lists_the_comments_on_a_pull_requests_diff_sorted_and_since_a_time() {
     assert_eq!(listed[0].pull_request_review_id.as_deref(), Some("5061"));
     assert_eq!(listed[0].created_at, "2024-02-01T10:00:00Z");
     assert_eq!(listed[0].updated_at, "2024-02-02T10:00:00Z");
+    assert_eq!(listed[0].author_association, "OWNER");
+    assert_eq!(listed[0].subject_type.as_deref(), Some("line"));
+    assert_eq!(listed[0].original_start_line, None);
+    assert_eq!(listed[0].reactions.as_ref().unwrap().plus_one, 1);
 }
 
 #[tokio::test]
@@ -839,6 +844,11 @@ async fn reads_a_pull_request_by_number() {
         (Some(3), Some(9), Some(2))
     );
     assert!(read.auto_merge);
+    assert!(read.locked);
+    assert_eq!(read.active_lock_reason.as_deref(), Some("resolved"));
+    assert_eq!(read.merged_by, None);
+    assert_eq!(read.rebaseable, Some(true));
+    assert_eq!(read.author_association, "COLLABORATOR");
 }
 
 #[tokio::test]

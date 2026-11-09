@@ -14,4 +14,7 @@ pub struct GithubReview {
     pub url: String,
     pub commit_id: Option<String>,
     pub submitted_at: Option<String>,
+    /// How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+    /// as GitHub names it. An open string.
+    pub author_association: String,
 }

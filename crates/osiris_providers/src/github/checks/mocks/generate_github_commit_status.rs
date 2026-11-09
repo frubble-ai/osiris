@@ -1,5 +1,6 @@
 //! A commit status, as GitHub answers it.
 
+use crate::github::mocks::generate_github_user::generate_github_user;
 use fake::{
     Fake,
     faker::{internet::en::Username, lorem::en::Sentence},
@@ -17,5 +18,6 @@ pub fn generate_github_commit_status(id: u64, state: &str) -> Value {
         "target_url": format!("https://ci.example.com/builds/{id}"),
         "created_at": "2024-01-02T03:04:05Z",
         "updated_at": "2024-01-02T03:05:06Z",
+        "creator": generate_github_user(id + 1000),
     })
 }

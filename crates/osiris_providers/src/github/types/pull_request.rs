@@ -15,6 +15,10 @@ pub struct GithubPullRequestBranch {
 
 /// A pull request.
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, PartialEq)]
+#[allow(
+    clippy::struct_excessive_bools,
+    reason = "GitHub's own flags, one each"
+)]
 pub struct GithubPullRequest {
     pub id: String,
     pub number: i64,
@@ -55,4 +59,13 @@ pub struct GithubPullRequest {
     pub changed_files: Option<i64>,
     pub comments: Option<i64>,
     pub review_comments: Option<i64>,
+    /// Whether its conversation is locked, and why when it is.
+    pub locked: bool,
+    pub active_lock_reason: Option<String>,
+    pub merged_by: Option<GithubUser>,
+    /// Whether it can be rebased onto its base; null while GitHub is still working it out.
+    pub rebaseable: Option<bool>,
+    /// How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+    /// as GitHub names it. An open string.
+    pub author_association: String,
 }

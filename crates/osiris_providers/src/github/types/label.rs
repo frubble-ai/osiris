@@ -10,4 +10,6 @@ pub struct GithubLabel {
     pub name: String,
     pub color: String,
     pub description: Option<String>,
+    /// Whether it is one of the labels GitHub gives every new repository.
+    pub default: bool,
 }

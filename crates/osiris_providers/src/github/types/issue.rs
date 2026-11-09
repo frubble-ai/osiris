@@ -30,4 +30,9 @@ pub struct GithubIssue {
     pub created_at: String,
     pub updated_at: String,
     pub closed_at: Option<String>,
+    /// Who closed it, when it is closed.
+    pub closed_by: Option<GithubUser>,
+    /// How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+    /// as GitHub names it. An open string.
+    pub author_association: String,
 }

@@ -64,7 +64,7 @@ pub mod workflow_run;
 pub use acknowledgement::GithubAcknowledgement;
 pub use artifact::GithubArtifact;
 pub use artifact_download::GithubArtifactDownload;
-pub use branch::GithubBranch;
+pub use branch::{GithubBranch, GithubBranchProtection};
 pub use check_run::{GithubCheckRun, GithubCheckRunOutput};
 pub use collaborator::{GithubCollaborator, GithubPermissions};
 pub use collaborator_addition::{GithubCollaboratorAddition, GithubRepositoryInvitation};

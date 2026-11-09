@@ -255,6 +255,8 @@ async fn reads_an_issue_with_its_owner_and_repo_encoded(
     assert_eq!(issue.id, "41");
     assert_eq!(issue.title, text(&answer, "title"));
     assert!(!issue.is_pull_request);
+    assert_eq!(issue.author_association, "OWNER");
+    assert_eq!(issue.closed_by, None);
 }
 
 #[tokio::test]
@@ -618,6 +620,7 @@ async fn reads_a_label_by_a_name_with_reserved_characters() {
 
     assert_eq!(label.id, "121");
     assert_eq!(label.color, text(&answer, "color"));
+    assert!(!label.default);
 }
 
 #[tokio::test]
@@ -967,6 +970,7 @@ async fn reads_a_comment_on_an_issue_by_id() {
     assert_eq!(comment.created_at, text(&answer, "created_at"));
     let reactions = comment.reactions.unwrap();
     assert_eq!((reactions.total_count, reactions.minus_one), (1, 1));
+    assert_eq!(comment.author_association, "CONTRIBUTOR");
 }
 
 #[tokio::test]
@@ -1272,6 +1276,10 @@ async fn reads_a_milestone_by_number() {
     );
     assert_eq!(milestone.closed_at, None);
     assert_eq!(milestone.title, text(&answer, "title"));
+    assert_eq!(
+        milestone.creator.as_ref().unwrap().login,
+        text(&answer["creator"], "login")
+    );
 }
 
 #[tokio::test]

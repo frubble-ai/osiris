@@ -15,6 +15,8 @@ pub struct ContributorAnswer {
     #[serde(rename = "type", default)]
     pub account_type: String,
     #[serde(default)]
+    pub site_admin: bool,
+    #[serde(default)]
     pub contributions: i64,
 }
 
@@ -27,6 +29,7 @@ impl From<ContributorAnswer> for GithubContributor {
             avatar_url: answer.avatar_url,
             url: answer.url,
             account_type: answer.account_type,
+            site_admin: answer.site_admin,
             contributions: answer.contributions,
         }
     }

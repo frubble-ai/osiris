@@ -34,6 +34,9 @@ pub struct ReleaseAnswer {
     pub created_at: String,
     pub published_at: Option<String>,
     pub reactions: Option<ReactionsAnswer>,
+    pub updated_at: Option<String>,
+    #[serde(default)]
+    pub immutable: bool,
 }
 
 impl From<ReleaseAnswer> for GithubRelease {
@@ -61,6 +64,8 @@ impl From<ReleaseAnswer> for GithubRelease {
             created_at: answer.created_at,
             published_at: answer.published_at,
             reactions: answer.reactions.map(GithubReactions::from),
+            updated_at: answer.updated_at,
+            immutable: answer.immutable,
         }
     }
 }

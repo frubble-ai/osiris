@@ -16,5 +16,6 @@ pub fn generate_github_review(id: u64, state: &str) -> Value {
         "html_url": format!("https://github.com/octo/hello/pull/1#pullrequestreview-{id}"),
         "commit_id": generate_sha(),
         "submitted_at": "2024-01-01T00:00:00Z",
+        "author_association": "MEMBER",
     })
 }

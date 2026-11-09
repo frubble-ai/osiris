@@ -1,6 +1,7 @@
 //! A milestone, as GitHub answers it.
 
-use crate::github::types::GithubMilestone;
+use super::user::UserAnswer;
+use crate::github::types::{GithubMilestone, GithubUser};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -23,6 +24,7 @@ pub struct MilestoneAnswer {
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
     pub closed_at: Option<String>,
+    pub creator: Option<UserAnswer>,
 }
 
 impl From<MilestoneAnswer> for GithubMilestone {
@@ -41,6 +43,7 @@ impl From<MilestoneAnswer> for GithubMilestone {
             created_at: answer.created_at,
             updated_at: answer.updated_at,
             closed_at: answer.closed_at,
+            creator: answer.creator.map(GithubUser::from),
         }
     }
 }

@@ -11,6 +11,8 @@ pub struct LabelAnswer {
     #[serde(default)]
     pub color: String,
     pub description: Option<String>,
+    #[serde(default)]
+    pub default: bool,
 }
 
 impl From<LabelAnswer> for GithubLabel {
@@ -21,6 +23,7 @@ impl From<LabelAnswer> for GithubLabel {
             name: answer.name,
             color: answer.color,
             description: answer.description,
+            default: answer.default,
         }
     }
 }

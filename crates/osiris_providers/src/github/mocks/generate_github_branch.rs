@@ -11,5 +11,13 @@ pub fn generate_github_branch(protected: bool) -> Value {
         "name": Word().fake::<String>(),
         "commit": { "sha": sha, "url": format!("https://api.github.com/commits/{sha}") },
         "protected": protected,
+        "protection": {
+            "enabled": protected,
+            "required_status_checks": {
+                "enforcement_level": if protected { "everyone" } else { "off" },
+                "contexts": if protected { vec!["ci/build"] } else { vec![] },
+                "checks": [],
+            },
+        },
     })
 }

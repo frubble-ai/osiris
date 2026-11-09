@@ -24,6 +24,9 @@ pub struct GithubRelease {
     pub created_at: String,
     pub published_at: Option<String>,
     pub reactions: Option<GithubReactions>,
+    pub updated_at: Option<String>,
+    /// Whether its tag and assets can no longer change.
+    pub immutable: bool,
 }
 
 /// Release notes GitHub wrote for a tag.

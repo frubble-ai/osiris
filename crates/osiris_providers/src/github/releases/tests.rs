@@ -201,6 +201,8 @@ async fn reads_a_release_by_its_id() {
         (reactions.total_count, reactions.plus_one, reactions.heart),
         (2, 1, 1)
     );
+    assert_eq!(release.updated_at.as_deref(), Some("2026-11-01T10:06:00Z"));
+    assert!(!release.immutable);
 }
 
 #[tokio::test]

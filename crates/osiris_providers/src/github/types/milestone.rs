@@ -1,5 +1,6 @@
 //! A milestone.
 
+use super::GithubUser;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -19,4 +20,5 @@ pub struct GithubMilestone {
     pub updated_at: Option<String>,
     /// When it was closed; none while it is open.
     pub closed_at: Option<String>,
+    pub creator: Option<GithubUser>,
 }

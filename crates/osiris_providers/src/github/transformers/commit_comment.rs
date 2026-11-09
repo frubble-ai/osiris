@@ -1,7 +1,7 @@
 //! A comment on a commit, as GitHub answers it.
 
-use super::user::UserAnswer;
-use crate::github::types::{GithubCommitComment, GithubUser};
+use super::{reactions::ReactionsAnswer, user::UserAnswer};
+use crate::github::types::{GithubCommitComment, GithubReactions, GithubUser};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -18,6 +18,12 @@ pub struct CommitCommentAnswer {
     pub created_at: String,
     #[serde(default)]
     pub updated_at: String,
+    #[serde(default)]
+    pub commit_id: String,
+    pub line: Option<i64>,
+    #[serde(default)]
+    pub author_association: String,
+    pub reactions: Option<ReactionsAnswer>,
 }
 
 impl From<CommitCommentAnswer> for GithubCommitComment {
@@ -32,6 +38,10 @@ impl From<CommitCommentAnswer> for GithubCommitComment {
             user: answer.user.map(GithubUser::from),
             created_at: answer.created_at,
             updated_at: answer.updated_at,
+            commit_id: answer.commit_id,
+            line: answer.line,
+            author_association: answer.author_association,
+            reactions: answer.reactions.map(GithubReactions::from),
         }
     }
 }

@@ -132,6 +132,10 @@ async fn lists_a_page_of_the_statuses_on_a_branch() {
     assert_eq!(listed[0].id, "2");
     assert_eq!(listed[0].state, "failure");
     assert_eq!(listed[1].context, statuses[1]["context"].as_str().unwrap());
+    assert_eq!(
+        listed[0].creator.as_ref().unwrap().login,
+        statuses[0]["creator"]["login"].as_str().unwrap()
+    );
 }
 
 #[tokio::test]

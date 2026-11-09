@@ -1,6 +1,7 @@
 //! A status a service set on a commit, as GitHub answers it.
 
-use crate::github::types::GithubCommitStatus;
+use super::user::UserAnswer;
+use crate::github::types::{GithubCommitStatus, GithubUser};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -16,6 +17,7 @@ pub struct CommitStatusAnswer {
     pub created_at: String,
     #[serde(default)]
     pub updated_at: String,
+    pub creator: Option<UserAnswer>,
 }
 
 impl From<CommitStatusAnswer> for GithubCommitStatus {
@@ -29,6 +31,7 @@ impl From<CommitStatusAnswer> for GithubCommitStatus {
             target_url: answer.target_url,
             created_at: answer.created_at,
             updated_at: answer.updated_at,
+            creator: answer.creator.map(GithubUser::from),
         }
     }
 }

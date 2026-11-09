@@ -28,5 +28,7 @@ pub fn generate_github_release(id: u64, tag_name: &str) -> Value {
         "author": generate_github_user(id + 1000),
         "created_at": "2026-11-01T10:00:00Z",
         "published_at": "2026-11-01T10:05:00Z",
+        "updated_at": "2026-11-01T10:06:00Z",
+        "immutable": false,
     })
 }

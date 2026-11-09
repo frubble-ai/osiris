@@ -9,6 +9,7 @@ pub fn generate_github_contributor(id: u64) -> Value {
     let mut contributor = generate_github_user(id);
     if let Some(fields) = contributor.as_object_mut() {
         fields.insert("contributions".into(), json!((1..5000).fake::<i64>()));
+        fields.insert("site_admin".into(), json!(true));
     }
     contributor
 }

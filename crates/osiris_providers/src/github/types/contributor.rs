@@ -11,5 +11,6 @@ pub struct GithubContributor {
     pub avatar_url: String,
     pub url: String,
     pub account_type: String,
+    pub site_admin: bool,
     pub contributions: i64,
 }

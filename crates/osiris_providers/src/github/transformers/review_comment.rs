@@ -1,7 +1,7 @@
 //! A comment on a line of a pull request's diff, as GitHub answers it.
 
-use super::user::UserAnswer;
-use crate::github::types::{GithubReviewComment, GithubUser};
+use super::{reactions::ReactionsAnswer, user::UserAnswer};
+use crate::github::types::{GithubReactions, GithubReviewComment, GithubUser};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -31,6 +31,11 @@ pub struct ReviewCommentAnswer {
     pub created_at: String,
     #[serde(default)]
     pub updated_at: String,
+    #[serde(default)]
+    pub author_association: String,
+    pub subject_type: Option<String>,
+    pub original_start_line: Option<i64>,
+    pub reactions: Option<ReactionsAnswer>,
 }
 
 impl From<ReviewCommentAnswer> for GithubReviewComment {
@@ -54,6 +59,10 @@ impl From<ReviewCommentAnswer> for GithubReviewComment {
             pull_request_review_id: answer.pull_request_review_id.map(|id| id.to_string()),
             created_at: answer.created_at,
             updated_at: answer.updated_at,
+            author_association: answer.author_association,
+            subject_type: answer.subject_type,
+            original_start_line: answer.original_start_line,
+            reactions: answer.reactions.map(GithubReactions::from),
         }
     }
 }

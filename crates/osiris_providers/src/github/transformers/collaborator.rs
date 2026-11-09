@@ -45,6 +45,8 @@ pub struct CollaboratorAnswer {
     pub url: String,
     #[serde(rename = "type", default)]
     pub account_type: String,
+    #[serde(default)]
+    pub site_admin: bool,
     pub permissions: Option<PermissionsAnswer>,
     pub role_name: Option<String>,
 }
@@ -58,6 +60,7 @@ impl From<CollaboratorAnswer> for GithubCollaborator {
             avatar_url: answer.avatar_url,
             url: answer.url,
             account_type: answer.account_type,
+            site_admin: answer.site_admin,
             permissions: answer.permissions.map(GithubPermissions::from),
             role_name: answer.role_name,
         }

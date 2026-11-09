@@ -15,6 +15,8 @@ pub struct ReviewAnswer {
     pub url: String,
     pub commit_id: Option<String>,
     pub submitted_at: Option<String>,
+    #[serde(default)]
+    pub author_association: String,
 }
 
 impl From<ReviewAnswer> for GithubReview {
@@ -28,6 +30,7 @@ impl From<ReviewAnswer> for GithubReview {
             url: answer.url,
             commit_id: answer.commit_id,
             submitted_at: answer.submitted_at,
+            author_association: answer.author_association,
         }
     }
 }

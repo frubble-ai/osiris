@@ -58,6 +58,17 @@
               },
               "protected": {
                 "type": "boolean"
+              },
+              "protection": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubBranchProtection",
+                    "description": "What its protection asks of a change, when GitHub answers it."
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "required": [
@@ -257,7 +268,14 @@
           "data": {
             "description": "A comment on a commit.",
             "properties": {
+              "author_association": {
+                "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+                "type": "string"
+              },
               "body": {
+                "type": "string"
+              },
+              "commit_id": {
                 "type": "string"
               },
               "created_at": {
@@ -265,6 +283,13 @@
               },
               "id": {
                 "type": "string"
+              },
+              "line": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
               },
               "path": {
                 "type": [
@@ -277,6 +302,16 @@
                 "type": [
                   "integer",
                   "null"
+                ]
+              },
+              "reactions": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubReactions"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "updated_at": {
@@ -301,7 +336,9 @@
               "body",
               "url",
               "created_at",
-              "updated_at"
+              "updated_at",
+              "commit_id",
+              "author_association"
             ],
             "type": "object"
           }
@@ -321,6 +358,13 @@
                 "format": "int64",
                 "type": "integer"
               },
+              "base_commit_sha": {
+                "description": "The commit compared from, and the latest one both sides share.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "behind_by": {
                 "format": "int64",
                 "type": "integer"
@@ -336,6 +380,12 @@
                   "$ref": "#/components/schemas/GithubCommitFile"
                 },
                 "type": "array"
+              },
+              "merge_base_commit_sha": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "status": {
                 "type": "string"
@@ -411,6 +461,16 @@
               },
               "created_at": {
                 "type": "string"
+              },
+              "creator": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "description": {
                 "type": [
@@ -696,6 +756,10 @@
                 },
                 "type": "array"
               },
+              "author_association": {
+                "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+                "type": "string"
+              },
               "body": {
                 "type": [
                   "string",
@@ -706,6 +770,17 @@
                 "type": [
                   "string",
                   "null"
+                ]
+              },
+              "closed_by": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser",
+                    "description": "Who closed it, when it is closed."
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "comments": {
@@ -798,7 +873,8 @@
               "is_pull_request",
               "locked",
               "created_at",
-              "updated_at"
+              "updated_at",
+              "author_association"
             ],
             "type": "object"
           }
@@ -814,6 +890,10 @@
           "data": {
             "description": "A comment on an issue or a pull request.",
             "properties": {
+              "author_association": {
+                "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+                "type": "string"
+              },
               "body": {
                 "type": "string"
               },
@@ -856,7 +936,8 @@
               "url",
               "body",
               "created_at",
-              "updated_at"
+              "updated_at",
+              "author_association"
             ],
             "type": "object"
           }
@@ -955,6 +1036,10 @@
               "color": {
                 "type": "string"
               },
+              "default": {
+                "description": "Whether it is one of the labels GitHub gives every new repository.",
+                "type": "boolean"
+              },
               "description": {
                 "type": [
                   "string",
@@ -971,7 +1056,8 @@
             "required": [
               "id",
               "name",
-              "color"
+              "color",
+              "default"
             ],
             "type": "object"
           }
@@ -1089,6 +1175,16 @@
                 "type": [
                   "string",
                   "null"
+                ]
+              },
+              "creator": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "description": {
@@ -1274,6 +1370,12 @@
           "data": {
             "description": "A pull request.",
             "properties": {
+              "active_lock_reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "additions": {
                 "format": "int64",
                 "type": [
@@ -1286,6 +1388,10 @@
                   "$ref": "#/components/schemas/GithubUser"
                 },
                 "type": "array"
+              },
+              "author_association": {
+                "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+                "type": "string"
               },
               "auto_merge": {
                 "description": "Whether it merges by itself once its checks pass.",
@@ -1353,6 +1459,10 @@
                 },
                 "type": "array"
               },
+              "locked": {
+                "description": "Whether its conversation is locked, and why when it is.",
+                "type": "boolean"
+              },
               "maintainer_can_modify": {
                 "type": [
                   "boolean",
@@ -1389,6 +1499,16 @@
                   "null"
                 ]
               },
+              "merged_by": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubUser"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
               "milestone": {
                 "oneOf": [
                   {
@@ -1402,6 +1522,13 @@
               "number": {
                 "format": "int64",
                 "type": "integer"
+              },
+              "rebaseable": {
+                "description": "Whether it can be rebased onto its base; null while GitHub is still working it out.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
               "requested_reviewers": {
                 "description": "Who is asked to review it: people, and teams by their slug.",
@@ -1462,7 +1589,9 @@
               "assignees",
               "requested_reviewers",
               "requested_teams",
-              "auto_merge"
+              "auto_merge",
+              "locked",
+              "author_association"
             ],
             "type": "object"
           }
@@ -1578,6 +1707,10 @@
               "id": {
                 "type": "string"
               },
+              "immutable": {
+                "description": "Whether its tag and assets can no longer change.",
+                "type": "boolean"
+              },
               "name": {
                 "type": [
                   "string",
@@ -1615,6 +1748,12 @@
               "target_commitish": {
                 "type": "string"
               },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "upload_url": {
                 "type": "string"
               },
@@ -1638,7 +1777,8 @@
               "upload_url",
               "assets",
               "target_commitish",
-              "created_at"
+              "created_at",
+              "immutable"
             ],
             "type": "object"
           }
@@ -2083,6 +2223,10 @@
           "data": {
             "description": "A review of a pull request.",
             "properties": {
+              "author_association": {
+                "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+                "type": "string"
+              },
               "body": {
                 "type": [
                   "string",
@@ -2124,7 +2268,8 @@
             "required": [
               "id",
               "state",
-              "url"
+              "url",
+              "author_association"
             ],
             "type": "object"
           }
@@ -2140,6 +2285,10 @@
           "data": {
             "description": "A comment on a line of a pull request's diff.",
             "properties": {
+              "author_association": {
+                "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+                "type": "string"
+              },
               "body": {
                 "type": "string"
               },
@@ -2178,6 +2327,13 @@
                   "null"
                 ]
               },
+              "original_start_line": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
               "path": {
                 "type": "string"
               },
@@ -2185,6 +2341,16 @@
                 "type": [
                   "string",
                   "null"
+                ]
+              },
+              "reactions": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GithubReactions"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "side": {
@@ -2201,6 +2367,13 @@
                 ]
               },
               "start_side": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "subject_type": {
+                "description": "What the comment is on: a `line` of the diff or the whole `file`.",
                 "type": [
                   "string",
                   "null"
@@ -2232,7 +2405,8 @@
               "diff_hunk",
               "url",
               "created_at",
-              "updated_at"
+              "updated_at",
+              "author_association"
             ],
             "type": "object"
           }
@@ -2703,6 +2877,17 @@
                 },
                 "protected": {
                   "type": "boolean"
+                },
+                "protection": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubBranchProtection",
+                      "description": "What its protection asks of a change, when GitHub answers it."
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -2850,6 +3035,9 @@
                     "null"
                   ]
                 },
+                "site_admin": {
+                  "type": "boolean"
+                },
                 "url": {
                   "type": "string"
                 }
@@ -2859,7 +3047,8 @@
                 "login",
                 "avatar_url",
                 "url",
-                "account_type"
+                "account_type",
+                "site_admin"
               ],
               "type": "object"
             },
@@ -2993,7 +3182,14 @@
             "items": {
               "description": "A comment on a commit.",
               "properties": {
+                "author_association": {
+                  "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+                  "type": "string"
+                },
                 "body": {
+                  "type": "string"
+                },
+                "commit_id": {
                   "type": "string"
                 },
                 "created_at": {
@@ -3001,6 +3197,13 @@
                 },
                 "id": {
                   "type": "string"
+                },
+                "line": {
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
                 },
                 "path": {
                   "type": [
@@ -3013,6 +3216,16 @@
                   "type": [
                     "integer",
                     "null"
+                  ]
+                },
+                "reactions": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubReactions"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 },
                 "updated_at": {
@@ -3037,7 +3250,9 @@
                 "body",
                 "url",
                 "created_at",
-                "updated_at"
+                "updated_at",
+                "commit_id",
+                "author_association"
               ],
               "type": "object"
             },
@@ -3061,6 +3276,16 @@
                 },
                 "created_at": {
                   "type": "string"
+                },
+                "creator": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "description": {
                   "type": [
@@ -3177,6 +3402,9 @@
                 "login": {
                   "type": "string"
                 },
+                "site_admin": {
+                  "type": "boolean"
+                },
                 "url": {
                   "type": "string"
                 }
@@ -3187,6 +3415,7 @@
                 "avatar_url",
                 "url",
                 "account_type",
+                "site_admin",
                 "contributions"
               ],
               "type": "object"
@@ -3390,6 +3619,10 @@
             "items": {
               "description": "A comment on an issue or a pull request.",
               "properties": {
+                "author_association": {
+                  "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+                  "type": "string"
+                },
                 "body": {
                   "type": "string"
                 },
@@ -3432,7 +3665,8 @@
                 "url",
                 "body",
                 "created_at",
-                "updated_at"
+                "updated_at",
+                "author_association"
               ],
               "type": "object"
             },
@@ -3590,6 +3824,10 @@
                 "color": {
                   "type": "string"
                 },
+                "default": {
+                  "description": "Whether it is one of the labels GitHub gives every new repository.",
+                  "type": "boolean"
+                },
                 "description": {
                   "type": [
                     "string",
@@ -3606,7 +3844,8 @@
               "required": [
                 "id",
                 "name",
-                "color"
+                "color",
+                "default"
               ],
               "type": "object"
             },
@@ -3669,6 +3908,16 @@
                   "type": [
                     "string",
                     "null"
+                  ]
+                },
+                "creator": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 },
                 "description": {
@@ -3736,6 +3985,12 @@
             "items": {
               "description": "A pull request.",
               "properties": {
+                "active_lock_reason": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "additions": {
                   "format": "int64",
                   "type": [
@@ -3748,6 +4003,10 @@
                     "$ref": "#/components/schemas/GithubUser"
                   },
                   "type": "array"
+                },
+                "author_association": {
+                  "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+                  "type": "string"
                 },
                 "auto_merge": {
                   "description": "Whether it merges by itself once its checks pass.",
@@ -3815,6 +4074,10 @@
                   },
                   "type": "array"
                 },
+                "locked": {
+                  "description": "Whether its conversation is locked, and why when it is.",
+                  "type": "boolean"
+                },
                 "maintainer_can_modify": {
                   "type": [
                     "boolean",
@@ -3851,6 +4114,16 @@
                     "null"
                   ]
                 },
+                "merged_by": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubUser"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
                 "milestone": {
                   "oneOf": [
                     {
@@ -3864,6 +4137,13 @@
                 "number": {
                   "format": "int64",
                   "type": "integer"
+                },
+                "rebaseable": {
+                  "description": "Whether it can be rebased onto its base; null while GitHub is still working it out.",
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
                 },
                 "requested_reviewers": {
                   "description": "Who is asked to review it: people, and teams by their slug.",
@@ -3924,7 +4204,9 @@
                 "assignees",
                 "requested_reviewers",
                 "requested_teams",
-                "auto_merge"
+                "auto_merge",
+                "locked",
+                "author_association"
               ],
               "type": "object"
             },
@@ -4042,6 +4324,10 @@
                 "id": {
                   "type": "string"
                 },
+                "immutable": {
+                  "description": "Whether its tag and assets can no longer change.",
+                  "type": "boolean"
+                },
                 "name": {
                   "type": [
                     "string",
@@ -4079,6 +4365,12 @@
                 "target_commitish": {
                   "type": "string"
                 },
+                "updated_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "upload_url": {
                   "type": "string"
                 },
@@ -4102,7 +4394,8 @@
                 "upload_url",
                 "assets",
                 "target_commitish",
-                "created_at"
+                "created_at",
+                "immutable"
               ],
               "type": "object"
             },
@@ -4428,6 +4721,10 @@
             "items": {
               "description": "A review of a pull request.",
               "properties": {
+                "author_association": {
+                  "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+                  "type": "string"
+                },
                 "body": {
                   "type": [
                     "string",
@@ -4469,7 +4766,8 @@
               "required": [
                 "id",
                 "state",
-                "url"
+                "url",
+                "author_association"
               ],
               "type": "object"
             },
@@ -4488,6 +4786,10 @@
             "items": {
               "description": "A comment on a line of a pull request's diff.",
               "properties": {
+                "author_association": {
+                  "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+                  "type": "string"
+                },
                 "body": {
                   "type": "string"
                 },
@@ -4526,6 +4828,13 @@
                     "null"
                   ]
                 },
+                "original_start_line": {
+                  "format": "int64",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
                 "path": {
                   "type": "string"
                 },
@@ -4533,6 +4842,16 @@
                   "type": [
                     "string",
                     "null"
+                  ]
+                },
+                "reactions": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GithubReactions"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 },
                 "side": {
@@ -4549,6 +4868,13 @@
                   ]
                 },
                 "start_side": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "subject_type": {
+                  "description": "What the comment is on: a `line` of the diff or the whole `file`.",
                   "type": [
                     "string",
                     "null"
@@ -4580,7 +4906,8 @@
                 "diff_hunk",
                 "url",
                 "created_at",
-                "updated_at"
+                "updated_at",
+                "author_association"
               ],
               "type": "object"
             },
@@ -7529,12 +7856,50 @@
           },
           "protected": {
             "type": "boolean"
+          },
+          "protection": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubBranchProtection",
+                "description": "What its protection asks of a change, when GitHub answers it."
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
           "name",
           "commit_sha",
           "protected"
+        ],
+        "type": "object"
+      },
+      "GithubBranchProtection": {
+        "description": "What a branch's protection asks of a change before it lands.",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "enforcement_level": {
+            "description": "Who the required status checks apply to: `off`, `non_admins` or `everyone`.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "required_status_checks": {
+            "description": "The status checks that must pass, by context.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "enabled",
+          "required_status_checks"
         ],
         "type": "object"
       },
@@ -7709,6 +8074,9 @@
               "null"
             ]
           },
+          "site_admin": {
+            "type": "boolean"
+          },
           "url": {
             "type": "string"
           }
@@ -7718,7 +8086,8 @@
           "login",
           "avatar_url",
           "url",
-          "account_type"
+          "account_type",
+          "site_admin"
         ],
         "type": "object"
       },
@@ -7850,7 +8219,14 @@
       "GithubCommitComment": {
         "description": "A comment on a commit.",
         "properties": {
+          "author_association": {
+            "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+            "type": "string"
+          },
           "body": {
+            "type": "string"
+          },
+          "commit_id": {
             "type": "string"
           },
           "created_at": {
@@ -7858,6 +8234,13 @@
           },
           "id": {
             "type": "string"
+          },
+          "line": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "path": {
             "type": [
@@ -7870,6 +8253,16 @@
             "type": [
               "integer",
               "null"
+            ]
+          },
+          "reactions": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubReactions"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "updated_at": {
@@ -7894,7 +8287,9 @@
           "body",
           "url",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "commit_id",
+          "author_association"
         ],
         "type": "object"
       },
@@ -7904,6 +8299,13 @@
           "ahead_by": {
             "format": "int64",
             "type": "integer"
+          },
+          "base_commit_sha": {
+            "description": "The commit compared from, and the latest one both sides share.",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "behind_by": {
             "format": "int64",
@@ -7920,6 +8322,12 @@
               "$ref": "#/components/schemas/GithubCommitFile"
             },
             "type": "array"
+          },
+          "merge_base_commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "status": {
             "type": "string"
@@ -8056,6 +8464,16 @@
           "created_at": {
             "type": "string"
           },
+          "creator": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "description": {
             "type": [
               "string",
@@ -8189,6 +8607,9 @@
           "login": {
             "type": "string"
           },
+          "site_admin": {
+            "type": "boolean"
+          },
           "url": {
             "type": "string"
           }
@@ -8199,6 +8620,7 @@
           "avatar_url",
           "url",
           "account_type",
+          "site_admin",
           "contributions"
         ],
         "type": "object"
@@ -8608,6 +9030,10 @@
             },
             "type": "array"
           },
+          "author_association": {
+            "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+            "type": "string"
+          },
           "body": {
             "type": [
               "string",
@@ -8618,6 +9044,17 @@
             "type": [
               "string",
               "null"
+            ]
+          },
+          "closed_by": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser",
+                "description": "Who closed it, when it is closed."
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "comments": {
@@ -8710,13 +9147,18 @@
           "is_pull_request",
           "locked",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "author_association"
         ],
         "type": "object"
       },
       "GithubIssueComment": {
         "description": "A comment on an issue or a pull request.",
         "properties": {
+          "author_association": {
+            "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+            "type": "string"
+          },
           "body": {
             "type": "string"
           },
@@ -8759,7 +9201,8 @@
           "url",
           "body",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "author_association"
         ],
         "type": "object"
       },
@@ -8946,6 +9389,10 @@
           "color": {
             "type": "string"
           },
+          "default": {
+            "description": "Whether it is one of the labels GitHub gives every new repository.",
+            "type": "boolean"
+          },
           "description": {
             "type": [
               "string",
@@ -8962,7 +9409,8 @@
         "required": [
           "id",
           "name",
-          "color"
+          "color",
+          "default"
         ],
         "type": "object"
       },
@@ -9083,6 +9531,16 @@
             "type": [
               "string",
               "null"
+            ]
+          },
+          "creator": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "description": {
@@ -9278,6 +9736,12 @@
       "GithubPullRequest": {
         "description": "A pull request.",
         "properties": {
+          "active_lock_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "additions": {
             "format": "int64",
             "type": [
@@ -9290,6 +9754,10 @@
               "$ref": "#/components/schemas/GithubUser"
             },
             "type": "array"
+          },
+          "author_association": {
+            "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+            "type": "string"
           },
           "auto_merge": {
             "description": "Whether it merges by itself once its checks pass.",
@@ -9357,6 +9825,10 @@
             },
             "type": "array"
           },
+          "locked": {
+            "description": "Whether its conversation is locked, and why when it is.",
+            "type": "boolean"
+          },
           "maintainer_can_modify": {
             "type": [
               "boolean",
@@ -9393,6 +9865,16 @@
               "null"
             ]
           },
+          "merged_by": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "milestone": {
             "oneOf": [
               {
@@ -9406,6 +9888,13 @@
           "number": {
             "format": "int64",
             "type": "integer"
+          },
+          "rebaseable": {
+            "description": "Whether it can be rebased onto its base; null while GitHub is still working it out.",
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "requested_reviewers": {
             "description": "Who is asked to review it: people, and teams by their slug.",
@@ -9466,7 +9955,9 @@
           "assignees",
           "requested_reviewers",
           "requested_teams",
-          "auto_merge"
+          "auto_merge",
+          "locked",
+          "author_association"
         ],
         "type": "object"
       },
@@ -9687,6 +10178,10 @@
           "id": {
             "type": "string"
           },
+          "immutable": {
+            "description": "Whether its tag and assets can no longer change.",
+            "type": "boolean"
+          },
           "name": {
             "type": [
               "string",
@@ -9724,6 +10219,12 @@
           "target_commitish": {
             "type": "string"
           },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "upload_url": {
             "type": "string"
           },
@@ -9747,7 +10248,8 @@
           "upload_url",
           "assets",
           "target_commitish",
-          "created_at"
+          "created_at",
+          "immutable"
         ],
         "type": "object"
       },
@@ -10179,6 +10681,10 @@
       "GithubReview": {
         "description": "A review of a pull request.",
         "properties": {
+          "author_association": {
+            "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+            "type": "string"
+          },
           "body": {
             "type": [
               "string",
@@ -10220,13 +10726,18 @@
         "required": [
           "id",
           "state",
-          "url"
+          "url",
+          "author_association"
         ],
         "type": "object"
       },
       "GithubReviewComment": {
         "description": "A comment on a line of a pull request's diff.",
         "properties": {
+          "author_association": {
+            "description": "How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),\nas GitHub names it. An open string.",
+            "type": "string"
+          },
           "body": {
             "type": "string"
           },
@@ -10265,6 +10776,13 @@
               "null"
             ]
           },
+          "original_start_line": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
           "path": {
             "type": "string"
           },
@@ -10272,6 +10790,16 @@
             "type": [
               "string",
               "null"
+            ]
+          },
+          "reactions": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GithubReactions"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "side": {
@@ -10288,6 +10816,13 @@
             ]
           },
           "start_side": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "subject_type": {
+            "description": "What the comment is on: a `line` of the diff or the whole `file`.",
             "type": [
               "string",
               "null"
@@ -10319,7 +10854,8 @@
           "diff_hunk",
           "url",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "author_association"
         ],
         "type": "object"
       },

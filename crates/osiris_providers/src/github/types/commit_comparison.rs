@@ -14,4 +14,7 @@ pub struct GithubCommitComparison {
     pub url: String,
     pub commits: Vec<GithubCommit>,
     pub files: Vec<GithubCommitFile>,
+    /// The commit compared from, and the latest one both sides share.
+    pub base_commit_sha: Option<String>,
+    pub merge_base_commit_sha: Option<String>,
 }

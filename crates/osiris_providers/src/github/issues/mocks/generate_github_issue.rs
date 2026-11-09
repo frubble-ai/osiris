@@ -32,6 +32,8 @@ pub fn generate_github_issue(id: u64, number: u64, pull_request: bool) -> Value 
         "locked": false,
         "active_lock_reason": null,
         "state_reason": null,
+        "closed_by": null,
+        "author_association": "OWNER",
         "reactions": { "total_count": 3, "+1": 2, "-1": 0, "laugh": 0, "confused": 0, "heart": 1, "hooray": 0, "rocket": 0, "eyes": 0 },
     });
     if pull_request && let Some(fields) = issue.as_object_mut() {

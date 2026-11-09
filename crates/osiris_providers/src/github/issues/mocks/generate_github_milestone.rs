@@ -1,5 +1,6 @@
 //! A milestone, as GitHub answers it.
 
+use crate::github::mocks::generate_github_user::generate_github_user;
 use fake::{Fake, faker::lorem::en::Sentence};
 use serde_json::{Value, json};
 
@@ -18,5 +19,6 @@ pub fn generate_github_milestone(id: u64, number: u64) -> Value {
         "created_at": "2026-01-01T00:00:00Z",
         "updated_at": "2026-01-02T00:00:00Z",
         "closed_at": null,
+        "creator": generate_github_user(id + 1000),
     })
 }

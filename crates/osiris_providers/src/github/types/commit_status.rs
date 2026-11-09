@@ -1,5 +1,6 @@
 //! A status a service set on a commit.
 
+use super::GithubUser;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -13,4 +14,5 @@ pub struct GithubCommitStatus {
     pub target_url: Option<String>,
     pub created_at: String,
     pub updated_at: String,
+    pub creator: Option<GithubUser>,
 }

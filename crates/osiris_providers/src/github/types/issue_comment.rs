@@ -15,4 +15,7 @@ pub struct GithubIssueComment {
     pub reactions: Option<GithubReactions>,
     pub created_at: String,
     pub updated_at: String,
+    /// How the author is related to the repository (`OWNER`, `MEMBER`, `CONTRIBUTOR`, `NONE`…),
+    /// as GitHub names it. An open string.
+    pub author_association: String,
 }

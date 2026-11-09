@@ -12,6 +12,7 @@ pub fn generate_github_collaborator(id: u64) -> Value {
             json!({ "admin": false, "maintain": false, "push": true, "triage": true, "pull": true }),
         );
         fields.insert("role_name".into(), json!("write"));
+        fields.insert("site_admin".into(), json!(false));
     }
     collaborator
 }

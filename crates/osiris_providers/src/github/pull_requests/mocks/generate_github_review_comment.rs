@@ -30,5 +30,9 @@ pub fn generate_github_review_comment(id: u64, in_reply_to: Option<u64>) -> Valu
         "pull_request_review_id": id + 5000,
         "created_at": "2024-02-01T10:00:00Z",
         "updated_at": "2024-02-02T10:00:00Z",
+        "author_association": "OWNER",
+        "subject_type": "line",
+        "original_start_line": null,
+        "reactions": { "total_count": 2, "+1": 1, "-1": 0, "laugh": 0, "confused": 0, "heart": 1, "hooray": 0, "rocket": 0, "eyes": 0 },
     })
 }

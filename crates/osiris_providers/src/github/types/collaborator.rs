@@ -25,6 +25,7 @@ pub struct GithubCollaborator {
     pub avatar_url: String,
     pub url: String,
     pub account_type: String,
+    pub site_admin: bool,
     pub permissions: Option<GithubPermissions>,
     pub role_name: Option<String>,
 }

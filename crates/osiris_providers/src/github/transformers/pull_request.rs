@@ -38,6 +38,10 @@ impl From<PullRequestBranchAnswer> for GithubPullRequestBranch {
 }
 
 #[derive(Deserialize)]
+#[allow(
+    clippy::struct_excessive_bools,
+    reason = "GitHub's own flags, one each"
+)]
 pub struct PullRequestAnswer {
     pub id: u64,
     #[serde(default)]
@@ -82,6 +86,13 @@ pub struct PullRequestAnswer {
     pub changed_files: Option<i64>,
     pub comments: Option<i64>,
     pub review_comments: Option<i64>,
+    #[serde(default)]
+    pub locked: bool,
+    pub active_lock_reason: Option<String>,
+    pub merged_by: Option<UserAnswer>,
+    pub rebaseable: Option<bool>,
+    #[serde(default)]
+    pub author_association: String,
 }
 
 /// A team asked to review, named by its slug.
@@ -135,6 +146,11 @@ impl From<PullRequestAnswer> for GithubPullRequest {
             changed_files: answer.changed_files,
             comments: answer.comments,
             review_comments: answer.review_comments,
+            locked: answer.locked,
+            active_lock_reason: answer.active_lock_reason,
+            merged_by: answer.merged_by.map(GithubUser::from),
+            rebaseable: answer.rebaseable,
+            author_association: answer.author_association,
         }
     }
 }

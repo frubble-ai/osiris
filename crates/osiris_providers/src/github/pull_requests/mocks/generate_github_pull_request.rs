@@ -45,5 +45,10 @@ pub fn generate_github_pull_request(id: u64, number: u64) -> Value {
         "updated_at": "2024-01-02T00:00:00Z",
         "closed_at": null,
         "merged_at": null,
+        "locked": true,
+        "active_lock_reason": "resolved",
+        "merged_by": null,
+        "rebaseable": true,
+        "author_association": "COLLABORATOR",
     })
 }

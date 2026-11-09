@@ -41,6 +41,9 @@ pub struct IssueAnswer {
     #[serde(default)]
     pub updated_at: String,
     pub closed_at: Option<String>,
+    pub closed_by: Option<UserAnswer>,
+    #[serde(default)]
+    pub author_association: String,
 }
 
 impl From<IssueAnswer> for GithubIssue {
@@ -66,6 +69,8 @@ impl From<IssueAnswer> for GithubIssue {
             created_at: answer.created_at,
             updated_at: answer.updated_at,
             closed_at: answer.closed_at,
+            closed_by: answer.closed_by.map(GithubUser::from),
+            author_association: answer.author_association,
         }
     }
 }
