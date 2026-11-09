@@ -49,24 +49,6 @@ export const zActionResultGithubCommitStatus = z.object({
 /**
  * An action's answer: what it read, as `data`.
  */
-export const zActionResultGithubCurrentUser = z.object({
-    data: z.object({
-        account_type: z.string(),
-        avatar_url: z.string(),
-        bio: z.string().nullish(),
-        company: z.string().nullish(),
-        email: z.string().nullish(),
-        id: z.string(),
-        location: z.string().nullish(),
-        login: z.string(),
-        name: z.string().nullish(),
-        url: z.string()
-    })
-});
-
-/**
- * An action's answer: what it read, as `data`.
- */
 export const zActionResultGithubFileContent = z.object({
     data: z.object({
         content_base64: z.string(),
@@ -182,15 +164,22 @@ export const zActionResultGithubPublicUser = z.object({
         account_type: z.string(),
         avatar_url: z.string(),
         bio: z.string().nullish(),
+        blog: z.string().nullish(),
         company: z.string().nullish(),
+        created_at: z.string().nullish(),
         email: z.string().nullish(),
         followers: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         following: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        hireable: z.boolean().nullish(),
         id: z.string(),
         location: z.string().nullish(),
         login: z.string(),
         name: z.string().nullish(),
+        public_gists: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
         public_repos: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+        site_admin: z.boolean(),
+        twitter_username: z.string().nullish(),
+        updated_at: z.string().nullish(),
         url: z.string()
     })
 });
@@ -1097,22 +1086,6 @@ export const zGithubContributor = z.object({
 });
 
 /**
- * The authenticated user, with their profile.
- */
-export const zGithubCurrentUser = z.object({
-    account_type: z.string(),
-    avatar_url: z.string(),
-    bio: z.string().nullish(),
-    company: z.string().nullish(),
-    email: z.string().nullish(),
-    id: z.string(),
-    location: z.string().nullish(),
-    login: z.string(),
-    name: z.string().nullish(),
-    url: z.string()
-});
-
-/**
  * Who did an event, or the organization it happened in: GitHub names an account on its activity
  * feeds by less than it does elsewhere, with no page link and no account type.
  */
@@ -1458,17 +1431,53 @@ export const zGithubPublicUser = z.object({
     account_type: z.string(),
     avatar_url: z.string(),
     bio: z.string().nullish(),
+    blog: z.string().nullish(),
     company: z.string().nullish(),
+    created_at: z.string().nullish(),
     email: z.string().nullish(),
     followers: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     following: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    hireable: z.boolean().nullish(),
     id: z.string(),
     location: z.string().nullish(),
     login: z.string(),
     name: z.string().nullish(),
+    public_gists: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
     public_repos: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    site_admin: z.boolean(),
+    twitter_username: z.string().nullish(),
+    updated_at: z.string().nullish(),
     url: z.string()
 });
+
+/**
+ * An action's answer: what it read, as `data`.
+ */
+export const zActionResultGithubCurrentUser = z.object({
+    data: zGithubPublicUser.and(z.object({
+        collaborators: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+        disk_usage: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+        owned_private_repos: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+        plan: z.string().nullish(),
+        private_gists: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+        total_private_repos: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+        two_factor_authentication: z.boolean().nullish()
+    }))
+});
+
+/**
+ * The authenticated user: their profile, and what GitHub shows only to the account itself, which
+ * is null where the token may not see it.
+ */
+export const zGithubCurrentUser = zGithubPublicUser.and(z.object({
+    collaborators: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+    disk_usage: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+    owned_private_repos: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+    plan: z.string().nullish(),
+    private_gists: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+    total_private_repos: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).nullish(),
+    two_factor_authentication: z.boolean().nullish()
+}));
 
 /**
  * The branch a pull request comes from (`head`) or goes into (`base`).

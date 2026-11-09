@@ -25,6 +25,15 @@ pub struct PublicUserAnswer {
     pub following: i64,
     #[serde(default)]
     pub public_repos: i64,
+    #[serde(default)]
+    pub public_gists: i64,
+    pub blog: Option<String>,
+    pub twitter_username: Option<String>,
+    pub hireable: Option<bool>,
+    #[serde(default)]
+    pub site_admin: bool,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
 }
 
 impl From<PublicUserAnswer> for GithubPublicUser {
@@ -44,6 +53,13 @@ impl From<PublicUserAnswer> for GithubPublicUser {
             followers: answer.followers,
             following: answer.following,
             public_repos: answer.public_repos,
+            public_gists: answer.public_gists,
+            blog: answer.blog,
+            twitter_username: answer.twitter_username,
+            hireable: answer.hireable,
+            site_admin: answer.site_admin,
+            created_at: answer.created_at,
+            updated_at: answer.updated_at,
         }
     }
 }

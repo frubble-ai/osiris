@@ -11,6 +11,13 @@ pub fn generate_github_public_user(id: u64) -> Value {
         fields.insert("followers".into(), json!((0..10_000).fake::<i64>()));
         fields.insert("following".into(), json!((0..1000).fake::<i64>()));
         fields.insert("public_repos".into(), json!((0..500).fake::<i64>()));
+        fields.insert("public_gists".into(), json!((0..50).fake::<i64>()));
+        fields.insert("blog".into(), json!("https://example.com"));
+        fields.insert("twitter_username".into(), json!("mona"));
+        fields.insert("hireable".into(), json!(true));
+        fields.insert("site_admin".into(), json!(false));
+        fields.insert("created_at".into(), json!("2019-01-01T00:00:00Z"));
+        fields.insert("updated_at".into(), json!("2026-01-01T00:00:00Z"));
     }
     user
 }

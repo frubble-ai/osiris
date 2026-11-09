@@ -484,63 +484,66 @@
         "description": "An action's answer: what it read, as `data`.",
         "properties": {
           "data": {
-            "description": "The authenticated user, with their profile.",
-            "properties": {
-              "account_type": {
-                "description": "`User` or `Bot` today. An open string.",
-                "type": "string"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GithubPublicUser"
               },
-              "avatar_url": {
-                "type": "string"
-              },
-              "bio": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "company": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "email": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "id": {
-                "type": "string"
-              },
-              "location": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "login": {
-                "type": "string"
-              },
-              "name": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "url": {
-                "type": "string"
+              {
+                "properties": {
+                  "collaborators": {
+                    "format": "int64",
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "disk_usage": {
+                    "description": "In kilobytes.",
+                    "format": "int64",
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "owned_private_repos": {
+                    "format": "int64",
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "plan": {
+                    "description": "The name of the account's plan.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "private_gists": {
+                    "format": "int64",
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "total_private_repos": {
+                    "format": "int64",
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "two_factor_authentication": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  }
+                },
+                "type": "object"
               }
-            },
-            "required": [
-              "id",
-              "login",
-              "avatar_url",
-              "url",
-              "account_type"
             ],
-            "type": "object"
+            "description": "The authenticated user: their profile, and what GitHub shows only to the account itself, which\nis null where the token may not see it."
           }
         },
         "required": [
@@ -1162,7 +1165,19 @@
                   "null"
                 ]
               },
+              "blog": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "company": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "created_at": {
                 "type": [
                   "string",
                   "null"
@@ -1182,6 +1197,12 @@
                 "format": "int64",
                 "type": "integer"
               },
+              "hireable": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
               "id": {
                 "type": "string"
               },
@@ -1200,9 +1221,28 @@
                   "null"
                 ]
               },
+              "public_gists": {
+                "format": "int64",
+                "type": "integer"
+              },
               "public_repos": {
                 "format": "int64",
                 "type": "integer"
+              },
+              "site_admin": {
+                "type": "boolean"
+              },
+              "twitter_username": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "url": {
                 "type": "string"
@@ -1216,7 +1256,9 @@
               "account_type",
               "followers",
               "following",
-              "public_repos"
+              "public_repos",
+              "public_gists",
+              "site_admin"
             ],
             "type": "object"
           }
@@ -8162,63 +8204,66 @@
         "type": "object"
       },
       "GithubCurrentUser": {
-        "description": "The authenticated user, with their profile.",
-        "properties": {
-          "account_type": {
-            "description": "`User` or `Bot` today. An open string.",
-            "type": "string"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GithubPublicUser"
           },
-          "avatar_url": {
-            "type": "string"
-          },
-          "bio": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "company": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "email": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "id": {
-            "type": "string"
-          },
-          "location": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "login": {
-            "type": "string"
-          },
-          "name": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "url": {
-            "type": "string"
+          {
+            "properties": {
+              "collaborators": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "disk_usage": {
+                "description": "In kilobytes.",
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "owned_private_repos": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "plan": {
+                "description": "The name of the account's plan.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "private_gists": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "total_private_repos": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "two_factor_authentication": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "type": "object"
           }
-        },
-        "required": [
-          "id",
-          "login",
-          "avatar_url",
-          "url",
-          "account_type"
         ],
-        "type": "object"
+        "description": "The authenticated user: their profile, and what GitHub shows only to the account itself, which\nis null where the token may not see it."
       },
       "GithubEvent": {
         "description": "An event on GitHub's activity feed. `payload` is GitHub's own, whose shape depends on `event_type`.",
@@ -9133,7 +9178,19 @@
               "null"
             ]
           },
+          "blog": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "company": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
             "type": [
               "string",
               "null"
@@ -9153,6 +9210,12 @@
             "format": "int64",
             "type": "integer"
           },
+          "hireable": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
           "id": {
             "type": "string"
           },
@@ -9171,9 +9234,28 @@
               "null"
             ]
           },
+          "public_gists": {
+            "format": "int64",
+            "type": "integer"
+          },
           "public_repos": {
             "format": "int64",
             "type": "integer"
+          },
+          "site_admin": {
+            "type": "boolean"
+          },
+          "twitter_username": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "url": {
             "type": "string"
@@ -9187,7 +9269,9 @@
           "account_type",
           "followers",
           "following",
-          "public_repos"
+          "public_repos",
+          "public_gists",
+          "site_admin"
         ],
         "type": "object"
       },

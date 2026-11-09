@@ -19,4 +19,11 @@ pub struct GithubPublicUser {
     pub followers: i64,
     pub following: i64,
     pub public_repos: i64,
+    pub public_gists: i64,
+    pub blog: Option<String>,
+    pub twitter_username: Option<String>,
+    pub hireable: Option<bool>,
+    pub site_admin: bool,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
 }

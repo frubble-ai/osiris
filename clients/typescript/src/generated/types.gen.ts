@@ -199,22 +199,23 @@ export type ActionResultGithubContentChange = {
  */
 export type ActionResultGithubCurrentUser = {
     /**
-     * The authenticated user, with their profile.
+     * The authenticated user: their profile, and what GitHub shows only to the account itself, which
+     * is null where the token may not see it.
      */
-    data: {
+    data: GithubPublicUser & {
+        collaborators?: number | null;
         /**
-         * `User` or `Bot` today. An open string.
+         * In kilobytes.
          */
-        account_type: string;
-        avatar_url: string;
-        bio?: string | null;
-        company?: string | null;
-        email?: string | null;
-        id: string;
-        location?: string | null;
-        login: string;
-        name?: string | null;
-        url: string;
+        disk_usage?: number | null;
+        owned_private_repos?: number | null;
+        /**
+         * The name of the account's plan.
+         */
+        plan?: string | null;
+        private_gists?: number | null;
+        total_private_repos?: number | null;
+        two_factor_authentication?: boolean | null;
     };
 };
 
@@ -486,15 +487,22 @@ export type ActionResultGithubPublicUser = {
         account_type: string;
         avatar_url: string;
         bio?: string | null;
+        blog?: string | null;
         company?: string | null;
+        created_at?: string | null;
         email?: string | null;
         followers: number;
         following: number;
+        hireable?: boolean | null;
         id: string;
         location?: string | null;
         login: string;
         name?: string | null;
+        public_gists: number;
         public_repos: number;
+        site_admin: boolean;
+        twitter_username?: string | null;
+        updated_at?: string | null;
         url: string;
     };
 };
@@ -2921,22 +2929,23 @@ export type GithubContributor = {
 };
 
 /**
- * The authenticated user, with their profile.
+ * The authenticated user: their profile, and what GitHub shows only to the account itself, which
+ * is null where the token may not see it.
  */
-export type GithubCurrentUser = {
+export type GithubCurrentUser = GithubPublicUser & {
+    collaborators?: number | null;
     /**
-     * `User` or `Bot` today. An open string.
+     * In kilobytes.
      */
-    account_type: string;
-    avatar_url: string;
-    bio?: string | null;
-    company?: string | null;
-    email?: string | null;
-    id: string;
-    location?: string | null;
-    login: string;
-    name?: string | null;
-    url: string;
+    disk_usage?: number | null;
+    owned_private_repos?: number | null;
+    /**
+     * The name of the account's plan.
+     */
+    plan?: string | null;
+    private_gists?: number | null;
+    total_private_repos?: number | null;
+    two_factor_authentication?: boolean | null;
 };
 
 /**
@@ -3304,15 +3313,22 @@ export type GithubPublicUser = {
     account_type: string;
     avatar_url: string;
     bio?: string | null;
+    blog?: string | null;
     company?: string | null;
+    created_at?: string | null;
     email?: string | null;
     followers: number;
     following: number;
+    hireable?: boolean | null;
     id: string;
     location?: string | null;
     login: string;
     name?: string | null;
+    public_gists: number;
     public_repos: number;
+    site_admin: boolean;
+    twitter_username?: string | null;
+    updated_at?: string | null;
     url: string;
 };
 
